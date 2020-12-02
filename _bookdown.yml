@@ -1,19 +1,83 @@
+# To Build the Book
 
+# 1. Consider deleting cache_directory/ and any stray book_temp.Rmd.
+# 2. Run renv::snapshot() and confirm/push any changes in renv.lock.
+# 3. Change output_dir to "docs".
+# 4. Uncomment desired rmd_files line, but add in a tab.
+# 5. Restart R.
+# 6. library(bookdown); clean_book(TRUE)
+# 7. Press "Build Website" in Build pane.
+# 8. Revert _bookdown.yml after chunks start processing.
+# 9. Commit and push changes in docs/ directory.
 
-# output_dir: "junk"
-# rmd_files:
-#   html: ["index.Rmd","01-visualization.Rmd","02-wrangling.Rmd"]
+output_dir: "junk"
+rmd_files:
+  # html: ["index.Rmd","01-visualization.Rmd","02-wrangling.Rmd"]
   # html: ["index.Rmd","00-shopping-week.Rmd","01-visualization.Rmd","02-wrangling.Rmd","03-rubin-causal-model.Rmd","04-functions.Rmd","05-probability.Rmd","06-one-parameter.Rmd","07-two-parameters.Rmd","08-three-parameters.Rmd","09-n-parameters.Rmd","10-model-choice.Rmd","11-continuous-response.Rmd","12-discrete-response.Rmd","tools.Rmd", "shiny.Rmd","maps.Rmd","animation.Rmd","references.Rmd"]
 
+# Previous section is modified by the book-builder. Its normal state is with both
+# html:[] files lists commented out. This makes it easy for chapter writers to just
+# knit their chapters eaasily. For book-builder convenience, we keep two of these
+# html:[] lists around. The short one is just for us testing out the set up.
+# The long one is the full book. Uncomment the one you want when building the book,
+# by hitting "Build Website". Note that the html:[] you use must be indented one
+# tab. If not, building the book will still "work", but it will include all the Rmd
+# files in the directory and in alphabetical order. It won't use your list.
 
+# By default, we set output_dir to "junk". This is where built files get put. The
+# .gitignore ignores that directory, so chapter writers are not bothered. They are
+# also prevented from, mistakenly, writing their new versions to docs. The
+# book-builder needs to set this to "docs", which is the directory which GH pages
+# uses.
 
-book_filename: "book_test"
+# Another interesting aspect is: What happens when we change output_dir from "junk" to
+# "docs"? How does the bookdown package know what those values are? For example,
+# `clean_book(TRUE)` is supposed to delete that directory. But it only knows that
+# directory is at restart. You can't just change it on the fly. So, change these settings,
+# restart, and then build the book.
+
+# This first section is never changed. "book_filename" sets the filename of
+# the main Rmd file and the (partial) name of some sub-folders. Are there
+# better procedures for this? "language" allows for customization of the
+# default titles, e.g,, change fig to FIGURE.
+
+# Warning: don't add an underscore to the beginning of filenames!
+
+book_filename: "book_temp"
 language:
+  label:
+    fig: "FIGURE "
+    tab: "TABLE "
   ui:
+    edit: "Edit"
     chapter_name: "Chapter "
+
+# "delete_merged_file"" deletes main Rmd file after book is sucessful
+# rendered. Is there a way to automatically delete the _bookdown_files
+# directory as well, when the build (of a chapter or of the book) is
+# complete? Would that be good?
+
 delete_merged_file: true
+
+# before_chapter_script (after_chapter_script) sources book_start.R
+# (book_end.R)  to set defaults before (after) building the book.
+# Note that, by default, bookdown follows a merge-then-knit (M-K) strategy.
+# All the chapters are merged together and then they are knit. This means
+# that book_start.R and book_end.R are only run once each.
+
 
 before_chapter_script: "book_start.R"
 after_chapter_script: "book_end.R"
 
+# More comments:
+
+# output_dir: sets the output diretory of the book. This is, by default, set to junk. Any
+# time you knit even a chapter, stuff will be dumped in junk/. When the book-builers want
+# to build the book, they set this to docs. Github, once the results are pushed, will
+# put everything which is pushed in docs/ up on Github pages. We will move yo Netify at some point.
+
+# rmd_files: allows to set custom order of Rmd files for the book.
+# Note that the "html:" must be indented with a tab, not with spaces.
+
+# Note that if there are no "html: [" entries, it will just build every Rmd in the directory.
 
