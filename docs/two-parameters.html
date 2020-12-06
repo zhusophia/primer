@@ -64,239 +64,15 @@
 <span class="header-section-number">7</span> Two Parameters<a class="anchor" aria-label="anchor" href="#two-parameters"><i class="fas fa-link"></i></a>
 </h1>
 <p>What is the average height of an American male? What is the 90th percentile of the distribution of height for American men? How certain are you of your estimates? If we pass 5 men walking down the street, what are the odds that the tallest will be at least 5 centimeters taller than the shortest?</p>
-<div id="resampling-tactile" class="section level2" number="7.1">
+<div id="eda-for-nhanes" class="section level2" number="7.1">
 <h2>
-<span class="header-section-number">7.1</span> Pennies example<a class="anchor" aria-label="anchor" href="#resampling-tactile"><i class="fas fa-link"></i></a>
+<span class="header-section-number">7.1</span> EDA for <code>nhanes</code><a class="anchor" aria-label="anchor" href="#eda-for-nhanes"><i class="fas fa-link"></i></a>
 </h2>
-<p>In Chapter <a href="one-parameter.html#one-parameter">6</a>, we studied sampling. We started with a “tactile” exercise where we wanted to know the proportion of beads in the urn that are red. While we could have performed an exhaustive count, this would have been a tedious process. So instead, we used a shovel to extract a sample of 50 beads and used the resulting proportion that were red as an <em>estimate</em>. Furthermore, we made sure to mix the urn’s contents before every use of the shovel. Because of the randomness created by the mixing, different uses of the shovel yielded different proportions red and hence different estimates of the proportion of the urn’s beads that are red.</p>
-<p>Remember: There is a <em>truth</em> here. There is an urn. It has red and white beads in it. An exact, but unknown, number of the beads are red. An exact, but unknown, number of the beads are white. An exact, but unknown, percentage of the beads are red – defined as the number red divided by the sum of the number red and the number white. Our goal was to estimate that unknown percentage. We wanted to make statements about the world, even if we can never be certain that those statements are <em>true</em>. We will never have the time or inclination to actually count all the balls. We use the term <em>parameter</em> for things that exist but which are unknown. We use statistics to estimate the true values of parameters.</p>
-<p>We then mimicked this <em>physical</em> sampling exercise with an equivalent <em>virtual</em> sampling exercise using the computer. In Subsection <a href="one-parameter.html#different-shovels">6.2.4</a>, we repeated this sampling procedure 1,000 times, using three different virtual shovels with 25, 50, and 100 slots. We visualized these three sets of 1,000 estimates in Chapter <a href="one-parameter.html#one-parameter">6</a> and saw that as the sample size increased, the variation in the estimates decreased. We then expanded this for all sample sizes from 1 to 100.</p>
-<p>In doing so, we constructed <em>sampling distributions</em>. The motivation for taking a 1,000 repeated samples and visualizing the resulting estimates was to study how these estimates varied from one sample to another; in other words, we wanted to study the effect of <em>sampling variation</em>. We quantified the variation of these estimates using their standard deviation, which has a special name: the <em>standard error</em>. In particular, we saw that as the sample size increased from 1 to 100, the standard error decreased and thus the sampling distributions narrowed. Larger sample sizes led to more <em>precise</em> estimates that varied less around the center.</p>
-<!-- Distinguish further the difference between standard deviation and standard error in the above paragraph. Readers can confuse the two. -->
-<p>We then tied these sampling exercises to terminology and mathematical notation related to sampling in Subsection <a href="one-parameter.html#terminology-and-notation">6.3.1</a>. Our <em>study population</em> was the large urn with <span class="math inline">\(N\)</span> = 2,400 balls, while the <em>population parameter</em>, the unknown quantity of interest, was the population proportion <span class="math inline">\(p\)</span> of the urn’s beads that were red. Since performing a <em>census</em> would be expensive in terms of time and energy, we instead extracted a <em>sample</em> of size <span class="math inline">\(n\)</span> = 50. The <em>point estimate</em>, also known as a <em>sample statistic</em>, used to estimate <span class="math inline">\(p\)</span> was the sample proportion <span class="math inline">\(\hat{p}\)</span> of these 50 sampled beads that were red. Furthermore, since the sample was obtained at <em>random</em>, it can be considered as <em>unbiased</em> and as <em>representative</em> of the population. Thus any results based on the sample could be <em>generalized</em> to the population. Therefore, the proportion of the shovel’s balls that were red was a “good guess” of the proportion of the urn’s balls that are red. In other words, we used the sample to draw <em>inferences</em> about the population.</p>
-<p>However, as described in Section <a href="one-parameter.html#sampling-simulation">6.2</a>, both the physical and virtual sampling exercises are not what one would do in real life. This was merely an activity used to study the effects of sampling variation. In a real life situation, we would not take 1,000 samples of size <span class="math inline">\(n\)</span>, but rather take a <em>single</em> representative sample that’s as large as possible. Additionally, we knew that the true proportion of the urn’s beads that were red was 37.5%. In a real-life situation, we will not know what this true value is. Because if we did, then why would we take a sample to estimate it?</p>
-<p>An example of a realistic sampling situation would be a poll, like the <a href="https://www.npr.org/sections/itsallpolitics/2013/12/04/248793753/poll-support-for-obama-among-young-americans-eroding">Obama poll</a> you saw in Section <a href="one-parameter.html#sampling-case-study">6.4</a>. Pollsters did not know the true proportion of <em>all</em> young Americans who supported President Obama in 2013, and thus they took a single sample of size <span class="math inline">\(n\)</span> = 2,089 young Americans to estimate this value.</p>
-<p>So how does one quantify the effects of sampling variation when you only have a <em>single sample</em> to work with? You cannot directly study the effects of sampling variation when you only have one sample. One common method to study this is <em>bootstrap resampling</em>, or simply <em>bootstrapping</em>.</p>
-<p>What if we want, not only a single estimate of the unknown population parameter, but also a <em>range of highly plausible</em> values? Going back to the Obama poll article, it stated that the pollsters’ estimate of the proportion of all young Americans who supported President Obama was 41%. But in addition it stated that the poll’s “margin of error was plus or minus 2.1 percentage points.” This “plausible range” was [41% - 2.1%, 41% + 2.1%] = [38.9%, 43.1%]. This range of plausible values is what’s known as a <em>confidence interval</em>, which will be the focus of the later sections of this chapter. In Bayesian terms, we want the posterior distribution of the unknown parameter <span class="math inline">\(p\)</span>, the proportion of young Americans who supported Obama.</p>
-<div id="to-the-bank" class="section level3" number="7.1.1">
-<h3>
-<span class="header-section-number">7.1.1</span> To the Bank<a class="anchor" aria-label="anchor" href="#to-the-bank"><i class="fas fa-link"></i></a>
-</h3>
-<p>As we did in Chapter <a href="one-parameter.html#one-parameter">6</a>, we’ll begin with a hands-on tactile activity. We almost always need the <strong>tidyverse</strong> package.</p>
+<p>Shifting away from dealing with pennies, let’s look at bootstrap modeling with the <code>nhanes</code> dataset from National Health and Nutrition Examination Survey conducted by the Centers for Disease Control and Prevention and covering children and adults in America.</p>
 <div class="sourceCode" id="cb808"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">PPBDS.data</span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://rsample.tidymodels.org">rsample</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://docs.ropensci.org/skimr">skimr</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://mc-stan.org/rstanarm/">rstanarm</a></span><span class="op">)</span></code></pre></div>
-<p><strong>PPBDS.data</strong> includes the data sets for this book. <strong>rsample</strong> includes functions for bootstrapping. <strong>rstanarm</strong> makes it easy to create and display Bayesian models.</p>
-</div>
-<div id="what-was-the-average-year-of-us-pennies-in-2019" class="section level3" number="7.1.2">
-<h3>
-<span class="header-section-number">7.1.2</span> What was the average year of US pennies in 2019?<a class="anchor" aria-label="anchor" href="#what-was-the-average-year-of-us-pennies-in-2019"><i class="fas fa-link"></i></a>
-</h3>
-<p>Try to imagine all the pennies used in the United States in 2019. That’s a lot of pennies! Now, say we’re interested in the average year of minting of <em>all</em> these pennies. One way to compute this value would be to gather up all pennies being used in the US, record the year, and compute the average. However, this would be nearly impossible! So instead, let’s collect a <em>sample</em> of 50 pennies from a local bank in downtown Northampton, Massachusetts, USA as seen in the photo below.</p>
-<div class="figure">
-<span id="fig:unnamed-chunk-606-1"></span>
-<img src="07-two-parameters/images/bank.jpg" alt="Collecting a sample of 50 US pennies from a local bank." width="100%"><p class="caption">
-FIGURE 7.1: Collecting a sample of 50 US pennies from a local bank.
-</p>
-</div>
-<div class="figure">
-<span id="fig:unnamed-chunk-606-2"></span>
-<img src="07-two-parameters/images/roll.jpg" alt="Collecting a sample of 50 US pennies from a local bank." width="100%"><p class="caption">
-FIGURE 7.2: Collecting a sample of 50 US pennies from a local bank.
-</p>
-</div>
-<p>An image of these 50 pennies can be seen below. For each of the 50 pennies starting in the top left, progressing row-by-row, and ending in the bottom right, note there is an “ID” identification variable printed in black and the year of minting printed in white.</p>
-<div class="figure">
-<span id="fig:unnamed-chunk-607"></span>
-<img src="07-two-parameters/images/3.jpg" alt="50 US pennies labelled." width="100%"><p class="caption">
-FIGURE 7.3: 50 US pennies labelled.
-</p>
-</div>
-<p>Run the <code>pennies_sample</code> code below to create our 50 sampled pennies.</p>
-<div class="sourceCode" id="cb809"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">pennies_sample</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>ID <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">50</span><span class="op">)</span>, 
-                         year <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2002</span>, <span class="fl">1986</span>, <span class="fl">2017</span>, <span class="fl">1988</span>, <span class="fl">2008</span>, <span class="fl">1983</span>, 
-                                  <span class="fl">2008</span>, <span class="fl">1996</span>, <span class="fl">2004</span>, <span class="fl">2000</span>, <span class="fl">1994</span>, <span class="fl">1995</span>, 
-                                  <span class="fl">2015</span>, <span class="fl">1978</span>, <span class="fl">1974</span>, <span class="fl">2015</span>, <span class="fl">2016</span>, <span class="fl">1996</span>, 
-                                  <span class="fl">1983</span>, <span class="fl">1971</span>, <span class="fl">1981</span>, <span class="fl">1976</span>, <span class="fl">1998</span>, <span class="fl">2017</span>, 
-                                  <span class="fl">1979</span>, <span class="fl">1979</span>, <span class="fl">1993</span>, <span class="fl">2006</span>, <span class="fl">1988</span>, <span class="fl">1978</span>, 
-                                  <span class="fl">2013</span>, <span class="fl">1976</span>, <span class="fl">1979</span>, <span class="fl">1985</span>, <span class="fl">1985</span>, <span class="fl">2015</span>, 
-                                  <span class="fl">1962</span>, <span class="fl">1999</span>, <span class="fl">2015</span>, <span class="fl">1990</span>, <span class="fl">1992</span>, <span class="fl">1997</span>,
-                                  <span class="fl">2018</span>, <span class="fl">2015</span>, <span class="fl">1997</span>, <span class="fl">2017</span>, <span class="fl">1982</span>, <span class="fl">1988</span>, 
-                                  <span class="fl">2006</span>, <span class="fl">2017</span><span class="op">)</span><span class="op">)</span>
-<span class="va">pennies_sample</span></code></pre></div>
-<pre><code>## # A tibble: 50 x 2
-##       ID  year
-##    &lt;int&gt; &lt;dbl&gt;
-##  1     1  2002
-##  2     2  1986
-##  3     3  2017
-##  4     4  1988
-##  5     5  2008
-##  6     6  1983
-##  7     7  2008
-##  8     8  1996
-##  9     9  2004
-## 10    10  2000
-## # … with 40 more rows</code></pre>
-<p>The <code>pennies_sample</code> data frame has 50 rows corresponding to each penny with two variables. The first variable <code>ID</code> corresponds to the ID labels in our table above, whereas the second variable <code>year</code> corresponds to the year of minting saved as a numeric variable, also known as a double (<code>dbl</code>).</p>
-<!-- DK: Shouldn't the year be an int? Should it be ID or id? Need to standardize this across the book. -->
-<p>Based on these 50 sampled pennies, what can we say about <em>all</em> US pennies in 2019? Let’s study some properties of our sample by performing an exploratory data analysis. Let’s first visualize the distribution of the year of these 50 pennies using our data visualization tools from before. Since <code>year</code> is a numerical variable, we use a histogram to visualize its distribution.</p>
-<div class="sourceCode" id="cb811"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">pennies_sample</span> <span class="op">%&gt;%</span>
-  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">year</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu">geom_histogram</span><span class="op">(</span>binwidth <span class="op">=</span> <span class="fl">10</span>, color <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span></code></pre></div>
-<div class="figure">
-<span id="fig:unnamed-chunk-609"></span>
-<img src="book_temp_files/figure-html/unnamed-chunk-609-1.png" alt="Distribution of year on 50 US pennies." width="100%"><p class="caption">
-FIGURE 7.4: Distribution of year on 50 US pennies.
-</p>
-</div>
-<p>Observe a slightly left-skewed distribution, since most pennies fall between 1980 and 2010 with only a few pennies older than 1970. What is the average year for the 50 sampled pennies? Eyeballing the histogram, it appears to be around 1990. Let’s now compute this value exactly using our data wrangling tools from Chapter <a href="wrangling.html#wrangling">2</a>.</p>
-<!-- DK: In the book, this shows up as "1994." Why is that? This happens in other chapters. Need to figure out decimal display issues. -->
-<div class="sourceCode" id="cb812"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">pennies_sample</span> <span class="op">%&gt;%</span> 
-  <span class="fu">summarize</span><span class="op">(</span>mean_year <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">year</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>## # A tibble: 1 x 1
-##   mean_year
-##       &lt;dbl&gt;
-## 1     1995.</code></pre>
-<p>Thus, if we’re willing to assume that <code>pennies_sample</code> is a representative sample from <em>all</em> US pennies, a “good guess” of the average year of minting of all US pennies would be 1995.44. In other words, around 1995. This should start sounding similar to what we did previously in Chapter <a href="one-parameter.html#one-parameter">6</a>!</p>
-<p>In Chapter <a href="one-parameter.html#one-parameter">6</a>, our <em>study population</em> was the urn of <span class="math inline">\(N = 2400\)</span> balls. Our <em>population parameter</em> was the <em>population proportion</em> of these balls that were red, denoted by <span class="math inline">\(p\)</span>. In order to estimate <span class="math inline">\(p\)</span>, we extracted a sample of 50 balls using the shovel. We then computed the relevant <em>point estimate</em>: the <em>sample proportion</em> of these 50 balls that were red, denoted mathematically by <span class="math inline">\(\hat{p}\)</span>. We also calculated a posterior probability distribution for <span class="math inline">\(p\)</span>.</p>
-<p>Here, our population is <span class="math inline">\(N\)</span> – whatever the number of pennies are being used in the US, a value which we don’t know and probably never will. The population parameter of interest is now the <em>population mean</em> year of all these pennies, a value denoted mathematically by the Greek letter <span class="math inline">\(\mu\)</span>, pronounced “mu.” In order to estimate <span class="math inline">\(\mu\)</span>, we went to the bank and obtained a sample of 50 pennies and computed the relevant point estimate: the <em>sample mean</em> year of these 50 pennies, denoted mathematically by <span class="math inline">\(\overline{x}\)</span> (pronounced “x-bar”).</p>
-<p>Going back to our 50 sampled pennies, the point estimate of interest is the sample mean <span class="math inline">\(\overline{x}\)</span> of 1995.44. This quantity is an <em>estimate</em> of the population mean year of <em>all</em> US pennies <span class="math inline">\(\mu\)</span>.</p>
-<p>Recall that we also saw in Chapter <a href="one-parameter.html#one-parameter">6</a> that such estimates are prone to <em>sampling variation</em>. For example, in this particular sample, we observed three pennies with the year 1999. If we sampled another 50 pennies, would we observe exactly three pennies with the year 1999 again? More than likely not. We might observe none, one, two, or maybe even all 50! The same can be said for the other 26 unique years that are represented in our sample of 50 pennies.</p>
-<p>So what do we do about this sampling variation? One solution is that we create bootstrap samples! Bootstrapping repeatedly draws independent samples from our data set with replacement. By sampling with replacement, the same observation can be sampled multiple times and each bootstrap sample will have the same number of observations as the original data set.</p>
-<p>The intuition with bootstrapping is that we can model an inference about the population from resampling our sample data and then performing an inference about a sample from each resample. It will look something like this: resampled → sample → population.</p>
-<p>The first thing we want to do when bootstrapping is to create our bootstrap samples. Since we are concerned with the <code>year</code> of pennies in 2019, let’s select <code>year</code> in our data set before we create our bootstraps. Let’s now perform the virtual analog for 1,000 resamples. Using these results, we’ll be able to study the variability in the sample means from 1,000 resamples of size 50. Let’s first add a <code>times = 1000</code> argument to <code><a href="https://rsample.tidymodels.org/reference/bootstraps.html">bootstraps()</a></code> to indicate we would like 1,000 replicates. Remember that we must use the <code>rsample</code> library to use bootstraps.</p>
-<div class="sourceCode" id="cb814"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">9</span><span class="op">)</span>
-<span class="va">virtual_resamples</span> <span class="op">&lt;-</span> <span class="va">pennies_sample</span> <span class="op">%&gt;%</span>
-  <span class="fu">select</span><span class="op">(</span><span class="va">year</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rsample.tidymodels.org/reference/bootstraps.html">bootstraps</a></span><span class="op">(</span>times <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span>
-<span class="va">virtual_resamples</span></code></pre></div>
-<pre><code>## # Bootstrap sampling 
-## # A tibble: 1,000 x 2
-##    splits          id           
-##    &lt;list&gt;          &lt;chr&gt;        
-##  1 &lt;split [50/19]&gt; Bootstrap0001
-##  2 &lt;split [50/20]&gt; Bootstrap0002
-##  3 &lt;split [50/16]&gt; Bootstrap0003
-##  4 &lt;split [50/18]&gt; Bootstrap0004
-##  5 &lt;split [50/18]&gt; Bootstrap0005
-##  6 &lt;split [50/18]&gt; Bootstrap0006
-##  7 &lt;split [50/17]&gt; Bootstrap0007
-##  8 &lt;split [50/14]&gt; Bootstrap0008
-##  9 &lt;split [50/19]&gt; Bootstrap0009
-## 10 &lt;split [50/20]&gt; Bootstrap0010
-## # … with 990 more rows</code></pre>
-<p>Our bootstrap samples are stored in a tibble-like object, with each bootstrap sample nested in the <code>splits</code> column. Each row is a different bootstrap sample and the <code>id</code> column is used to identify each bootstrap sample.</p>
-<p>To view a specific bootstrap sample, use the <code><a href="https://rsample.tidymodels.org/reference/as.data.frame.rsplit.html">analysis()</a></code> function from the <code>rsample</code> package, which basically allows you to view a specific bootstrap sample as a data frame. Consider the first bootstrap sample:</p>
-<div class="sourceCode" id="cb816"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rsample.tidymodels.org/reference/as.data.frame.rsplit.html">analysis</a></span><span class="op">(</span><span class="va">virtual_resamples</span><span class="op">$</span><span class="va">splits</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>## # A tibble: 50 x 1
-##     year
-##    &lt;dbl&gt;
-##  1  1983
-##  2  2017
-##  3  1983
-##  4  2017
-##  5  1995
-##  6  1988
-##  7  1978
-##  8  2015
-##  9  1962
-## 10  1996
-## # … with 40 more rows</code></pre>
-<p>Replace <code>1</code> with some other number to see a later bootstrap sample.</p>
-<p>Notice that it has 50 rows, which is the same as the number of rows in our <code>pennies_sample</code>. Now that we know how to create bootstrap samples and view them, we can apply more code to our bootstraps to find our desired statistic, which is the average year of pennies in 2019.</p>
-<p>To compute our desired statistics, we now create the column <code>boot</code>.</p>
-<div class="sourceCode" id="cb818"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">virtual_resamples</span> <span class="op">&lt;-</span> <span class="va">pennies_sample</span> <span class="op">%&gt;%</span>
-  <span class="fu">select</span><span class="op">(</span><span class="va">year</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rsample.tidymodels.org/reference/bootstraps.html">bootstraps</a></span><span class="op">(</span>times <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">mutate</span><span class="op">(</span>boot <span class="op">=</span> <span class="fu">map</span><span class="op">(</span><span class="va">splits</span>, <span class="op">~</span> <span class="fu"><a href="https://rsample.tidymodels.org/reference/as.data.frame.rsplit.html">analysis</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-<span class="va">virtual_resamples</span></code></pre></div>
-<pre><code>## # Bootstrap sampling 
-## # A tibble: 1,000 x 3
-##    splits          id            boot             
-##    &lt;list&gt;          &lt;chr&gt;         &lt;list&gt;           
-##  1 &lt;split [50/19]&gt; Bootstrap0001 &lt;tibble [50 × 1]&gt;
-##  2 &lt;split [50/18]&gt; Bootstrap0002 &lt;tibble [50 × 1]&gt;
-##  3 &lt;split [50/20]&gt; Bootstrap0003 &lt;tibble [50 × 1]&gt;
-##  4 &lt;split [50/18]&gt; Bootstrap0004 &lt;tibble [50 × 1]&gt;
-##  5 &lt;split [50/19]&gt; Bootstrap0005 &lt;tibble [50 × 1]&gt;
-##  6 &lt;split [50/15]&gt; Bootstrap0006 &lt;tibble [50 × 1]&gt;
-##  7 &lt;split [50/13]&gt; Bootstrap0007 &lt;tibble [50 × 1]&gt;
-##  8 &lt;split [50/19]&gt; Bootstrap0008 &lt;tibble [50 × 1]&gt;
-##  9 &lt;split [50/20]&gt; Bootstrap0009 &lt;tibble [50 × 1]&gt;
-## 10 &lt;split [50/19]&gt; Bootstrap0010 &lt;tibble [50 × 1]&gt;
-## # … with 990 more rows</code></pre>
-<p>We are iterating over each bootstrap sample, applying <code><a href="https://rsample.tidymodels.org/reference/as.data.frame.rsplit.html">analysis()</a></code> to each row. <code>boot</code> is now a list-column in the tibble, which we can use if we want to find a specific characteristic of each sample like the average year. Given that <code>boot</code> is a list column and we want to pull out the mean year as we are interested in this, we can create two more columns:</p>
-<div class="sourceCode" id="cb820"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">9</span><span class="op">)</span>
-<span class="va">virtual_resamples</span> <span class="op">&lt;-</span> <span class="va">pennies_sample</span> <span class="op">%&gt;%</span>
-  <span class="fu">select</span><span class="op">(</span><span class="va">year</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rsample.tidymodels.org/reference/bootstraps.html">bootstraps</a></span><span class="op">(</span>times <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">mutate</span><span class="op">(</span>boot <span class="op">=</span> <span class="fu">map</span><span class="op">(</span><span class="va">splits</span>, <span class="op">~</span> <span class="fu"><a href="https://rsample.tidymodels.org/reference/as.data.frame.rsplit.html">analysis</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">mutate</span><span class="op">(</span>years <span class="op">=</span> <span class="fu">map</span><span class="op">(</span><span class="va">boot</span>, <span class="op">~</span> <span class="fu">pull</span><span class="op">(</span><span class="va">.</span>, <span class="va">year</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu">mutate</span><span class="op">(</span>year_mean <span class="op">=</span> <span class="fu">map_dbl</span><span class="op">(</span><span class="va">years</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-<span class="va">virtual_resamples</span></code></pre></div>
-<pre><code>## # Bootstrap sampling 
-## # A tibble: 1,000 x 5
-##    splits          id            boot              years      year_mean
-##    &lt;list&gt;          &lt;chr&gt;         &lt;list&gt;            &lt;list&gt;         &lt;dbl&gt;
-##  1 &lt;split [50/19]&gt; Bootstrap0001 &lt;tibble [50 × 1]&gt; &lt;dbl [50]&gt;     1992.
-##  2 &lt;split [50/20]&gt; Bootstrap0002 &lt;tibble [50 × 1]&gt; &lt;dbl [50]&gt;     1999.
-##  3 &lt;split [50/16]&gt; Bootstrap0003 &lt;tibble [50 × 1]&gt; &lt;dbl [50]&gt;     1992.
-##  4 &lt;split [50/18]&gt; Bootstrap0004 &lt;tibble [50 × 1]&gt; &lt;dbl [50]&gt;     1993.
-##  5 &lt;split [50/18]&gt; Bootstrap0005 &lt;tibble [50 × 1]&gt; &lt;dbl [50]&gt;     1995.
-##  6 &lt;split [50/18]&gt; Bootstrap0006 &lt;tibble [50 × 1]&gt; &lt;dbl [50]&gt;     1998.
-##  7 &lt;split [50/17]&gt; Bootstrap0007 &lt;tibble [50 × 1]&gt; &lt;dbl [50]&gt;     1993.
-##  8 &lt;split [50/14]&gt; Bootstrap0008 &lt;tibble [50 × 1]&gt; &lt;dbl [50]&gt;     1995.
-##  9 &lt;split [50/19]&gt; Bootstrap0009 &lt;tibble [50 × 1]&gt; &lt;dbl [50]&gt;     1993.
-## 10 &lt;split [50/20]&gt; Bootstrap0010 &lt;tibble [50 × 1]&gt; &lt;dbl [50]&gt;     2000.
-## # … with 990 more rows</code></pre>
-<p>Voila! We were able to create a thousand bootstrap samples and calculate the mean year for each resample. Let’s now create a plot to visualizes the posterior distribution for the mean year of American pennies in 2019.</p>
-<!-- DK: Need to explain the .. syntax or replace it with the new stat_density trick. -->
-<div class="sourceCode" id="cb822"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">virtual_resamples</span> <span class="op">%&gt;%</span> 
-  <span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu">geom_histogram</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">year_mean</span>, 
-                       y <span class="op">=</span> <span class="fu">after_stat</span><span class="op">(</span><span class="va">count</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">count</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, 
-                       binwidth <span class="op">=</span> <span class="fl">.5</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Mean Year"</span>, 
-         y <span class="op">=</span> <span class="st">"Probability"</span>,
-         title <span class="op">=</span> <span class="st">"Posterior Distribution for the Mean Year of American Pennies in 2019"</span><span class="op">)</span> </code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-616-1.png" width="672"></div>
-<p>How did we sneak in the word “posterior” into this discussion? Recall in Chapter <a href="probability.html#probability">5</a> that we defined a posterior distribution as our beliefs about an unknown number: either a number which we don’t know now but which we will know, like Biden’s electoral vote total or a number which we can never know, like the average year for all pennies. In the case of the bootstrap samples we made, the posterior distribution represents our beliefs about <span class="math inline">\(\mu\)</span>, the mean year of American pennies in 2019 after taking into account the information from our bootstrap sample means. As demonstrated in the plot above, we can see that <span class="math inline">\(\mu\)</span> — an unknown parameter, the true value of which we will never know — is most likely between 1992 and 1998.</p>
-<p>Have we proved how the bootstrap, almost magically, can create a reasonable posterior? Not at all! The mathematics of that proof are beyond the scope of this book.</p>
-<!-- In the "resampling with replacement" scenario we are illustrating here, this histogram has a special name: the *bootstrap distribution of the sample mean*. Furthermore, recall it is an approximation to the *sampling distribution* of the sample mean, a concept you saw before. This distribution allows us to study the effect of sampling variation on our estimates of the true population mean, in this case the true mean year for *all* US pennies. However, unlike in Chapter \@ref(one-parameter) where we took multiple samples (something one would never do in practice), bootstrap distributions are constructed by taking multiple resamples from a *single* sample: in this case, the 50 original pennies from the bank.  -->
-<!-- Congratulations! You've just constructed your first bootstrap distribution!  -->
-<!-- ### Measuring uncertainty with confidence intervals {#ci-build-up} -->
-<!-- Let's start this section with an analogy involving fishing. Say you are trying to catch a fish. On the one hand, you could use a spear, while on the other you could use a net. Using the net will probably allow you to catch more fish! -->
-<!-- Now think back to our pennies exercise< where you are trying to estimate the true population mean year $\mu$ of *all* US pennies. Think of the value of $\mu$ as a fish. -->
-<!-- On the one hand, we could use the appropriate *point estimate/sample statistic* to estimate $\mu$, which we saw in the table in the previous section, is the sample mean $\overline{x}$. Based on our sample of 50 pennies from the bank, the sample mean was 1995.44. Think of using this value as "fishing with a spear." -->
-<!-- What would "fishing with a net" correspond to? Look at the bootstrap distribution we created once more. Between which two years would you say that "most" sample means lie?  While this question is somewhat subjective, saying that most sample means lie between 1992 and 2000 would not be unreasonable. Think of this interval as the "net." -->
-<!-- What we've just illustrated is the concept of a *confidence interval*, which we'll abbreviate with "CI" throughout this book. As opposed to a point estimate/sample statistic that estimates the value of an unknown population parameter with a single value, a *confidence interval* \index{confidence interval} gives what can be interpreted as a range of plausible values. Going back to our analogy, point estimates/sample statistics can be thought of as spears, whereas confidence intervals can be thought of as nets. -->
-<!-- ```{r, echo=FALSE, fig.align='center', fig.cap="Analogy of difference between point estimates and confidence intervals."} -->
-<!-- knitr::include_graphics("07-two-parameters/images/point_estimate_vs_conf_int.png") -->
-<!-- ``` -->
-<!-- Our proposed interval of 1992 to 2000 was constructed by eye and was thus somewhat subjective. We now introduce two methods for constructing such intervals in a more exact fashion: the *lm method* and the *quantile method*. -->
-<!-- Second, they both require you to specify the *confidence level*. Commonly used confidence levels include 90%, 95%, and 99%.  All other things being equal, higher confidence levels correspond to wider confidence intervals, and lower confidence levels correspond to narrower confidence intervals. In this book, we'll be mostly using 95% and hence constructing "95% confidence intervals for $\mu$" for our pennies activity. -->
-</div>
-</div>
-<div id="eda-for-nhanes" class="section level2" number="7.2">
-<h2>
-<span class="header-section-number">7.2</span> EDA for <code>nhanes</code><a class="anchor" aria-label="anchor" href="#eda-for-nhanes"><i class="fas fa-link"></i></a>
-</h2>
-<p>Shifting away from dealing with pennies, let’s look at bootstrap modeling with the <code>nhanes</code> dataset from National Health and Nutrition Examination Survey conducted by the Centers for Disease Control and Prevention and covering children and adults in America. It is located in the <strong>PPBDS.data</strong> package which we loaded above.</p>
-<div class="sourceCode" id="cb823"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">glimpse</span><span class="op">(</span><span class="va">nhanes</span><span class="op">)</span></code></pre></div>
+<span class="fu">glimpse</span><span class="op">(</span><span class="va">nhanes</span><span class="op">)</span></code></pre></div>
 <pre><code>## Rows: 10,000
 ## Columns: 15
 ## $ survey         &lt;int&gt; 2009, 2009, 2009, 2009, 2009, 2009, 2009, 2009, 2009, …
@@ -315,24 +91,24 @@ FIGURE 7.4: Distribution of year on 50 US pennies.
 ## $ pregnancies    &lt;int&gt; NA, NA, NA, NA, 2, NA, NA, 1, 1, 1, NA, NA, NA, NA, NA…
 ## $ sleep          &lt;int&gt; 4, 4, 4, NA, 8, NA, NA, 8, 8, 8, 7, 5, 4, NA, 5, 7, NA…</code></pre>
 <p><code>nhanes</code> has data on a diverse array of things like physical attributes, education, and sleep. Let’s restrict our attention to a subset, focusing on gender, height and the year of the survey.</p>
-<div class="sourceCode" id="cb825"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb810"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch7</span> <span class="op">&lt;-</span> <span class="va">nhanes</span> <span class="op">%&gt;%</span> 
   <span class="fu">select</span><span class="op">(</span><span class="va">age</span>, <span class="va">gender</span>, <span class="va">height</span>, <span class="va">survey</span><span class="op">)</span></code></pre></div>
 <p>Look at a random sample of our data:</p>
-<div class="sourceCode" id="cb826"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb811"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch7</span> <span class="op">%&gt;%</span> 
   <span class="fu">sample_n</span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 5 x 4
 ##     age gender height survey
 ##   &lt;int&gt; &lt;chr&gt;   &lt;dbl&gt;  &lt;int&gt;
-## 1    80 Female   157.   2009
-## 2     0 Female    NA    2009
-## 3    19 Female   161.   2011
-## 4    39 Male     175    2009
-## 5    24 Female   159.   2009</code></pre>
+## 1     4 Male     104.   2011
+## 2    67 Male     167.   2009
+## 3     8 Male     135.   2011
+## 4    41 Female   163.   2009
+## 5    26 Female   167.   2011</code></pre>
 <p>Notice how there is a decimal in the <code>height</code> column of <code>ch7</code>. This is because <code>height</code> is a <code>&lt;dbl&gt;</code> and not an <code>&lt;int&gt;</code>.</p>
 <p>Let’s also run <code>glimpse()</code> on our new data.</p>
-<div class="sourceCode" id="cb828"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb813"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch7</span> <span class="op">%&gt;%</span>
   <span class="fu">glimpse</span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## Rows: 10,000
@@ -343,12 +119,12 @@ FIGURE 7.4: Distribution of year on 50 US pennies.
 ## $ survey &lt;int&gt; 2009, 2009, 2009, 2009, 2009, 2009, 2009, 2009, 2009, 2009, 20…</code></pre>
 <p>Be on the lookout for anything suspicious. Are there any NA’s in your data set? What types of data are the columns, i.e. why is <code>survey</code> characterized as integer instead of double? Was most of the data collected in 2009? Are there more females than males? You can never look at your data too closely.</p>
 <p>In addition to <code>glimpse()</code>, we can run <code><a href="https://docs.ropensci.org/skimr/reference/skim.html">skim()</a></code>, from the <strong>skimr</strong> package, to calculate some summary statistics.</p>
-<div class="sourceCode" id="cb830"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb815"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch7</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://docs.ropensci.org/skimr/reference/skim.html">skim</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <div class="inline-table"><table class="table table-sm">
 <caption>
-<span id="tab:unnamed-chunk-621">TABLE 7.1: </span>Data summary</caption>
+<span id="tab:unnamed-chunk-609">TABLE 7.1: </span>Data summary</caption>
 <tbody>
 <tr class="odd">
 <td align="left">Name</td>
@@ -469,98 +245,48 @@ FIGURE 7.4: Distribution of year on 50 US pennies.
 </tbody>
 </table></div>
 <p>Interesting! There are 353 missing values of height in our subset of data. Just using <code>glimpse()</code> does not show us that. Let’s filter out the NA’s using <code>drop_na</code>. This we will delete the rows in which the value of any variable is missing. For simplicity, let’s only consider adults.</p>
-<div class="sourceCode" id="cb831"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb816"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch7</span> <span class="op">&lt;-</span> <span class="va">nhanes</span> <span class="op">%&gt;%</span> 
   <span class="fu">select</span><span class="op">(</span><span class="va">age</span>, <span class="va">gender</span>, <span class="va">height</span>, <span class="va">survey</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">age</span> <span class="op">&gt;=</span> <span class="fl">18</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">drop_na</span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p>Plot your data. <code>geom_density()</code> is a smooth version of <code>geom_histogram()</code>. With <code>geom_density()</code>, the y-axis is scaled so that the area under the curve equals 1.</p>
-<div class="sourceCode" id="cb832"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb817"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch7</span> <span class="op">%&gt;%</span>
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">height</span>, color <span class="op">=</span> <span class="va">gender</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">geom_density</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Height"</span>,
        title <span class="op">=</span> <span class="st">"Height by Gender in NHANES Dataset"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-623-1.png" width="672"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-611-1.png" width="672"></div>
 <p>We can see the the most probable heights for both genders and that men are generally taller than women.</p>
 <!-- ## Using Bootstraps with `nhanes` -->
 <!-- 4. Prove that the bootstrap works, that our 95% confidence intervals provide correct coverage. We make a game and I give you a sample of like 40. Here's the 40, and you give me a 95% CI using the bootstrap tools we learned. Then I give you another 40. And another. If we do this 1,00 times, and we use the same procedure for calculating a confidence interval each time, then 950 should include the truth. That's how we know bootstraps is correct and I could only demonstrate this to you if we know what the truth is.   -->
 <!-- Plan: create function called create_ci(), which takes a tibble with a single variable called height and returns the 95% confidence interval --- i.e., a numeric vector of length 2 --- for the 75th percentile.  Note that you get to hard code everything. -->
 <!-- Then, create a tibble, first column is ID. Second column is height_sample, which is created by running sample(ch7$height, size = 40, replace = FALSE). Third column is ci, which is result mutate(ci = map(height_sample, ~ create_ci(.)). Fourth column is within_ci, which is TRUE if ci includes the TRUE value and FALSE otherwise. (If you want to have two columns, one for each limit, that is fine.) -->
 </div>
-<div id="bootstrap-to-estimate-average-height" class="section level2" number="7.3">
+<div id="probability-to-bootstrap-to-bayesian-models" class="section level2" number="7.2">
 <h2>
-<span class="header-section-number">7.3</span> Bootstrap to estimate average height<a class="anchor" aria-label="anchor" href="#bootstrap-to-estimate-average-height"><i class="fas fa-link"></i></a>
-</h2>
-<p>We have shown you how to use bootstrap sampling to create a posterior distribution for an unknown parameter. Let’s use a similar approach to estimate the value of a different unknown parameter: the average height of an adult American male in 2009. Let’s also name this parameter <span class="math inline">\(\mu\)</span>. Is it confusing that we are using the same parameter? Yes! But, sadly, there are only so many Greek letters. We have no choice but to reuse them. By convention, <span class="math inline">\(\mu\)</span> is often used as the parameter name for an unknown mean. But we could have used a different letter, Greek or otherwise. And, symbols besides <span class="math inline">\(\mu\)</span> are often used for unknown means. It is up to you, but, in general, following the conventions in your field is wise.</p>
-<p>First, filter the data set:</p>
-<div class="sourceCode" id="cb833"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ch7_male</span> <span class="op">&lt;-</span> <span class="va">nhanes</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">survey</span> <span class="op">==</span> <span class="fl">2009</span>, <span class="va">gender</span> <span class="op">==</span> <span class="st">"Male"</span>, <span class="va">age</span> <span class="op">&gt;=</span> <span class="fl">18</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">select</span><span class="op">(</span><span class="va">height</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">drop_na</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<p>Dropping missing values can be dangerous, depending on their origin and the goals of our analysis. <em>Never drop lightly.</em></p>
-<p>Second, use (almost) the same code as before:</p>
-<div class="sourceCode" id="cb834"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">9</span><span class="op">)</span>
-<span class="va">virtual_resamples</span> <span class="op">&lt;-</span> <span class="va">ch7_male</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rsample.tidymodels.org/reference/bootstraps.html">bootstraps</a></span><span class="op">(</span>times <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">mutate</span><span class="op">(</span>boot <span class="op">=</span> <span class="fu">map</span><span class="op">(</span><span class="va">splits</span>, <span class="op">~</span> <span class="fu"><a href="https://rsample.tidymodels.org/reference/as.data.frame.rsplit.html">analysis</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">mutate</span><span class="op">(</span>heights <span class="op">=</span> <span class="fu">map</span><span class="op">(</span><span class="va">boot</span>, <span class="op">~</span> <span class="fu">pull</span><span class="op">(</span><span class="va">.</span>, <span class="va">height</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu">mutate</span><span class="op">(</span>height_mean <span class="op">=</span> <span class="fu">map_dbl</span><span class="op">(</span><span class="va">heights</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-<span class="va">virtual_resamples</span></code></pre></div>
-<pre><code>## # Bootstrap sampling 
-## # A tibble: 1,000 x 5
-##    splits             id            boot                heights      height_mean
-##    &lt;list&gt;             &lt;chr&gt;         &lt;list&gt;              &lt;list&gt;             &lt;dbl&gt;
-##  1 &lt;split [1.8K/663]&gt; Bootstrap0001 &lt;tibble [1,814 × 1… &lt;dbl [1,814…        176.
-##  2 &lt;split [1.8K/640]&gt; Bootstrap0002 &lt;tibble [1,814 × 1… &lt;dbl [1,814…        176.
-##  3 &lt;split [1.8K/662]&gt; Bootstrap0003 &lt;tibble [1,814 × 1… &lt;dbl [1,814…        176.
-##  4 &lt;split [1.8K/649]&gt; Bootstrap0004 &lt;tibble [1,814 × 1… &lt;dbl [1,814…        176.
-##  5 &lt;split [1.8K/669]&gt; Bootstrap0005 &lt;tibble [1,814 × 1… &lt;dbl [1,814…        176.
-##  6 &lt;split [1.8K/660]&gt; Bootstrap0006 &lt;tibble [1,814 × 1… &lt;dbl [1,814…        176.
-##  7 &lt;split [1.8K/661]&gt; Bootstrap0007 &lt;tibble [1,814 × 1… &lt;dbl [1,814…        176.
-##  8 &lt;split [1.8K/641]&gt; Bootstrap0008 &lt;tibble [1,814 × 1… &lt;dbl [1,814…        176.
-##  9 &lt;split [1.8K/647]&gt; Bootstrap0009 &lt;tibble [1,814 × 1… &lt;dbl [1,814…        176.
-## 10 &lt;split [1.8K/657]&gt; Bootstrap0010 &lt;tibble [1,814 × 1… &lt;dbl [1,814…        176.
-## # … with 990 more rows</code></pre>
-<p>Plot the results:</p>
-<!-- DK: No decimals show up on the x-axis when this is knit, just 176, 176, 176.  -->
-<div class="sourceCode" id="cb836"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">virtual_resamples</span> <span class="op">%&gt;%</span> 
-  <span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu">geom_histogram</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">height_mean</span>, 
-                       y <span class="op">=</span> <span class="fu">after_stat</span><span class="op">(</span><span class="va">count</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">count</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, 
-                       binwidth <span class="op">=</span> <span class="fl">0.02</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Mean Height"</span>, 
-         y <span class="op">=</span> <span class="st">"Probability"</span>,
-         title <span class="op">=</span> <span class="st">"Posterior Distribution for the Mean Height of American Males in 2009"</span><span class="op">)</span> </code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-626-1.png" width="672"></div>
-<p>The posterior distribution includes all the information we have about the unknown parameter — mean height of American males — which we have used our data to estimate. But we don’t always want the entire object. Instead, we might want to know the:</p>
-<ul>
-<li><p>Mean: 175.97</p></li>
-<li><p>Median: 175.97</p></li>
-<li><p>95% confidence interval: 175.66, 176.28</p></li>
-</ul>
-<p>We use the <code><a href="https://rdrr.io/r/stats/quantile.html">quantile()</a></code> function to calculate the confidence interval. Note that, in this book, we use the Bayesian interpretation of a confidence interval. There is a truth out there. The average height in our population is a specific number. We don’t know what that number is. But we are 95% sure that it lies within the 95% confidence interval.</p>
-</div>
-<div id="probability-to-bootstrap-to-bayesian-models" class="section level2" number="7.4">
-<h2>
-<span class="header-section-number">7.4</span> Probability to bootstrap to Bayesian models<a class="anchor" aria-label="anchor" href="#probability-to-bootstrap-to-bayesian-models"><i class="fas fa-link"></i></a>
+<span class="header-section-number">7.2</span> Probability to bootstrap to Bayesian models<a class="anchor" aria-label="anchor" href="#probability-to-bootstrap-to-bayesian-models"><i class="fas fa-link"></i></a>
 </h2>
 <p>Most textbooks would, at this stage, provide a more mathematical explanation of the transition we are making from Chapter <a href="probability.html#probability">5</a> to this chapter. In both Chapters <a href="probability.html#probability">5</a> and <a href="one-parameter.html#one-parameter">6</a> we dealt with a discrete set of possible models. We began with examples in which there were only two or three possible “true” states of the world. You were either infected or not infected. There were either zero, one or two white marbles in the bag. These examples grew more and more complex, both by increasing the number of models under consideration and by increasing the number of possible outcomes of the experiment. In the case of the urn, there were 2,401 possible models: either zero or one or two or . . . 2,400 red beads in the urn.</p>
 <p>The transition from a discrete set of possible models to an infinite set of possible models is mathematically complex but easy on the intuition. Just wave you hands, imagine lots more models, and invoke the aesthetic appeal of smoothness. In the case of height, there are an infinite number of possible models: average height of adult American men in 2009 could be 175, 175.1, 175.14, 175.148, 175.1482, and so on. There are an infinite number of possible values since height is continuous. Yet, almost miraculously, the same intuition applies.</p>
 <p>Let’s use <span class="math inline">\(\mu\)</span> as the parameter for the unknown average height of all the adult men in America in 2009. This is exactly analogous to the parameter <span class="math inline">\(p\)</span> from Chapter <a href="one-parameter.html#one-parameter">6</a>, the proportion of red beans in the urn. The only difference is that there are an infinite number of values which <span class="math inline">\(\mu\)</span> might take. We restricted <span class="math inline">\(p\)</span> to only 2,401 possible values: <span class="math inline">\(0\)</span>, <span class="math inline">\(1/2400\)</span>, <span class="math inline">\(2/2400\)</span>, …, <span class="math inline">\(2399/2400\)</span>, <span class="math inline">\(1\)</span>.</p>
 <p>Although a bootstrap can create a posterior distribution, as above, there are much simpler ways to do so. The most common involves the function <code><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm()</a></code> from the <strong>rstanarm</strong> library. Halfway through the book, we are now ready for our first full scale data science project. Let us be guided by the cardinal virtues.</p>
 </div>
-<div id="cardinal-virtues" class="section level2" number="7.5">
+<div id="cardinal-virtues" class="section level2" number="7.3">
 <h2>
-<span class="header-section-number">7.5</span> Cardinal Virtues<a class="anchor" aria-label="anchor" href="#cardinal-virtues"><i class="fas fa-link"></i></a>
+<span class="header-section-number">7.3</span> Cardinal Virtues<a class="anchor" aria-label="anchor" href="#cardinal-virtues"><i class="fas fa-link"></i></a>
 </h2>
+<p>Consider a subset of the <code>nhanes</code> data:</p>
+<div class="sourceCode" id="cb818"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">ch7_male</span> <span class="op">&lt;-</span> <span class="va">nhanes</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">survey</span> <span class="op">==</span> <span class="fl">2009</span>, <span class="va">gender</span> <span class="op">==</span> <span class="st">"Male"</span>, <span class="va">age</span> <span class="op">&gt;=</span> <span class="fl">18</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">select</span><span class="op">(</span><span class="va">height</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">drop_na</span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p>Data science is ultimately a moral act, so we will use the four <a href="https://en.wikipedia.org/wiki/Cardinal_virtues">Cardinal Virtues</a> — Wisdom, Justice, Courage and Temperance — to organize our approach. The purpose of this section is two-fold. First, we will show you that a more formal Bayesian approach results in, more or less, the same answer as the bootstrap above, but with much less code. Second, we will show how the Cardinal Virtues guide good data science.</p>
-<div id="wisdom-2" class="section level3" number="7.5.1">
+<div id="wisdom-2" class="section level3" number="7.3.1">
 <h3>
-<span class="header-section-number">7.5.1</span> Wisdom<a class="anchor" aria-label="anchor" href="#wisdom-2"><i class="fas fa-link"></i></a>
+<span class="header-section-number">7.3.1</span> Wisdom<a class="anchor" aria-label="anchor" href="#wisdom-2"><i class="fas fa-link"></i></a>
 </h3>
 <div class="inline-figure"><img src="other/images/Wisdom.jpg" width="100%"></div>
 <p>What decision do we face? The reason for making models is not, primarily that making models is fun, although it is! The reason is that we face a decision. We must decide between X or Y. We must choose from A, B or C. We must set D to a specific numeric value. Given that decision, we should make a model of the world to help us.</p>
@@ -577,9 +303,9 @@ FIGURE 7.4: Distribution of year on 50 US pennies.
 <p>Is not-perfect data always better? No! If your problem is estimating the median height of 5th grade girls in Toyko, we doubt that our data is at all relevant. Wisdom recognizes the danger of using non-relevant data to build a model and then mistakenly using that model in a way which will only make the situation worse. If the data won’t help, don’t use the data, don’t build a model. Better to just use your common sense and experience. Or find better data.</p>
 <p>The other aspect of Wisdom is ethics. Just because we <em>can</em> make a model does not mean we <em>should</em> make that model. Models can be used for evil and, if at all possible, we should do no evil. Fortunately, it is hard to generate many ethical worries about height models. If, instead, we were modeling criminality, the ethics become much more complex . . .</p>
 </div>
-<div id="justice-2" class="section level3" number="7.5.2">
+<div id="justice-2" class="section level3" number="7.3.2">
 <h3>
-<span class="header-section-number">7.5.2</span> Justice<a class="anchor" aria-label="anchor" href="#justice-2"><i class="fas fa-link"></i></a>
+<span class="header-section-number">7.3.2</span> Justice<a class="anchor" aria-label="anchor" href="#justice-2"><i class="fas fa-link"></i></a>
 </h3>
 <div class="inline-figure"><img src="other/images/Justice.jpg" width="100%"></div>
 <p>Mathematical knowledge is the least important skill for a data scientist.</p>
@@ -604,7 +330,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#kmckzevqzr .gt_table {
+#dfqiudzgil .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -629,7 +355,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
   border-left-color: #D3D3D3;
 }
 
-#kmckzevqzr .gt_heading {
+#dfqiudzgil .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -641,7 +367,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
   border-right-color: #D3D3D3;
 }
 
-#kmckzevqzr .gt_title {
+#dfqiudzgil .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -651,7 +377,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
   border-bottom-width: 0;
 }
 
-#kmckzevqzr .gt_subtitle {
+#dfqiudzgil .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -661,13 +387,13 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
   border-top-width: 0;
 }
 
-#kmckzevqzr .gt_bottom_border {
+#dfqiudzgil .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#kmckzevqzr .gt_col_headings {
+#dfqiudzgil .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -682,7 +408,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
   border-right-color: #D3D3D3;
 }
 
-#kmckzevqzr .gt_col_heading {
+#dfqiudzgil .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -702,7 +428,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
   overflow-x: hidden;
 }
 
-#kmckzevqzr .gt_column_spanner_outer {
+#dfqiudzgil .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -714,15 +440,15 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
   padding-right: 4px;
 }
 
-#kmckzevqzr .gt_column_spanner_outer:first-child {
+#dfqiudzgil .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#kmckzevqzr .gt_column_spanner_outer:last-child {
+#dfqiudzgil .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#kmckzevqzr .gt_column_spanner {
+#dfqiudzgil .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -734,7 +460,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
   width: 100%;
 }
 
-#kmckzevqzr .gt_group_heading {
+#dfqiudzgil .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -756,7 +482,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
   vertical-align: middle;
 }
 
-#kmckzevqzr .gt_empty_group_heading {
+#dfqiudzgil .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -771,15 +497,15 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
   vertical-align: middle;
 }
 
-#kmckzevqzr .gt_from_md > :first-child {
+#dfqiudzgil .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#kmckzevqzr .gt_from_md > :last-child {
+#dfqiudzgil .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#kmckzevqzr .gt_row {
+#dfqiudzgil .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -798,7 +524,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
   overflow-x: hidden;
 }
 
-#kmckzevqzr .gt_stub {
+#dfqiudzgil .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -810,7 +536,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
   padding-left: 12px;
 }
 
-#kmckzevqzr .gt_summary_row {
+#dfqiudzgil .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -820,7 +546,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
   padding-right: 5px;
 }
 
-#kmckzevqzr .gt_first_summary_row {
+#dfqiudzgil .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -830,7 +556,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
   border-top-color: #D3D3D3;
 }
 
-#kmckzevqzr .gt_grand_summary_row {
+#dfqiudzgil .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -840,7 +566,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
   padding-right: 5px;
 }
 
-#kmckzevqzr .gt_first_grand_summary_row {
+#dfqiudzgil .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -850,11 +576,11 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
   border-top-color: #D3D3D3;
 }
 
-#kmckzevqzr .gt_striped {
+#dfqiudzgil .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#kmckzevqzr .gt_table_body {
+#dfqiudzgil .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -863,7 +589,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
   border-bottom-color: #D3D3D3;
 }
 
-#kmckzevqzr .gt_footnotes {
+#dfqiudzgil .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -877,13 +603,13 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
   border-right-color: #D3D3D3;
 }
 
-#kmckzevqzr .gt_footnote {
+#dfqiudzgil .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#kmckzevqzr .gt_sourcenotes {
+#dfqiudzgil .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -897,46 +623,46 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
   border-right-color: #D3D3D3;
 }
 
-#kmckzevqzr .gt_sourcenote {
+#dfqiudzgil .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#kmckzevqzr .gt_left {
+#dfqiudzgil .gt_left {
   text-align: left;
 }
 
-#kmckzevqzr .gt_center {
+#dfqiudzgil .gt_center {
   text-align: center;
 }
 
-#kmckzevqzr .gt_right {
+#dfqiudzgil .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#kmckzevqzr .gt_font_normal {
+#dfqiudzgil .gt_font_normal {
   font-weight: normal;
 }
 
-#kmckzevqzr .gt_font_bold {
+#dfqiudzgil .gt_font_bold {
   font-weight: bold;
 }
 
-#kmckzevqzr .gt_font_italic {
+#dfqiudzgil .gt_font_italic {
   font-style: italic;
 }
 
-#kmckzevqzr .gt_super {
+#dfqiudzgil .gt_super {
   font-size: 65%;
 }
 
-#kmckzevqzr .gt_footnote_marks {
+#dfqiudzgil .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="kmckzevqzr" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><div class="inline-table"><table class="gt_table">
+<div id="dfqiudzgil" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><div class="inline-table"><table class="gt_table">
 <thead class="gt_col_headings">
 <tr>
 <th class="gt_col_heading gt_center gt_columns_bottom_border" rowspan="2" colspan="1" style="text-align: left; vertical-align: middle;">ID</th>
@@ -994,19 +720,19 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 <p> </p>
 <p>Since this is not a causal model, there is only one potential outcome — which is to say, only one outcome: an individual’s height.</p>
 </div>
-<div id="courage-2" class="section level3" number="7.5.3">
+<div id="courage-2" class="section level3" number="7.3.3">
 <h3>
-<span class="header-section-number">7.5.3</span> Courage<a class="anchor" aria-label="anchor" href="#courage-2"><i class="fas fa-link"></i></a>
+<span class="header-section-number">7.3.3</span> Courage<a class="anchor" aria-label="anchor" href="#courage-2"><i class="fas fa-link"></i></a>
 </h3>
 <div class="inline-figure"><img src="other/images/Courage.jpg" width="100%"></div>
 <p>In data science, we deal with math, words, and code, but the most important of these is code. We need Courage to create the model, to take the leap of faith that we can make our ideas real.</p>
-<div id="stan_glm" class="section level4" number="7.5.3.1">
+<div id="stan_glm" class="section level4" number="7.3.3.1">
 <h4>
-<span class="header-section-number">7.5.3.1</span> stan_glm<a class="anchor" aria-label="anchor" href="#stan_glm"><i class="fas fa-link"></i></a>
+<span class="header-section-number">7.3.3.1</span> stan_glm<a class="anchor" aria-label="anchor" href="#stan_glm"><i class="fas fa-link"></i></a>
 </h4>
 <p>Bayesian models are not hard to create in R. Sticking to the same filtered adult male 2009 data, we can reduce all the work we did for the bootstrap approach to the <code><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm()</a></code> function which, when fed the correct inputs, creates a Bayesian generalized linear model of height. This function comes from the <strong>rstanarm</strong> package, which is very useful for Bayesian models in general.</p>
 <p>The first argument in the <code><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm()</a></code> function is <code>data</code>, which in our case is the filtered <code>ch7_male</code> tibble we used in the bootstrap example. The only other mandatory argument is the formula that we want to build a model around. In this case, since we have no predictor variables, our equation will be <code>height ~ 1</code>.</p>
-<div class="sourceCode" id="cb837"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb819"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">9</span><span class="op">)</span>
 <span class="va">fit_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">ch7_male</span>, 
                     <span class="va">height</span> <span class="op">~</span> <span class="fl">1</span>, 
@@ -1021,12 +747,12 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 <li><p>There is a direct connection between the mathematical form of the model created under Justice and the code we use to fit the model under Courage. <code>height ~ 1</code> is the code equivalent of <span class="math inline">\(y_i = \mu\)</span>.</p></li>
 <li><p>The default value for <code>family</code> is <code><a href="https://rdrr.io/r/stats/family.html">gaussian()</a></code>, so we did not need to include it in the call above. From the Justice section, the assumption that <span class="math inline">\(\epsilon_i \sim N(0, \sigma^2)\)</span> is equivalent to using <code><a href="https://rdrr.io/r/stats/family.html">gaussian()</a></code>. If <span class="math inline">\(\epsilon_i\)</span> has a different distribution, we would need to use a different <code>family</code>.</p></li>
 </ul>
-<div id="printed-model" class="section level5" number="7.5.3.1.1">
+<div id="printed-model" class="section level5" number="7.3.3.1.1">
 <h5>
-<span class="header-section-number">7.5.3.1.1</span> Printed model<a class="anchor" aria-label="anchor" href="#printed-model"><i class="fas fa-link"></i></a>
+<span class="header-section-number">7.3.3.1.1</span> Printed model<a class="anchor" aria-label="anchor" href="#printed-model"><i class="fas fa-link"></i></a>
 </h5>
 <p>There are several ways to examine the fitted model. The simplest is to print it:</p>
-<div class="sourceCode" id="cb838"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb820"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_obj</span></code></pre></div>
 <pre><code>## stan_glm
 ##  family:       gaussian [identity]
@@ -1056,7 +782,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 <li><p>The second most important number for summarizing a distribution concerns its <em>spread</em>. How far is the data spread around its center? The most common measure used for this is the standard deviation. MAD SD, the scaled standard deviations of the absolute difference between each observation and the median of all observations, is another. If the variable has a normal distribution, then the standard deviation and the MAD SD will be very similar. But the MAD SD is much more robust to outliers, which is why it is used here.</p></li>
 </ul>
 <p>Instead of printing the whole model, we can just print out the parameter values:</p>
-<div class="sourceCode" id="cb840"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb822"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://docs.ropensci.org/skimr/reference/print.html">print</a></span><span class="op">(</span><span class="va">fit_obj</span>, detail <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 <pre><code>##             Median MAD_SD
 ## (Intercept) 176.0    0.2 
@@ -1068,13 +794,13 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 <p>Now that we understand the meaning of Median and MAD_SD in the above display, we can interpret the actual numbers. The median of the intercept, 175.98, is the median of our posterior distribution for <span class="math inline">\(\mu\)</span>, the average height of all American men in 2009. The median of sigma, 7.29, is the median of our posterior distribution for the true <span class="math inline">\(\sigma\)</span>, which can be roughly understood as the variability in the height of men, once we account for our estimate of <span class="math inline">\(\mu\)</span>.</p>
 <p>The MAD_SD for each parameter is a measure of the variability of our posterior distributions. How spread out are they? Speaking roughly, 95% of the mass of a posterior distribution is located within +/- 2 MAD SDs from the median. For example, we would be about 95% confident that the true value of <span class="math inline">\(\mu\)</span> is somewhere between 175.6 and 176.3.</p>
 </div>
-<div id="plotting-the-posterior-distributions" class="section level5" number="7.5.3.1.2">
+<div id="plotting-the-posterior-distributions" class="section level5" number="7.3.3.1.2">
 <h5>
-<span class="header-section-number">7.5.3.1.2</span> Plotting the posterior distributions<a class="anchor" aria-label="anchor" href="#plotting-the-posterior-distributions"><i class="fas fa-link"></i></a>
+<span class="header-section-number">7.3.3.1.2</span> Plotting the posterior distributions<a class="anchor" aria-label="anchor" href="#plotting-the-posterior-distributions"><i class="fas fa-link"></i></a>
 </h5>
 <p>Instead of doing this math in our heads, we can display both posterior distributions. <em>Pictures speak where math mumbles.</em> Fortunately, getting draws from those posteriors is easy:</p>
 <!-- DK: Why don't we see decimals for the intercept in this print out? -->
-<div class="sourceCode" id="cb842"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb824"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_obj</span> <span class="op">%&gt;%</span> 
   <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 4,000 x 2
@@ -1092,7 +818,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 ## 10          176.  7.28
 ## # … with 3,990 more rows</code></pre>
 <p>These 4,000 rows are “draws” from the estimated posteriors, each in its own column. These are like the vectors which result from calling functions like <code><a href="https://rdrr.io/r/stats/Normal.html">rnorm()</a></code> or <code><a href="https://rdrr.io/r/stats/Binomial.html">rbinom()</a></code>. We can create the plot in a similar way:</p>
-<div class="sourceCode" id="cb844"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb826"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_obj</span> <span class="op">%&gt;%</span> 
   <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">rename</span><span class="op">(</span>mu <span class="op">=</span> <span class="va">`(Intercept)`</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -1104,9 +830,9 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
          x <span class="op">=</span> <span class="st">"Height in Centimeters"</span>,
          y <span class="op">=</span> <span class="st">"Probability"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">theme_classic</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-635-1.png" width="672"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-621-1.png" width="672"></div>
 <p>Although it is possible to have variable names like “(Intercept),” it is not recommended. Avoid weird names! When you are stuck with them, place them in backticks. Even better, rename them, as we do above.</p>
-<div class="sourceCode" id="cb845"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb827"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_obj</span> <span class="op">%&gt;%</span> 
   <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">sigma</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
@@ -1117,18 +843,18 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
          x <span class="op">=</span> <span class="st">"Sigma in Centimeters"</span>,
          y <span class="op">=</span> <span class="st">"Probability"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">theme_classic</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-636-1.png" width="672"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-622-1.png" width="672"></div>
 <p>Again, <span class="math inline">\(\sigma\)</span> is usually a nuisance parameter. We don’t really care what its value us, so we rarely plot it.</p>
 <!-- DK: Discuss the meaning in more detail. -->
 <!-- DK: Fun problem set exercise is to pull this data, pivot it, and then create one graphic with all distributions showing. -->
 </div>
 </div>
-<div id="decomposing-the-outcome" class="section level4" number="7.5.3.2">
+<div id="decomposing-the-outcome" class="section level4" number="7.3.3.2">
 <h4>
-<span class="header-section-number">7.5.3.2</span> Decomposing the outcome<a class="anchor" aria-label="anchor" href="#decomposing-the-outcome"><i class="fas fa-link"></i></a>
+<span class="header-section-number">7.3.3.2</span> Decomposing the outcome<a class="anchor" aria-label="anchor" href="#decomposing-the-outcome"><i class="fas fa-link"></i></a>
 </h4>
 <p>Two other important concepts in model creation are “fitted” values and residuals.</p>
-<div class="sourceCode" id="cb846"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb828"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch7_male</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate</span><span class="op">(</span>fitted_value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html">fitted</a></span><span class="op">(</span><span class="va">fit_obj</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate</span><span class="op">(</span>residual <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/residuals.html">residuals</a></span><span class="op">(</span><span class="va">fit_obj</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -1142,18 +868,18 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 ## 4   168.         176.    -8.08
 ## 5   164.         176.   -12.1</code></pre>
 <p>The fitted value represents the model’s best guess at to what the true value of the outcome should be for that individual, given information about any covariates. This is a tricky concept since, after all, we already know what the actual value is. The residual is the difference between the outcome and the fitted value. These definitions lead to a natural decomposition of the outcome data:</p>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-638-1.png" width="672"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-624-1.png" width="672"></div>
 <!-- DK: More details. And don't forget to compare this confidence interval to the bootstrapped one. And do a posterior predictive check! -->
 </div>
 </div>
-<div id="temperance-2" class="section level3" number="7.5.4">
+<div id="temperance-2" class="section level3" number="7.3.4">
 <h3>
-<span class="header-section-number">7.5.4</span> Temperance<a class="anchor" aria-label="anchor" href="#temperance-2"><i class="fas fa-link"></i></a>
+<span class="header-section-number">7.3.4</span> Temperance<a class="anchor" aria-label="anchor" href="#temperance-2"><i class="fas fa-link"></i></a>
 </h3>
 <div class="inline-figure"><img src="other/images/Temperance.jpg" width="100%"></div>
 <!-- DK: Should introduce matrices in chapter 2. -->
 <p>Recall that a “matrix” in R is a rectangular array of data, shaped like a data frame or tibble, but containing only one type of data, e.g., numeric. Large matrices also print out ugly. (There are other differences, none of which we care about here.) Example:</p>
-<div class="sourceCode" id="cb848"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb830"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">8</span>, <span class="fl">9</span>, <span class="fl">12</span>, <span class="fl">13</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
 <span class="va">m</span></code></pre></div>
 <pre><code>##      [,1] [,2]
@@ -1161,7 +887,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 ## [2,]    4   12
 ## [3,]    8   13</code></pre>
 <p>The easiest way to pull information from a matrix is to use <code>[]</code>, the subset operator. Here is how we grab the second column of <code>m</code>:</p>
-<div class="sourceCode" id="cb850"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb832"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">m</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span></code></pre></div>
 <pre><code>## [1]  9 12 13</code></pre>
 <p>Note how matrices with just one dimension “collapse” into single vectors. Tibbles, on the other hand, always maintain their rectangular shapes, even with only one column or row. Matrices are important because <code><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict()</a></code> and other functions from <strong>rstanarm</strong> return matrices.</p>
@@ -1172,17 +898,17 @@ In this case, the <em>outcome</em> is the height of an individual male. This, al
 <li>What is the probability that the next adult male we meet will be taller than 180 centimeters?</li>
 </ul>
 <p>We have a model of American male height from 2009, <code>fit_obj</code>, which we can use for this purpose.</p>
-<div class="sourceCode" id="cb852"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb834"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">11</span><span class="op">)</span>
 <span class="va">pp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict</a></span><span class="op">(</span><span class="va">fit_obj</span><span class="op">)</span></code></pre></div>
 <p>Unfortunately, <code><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict()</a></code> returns a weird object with class “ppd,” which stands for posterior probability distribution. There are some advanced use cases in which this is a useful class of object to work with. But, for the purposes of this book, the “ppd” class is too complex. So, whenever we call <code><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict()</a></code>, we will always transform it into a tibble like so:</p>
-<div class="sourceCode" id="cb853"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb835"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">11</span><span class="op">)</span>
 <span class="va">pp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict</a></span><span class="op">(</span><span class="va">fit_obj</span><span class="op">)</span> <span class="op">%&gt;%</span>
     <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
     <span class="fu">mutate_all</span><span class="op">(</span><span class="va">as.numeric</span><span class="op">)</span></code></pre></div>
 <p>Doing so requires two steps. First, use <code>as_tibble()</code>, just as you might expect. In R, we often transform one thing into another thing with functions which begin with <code>as_</code>. Unfortunately, that does not solve our problem because each column is still of class <code>ppd</code>. So, second, we use the <code>mutate_all(as.numeric)</code> incantation to transform each column. The resulting object, <code>pp</code>, is still not easy to work with, both because the variable names are all numbers and because of how big it is.</p>
-<div class="sourceCode" id="cb854"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb836"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="va">pp</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 4000 1814</code></pre>
 <p>There are 4000 rows because, by default, <code><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm()</a></code> gives us 4000 draws from the posterior distribution, both for the distribution of the parameters (which we looked at above under Courage) and for the predicted values. There
@@ -1191,7 +917,7 @@ are 1814 because the matrix provides draws from the same posterior predictive di
 <p>The reason is that, in order to confirm that our model is consistent with the data, <em>we should compare the posterior probability distribution for each observation to the actual value for that observation.</em> They should be consistent. That is, if the model is sensible, about 95% of the true observations should lie within the 95% confidence interval of their respective posterior probability distributions. The process of doing this comparison is a <em>posterior predictive check.</em></p>
 <!-- DK: Do this now or save for later? -->
 <p>In the meantime, we can still use any column in <code>pp</code> to answer our question. (We will use the first column for convenience.) Consider:</p>
-<div class="sourceCode" id="cb856"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb838"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">tibble</span><span class="op">(</span>pred <span class="op">=</span> <span class="va">pp</span><span class="op">$</span><span class="va">`1`</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate</span><span class="op">(</span>gt_180 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">pred</span> <span class="op">&gt;</span> <span class="fl">180</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 4,000 x 2
@@ -1209,7 +935,7 @@ are 1814 because the matrix provides draws from the same posterior predictive di
 ## 10  183. TRUE  
 ## # … with 3,990 more rows</code></pre>
 <p>We don’t have to put the posterior predictions in a tibble, but doing so makes everything easier. What are the odds that the next adult male will be taller than 180 centimeters?</p>
-<div class="sourceCode" id="cb858"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb840"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">tibble</span><span class="op">(</span>pred <span class="op">=</span> <span class="va">pp</span><span class="op">$</span><span class="va">`1`</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate</span><span class="op">(</span>gt_180 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">pred</span> <span class="op">&gt;</span> <span class="fl">180</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">summarize</span><span class="op">(</span>answer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">gt_180</span><span class="op">)</span> <span class="op">/</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
@@ -1224,7 +950,7 @@ are 1814 because the matrix provides draws from the same posterior predictive di
 <li>What is the probability that, among the next 4 men we meet, the tallest is at least 10 cm taller than the shortest?</li>
 </ul>
 <p>Bayesian models are beautiful because, via the magic of simulation, we can answer (almost!) any question. With simulation, we just need to answer this step by step.</p>
-<div class="sourceCode" id="cb860"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb842"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">tibble</span><span class="op">(</span>pred_1 <span class="op">=</span> <span class="va">pp</span><span class="op">$</span><span class="va">`1`</span>,
        pred_2 <span class="op">=</span> <span class="va">pp</span><span class="op">$</span><span class="va">`2`</span>,
        pred_3 <span class="op">=</span> <span class="va">pp</span><span class="op">$</span><span class="va">`3`</span>,
@@ -1246,7 +972,7 @@ are 1814 because the matrix provides draws from the same posterior predictive di
 <li>What is our posterior probability of the height of the 3rd tallest man out of the next 100 we meet?</li>
 </ul>
 <p>The same approach will work for almost any question.</p>
-<div class="sourceCode" id="cb862"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb844"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pp</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">100</span><span class="op">]</span> <span class="op">%&gt;%</span> 
   <span class="fu">rowwise</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate</span><span class="op">(</span>third_tallest <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html">sort</a></span><span class="op">(</span><span class="fu">c_across</span><span class="op">(</span><span class="va">`1`</span><span class="op">:</span><span class="va">`100`</span><span class="op">)</span>, decreasing <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -1257,13 +983,13 @@ are 1814 because the matrix provides draws from the same posterior predictive di
          subtitle <span class="op">=</span> <span class="st">"of the 3rd Tallest from One Hundred Random Men"</span>,
          x <span class="op">=</span> <span class="st">"Height (cm)"</span>,
          y <span class="op">=</span> <span class="st">"Probability"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-648-1.png" width="672"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-634-1.png" width="672"></div>
 <!-- DK: Need more text. Explain all the things that could be wrong with the model. Explain what is going on in different columns. Explain all the cool R code tricks.  -->
 </div>
 </div>
-<div id="summary-2" class="section level2" number="7.6">
+<div id="summary-2" class="section level2" number="7.4">
 <h2>
-<span class="header-section-number">7.6</span> Summary<a class="anchor" aria-label="anchor" href="#summary-2"><i class="fas fa-link"></i></a>
+<span class="header-section-number">7.4</span> Summary<a class="anchor" aria-label="anchor" href="#summary-2"><i class="fas fa-link"></i></a>
 </h2>
 <p>The next five chapters will follow the same process we have just completed here. We start with a decision we have to make. With luck, we will have some data to guide us. (Without data, even the best data scientist will struggle to make progress.) <em>Wisdom</em> asks us: “Is the data we have close enough to the decision we face to make using that data likely to be helpful?” Often times, the answer is “No.” Even if we do have data, and the ability to make a model, Wisdom will tap us on the shoulder and say, “Even if you can make a model, don’t forget to ask yourself if you should.” Ethics matter.</p>
 <p>Once we start to build the model, <em>Justice</em> will guide us. Is the model descriptive or causal? What is the mathematical relationship between the dependent variable we are trying to explain and the independent variables we can use to explain it? What assumptions are we making about distributions, especially with regard to the error term?</p>
@@ -1288,24 +1014,17 @@ are 1814 because the matrix provides draws from the same posterior predictive di
     <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
       <ul class="nav navbar-nav">
 <li><a class="nav-link" href="#two-parameters"><span class="header-section-number">7</span> Two Parameters</a></li>
+<li><a class="nav-link" href="#eda-for-nhanes"><span class="header-section-number">7.1</span> EDA for nhanes</a></li>
+<li><a class="nav-link" href="#probability-to-bootstrap-to-bayesian-models"><span class="header-section-number">7.2</span> Probability to bootstrap to Bayesian models</a></li>
 <li>
-<a class="nav-link" href="#resampling-tactile"><span class="header-section-number">7.1</span> Pennies example</a><ul class="nav navbar-nav">
-<li><a class="nav-link" href="#to-the-bank"><span class="header-section-number">7.1.1</span> To the Bank</a></li>
-<li><a class="nav-link" href="#what-was-the-average-year-of-us-pennies-in-2019"><span class="header-section-number">7.1.2</span> What was the average year of US pennies in 2019?</a></li>
+<a class="nav-link" href="#cardinal-virtues"><span class="header-section-number">7.3</span> Cardinal Virtues</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#wisdom-2"><span class="header-section-number">7.3.1</span> Wisdom</a></li>
+<li><a class="nav-link" href="#justice-2"><span class="header-section-number">7.3.2</span> Justice</a></li>
+<li><a class="nav-link" href="#courage-2"><span class="header-section-number">7.3.3</span> Courage</a></li>
+<li><a class="nav-link" href="#temperance-2"><span class="header-section-number">7.3.4</span> Temperance</a></li>
 </ul>
 </li>
-<li><a class="nav-link" href="#eda-for-nhanes"><span class="header-section-number">7.2</span> EDA for nhanes</a></li>
-<li><a class="nav-link" href="#bootstrap-to-estimate-average-height"><span class="header-section-number">7.3</span> Bootstrap to estimate average height</a></li>
-<li><a class="nav-link" href="#probability-to-bootstrap-to-bayesian-models"><span class="header-section-number">7.4</span> Probability to bootstrap to Bayesian models</a></li>
-<li>
-<a class="nav-link" href="#cardinal-virtues"><span class="header-section-number">7.5</span> Cardinal Virtues</a><ul class="nav navbar-nav">
-<li><a class="nav-link" href="#wisdom-2"><span class="header-section-number">7.5.1</span> Wisdom</a></li>
-<li><a class="nav-link" href="#justice-2"><span class="header-section-number">7.5.2</span> Justice</a></li>
-<li><a class="nav-link" href="#courage-2"><span class="header-section-number">7.5.3</span> Courage</a></li>
-<li><a class="nav-link" href="#temperance-2"><span class="header-section-number">7.5.4</span> Temperance</a></li>
-</ul>
-</li>
-<li><a class="nav-link" href="#summary-2"><span class="header-section-number">7.6</span> Summary</a></li>
+<li><a class="nav-link" href="#summary-2"><span class="header-section-number">7.4</span> Summary</a></li>
 </ul>
 
       <div class="book-extra">
