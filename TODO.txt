@@ -1,6 +1,6 @@
 # Priorities
 
-* In index.Rmd we mention 6 or do books which we get material from. But we only provide a clear citation for two of them: @isrs2014 and @rds2016. Provide a proper reference for all the books which we use material from. This requires adding entries to bib/references.bib and then using @something to reference them back in index.Rmd. 
+* In index.Rmd we mention 6 or so books which we get material from. But we only provide a clear citation for two of them: @isrs2014 and @rds2016. Provide a proper reference for all the books which we use material from. This requires adding entries to bib/references.bib and then using @something to reference them back in index.Rmd. 
 
 * Note that I have removed library(Rgraphviz) from chapter 5. That is an ugly Bioconductor package that we should not use. But, that means I had to set eval=FALSE to 5 or 6 images that it created. (You can see what those images looked like at https://davidkane9.github.io/PPBDS/.) So, we need to replace those graphics. Maybe https://github.com/malcolmbarrett/ggdag. Or maybe straight dagitty?
 
@@ -8,86 +8,54 @@
 
 * Switch chapter 3 and 4. (Need to rename files and folders.) The earlier we show students functions, the earlier we can start working with Shiny. We might even consider putting RCM after probability. The other advantage is that we don't have a ton of good questions to ask in the RCM tutorial. Since earlier tutorials are longer, we should do topics which allow for more tutorial questions
 
-* Rename all my Conclusions as Summarys. Have the Summary really highlight the key R commands we have learned this chapter.
-
-## Other items
-
-* Introduce stan_glm() at the start of chapter 7 as the easier way to solve the bead problem. This will look a lot like the initial use of stan_glm in chapter 7 right now. Nothing wrong with doing that intro twice! Going through each line of that output is useful, as is the use of fitted(), residuals(), and so on.
+* Rename all my Conclusions as Summarys. Have the Summary really highlight the key R commands we have learned in each chapter.
 
 
-* Chapter 8 should include two other model discussions. First, leave in intercept. Second, a model with a continuous predictor. In both cases, we would still be doing three parameter models. And that it would allow chapter 9 to focus on more complex models. Chapter 7 should cover every complex topic in detail, like fitted(), residuals() and so on.
+* Expand the Shiny appendix to highlight those aspects of Shiny that are most used by students for their final projects. Start with panel tabs. And math. And regresssion tables. Maybe switch the entire focus to the Mastering Shiny book?
 
 
+* Chapter 6 must explain clearly the concept of standard error, and of p-values. Need this rock-solid before going into MAD SD complexity in chapter 7.
 
+* Introduce stan_glm() at the start of chapter 7 as the easier way to solve the bead problem. This will look a lot like the initial use of stan_glm in chapter 7 right now. Nothing wrong with doing that intro twice! Going through each line of that output is useful, as is the use of fitted(), residuals(), and so on. 
+
+* Start height example with a sample of size 30. Easier to get a handle on things. Make sure two data points are identical. Do everything and then pick a second sample of 30. The model is similar, but not the same! Connect to different shovel samples.
+
+* Edit second example of chapter 7 so that it too goes through all the key commands and concepts which we will use in every chapter. Expected values and posterior_epred(). fitted() and residuals(). posterior_predict(). 
+
+
+* Chapter 7 should use a simulation study to confirm that our 95% confidence interval for the mean covers the true mean 95% of the time. It should also use a simulation study to confirm that our 95% confidence interval for the prediction covers the true value 95% of the time, i.e., that posterior predictive distributions work. We purposely skipped this in the bead example from the start of the chapter.
+
+
+* Explain transformations and centering somewhere in Chapter 7, and maybe normalization as well. Sometimes we want to measure height in centimenters, sometimes in feet. Sometimes using z-scores is best. Sometimes percentiles. Discuss continuous versus categorial variables.
+
+* Chapter 7 should introduce, gently, the concept of in-sample and out-of-sample. As well as predictive accuracy as being a good way to judge how good your model is. What are some useful measures of predictive accuracy? Discuss our objective functions; minimize what? when would median be better than mean? Find a skewed data set and show how guessing the median works better than guessing the mean, if you care about absolute difference. (Can we estimate the median with stan_glm()?) 
+
+
+* Chapter 8 should include two other model discussions. First, leave in intercept. Second, a model with a continuous predictor. In both cases, we would still be doing three parameter models. And that it would allow chapter 9 to focus on more complex models. 
+
+* Chapter 9 should start with  single variable which actually requires lots of parameters? For example, regress presidential support on state and come up with a different average approval for each state. This is cheating in that it is too many paramters. But it would allow us to explain a bunch of stuff! Including Bayesian shrinkage. Saving this till the end of the model causes us to miss stuff.
+
+
+## To Discuss Later
 
 * More discussion of what it means to "control for" something in a regression.
 
-
 * Are all the graphics too small? Check out R4DS and change the default settings?
 
-
-* Is centering too hard a topic for the book? No. Do it (and normalization) in chapter 7 and maybe another example in 8 or 9.
-
+* Other posssible issues for chapters 7 and 8: play the prediction game; include nice looking table creation; maybe use tidybayes as well.
 
 
-## Rewrite chapter 7
+* Need discussion of what it means to "control" for. Right now, we don't mention this until chapter 11. Needs to be covered earlier, especially in chapter 9. That sets the stage for later.
 
-Basic idea is that, without bootstrapping, we can go through every detail we will need later very slowly. 
+* Standardize notation. What are predicted/fitted values? Use y_i everywhere, instead of using problem specific terms? That seems a bad idea.
 
-Is using height OK? Maybe. But then we should do everything with an initial sample of size 30 so that we have some variation in our estimate of the mean. Maybe we do two or more examples. Nothing wrong with estimating several models!
+* Generate some error messages and then show that they can teach you something. Object does not exist. filter only have one equal sign, and so on. Do this all the time. Normalize the generation and processing of error messages.
 
+* Discuss base R versus tidyverse so that students are not confused when they see base R. Maybe this is week 3 in functions? And have a tutorial for this.
 
-continuous versus categorial variables
+* Show a couple of distributions (poisson, normal, lognormal) in chapter 2. Maybe mention again in chapter 7. Show why mean might be a bad model! Can use a different families, but all still with one parameter.
 
-Explain centering and other transformations. We might want to predict someone's height in absolute terms or in relative terms. (Hmm. Does that work? If we subtract out the mean, then our mu is zero, right? Maybe do it relative to some absolute number? )
-
-posterior predictive distributions. What do they mean? How do we confirm that they are reasonable?
-
-Use a simulation study to confirm that our 95% confidence interval for the mean covers the true mean 95% of the time.
-
-Use a simulation study to confirm that our 95% confidence interval for the prediction covers the true value 95% of the time.
-
-posterior_epred
-
-expected values
-
-fitted() and residuals()
-
-Definition of posterior predictive probability distribution or, more simply, posterior predictive distribution.
-
-transformations, to inches, to percentiles, to z-scors
-
-tests of predictive accuracy. model comparisons, set stage for chapter 10
-
-in-sample and out-of-sample
-
-objective functions; minimize what? when would median be better than mean? Find a skewed data set and show how guessing the median works better than guessing the mean, if you care about absolute difference. (Can we estimate the median with stan_glm()?) 
-
-Use stan_glm(family = binomial()) to estimate an urn example. Indeed, maybe use stan_glm with a poisson or other distribution, but still with just one parameter.
-
-play the prediction game
-
-include nice looking table creation
-
-Maybe use tidybayes as well?
-
-Might chapter 7 include a single variable which actually requires lots of parameters? For example, regress height on state and come up with a different average height for each state. This is cheating in that it is too many paramters. But it would allow us to explain a bunch of stuff! Including Bayesian shrinkage.
-
-Create a nice plot which shows how \pm 2 MAD_SDs covers 95%. Maybe explain better what MAD SD means? Maybe connect it directly to what a standard error is? 
-
-## Improvements
-
-Need discussion of what it means to "control" for. Right now, we don't mention this until chapter 11. Needs to be covered earlier, especially in chapter 9. That sets the stage for later.
-
-Standardize notation. What are predicted/fitted values? Use y_i everywhere, instead of using problem specific terms? That seems a bad idea.
-
-Generate some error messages and then show that they can teach you something. Object does not exist. filter only have one equal sign, and so on. Do this all the time. Normalize the generation and processing of error messages.
-
-Discuss base R versus tidyverse so that students are not confused when they see base R.
-
-Show a couple of distributions (poisson, normal, lognormal) in chapter 2. Maybe mention again in chapter 7. Show why mean might be a bad model! Can use a different families, but all still with one parameter.
-
-Teach more file management, organization, use of R scripts. (Should have done that in some of the problem sets. Maybe a milestone could require that the graphic is created with a .R script with an image saved and then placed in the app directory.) Maybe add to tools? Create a tutorial for week 4?
+* Teach more file management, organization, use of R scripts. (Should have done that in some of the problem sets. Maybe a milestone could require that the graphic is created with a .R script with an image saved and then placed in the app directory.) Maybe add to tools? Create a tutorial for week 4?
 
 * as_tibble_col(), and other things for coercing ppd objects.
 
@@ -96,7 +64,7 @@ Teach more file management, organization, use of R scripts. (Should have done th
 * Remove all estimand references. Too confusing for this book.
 
 
-4) Better workflow, automatic (with click confirmation) replacement of docs/ after successful check. Two parts: First, change the check so that it builds the book nicely. (Maybe not necessary. Maybe building the book in junk/ is OK?) Second, move the newly created book --- once it is accepted --- to docs/ on the master branch. Should we be taking multiple branches more seriously. Probably.
+*  Better workflow, automatic (with click confirmation) replacement of docs/ after successful check. Two parts: First, change the check so that it builds the book nicely. (Maybe not necessary. Maybe building the book in junk/ is OK?) Second, move the newly created book --- once it is accepted --- to docs/ on the master branch. Should we be taking multiple branches more seriously. Probably.
   + Things to discuss:
     - This change will prevent authors from easily knitting individual chapters. I will explore alternatives.
     - Two ways of handing auto-building and auot-updating:
@@ -108,9 +76,9 @@ Teach more file management, organization, use of R scripts. (Should have done th
 
 
 
-## DK
+## Older Materia
 
-
+Everything below needs to be reviewed and organized.
 
 Understand bibliography.
 
