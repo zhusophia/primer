@@ -1,34 +1,9 @@
 
-<!-- New Plan: -->
-
-<!-- * Delete the bootstrap. It is unnecessary. -->
-
 <!-- * Start by saying: Wow. What a bother it was to do everything by hand in chapter 6! There must be an easier way. And, indeed, there is! Use stan_glm. Show how it produces the same answers, with family binomial, as we got at end of chapter 6. Interpret the meaning of the parameter? Show the math?  -->
 
 <!-- Good reference: https://cran.r-project.org/web/packages/rstanarm/vignettes/binomial.html -->
 
-<!-- * You can pass seed as an argument to stan_glm! -->
-
-
-
-```{r, message=FALSE}
-library(tidyverse)
-library(rstanarm)
-
-shovel <- tibble(red = c(rep(1, 17), rep(0, 33))) %>% 
-  sample_frac()
-  
-
-fit_3 <- stan_glm(red ~ 1, 
-                  data = shovel,
-                  family = binomial(),
-                  refresh = 0,
-                  seed = 9)
-
-```
-
-
-<!-- * Then, EDA of nhanes.  -->
+<!-- Should use summary(fit_1) and discuss. -->
 
 
 <!-- TO-DO: --> 
@@ -89,15 +64,99 @@ Then, create a tibble, first column is ID. Second column is height_sample, which
 # Two Parameters {#two-parameters}
 
 
-What is the average height of an American male? What is the 90th percentile of the distribution of height for American men? How certain are you of your estimates? If we pass 5 men walking down the street, what are the odds that the tallest will be at least 5 centimeters taller than the shortest?
+In Chapter \@ref(one-parameter), we learned how to do inference. Given certain assumptions about the problem, we created a joint distribution of the models under consideration and the data which might be observed. Once we observe the data, we could go from the joint distribution to the conditional distribution of possible models given the data which we did, in fact, observe. That conditional distribution is our posterior probability distribution over the space of possible models. With that distribution, we can answer any question we might (reasonably) ask.
+
+But what a pain in the ass that whole process was! Do professionals actually go through all those steps every time they work on a data science problem? No! Don't be absurd. Instead, professionals use standard tools which, in an automated fashion, take care of those steps, taking us directly from assumptions and data to that posterior:
+
+$$p(models | data = results\ of\ experiment)$$.
 
 
+
+## rstanarm
+
+The most popular package for doing Bayesian data science in R is **rstanarm**. Assume that, as before, we have used a shovel of size 50 to draw beads from the urn and that 17 of the 50 were red. What inferences can we draw?
+
+First, after loading **tidyverse**, we need to create an object which contains this data.
+
+```{r, message=FALSE}
+library(tidyverse)
+library(rstanarm)
+
+shovel <- tibble(red = c(rep(1, 17), rep(0, 33))) %>% 
+  sample_frac() %>% 
+  mutate(ID = 1:nrow(.)) %>% 
+  select(ID, red)
+  
+shovel
+```
+
+`sample_frac()` just re-arranges the rows of `shovel`. Doing so does not matter since the order of the beads in the shovel is irrelevant to estimating the proportion of red beads in the urn. `shovel` is a column with a single variable, `red`, which takes the value 1 if that bead is red, and the value 0 if it is white.
+
+Second, with the data, we can now create a model, using `stan_glm()` from the **rstanarm** package. The basic call to `stan_glm()` uses three arguments:
+
+* `formula` is the structure of the statistical model we are estimating. In this case, `red` is our *dependent* variable, the variable that we are trying to explain or model. The tilde --- the "~" --- separates the dependent variable `red` from any explanatory variables. In this case, there is only a constant term, indicated by `1`. 
+
+* `data` is the data frame or, more usually, tibble, with the data necessary to estimate the model.
+
+* `family` indicates our assumption about the error term for this model, along with the link function. (We will discuss the constant, the error term and the link function in more detail below.) Because `red` only takes the values 0 and 1, we use the `binomial` family. 
+
+Estimating this model generates a great deal of mystifying output.
+
+```{r, message=FALSE}
+library(rstanarm)
+
+stan_glm(formula = red ~ 1, 
+         data = shovel,
+         family = binomial)
+```
+
+We will wait to later to discuss the meaning of that output. In the meantime, let's hide it by setting the `refresh` argument to 0. It is also handy to set the `seed` argument to a specific value. This allows us to regenerate exactly these results, even though the underlying estimation procedure is random. Save the resulting model as an object named `fit_1`.
+
+
+```{r}
+fit_1 <- stan_glm(formula = red ~ 1, 
+                  data = shovel,
+                  family = binomial,
+                  refresh = 0,
+                  seed = 9)
+```
+
+This single function call has done all the work which we did "by hand" in Chapter \@ref(one-parameter): created the joint distribution and then estimated the posterior probability distribution, conditional on the data which was passed in to the `data` argument. Let's explore that resulting object:
+
+```{r}
+fit_1
+```
+
+The top half of this print out gives us highlights of the model. It reminds us of the assumptions we used to create it. First, the family is binomial and we have used logit, the default link function. Second, the assumed model has `red` as a function of a single predictor, a constant term. Third, there are 50 observations in our data set.
+
+The second half of this output shows the estimating parameter values in our model. We will discuss these numbers and what they mean later. In the meantime, let's generate the posterior probability distribution for the percentage of red beads in the urn.
+
+```{r}
+fit_1 %>% 
+  posterior_epred() %>% 
+  as_tibble() %>% 
+  pivot_longer(cols = everything(), values_to = "p") %>% 
+  ggplot(aes(x = p,
+             y = after_stat(count/sum(count)))) +
+    geom_histogram(bins = 100) +
+    labs(title = "Posterior Probability Distribution",
+         subtitle = "Proportion of red beads is centered at 34%",
+         x = "Percent of Beads in Urn which Are Red",
+         y = "Probability") + 
+    scale_x_continuous(labels = scales::percent_format()) +
+    scale_y_continuous(labels = scales::percent_format()) +
+    theme_classic()
+```
+
+This is, more or less, the same result we got in the previous chapter, but with much less work.
+
+<!-- Similar, we can estimate the posterior *predictive* distribution   -->
 
 
 ## EDA for `nhanes`
 
 
-Shifting away from dealing with pennies, let's look at bootstrap modeling with the `nhanes` dataset from National Health and Nutrition Examination Survey conducted by the Centers for Disease Control and Prevention and covering children and adults in America. 
+Shifting away from dealing with beads, let's look at the `nhanes` dataset from National Health and Nutrition Examination Survey conducted by the Centers for Disease Control and Prevention and covering children and adults in America. 
 
 
 ```{r}
