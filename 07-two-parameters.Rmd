@@ -12,13 +12,7 @@
 
 <!-- We should reframe the chapter. Start with the big picture involving the connection between this chapter and the other chapters. Then, invoke the bootstrap as being the equivalent of all the sampling tricks we did in previous chapters. Then, make some graphics which look a lot like the graphics from chapter 6. (Make one graphic for a fixed value of sigma and then, I hope, make a 3-D graphic which shows what we do with two unknowns.) Then, explain that this is a total pain in the butt. Then introduce stan_glm() as the solution. Then show that stan_glm() "works" by doing the repeated sampling exercise which we had previously suggested for bootstrapping.  -->
 
-<!-- Connect the discussion to chapter 6 directly. The 2,400 beads in the Urn is like the 100,000,000 pennies in the US. The sample of 50 beads from the paddle is like the sample of 50 pennies we have. The big difference is that chapter 6 just wants a proportion (or a count). We want a mean. -->
-
-<!-- Key differences: First, chapter 6 deals with a limited set of specific models: 2401 possible models. The procedure is just what we saw in chapter 5.  We, on the other hand, have a continuous parameter.  (Average year is continuous. Number of beads is discrete.) Second, chapter 5 dealt with one parameter: the number of read beads, which we can also define as $p$, defined as the number of read beads divided by 2,400.  The  model in chapter 6 was binomial, and there is only one unknown parameter p. We have two unknown parameters: the mean mu of height in the US and the standard deviation sigma, of the normally distributed error term. -->
-
-
-<!-- Remaining Outline of the Chapter -->
-
+<!-- Key differences: First, chapter 6 deals with a limited set of specific models: 2401 possible models. The procedure is just what we saw in chapter 5.  We, on the other hand, have a continuous parameter.  Second, chapter 5 dealt with one parameter: the number of read beads, which we can also define as $p$, defined as the number of read beads divided by 2,400.  The  model in chapter 6 was binomial, and there is only one unknown parameter p. We have two unknown parameters: the mean mu of height in the US and the standard deviation sigma, of the normally distributed error term. -->
 
 <!-- Prove that the bootstrap works, that our 95% confidence intervals provide correct coverage. We make a game and I give you a sample of like 40. Here's the 40, and you give me a 95% CI using the bootstrap tools we learned. Then I give you another 40. And another. If we do this 1,00 times, and we use the same procedure for calculating a confidence interval each time, then 950 should include the truth. That's how we know bootstraps is correct and I could only demonstrate this to you if we know what the truth is.  
 
@@ -42,6 +36,16 @@ Then, create a tibble, first column is ID. Second column is height_sample, which
 <!-- 4b) Key issue two: Do we go straight from the bootstrap to rstanarm functions? That would be pretty aggressive. But also pretty cool! -->
 
 <!-- 5) Need to build a Rubin Table. (Read chapter 3 for background and discussion.) We want to have the year for every penny in the world. Sadly, we don't have that! But we do have 50 pennies. Show an RT, which shows both pennies we know the year of and pennies we don't know the year of. If we knew all the pennies, we could just calculate our estimand directly. We would know exactly the mean, the median, the 3rd oldest and so on. No uncertainty. But, we don't have all the years. The question marks mock us! So, we need to infer what is in the missing rows. (And then we . . . not sure I have thought this through.) Also, we can discuss lots of possible biases in the sampling mechanism. Indeed, the sampling mechanism is the key thing to discuss in this section. -->
+
+<!-- ## Using Bootstraps with `nhanes` -->
+
+<!-- 4. Prove that the bootstrap works, that our 95% confidence intervals provide correct coverage. We make a game and I give you a sample of like 40. Here's the 40, and you give me a 95% CI using the bootstrap tools we learned. Then I give you another 40. And another. If we do this 1,00 times, and we use the same procedure for calculating a confidence interval each time, then 950 should include the truth. That's how we know bootstraps is correct and I could only demonstrate this to you if we know what the truth is.   -->
+
+<!-- Plan: create function called create_ci(), which takes a tibble with a single variable called height and returns the 95% confidence interval --- i.e., a numeric vector of length 2 --- for the 75th percentile.  Note that you get to hard code everything. -->
+
+<!-- Then, create a tibble, first column is ID. Second column is height_sample, which is created by running sample(ch7$height, size = 40, replace = FALSE). Third column is ci, which is result mutate(ci = map(height_sample, ~ create_ci(.)). Fourth column is within_ci, which is TRUE if ci includes the TRUE value and FALSE otherwise. (If you want to have two columns, one for each limit, that is fine.) -->
+
+
 
 
 <!-- Other Notes -->
@@ -68,95 +72,39 @@ In Chapter \@ref(one-parameter), we learned how to do inference. Given certain a
 
 But what a pain in the ass that whole process was! Do professionals actually go through all those steps every time they work on a data science problem? No! Don't be absurd. Instead, professionals use standard tools which, in an automated fashion, take care of those steps, taking us directly from assumptions and data to that posterior:
 
-$$p(models | data = results\ of\ experiment)$$.
+$$p(models | data = data\ we\ observed)$$.
 
 
+The purpose of this chapter is to demonstrate, slowly and thoroughly, how professionals do data science.
 
-## rstanarm
+Data science is ultimately a moral act, so we will use the four [Cardinal Virtues](https://en.wikipedia.org/wiki/Cardinal_virtues) --- Wisdom, Justice, Courage and Temperance --- to organize our approach.  
 
-The most popular package for doing Bayesian data science in R is **rstanarm**. Assume that, as before, we have used a shovel of size 50 to draw beads from the urn and that 17 of the 50 were red. What inferences can we draw?
+## Wisdom
 
-First, after loading **tidyverse**, we need to create an object which contains this data.
-
-```{r, message=FALSE}
-library(tidyverse)
-library(rstanarm)
-
-shovel <- tibble(red = c(rep(1, 17), rep(0, 33))) %>% 
-  sample_frac() %>% 
-  mutate(ID = 1:nrow(.)) %>% 
-  select(ID, red)
-  
-shovel
+```{r echo=FALSE, out.width="100%"}
+knitr::include_graphics("other/images/Wisdom.jpg")
 ```
 
-`sample_frac()` just re-arranges the rows of `shovel`. Doing so does not matter since the order of the beads in the shovel is irrelevant to estimating the proportion of red beads in the urn. `shovel` is a column with a single variable, `red`, which takes the value 1 if that bead is red, and the value 0 if it is white.
+What decision do we face? The reason for making models is not, primarily that making models is fun, although it is! The reason is that we face a decision. We must decide between X or Y. We must choose from A, B or C. We must set D to a specific numeric value. Given that decision, we should make a model of the world to help us.
 
-Second, with the data, we can now create a model, using `stan_glm()` from the **rstanarm** package. The basic call to `stan_glm()` uses three arguments:
+In any textbook, it will be tough to avoid the "toy problem" trap. The real world is complex. Any substantive decision problem includes a great deal of complexity and requires a great deal of context. We do not have the time to get into that level of detail. So, we simplify. We are going to create a model of height for adult men. We will then use that model to answer four questions:
 
-* `formula` is the structure of the statistical model we are estimating. In this case, `red` is our *dependent* variable, the variable that we are trying to explain or model. The tilde --- the "~" --- separates the dependent variable `red` from any explanatory variables. In this case, there is only a constant term, indicated by `1`. 
+* What is the average height of men in the population?
 
-* `data` is the data frame or, more usually, tibble, with the data necessary to estimate the model.
+* What is the probability that the next adult male we meet will be taller than 180 centimeters?
 
-* `family` indicates our assumption about the error term for this model, along with the link function. (We will discuss the constant, the error term and the link function in more detail below.) Because `red` only takes the values 0 and 1, we use the `binomial` family. 
+* What is the probability that, among the next 4 men we meet, the tallest is at least 10 cm taller than the shortest?
 
-Estimating this model generates a great deal of mystifying output.
+* What is our posterior probability distribution for the height of the 3rd tallest man out of the next 100 we meet?
 
-```{r, message=FALSE}
-library(rstanarm)
+The middle two questions have a single number, a single probability, as their answer. The first and third questions require a full scale posterior probability distribution.
 
-stan_glm(formula = red ~ 1, 
-         data = shovel,
-         family = binomial)
-```
+Before starting that process, however, we need to look at the data we have.
 
-We will wait to later to discuss the meaning of that output. In the meantime, let's hide it by setting the `refresh` argument to 0. It is also handy to set the `seed` argument to a specific value. This allows us to regenerate exactly these results, even though the underlying estimation procedure is random. Save the resulting model as an object named `fit_1`.
+### EDA for `nhanes`
 
 
-```{r}
-fit_1 <- stan_glm(formula = red ~ 1, 
-                  data = shovel,
-                  family = binomial,
-                  refresh = 0,
-                  seed = 9)
-```
-
-This single function call has done all the work which we did "by hand" in Chapter \@ref(one-parameter): created the joint distribution and then estimated the posterior probability distribution, conditional on the data which was passed in to the `data` argument. Let's explore that resulting object:
-
-```{r}
-fit_1
-```
-
-The top half of this print out gives us highlights of the model. It reminds us of the assumptions we used to create it. First, the family is binomial and we have used logit, the default link function. Second, the assumed model has `red` as a function of a single predictor, a constant term. Third, there are 50 observations in our data set.
-
-The second half of this output shows the estimating parameter values in our model. We will discuss these numbers and what they mean later. In the meantime, let's generate the posterior probability distribution for the percentage of red beads in the urn.
-
-```{r}
-fit_1 %>% 
-  posterior_epred() %>% 
-  as_tibble() %>% 
-  pivot_longer(cols = everything(), values_to = "p") %>% 
-  ggplot(aes(x = p,
-             y = after_stat(count/sum(count)))) +
-    geom_histogram(bins = 100) +
-    labs(title = "Posterior Probability Distribution",
-         subtitle = "Proportion of red beads is centered at 34%",
-         x = "Percent of Beads in Urn which Are Red",
-         y = "Probability") + 
-    scale_x_continuous(labels = scales::percent_format()) +
-    scale_y_continuous(labels = scales::percent_format()) +
-    theme_classic()
-```
-
-This is, more or less, the same result we got in the previous chapter, but with much less work.
-
-<!-- Similar, we can estimate the posterior *predictive* distribution   -->
-
-
-## EDA for `nhanes`
-
-
-Shifting away from dealing with beads, let's look at the `nhanes` dataset from National Health and Nutrition Examination Survey conducted by the Centers for Disease Control and Prevention and covering children and adults in America. 
+Let's look at the `nhanes` dataset from the National Health and Nutrition Examination Survey conducted by the Centers for Disease Control and Prevention and covering children and adults in the United States. 
 
 
 ```{r}
@@ -168,14 +116,15 @@ glimpse(nhanes)
 `nhanes` has data on a diverse array of things like physical attributes, education, and sleep. Let's restrict our attention to a subset, focusing on gender, height and the year of the survey. 
 
 ```{r}
-ch7 <- nhanes %>% 
+nhanes %>% 
   select(age, gender, height, survey)
 ```
 
 Look at a random sample of our data:
 
 ```{r}
-ch7 %>% 
+nhanes %>% 
+  select(age, gender, height, survey) %>% 
   sample_n(5)
 ```
 
@@ -184,7 +133,8 @@ Notice how there is a decimal in the `height` column of `ch7`. This is because `
 Let's also run `glimpse()` on our new data.
 
 ```{r}
-ch7 %>%
+nhanes %>% 
+  select(age, gender, height, survey) %>% 
   glimpse()
 ```
 
@@ -193,11 +143,12 @@ Be on the lookout for anything suspicious. Are there any NA's in your data set? 
 In addition to `glimpse()`, we can run `skim()`, from the **skimr** package, to calculate some summary statistics. 
 
 ```{r, out.width="100%"}
-ch7 %>% 
+nhanes %>% 
+  select(age, gender, height, survey) %>% 
   skim()
 ```
 
-Interesting! There are 353 missing values of height in our subset of data. Just using `glimpse()` does not show us that.  Let's filter out the NA's using `drop_na`. This we will delete the rows in which the value of any variable is missing. For simplicity, let's only consider adults.
+Interesting! There are 353 missing values of height in our subset of data. Just using `glimpse()` does not show us that.  Let's filter out the NA's using `drop_na`. This will delete the rows in which the value of any variable is missing. For simplicity, let's only consider adults.
 
 ```{r}
 ch7 <- nhanes %>% 
@@ -207,6 +158,8 @@ ch7 <- nhanes %>%
 ```
 
 Plot your data. `geom_density()` is a smooth version of `geom_histogram()`. With `geom_density()`, the y-axis is scaled so that the area under the curve equals 1. 
+
+<!-- DK: Delete females and make a better plot. -->
 
 ```{r}
 ch7 %>%
@@ -218,82 +171,45 @@ ch7 %>%
 
 We can see the the most probable heights for both genders and that men are generally taller than women. 
 
-<!-- ## Using Bootstraps with `nhanes` -->
 
-<!-- 4. Prove that the bootstrap works, that our 95% confidence intervals provide correct coverage. We make a game and I give you a sample of like 40. Here's the 40, and you give me a 95% CI using the bootstrap tools we learned. Then I give you another 40. And another. If we do this 1,00 times, and we use the same procedure for calculating a confidence interval each time, then 950 should include the truth. That's how we know bootstraps is correct and I could only demonstrate this to you if we know what the truth is.   -->
-
-<!-- Plan: create function called create_ci(), which takes a tibble with a single variable called height and returns the 95% confidence interval --- i.e., a numeric vector of length 2 --- for the 75th percentile.  Note that you get to hard code everything. -->
-
-<!-- Then, create a tibble, first column is ID. Second column is height_sample, which is created by running sample(ch7$height, size = 40, replace = FALSE). Third column is ci, which is result mutate(ci = map(height_sample, ~ create_ci(.)). Fourth column is within_ci, which is TRUE if ci includes the TRUE value and FALSE otherwise. (If you want to have two columns, one for each limit, that is fine.) -->
-
-
-
-## Probability to bootstrap to Bayesian models
-
-Most textbooks would, at this stage, provide a more mathematical explanation of the transition we are making from Chapter \@ref(probability) to this chapter. In both Chapters \@ref(probability) and \@ref(one-parameter) we dealt with a discrete set of possible models. We began with examples in which there were only two or three possible "true" states of the world. You were either infected or not infected. There were either zero, one or two white marbles in the bag. These examples grew more and more complex, both by increasing the number of models under consideration and by increasing the number of possible outcomes of the experiment. In the case of the urn, there were 2,401 possible models: either zero or one or two or . . . 2,400 red beads in the urn. 
-
-The transition from a discrete set of possible models to an infinite set of possible models is mathematically complex but easy on the intuition. Just wave you hands, imagine lots more models, and invoke the aesthetic appeal of smoothness. In the case of height, there are an infinite number of possible models: average height of adult American men in 2009 could be 175, 175.1, 175.14, 175.148, 175.1482, and so on. There are an infinite number of possible values since height is continuous. Yet, almost miraculously, the same intuition applies. 
-
-Let's use $\mu$ as the parameter for the unknown average height of all the adult men in America in 2009. This is exactly analogous to the parameter $p$ from Chapter \@ref(one-parameter), the proportion of red beans in the urn. The only difference is that there are an infinite number of values which $\mu$ might take. We restricted $p$ to only 2,401 possible values: $0$, $1/2400$, $2/2400$, ..., $2399/2400$, $1$. 
-
-Although a bootstrap can create a posterior distribution, as above, there are much simpler ways to do so. The most common involves the function `stan_glm()` from the **rstanarm** library. Halfway through the book, we are now ready for our first full scale data science project. Let us be guided by the cardinal virtues.
-
-
-## Cardinal Virtues
-
-Consider a subset of the `nhanes` data:
+Let's focus on a subset of the `nhanes` data, designed to answer our questions:
 
 ```{r}
-ch7_male <- nhanes %>%
+ch7 <- nhanes %>%
   filter(survey == 2009, gender == "Male", age >= 18) %>%
   select(height) %>%
   drop_na()
 ```
 
 
-Data science is ultimately a moral act, so we will use the four [Cardinal Virtues](https://en.wikipedia.org/wiki/Cardinal_virtues) --- Wisdom, Justice, Courage and Temperance --- to organize our approach. The purpose of this section is two-fold. First, we will show you that a more formal Bayesian approach results in, more or less, the same answer as the bootstrap above, but with much less code. Second, we will show how the Cardinal Virtues guide good data science.  
+Will the data we have --- which is only for a sample of adult American men in 2009 --- allow us to answer our questions, however roughly? 
 
-### Wisdom
-
-```{r echo=FALSE, out.width="100%"}
-knitr::include_graphics("other/images/Wisdom.jpg")
-```
-
-What decision do we face? The reason for making models is not, primarily that making models is fun, although it is! The reason is that we face a decision. We must decide between X or Y. We must choose from A, B or C. We must set D to a specific numeric value. Given that decision, we should make a model of the world to help us.
-
-In any textbook, it will be tough to avoid the "toy problem" trap. The real world is complex. Any substantive decision problem includes a great deal of complexity and requires a great deal of context. We do not have the time to get into that level of detail. So, we simplify. We are going to create a model of height for adult men. We will then use that model to answer three questions:
-
-* What is the probability that the next adult male we meet will be taller than 180 centimeters?
-
-* What is the probability that, among the next 4 men we meet, the tallest is at least 10 cm taller than the shortest?
-
-* What is our posterior probability distribution for the height of the 3rd tallest man out of the next 100 we meet?
-
-The first two questions have a single number, a single probability, as their answer. The third question requires a full scale posterior probability distribution.
-
-But before starting that process, we need to check that the data we have --- which is only for a sample of adult American men in 2009 --- will allow us to answer these questions, however roughly. 
-
-That is where Wisdom comes in. In the social sciences, *there is never a perfect relationship between the data you have and the question you are trying to answer.* Data for American males in 2009 is not the same thing as data for American males today. Nor is it the same as the data for men in France or Mexico. Moreover, the problem hasn't specified where on Earth we are, nor who we are near. Walking near a basketball tournament will generate different answers than walking around Times Square. 
+That is where Wisdom comes in. In the social sciences, *there is never a perfect relationship between the data you have and the question you are trying to answer.* Data for American males in 2009 is not the same thing as data for American males today. Nor is it the same as the data for men in France or Mexico. Moreover, the problem hasn't specified where on Earth we are, nor who we are near. Walking by a basketball tournament will generate different answers than walking around Times Square. 
 
 Yet, this data is relevant. Right? It is certainly better than nothing. That is, using not-perfect data is better than using no data at all.
 
+Is not-perfect data always better? No! If your problem is estimating the median height of 5th grade girls in Tokyo, we doubt that our data is at all relevant. Wisdom recognizes the danger of using non-relevant data to build a model and then mistakenly using that model in a way which will only make the situation worse. If the data won't help, don't use the data, don't build a model. Better to just use your common sense and experience. Or find better data.
 
-Is not-perfect data always better? No! If your problem is estimating the median height of 5th grade girls in Toyko, we doubt that our data is at all relevant. Wisdom recognizes the danger of using non-relevant data to build a model and then mistakenly using that model in a way which will only make the situation worse. If the data won't help, don't use the data, don't build a model. Better to just use your common sense and experience. Or find better data.
+<!-- DK: Discuss the Rubin Table. More on population. -->
+
+The statistical term "population" is often relevant here. Recall from Chapter \@ref(one-parameter) that the "population" is the set of units which we are interested in. 
 
 The other aspect of Wisdom is ethics. Just because we *can* make a model does not mean we *should* make that model. Models can be used for evil and, if at all possible, we should do no evil. Fortunately, it is hard to generate many ethical worries about height models. If, instead, we were modeling criminality, the ethics become much more complex . . .
 
-### Justice
+## Justice
 
 ```{r, echo=FALSE, out.width="100%"}
 knitr::include_graphics("other/images/Justice.jpg")
 ```
 
+Having looked at our data and decided that it is "close enough" to our questions that creating a model will help us, we move on to Justice.
+
 Mathematical knowledge is the least important skill for a data scientist. 
 
 However, a little mathematical notation will make our modeling assumptions clear, will bring some precision to our approach. In this case:
 
-$$ y_i =  \mu + \epsilon_i $$
-with $\epsilon_i \sim N(0, \sigma^2)$. $y_i$ is the height of male $i$. $\mu$ is the average height of all males in the population. $\epsilon_i$ is the "error term," the difference between the height of male $i$ and the average height of all males.  $\epsilon_i$ is normally distributed with a mean of 0 and a standard deviation of $\sigma$. 
+$$ height_i =  \mu + \epsilon_i $$
+with $\epsilon_i \sim N(0, \sigma^2)$. $height_i$ is the height of male $i$. $\mu$ is the average height of all males in the population. $\epsilon_i$ is the "error term," the difference between the height of male $i$ and the average height of all males.  $\epsilon_i$ is, by assumption, normally distributed with a mean of 0 and a standard deviation of $\sigma$. 
 
 This is the simplest model we can construct. Note: 
 
@@ -341,7 +257,7 @@ tibble(ID = c("1", "2", "...", "473", "474",
 
 Since this is not a causal model, there is only one potential outcome --- which is to say, only one outcome: an individual's height. 
 
-### Courage
+## Courage
 
 ```{r echo=FALSE, out.width="100%"}
 knitr::include_graphics("other/images/Courage.jpg")
@@ -521,7 +437,7 @@ outcome + fitted + res +
 
 
 
-### Temperance
+## Temperance
 
 ```{r echo=FALSE, out.width="100%"}
 knitr::include_graphics("other/images/Temperance.jpg")
@@ -649,6 +565,90 @@ pp[, 1:100] %>%
 
 <!-- DK: Need more text. Explain all the things that could be wrong with the model. Explain what is going on in different columns. Explain all the cool R code tricks.  -->
 
+<!-- DK: Insert a demonstration which shows that the 95% confidence interval does, in fact, provide 95% coverage. -->
+
+
+## rstanarm
+
+The most popular package for doing Bayesian data science in R is **rstanarm**. Assume that, as before, we have used a shovel of size 50 to draw beads from the urn and that 17 of the 50 were red. What inferences can we draw?
+
+First, after loading **tidyverse**, we need to create an object which contains this data.
+
+```{r, message=FALSE}
+library(tidyverse)
+library(rstanarm)
+
+shovel <- tibble(red = c(rep(1, 17), rep(0, 33))) %>% 
+  sample_frac() %>% 
+  mutate(ID = 1:nrow(.)) %>% 
+  select(ID, red)
+  
+shovel
+```
+
+`sample_frac()` just re-arranges the rows of `shovel`. Doing so does not matter since the order of the beads in the shovel is irrelevant to estimating the proportion of red beads in the urn. `shovel` is a column with a single variable, `red`, which takes the value 1 if that bead is red, and the value 0 if it is white.
+
+Second, with the data, we can now create a model, using `stan_glm()` from the **rstanarm** package. The basic call to `stan_glm()` uses three arguments:
+
+* `formula` is the structure of the statistical model we are estimating. In this case, `red` is our *dependent* variable, the variable that we are trying to explain or model. The tilde --- the "~" --- separates the dependent variable `red` from any explanatory variables. In this case, there is only a constant term, indicated by `1`. 
+
+* `data` is the data frame or, more usually, tibble, with the data necessary to estimate the model.
+
+* `family` indicates our assumption about the error term for this model, along with the link function. (We will discuss the constant, the error term and the link function in more detail below.) Because `red` only takes the values 0 and 1, we use the `binomial` family. 
+
+Estimating this model generates a great deal of mystifying output.
+
+```{r, message=FALSE}
+library(rstanarm)
+
+stan_glm(formula = red ~ 1, 
+         data = shovel,
+         family = binomial)
+```
+
+We will wait to later to discuss the meaning of that output. In the meantime, let's hide it by setting the `refresh` argument to 0. It is also handy to set the `seed` argument to a specific value. This allows us to regenerate exactly these results, even though the underlying estimation procedure is random. Save the resulting model as an object named `fit_1`.
+
+
+```{r}
+fit_1 <- stan_glm(formula = red ~ 1, 
+                  data = shovel,
+                  family = binomial,
+                  refresh = 0,
+                  seed = 9)
+```
+
+This single function call has done all the work which we did "by hand" in Chapter \@ref(one-parameter): created the joint distribution and then estimated the posterior probability distribution, conditional on the data which was passed in to the `data` argument. Let's explore that resulting object:
+
+```{r}
+fit_1
+```
+
+The top half of this print out gives us highlights of the model. It reminds us of the assumptions we used to create it. First, the family is binomial and we have used logit, the default link function. Second, the assumed model has `red` as a function of a single predictor, a constant term. Third, there are 50 observations in our data set.
+
+The second half of this output shows the estimating parameter values in our model. We will discuss these numbers and what they mean later. In the meantime, let's generate the posterior probability distribution for the percentage of red beads in the urn.
+
+```{r}
+fit_1 %>% 
+  posterior_epred() %>% 
+  as_tibble() %>% 
+  pivot_longer(cols = everything(), values_to = "p") %>% 
+  ggplot(aes(x = p,
+             y = after_stat(count/sum(count)))) +
+    geom_histogram(bins = 100) +
+    labs(title = "Posterior Probability Distribution",
+         subtitle = "Proportion of red beads is centered at 34%",
+         x = "Percent of Beads in Urn which Are Red",
+         y = "Probability") + 
+    scale_x_continuous(labels = scales::percent_format()) +
+    scale_y_continuous(labels = scales::percent_format()) +
+    theme_classic()
+```
+
+This is, more or less, the same result we got in the previous chapter, but with much less work.
+
+<!-- Similar, we can estimate the posterior *predictive* distribution   -->
+
+
 
 ## Summary
 
@@ -661,3 +661,16 @@ Having set up the model framework, we need *Courage* to implement the model in c
 *Temperance* guides the final step. With a model, we can finally get back to the decision which motivated the exercise in the first place. We can use the model to make statements about the world, both to confirm that the model is consistent with the world and to use the model to make predictions about numbers which we do not know. 
 
 Let's practice this process another dozen or so times.
+
+
+
+<!-- ## Probability to bootstrap to Bayesian models -->
+
+<!-- Most textbooks would, at this stage, provide a more mathematical explanation of the transition we are making from Chapter \@ref(probability) to this chapter. In both Chapters \@ref(probability) and \@ref(one-parameter) we dealt with a discrete set of possible models. We began with examples in which there were only two or three possible "true" states of the world. You were either infected or not infected. There were either zero, one or two white marbles in the bag. These examples grew more and more complex, both by increasing the number of models under consideration and by increasing the number of possible outcomes of the experiment. In the case of the urn, there were 2,401 possible models: either zero or one or two or . . . 2,400 red beads in the urn.  -->
+
+<!-- The transition from a discrete set of possible models to an infinite set of possible models is mathematically complex but easy on the intuition. Just wave you hands, imagine lots more models, and invoke the aesthetic appeal of smoothness. In the case of height, there are an infinite number of possible models: average height of adult American men in 2009 could be 175, 175.1, 175.14, 175.148, 175.1482, and so on. There are an infinite number of possible values since height is continuous. Yet, almost miraculously, the same intuition applies.  -->
+
+<!-- Let's use $\mu$ as the parameter for the unknown average height of all the adult men in America in 2009. This is exactly analogous to the parameter $p$ from Chapter \@ref(one-parameter), the proportion of red beans in the urn. The only difference is that there are an infinite number of values which $\mu$ might take. We restricted $p$ to only 2,401 possible values: $0$, $1/2400$, $2/2400$, ..., $2399/2400$, $1$.  -->
+
+<!-- Although a bootstrap can create a posterior distribution, as above, there are much simpler ways to do so. The most common involves the function `stan_glm()` from the **rstanarm** library. Halfway through the book, we are now ready for our first full scale data science project. Let us be guided by the cardinal virtues. -->
+
