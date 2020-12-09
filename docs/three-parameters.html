@@ -32,7 +32,7 @@
 
       <nav aria-label="Table of contents"><h2>Table of contents</h2>
         <ul class="book-toc list-unstyled">
-<li><a class="" href="index.html"></a></li>
+<li><a class="" href="index.html">Welcome</a></li>
 <li><a class="" href="preamble.html">Preamble</a></li>
 <li><a class="" href="shopping-week.html">Shopping Week</a></li>
 <li><a class="" href="visualization.html"><span class="header-section-number">1</span> Visualization</a></li>
@@ -71,12 +71,12 @@
 <!-- DK: Still need to standardize the method we use for providing references. -->
 <!-- DK: Fix Enos reference. -->
 <p>Always explore your data. To demonstrate modeling with three parameters, we will use the <code>trains</code> data set from the <strong>primer.data</strong> package. Recall the discussion from Chapter <a href="rubin-causal-model.html#rubin-causal-model">3</a>. Enos (2014) randomly placed Spanish-speaking confederates on nine train platforms around Boston, Massachusetts. Exposure to Spanish-speakers – the <code>treatment</code> – influenced attitudes toward immigration. These reactions were measured through changes in answers to three survey questions. Let’s load the libraries we will need in this chapter, all of which we have used before, and look at the data.</p>
-<div class="sourceCode" id="cb853"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb854"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">primer.data</span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://mc-stan.org/rstanarm/">rstanarm</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://docs.ropensci.org/skimr">skimr</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb854"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb855"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">glimpse</span><span class="op">(</span><span class="va">trains</span><span class="op">)</span></code></pre></div>
 <pre><code>## Rows: 115
 ## Columns: 8
@@ -89,23 +89,23 @@
 ## $ treatment &lt;fct&gt; Treated, Treated, Treated, Treated, Control, Treated, Contr…
 ## $ att_end   &lt;dbl&gt; 11, 10, 5, 11, 5, 13, 13, 11, 12, 10, 9, 9, 13, 7, 8, 13, 8…</code></pre>
 <p>Here, we can see information about each respondent’s gender, political affiliations, age, and income. Additionally, <code>treatment</code> indicates whether a subject was in the control or treatment group, and their attitudes toward immigration both before (<code>att_start</code>) and after (<code>att_end</code>) the experiment. You can type <code><a href="https://rdrr.io/pkg/primer.data/man/trains.html">?trains</a></code> to read the help page for more information about each variable. Let’s restrict attention to a subset of the variables.</p>
-<div class="sourceCode" id="cb856"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb857"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch8</span> <span class="op">&lt;-</span> <span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu">select</span><span class="op">(</span><span class="va">age</span>, <span class="va">att_end</span>, <span class="va">party</span>, <span class="va">treatment</span><span class="op">)</span></code></pre></div>
 <p>It is always smart to look at a some random samples of the data:</p>
-<div class="sourceCode" id="cb857"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb858"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch8</span> <span class="op">%&gt;%</span> 
   <span class="fu">sample_n</span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 5 x 4
 ##     age att_end party      treatment
 ##   &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;      &lt;fct&gt;    
-## 1    44       9 Democrat   Control  
-## 2    67       9 Democrat   Control  
-## 3    42      10 Democrat   Treated  
-## 4    52      10 Republican Treated  
-## 5    46      12 Democrat   Control</code></pre>
+## 1    44       9 Republican Control  
+## 2    53       8 Democrat   Control  
+## 3    50       7 Democrat   Treated  
+## 4    52      13 Democrat   Treated  
+## 5    37       7 Republican Control</code></pre>
 <p><code>att_end</code> is a measure of person’s attitude toward immigration. A higher number means more conservative, i.e., a more exclusionary stance toward immigration into the United States.</p>
-<div class="sourceCode" id="cb859"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb860"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch8</span> <span class="op">%&gt;%</span> 
   <span class="fu">glimpse</span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## Rows: 115
@@ -115,7 +115,7 @@
 ## $ party     &lt;chr&gt; "Democrat", "Republican", "Democrat", "Democrat", "Democrat…
 ## $ treatment &lt;fct&gt; Treated, Treated, Treated, Treated, Control, Treated, Contr…</code></pre>
 <p>Pay attention to the variable types. Do they make sense? Perhaps. But there are certainly grounds for suspicion. Why are <code>age</code> and <code>att_end</code> doubles rather than integers? All the values in the data appear to be integers, so there is no benefit to having these variables be doubles. Why is <code>party</code> a character variable and <code>treatment</code> a factor variable? It could be that these are intentional choices made by the creator of the tibble, i.e., us. These could be mistakes. Or, most likely, these choices are a mixture of sensible and arbitrary. Regardless, it is your responsibility to notice them. You can’t make a good model without looking closely at the data which you are using.</p>
-<div class="sourceCode" id="cb861"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb862"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch8</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://docs.ropensci.org/skimr/reference/skim.html">skim</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <div class="inline-table"><table class="table table-sm">
@@ -252,7 +252,7 @@
 </table></div>
 <p><code><a href="https://docs.ropensci.org/skimr/reference/skim.html">skim()</a></code> shows us what the different values of <code>treatment</code> are because it is a factor. Unfortunately, it does not do the same for character variables like <code>party</code>. The ranges for <code>age</code> and <code>att_end</code> seem reasonable. Recall that participants were asked three questions about immigration issues, each of which allowed for an answer indicated strength of agreement on a scale form 1 to 5, with higher values indicating more agreement with conservative viewpoints. <code>att_end</code> is the sum of the responses to the three questions, so the most liberal possible value is 3 and the most conservative is 15.</p>
 <p>Always plot your data.</p>
-<div class="sourceCode" id="cb862"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb863"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch8</span> <span class="op">%&gt;%</span>
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">party</span>, y <span class="op">=</span> <span class="va">age</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">geom_jitter</span><span class="op">(</span>width <span class="op">=</span> <span class="fl">0.1</span>, height <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span> 
@@ -262,7 +262,7 @@
        y <span class="op">=</span> <span class="st">"Age"</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-647-1.png" width="672"></div>
 <p>There are more Democrats in this dataset than Republicans. Democrats also span a wider range of ages than Republicans.</p>
-<div class="sourceCode" id="cb863"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb864"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch8</span> <span class="op">%&gt;%</span>
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">treatment</span>, y <span class="op">=</span> <span class="va">att_end</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">geom_boxplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
@@ -315,7 +315,7 @@ FIGURE 8.2: Justice
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#xcmooxjmvw .gt_table {
+#wagmkbesgh .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -340,7 +340,7 @@ FIGURE 8.2: Justice
   border-left-color: #D3D3D3;
 }
 
-#xcmooxjmvw .gt_heading {
+#wagmkbesgh .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -352,7 +352,7 @@ FIGURE 8.2: Justice
   border-right-color: #D3D3D3;
 }
 
-#xcmooxjmvw .gt_title {
+#wagmkbesgh .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -362,7 +362,7 @@ FIGURE 8.2: Justice
   border-bottom-width: 0;
 }
 
-#xcmooxjmvw .gt_subtitle {
+#wagmkbesgh .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -372,13 +372,13 @@ FIGURE 8.2: Justice
   border-top-width: 0;
 }
 
-#xcmooxjmvw .gt_bottom_border {
+#wagmkbesgh .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#xcmooxjmvw .gt_col_headings {
+#wagmkbesgh .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -393,7 +393,7 @@ FIGURE 8.2: Justice
   border-right-color: #D3D3D3;
 }
 
-#xcmooxjmvw .gt_col_heading {
+#wagmkbesgh .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -413,7 +413,7 @@ FIGURE 8.2: Justice
   overflow-x: hidden;
 }
 
-#xcmooxjmvw .gt_column_spanner_outer {
+#wagmkbesgh .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -425,15 +425,15 @@ FIGURE 8.2: Justice
   padding-right: 4px;
 }
 
-#xcmooxjmvw .gt_column_spanner_outer:first-child {
+#wagmkbesgh .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#xcmooxjmvw .gt_column_spanner_outer:last-child {
+#wagmkbesgh .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#xcmooxjmvw .gt_column_spanner {
+#wagmkbesgh .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -445,7 +445,7 @@ FIGURE 8.2: Justice
   width: 100%;
 }
 
-#xcmooxjmvw .gt_group_heading {
+#wagmkbesgh .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -467,7 +467,7 @@ FIGURE 8.2: Justice
   vertical-align: middle;
 }
 
-#xcmooxjmvw .gt_empty_group_heading {
+#wagmkbesgh .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -482,15 +482,15 @@ FIGURE 8.2: Justice
   vertical-align: middle;
 }
 
-#xcmooxjmvw .gt_from_md > :first-child {
+#wagmkbesgh .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#xcmooxjmvw .gt_from_md > :last-child {
+#wagmkbesgh .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#xcmooxjmvw .gt_row {
+#wagmkbesgh .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -509,7 +509,7 @@ FIGURE 8.2: Justice
   overflow-x: hidden;
 }
 
-#xcmooxjmvw .gt_stub {
+#wagmkbesgh .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -521,7 +521,7 @@ FIGURE 8.2: Justice
   padding-left: 12px;
 }
 
-#xcmooxjmvw .gt_summary_row {
+#wagmkbesgh .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -531,7 +531,7 @@ FIGURE 8.2: Justice
   padding-right: 5px;
 }
 
-#xcmooxjmvw .gt_first_summary_row {
+#wagmkbesgh .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -541,7 +541,7 @@ FIGURE 8.2: Justice
   border-top-color: #D3D3D3;
 }
 
-#xcmooxjmvw .gt_grand_summary_row {
+#wagmkbesgh .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -551,7 +551,7 @@ FIGURE 8.2: Justice
   padding-right: 5px;
 }
 
-#xcmooxjmvw .gt_first_grand_summary_row {
+#wagmkbesgh .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -561,11 +561,11 @@ FIGURE 8.2: Justice
   border-top-color: #D3D3D3;
 }
 
-#xcmooxjmvw .gt_striped {
+#wagmkbesgh .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#xcmooxjmvw .gt_table_body {
+#wagmkbesgh .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -574,7 +574,7 @@ FIGURE 8.2: Justice
   border-bottom-color: #D3D3D3;
 }
 
-#xcmooxjmvw .gt_footnotes {
+#wagmkbesgh .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -588,13 +588,13 @@ FIGURE 8.2: Justice
   border-right-color: #D3D3D3;
 }
 
-#xcmooxjmvw .gt_footnote {
+#wagmkbesgh .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#xcmooxjmvw .gt_sourcenotes {
+#wagmkbesgh .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -608,46 +608,46 @@ FIGURE 8.2: Justice
   border-right-color: #D3D3D3;
 }
 
-#xcmooxjmvw .gt_sourcenote {
+#wagmkbesgh .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#xcmooxjmvw .gt_left {
+#wagmkbesgh .gt_left {
   text-align: left;
 }
 
-#xcmooxjmvw .gt_center {
+#wagmkbesgh .gt_center {
   text-align: center;
 }
 
-#xcmooxjmvw .gt_right {
+#wagmkbesgh .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#xcmooxjmvw .gt_font_normal {
+#wagmkbesgh .gt_font_normal {
   font-weight: normal;
 }
 
-#xcmooxjmvw .gt_font_bold {
+#wagmkbesgh .gt_font_bold {
   font-weight: bold;
 }
 
-#xcmooxjmvw .gt_font_italic {
+#wagmkbesgh .gt_font_italic {
   font-style: italic;
 }
 
-#xcmooxjmvw .gt_super {
+#wagmkbesgh .gt_super {
   font-size: 65%;
 }
 
-#xcmooxjmvw .gt_footnote_marks {
+#wagmkbesgh .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="xcmooxjmvw" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><div class="inline-table"><table class="gt_table">
+<div id="wagmkbesgh" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><div class="inline-table"><table class="gt_table">
 <thead class="gt_col_headings">
 <tr>
 <th class="gt_col_heading gt_center gt_columns_bottom_border" rowspan="2" colspan="1" style="text-align: left; vertical-align: middle;">ID</th>
@@ -752,7 +752,7 @@ FIGURE 8.3: Courage
 </div>
 <p>Courage allows us to translate math to code.</p>
 <p>To get posterior distributions for our three parameters, we will again use <code><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm()</a></code>, just as we did in Chapter <a href="two-parameters.html#two-parameters">7</a>. If we take a look at the formula, we can see that it is similar to the equation from before.</p>
-<div class="sourceCode" id="cb864"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb865"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span><span class="va">age</span> <span class="op">~</span> <span class="va">party</span> <span class="op">-</span> <span class="fl">1</span>, 
                     data <span class="op">=</span> <span class="va">trains</span>, 
                     refresh <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
@@ -762,7 +762,7 @@ FIGURE 8.3: Courage
 <li><p>We have also added <code>-1</code> at the end of the equation, indicating that we do not want an intercept, which would otherwise be added by default.</p></li>
 </ul>
 <p>The resulting output:</p>
-<div class="sourceCode" id="cb865"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb866"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_obj</span></code></pre></div>
 <pre><code>## stan_glm
 ##  family:       gaussian [identity]
@@ -771,8 +771,8 @@ FIGURE 8.3: Courage
 ##  predictors:   2
 ## ------
 ##                 Median MAD_SD
-## partyDemocrat   42.6    1.2  
-## partyRepublican 41.1    2.8  
+## partyDemocrat   42.6    1.3  
+## partyRepublican 41.0    3.0  
 ## 
 ## Auxiliary parameter(s):
 ##       Median MAD_SD
@@ -784,7 +784,7 @@ FIGURE 8.3: Courage
 <p><code>partyDemocrat</code> corresponds to <span class="math inline">\(\beta_1\)</span>, the average age of Democrats in the population. <code>partyRepublican</code> corresponds to <span class="math inline">\(\beta_2\)</span>, the average age of Republicans in the population. Since we don’t really care about the posterior distribution for <span class="math inline">\(\sigma\)</span>, we won’t discuss it here. Graphically:</p>
 <!-- DK: Lots to clean up about this plot! -->
 <!-- DK: Should we use different parameter names like beta_r? -->
-<div class="sourceCode" id="cb867"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb868"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_obj</span> <span class="op">%&gt;%</span> 
   <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="va">sigma</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -816,7 +816,7 @@ FIGURE 8.3: Courage
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#mwpnvhibij .gt_table {
+#yiyfvmegge .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -841,7 +841,7 @@ FIGURE 8.3: Courage
   border-left-color: #D3D3D3;
 }
 
-#mwpnvhibij .gt_heading {
+#yiyfvmegge .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -853,7 +853,7 @@ FIGURE 8.3: Courage
   border-right-color: #D3D3D3;
 }
 
-#mwpnvhibij .gt_title {
+#yiyfvmegge .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -863,7 +863,7 @@ FIGURE 8.3: Courage
   border-bottom-width: 0;
 }
 
-#mwpnvhibij .gt_subtitle {
+#yiyfvmegge .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -873,13 +873,13 @@ FIGURE 8.3: Courage
   border-top-width: 0;
 }
 
-#mwpnvhibij .gt_bottom_border {
+#yiyfvmegge .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#mwpnvhibij .gt_col_headings {
+#yiyfvmegge .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -894,7 +894,7 @@ FIGURE 8.3: Courage
   border-right-color: #D3D3D3;
 }
 
-#mwpnvhibij .gt_col_heading {
+#yiyfvmegge .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -914,7 +914,7 @@ FIGURE 8.3: Courage
   overflow-x: hidden;
 }
 
-#mwpnvhibij .gt_column_spanner_outer {
+#yiyfvmegge .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -926,15 +926,15 @@ FIGURE 8.3: Courage
   padding-right: 4px;
 }
 
-#mwpnvhibij .gt_column_spanner_outer:first-child {
+#yiyfvmegge .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#mwpnvhibij .gt_column_spanner_outer:last-child {
+#yiyfvmegge .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#mwpnvhibij .gt_column_spanner {
+#yiyfvmegge .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -946,7 +946,7 @@ FIGURE 8.3: Courage
   width: 100%;
 }
 
-#mwpnvhibij .gt_group_heading {
+#yiyfvmegge .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -968,7 +968,7 @@ FIGURE 8.3: Courage
   vertical-align: middle;
 }
 
-#mwpnvhibij .gt_empty_group_heading {
+#yiyfvmegge .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -983,15 +983,15 @@ FIGURE 8.3: Courage
   vertical-align: middle;
 }
 
-#mwpnvhibij .gt_from_md > :first-child {
+#yiyfvmegge .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#mwpnvhibij .gt_from_md > :last-child {
+#yiyfvmegge .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#mwpnvhibij .gt_row {
+#yiyfvmegge .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1010,7 +1010,7 @@ FIGURE 8.3: Courage
   overflow-x: hidden;
 }
 
-#mwpnvhibij .gt_stub {
+#yiyfvmegge .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1022,7 +1022,7 @@ FIGURE 8.3: Courage
   padding-left: 12px;
 }
 
-#mwpnvhibij .gt_summary_row {
+#yiyfvmegge .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1032,7 +1032,7 @@ FIGURE 8.3: Courage
   padding-right: 5px;
 }
 
-#mwpnvhibij .gt_first_summary_row {
+#yiyfvmegge .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1042,7 +1042,7 @@ FIGURE 8.3: Courage
   border-top-color: #D3D3D3;
 }
 
-#mwpnvhibij .gt_grand_summary_row {
+#yiyfvmegge .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1052,7 +1052,7 @@ FIGURE 8.3: Courage
   padding-right: 5px;
 }
 
-#mwpnvhibij .gt_first_grand_summary_row {
+#yiyfvmegge .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1062,11 +1062,11 @@ FIGURE 8.3: Courage
   border-top-color: #D3D3D3;
 }
 
-#mwpnvhibij .gt_striped {
+#yiyfvmegge .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#mwpnvhibij .gt_table_body {
+#yiyfvmegge .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1075,7 +1075,7 @@ FIGURE 8.3: Courage
   border-bottom-color: #D3D3D3;
 }
 
-#mwpnvhibij .gt_footnotes {
+#yiyfvmegge .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1089,13 +1089,13 @@ FIGURE 8.3: Courage
   border-right-color: #D3D3D3;
 }
 
-#mwpnvhibij .gt_footnote {
+#yiyfvmegge .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#mwpnvhibij .gt_sourcenotes {
+#yiyfvmegge .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1109,46 +1109,46 @@ FIGURE 8.3: Courage
   border-right-color: #D3D3D3;
 }
 
-#mwpnvhibij .gt_sourcenote {
+#yiyfvmegge .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#mwpnvhibij .gt_left {
+#yiyfvmegge .gt_left {
   text-align: left;
 }
 
-#mwpnvhibij .gt_center {
+#yiyfvmegge .gt_center {
   text-align: center;
 }
 
-#mwpnvhibij .gt_right {
+#yiyfvmegge .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#mwpnvhibij .gt_font_normal {
+#yiyfvmegge .gt_font_normal {
   font-weight: normal;
 }
 
-#mwpnvhibij .gt_font_bold {
+#yiyfvmegge .gt_font_bold {
   font-weight: bold;
 }
 
-#mwpnvhibij .gt_font_italic {
+#yiyfvmegge .gt_font_italic {
   font-style: italic;
 }
 
-#mwpnvhibij .gt_super {
+#yiyfvmegge .gt_super {
   font-size: 65%;
 }
 
-#mwpnvhibij .gt_footnote_marks {
+#yiyfvmegge .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="mwpnvhibij" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><div class="inline-table"><table class="gt_table">
+<div id="yiyfvmegge" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><div class="inline-table"><table class="gt_table">
 <thead class="gt_header">
 <tr>
 <th colspan="4" class="gt_heading gt_title gt_font_normal" style>8 Observations from Trains Dataset</th>
@@ -1167,49 +1167,49 @@ FIGURE 8.3: Courage
 <tr>
 <td class="gt_row gt_center">31</td>
       <td class="gt_row gt_center">Democrat</td>
-      <td class="gt_row gt_center">42.61</td>
+      <td class="gt_row gt_center">42.59</td>
       <td class="gt_row gt_center">-11.6</td>
     </tr>
 <tr>
 <td class="gt_row gt_center">34</td>
       <td class="gt_row gt_center">Republican</td>
-      <td class="gt_row gt_center">41.13</td>
-      <td class="gt_row gt_center">-7.1</td>
+      <td class="gt_row gt_center">41.04</td>
+      <td class="gt_row gt_center">-7.0</td>
     </tr>
 <tr>
 <td class="gt_row gt_center">63</td>
       <td class="gt_row gt_center">Democrat</td>
-      <td class="gt_row gt_center">42.61</td>
+      <td class="gt_row gt_center">42.59</td>
       <td class="gt_row gt_center">20.4</td>
     </tr>
 <tr>
 <td class="gt_row gt_center">45</td>
       <td class="gt_row gt_center">Democrat</td>
-      <td class="gt_row gt_center">42.61</td>
+      <td class="gt_row gt_center">42.59</td>
       <td class="gt_row gt_center">2.4</td>
     </tr>
 <tr>
 <td class="gt_row gt_center">55</td>
       <td class="gt_row gt_center">Democrat</td>
-      <td class="gt_row gt_center">42.61</td>
+      <td class="gt_row gt_center">42.59</td>
       <td class="gt_row gt_center">12.4</td>
     </tr>
 <tr>
 <td class="gt_row gt_center">37</td>
       <td class="gt_row gt_center">Democrat</td>
-      <td class="gt_row gt_center">42.61</td>
+      <td class="gt_row gt_center">42.59</td>
       <td class="gt_row gt_center">-5.6</td>
     </tr>
 <tr>
 <td class="gt_row gt_center">53</td>
       <td class="gt_row gt_center">Republican</td>
-      <td class="gt_row gt_center">41.13</td>
-      <td class="gt_row gt_center">11.9</td>
+      <td class="gt_row gt_center">41.04</td>
+      <td class="gt_row gt_center">12.0</td>
     </tr>
 <tr>
 <td class="gt_row gt_center">36</td>
       <td class="gt_row gt_center">Democrat</td>
-      <td class="gt_row gt_center">42.61</td>
+      <td class="gt_row gt_center">42.59</td>
       <td class="gt_row gt_center">-6.6</td>
     </tr>
 </tbody>
@@ -1244,11 +1244,11 @@ FIGURE 8.4: Temperance
 </ul>
 <p>So far we have only tried our model on people from our data set whose real age we already knew. This is helpful to understand the model, but our ultimate goal is to understand more about the real world, about people we don’t yet know much about. Temperance guides us to make meaningful predictions and to become aware of their known and unknown limitations.</p>
 <p>Start with a simple question, what are the chances that a random Democrat is over 50 years old? First, we create a tibble with the desired input for our model. In our case the tibble has a variable named “party” which contains a single observation with the value “Democrat.” This is a bit different than Chapter <a href="two-parameters.html#two-parameters">7</a>.</p>
-<div class="sourceCode" id="cb868"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb869"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">new_obs</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>party <span class="op">=</span> <span class="st">"Democrat"</span><span class="op">)</span></code></pre></div>
 <p>Next, we’ll use the <code><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict()</a></code> function to get some draws from the posterior for this scenario. Note that we have a new posterior distribution under consideration here. The unknown parameter, call it <span class="math inline">\(D_{age}\)</span>, is the age of a Democrat. This could be the age of a randomly selected Democrat from the population or of the next Democrat we meet or of the next Democrat we interview on the train platform. The definition of “population” determines the appropriate interpretation. Yet, regardless, <span class="math inline">\(D_{age}\)</span> is an unknown parameter. But it is not one — like <span class="math inline">\(\beta_1\)</span>, <span class="math inline">\(\beta_2\)</span>, or <span class="math inline">\(\sigma\)</span> — for which we have already created a posterior probability distribution. That is why we need <code><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict()</a></code>.</p>
 <p><code><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict()</a></code> takes two arguments: the model for which the simulations should be run, and a tibble indicating for which and how many parameters we want to run these simulations. In this case, the model is the one from Courage and the tibble is the one we just created.</p>
-<div class="sourceCode" id="cb869"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb870"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">9</span><span class="op">)</span>
 <span class="va">pp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict</a></span><span class="op">(</span><span class="va">fit_obj</span>, newdata <span class="op">=</span> <span class="va">new_obs</span><span class="op">)</span> <span class="op">%&gt;%</span>
     <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -1258,19 +1258,19 @@ FIGURE 8.4: Temperance
 <pre><code>## # A tibble: 10 x 1
 ##      `1`
 ##    &lt;dbl&gt;
-##  1  34.6
-##  2  34.0
-##  3  41.7
-##  4  41.4
-##  5  48.2
-##  6  26.6
+##  1  31.9
+##  2  30.7
+##  3  40.3
+##  4  39.7
+##  5  48.5
+##  6  28.0
 ##  7  57.2
-##  8  41.0
-##  9  38.2
-## 10  39.5</code></pre>
+##  8  40.5
+##  9  37.5
+## 10  35.5</code></pre>
 <p>We might expect that we can use <code>as_tibble()</code> directly after the object returned <code><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict()</a></code>. Sadly, for obscure technical reasons, that won’t quite work. So, we need the incantation <code>mutate_all(as.numeric)</code> to make sure that the resulting tibble is well-behaved. This command ensures that every column in the tibble is a simple numeric vector, which is what we want.</p>
 <p>A look at the first few observations shows that we simply get ten draws from the model’s posterior distribution of the age of a Democrat. It is important to understand that this is not a concrete person from the <code>trains</code> dataset - the algorithm in <code><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict()</a></code> simply uses the existing data from <code>trains</code> to estimate this posterior distribution.</p>
-<div class="sourceCode" id="cb871"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb872"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pp</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">`1`</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">geom_histogram</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y <span class="op">=</span> <span class="fu">after_stat</span><span class="op">(</span><span class="va">count</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">count</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
@@ -1282,20 +1282,20 @@ FIGURE 8.4: Temperance
     <span class="fu">theme_classic</span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-661-1.png" width="672"></div>
 <p>Once we have the posterior distribution, we can answer (almost) any reasonable question. In this case, the probability that the next Democrat will be over 50 is around 27%.</p>
-<div class="sourceCode" id="cb872"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb873"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">tibble</span><span class="op">(</span>age <span class="op">=</span> <span class="va">pp</span><span class="op">$</span><span class="va">`1`</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate</span><span class="op">(</span>ot_50 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">age</span> <span class="op">&gt;</span> <span class="fl">50</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">summarize</span><span class="op">(</span>perc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">ot_50</span><span class="op">)</span><span class="op">/</span><span class="fu">n</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 1 x 1
 ##    perc
 ##   &lt;dbl&gt;
-## 1 0.276</code></pre>
+## 1 0.277</code></pre>
 <p>Recall the second question:</p>
 <ul>
 <li>In a group of three Democrats and three Republicans, what age difference should we expect between the oldest Democrat and the youngest Republican?</li>
 </ul>
 <p>As before we start by creating a tibble with the desired input. Note that the name of the column (“party”) and the observations (“Democrat,” “Republican”) must always be <em>exactly</em> as they are in the original data set. This tibble as well as our model can then be used as arguments for <code><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict()</a></code>:</p>
-<div class="sourceCode" id="cb874"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb875"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">new</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>party <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Democrat"</span>, <span class="st">"Democrat"</span>, <span class="st">"Democrat"</span>, 
                         <span class="st">"Republican"</span>, <span class="st">"Republican"</span>,<span class="st">"Republican"</span><span class="op">)</span><span class="op">)</span>
 
@@ -1308,21 +1308,21 @@ FIGURE 8.4: Temperance
 <pre><code>## # A tibble: 10 x 6
 ##      `1`   `2`   `3`   `4`   `5`   `6`
 ##    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-##  1 67.6   58.2  34.6  19.5  24.0  41.1
-##  2 44.6   59.4  72.1  40.5  20.8  37.8
-##  3 63.6   45.5  34.0  21.6  14.5  21.6
-##  4 44.7   49.1  37.7  30.8  46.6  44.6
-##  5  3.79  26.7  29.7  36.6  49.0  36.5
-##  6 39.9   29.5  65.8  21.5  36.7  54.2
-##  7 51.1   51.2  41.2  49.7  16.9  37.3
-##  8 59.1   70.1  22.4  29.2  20.7  48.3
-##  9 45.8   36.2  35.3  43.5  51.3  25.1
-## 10 63.0   53.5  47.5  55.2  47.4  54.3</code></pre>
+##  1 64.4   55.2  31.9  19.1  23.5  40.4
+##  2 41.5   56.6  69.4  43.8  23.8  41.1
+##  3 60.1   43.8  33.3  32.4  26.0  32.4
+##  4 43.0   47.5  35.9  22.8  38.9  36.8
+##  5  5.83  27.9  30.7  36.2  48.1  36.1
+##  6 41.6   31.0  68.0  13.4  28.9  46.9
+##  7 50.6   50.7  40.1  48.3  13.3  35.1
+##  8 59.0   70.2  21.5  28.4  19.6  47.9
+##  9 45.4   35.5  34.5  47.0  55.2  27.9
+## 10 60.6   50.5  44.1  61.2  52.9  60.3</code></pre>
 <!-- DK: These pp objects are fundamentally flawed because some of the predicted values are absurdly low, even negative! This is not the fault of the model or the code. It is simply that the sigma is large enough, then the model things a negative age is plausible. We should at least mention this, ideally as part of a posterior predictive check, perhaps in a problem set. -->
 <p>A look at the output shows that we now have 6 columns: one for each person. R does not name the columns, but they are arranged in the same order in which we specified the persons in the tibble (D, D, D, R, R, R). To determine the expected age difference, we can then proceed as follows:</p>
 <!-- DK: I am unsure about this code. Would c() in place of c_across() work as well? -->
 <!-- DK: This works, but it takes much more time than it should because the the pp object still has every column as a ppd object, even after as_tibble(). The rest of the code still works, but takes a 100x longer than it should. Maybe this is the best approach for handling the ppd problem? Just ignore it and take the time hit? -->
-<div class="sourceCode" id="cb876"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb877"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pp</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://magrittr.tidyverse.org/reference/aliases.html">set_names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"dem_1"</span>, <span class="st">"dem_2"</span>, <span class="st">"dem_3"</span>, 
               <span class="st">"rep_1"</span>, <span class="st">"rep_2"</span>, <span class="st">"rep_3"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -1435,7 +1435,7 @@ FIGURE 8.7: Courage
 </p>
 </div>
 <p>With Justice satisfied, we gather our Courage and fit the model. Note that, except for the change in variable names, the code is exactly the same as it was above, in our predictive model for age. <em>Predictive models and causal models use the same math and the same code.</em> The differences, and they are very important, lie in the interpretation of the results, not in their creation.</p>
-<div class="sourceCode" id="cb877"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb878"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">9</span><span class="op">)</span>
 <span class="va">fit_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span><span class="va">att_end</span> <span class="op">~</span> <span class="va">treatment</span> <span class="op">-</span> <span class="fl">1</span>, 
                     data <span class="op">=</span> <span class="va">trains</span>, 
@@ -1464,7 +1464,7 @@ FIGURE 8.7: Courage
 <p>Up until now, we have used the Bayesian interpretation of “confidence interval.” This is also the intuitive meaning which, outside of academia, is almost universal. There is a truth out there. We don’t know, and sometimes can’t know, the truth. A confidence interval, and its associated confidence level, tells us how likely the truth is to lie within a specific range. If your boss asks you for a confidence interval, she almost certainly is using this interpretation.</p>
 <p>But, in contemporary academic research, the phrase “confidence interval” is usually given a “Frequentist” interpretation. (The biggest divide in statistics is between Bayesians and Frequentist interpretations. The Frequentist approach, also known as “Classical” statistics, has been dominant for 100 years. Its power is fading, which is why this textbook uses the Bayesian approach.) For a Frequentist, a 95% confidence interval means that, if we were to apply the procedure we used in an infinite number of future situations like this, we would expect the true value to fall within the calculated confidence intervals 95% of the time. In academia, a distinction is sometimes made between confidence intervals (which use the Frequentist interpretation) and credible intervals (which use the Bayesian interpretation). We won’t worry about that difference in this book.</p>
 <p>Let’s look at the entire posteriors for both <span class="math inline">\(\beta_1\)</span> and <span class="math inline">\(\beta_2\)</span>.</p>
-<div class="sourceCode" id="cb879"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb880"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_obj</span> <span class="op">%&gt;%</span> 
   <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="va">sigma</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -1504,7 +1504,7 @@ FIGURE 8.8: Temperance
 <li>What is the average treatment effect, of exposing people to Spanish-speakers, on their attitudes toward immigration?</li>
 </ul>
 <!-- DK: Below is also not clear. --><p>Recall from Chapter <a href="rubin-causal-model.html#rubin-causal-model">3</a> the discussion of the <em>average treatment effect</em>. One simple estimator of the average treatment effect is the difference between <span class="math inline">\(\beta_1\)</span> and <span class="math inline">\(\beta_2\)</span>. After all, the definition of <span class="math inline">\(\beta_1\)</span> is the average attitude toward immigration, of the population, for anyone, under exposure to the treatment. So, <span class="math inline">\(\beta_1 - \beta_2\)</span> is the average treatment effect for the population, roughly 1.5. However, estimating the posterior probability distribution for this parameter is tricky, unless we make use of the posterior distributions of <span class="math inline">\(\beta_1\)</span> and <span class="math inline">\(\beta_2\)</span>. With that information, the problem is simple:</p>
-<div class="sourceCode" id="cb880"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb881"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">14</span><span class="op">)</span>
 <span class="va">fit_obj</span> <span class="op">%&gt;%</span> 
   <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -1526,12 +1526,12 @@ FIGURE 8.8: Temperance
 <li>What is the largest effect size which still has a 1 in 10 chance of occurring?</li>
 </ul>
 <p>To answer this question, we first need to create a tibble which we can pass to <code><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict()</a></code>. The variables in the tibbles which will be passed in as <code>newdata</code> must be exactly the same as their counterparts in the original data. For example, <code>treatment</code> must be a factor, with the same levels as it has in <code>trains</code>.</p>
-<div class="sourceCode" id="cb881"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb882"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ate_data</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>treatment <span class="op">=</span>
                      <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Treated"</span>, <span class="st">"Control"</span><span class="op">)</span>,
                             levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Treated"</span>, <span class="st">"Control"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>Consider the result of posterior_predict() for someone treated and someone in the control group.</p>
-<div class="sourceCode" id="cb882"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb883"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict</a></span><span class="op">(</span><span class="va">fit_obj</span>, 
                         newdata <span class="op">=</span> <span class="va">ate_data</span><span class="op">)</span> <span class="op">%&gt;%</span>
     <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>

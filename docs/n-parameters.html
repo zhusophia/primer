@@ -32,7 +32,7 @@
 
       <nav aria-label="Table of contents"><h2>Table of contents</h2>
         <ul class="book-toc list-unstyled">
-<li><a class="" href="index.html"></a></li>
+<li><a class="" href="index.html">Welcome</a></li>
 <li><a class="" href="preamble.html">Preamble</a></li>
 <li><a class="" href="shopping-week.html">Shopping Week</a></li>
 <li><a class="" href="visualization.html"><span class="header-section-number">1</span> Visualization</a></li>
@@ -71,7 +71,7 @@
 <span class="header-section-number">9.1</span> EDA of <code>governors</code><a class="anchor" aria-label="anchor" href="#eda-of-governors"><i class="fas fa-link"></i></a>
 </h2>
 <p>Packages:</p>
-<div class="sourceCode" id="cb883"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb884"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">primer.data</span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://docs.ropensci.org/skimr">skimr</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span>
@@ -81,7 +81,7 @@
 <!-- DK: Provide proper citation to Barfort et al. -->
 <!-- DK: Go and change governors data to use better variable names than the ones we have here. Maybe switch to years instead of days. Or maybe just clean them up here. -->
 <p>We will use the <code>governors</code> data set from the <strong>primer.data</strong> package. This data set features the demographic information about the candidates for governor in the US. It comes from the paper “Longevity Returns to Political Office” by Barfort, Klemmensen and Larsen (2019), which concludes that winning a gubernatorial election increases a candidate’s lifespan.</p>
-<div class="sourceCode" id="cb884"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb885"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">glimpse</span><span class="op">(</span><span class="va">governors</span><span class="op">)</span></code></pre></div>
 <pre><code>## Rows: 1,092
 ## Columns: 11
@@ -97,11 +97,11 @@
 ## $ alive_post &lt;int&gt; 14991, 773, 5319, 4871, 12069, 19924, 13096, 18622, 549, 1…
 ## $ alive_pre  &lt;int&gt; 13906, 28690, 17805, 17001, 16828, 12152, 15778, 17597, 14…</code></pre>
 <p>There are 11 variables and 1,092 observations. In this Chapter, we will only be looking at the variables <code>last_name</code>, <code>year</code>, <code>state</code>, <code>sex</code>, <code>alive_post</code>, and <code>alive_pre</code>.</p>
-<div class="sourceCode" id="cb886"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb887"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch9_gov</span> <span class="op">&lt;-</span> <span class="va">governors</span> <span class="op">%&gt;%</span> 
   <span class="fu">select</span><span class="op">(</span><span class="va">last_name</span>, <span class="va">year</span>, <span class="va">state</span>, <span class="va">sex</span>, <span class="va">alive_post</span>, <span class="va">alive_pre</span><span class="op">)</span></code></pre></div>
 <p><code>alive_pre</code> and <code>alive_post</code> are how many days a candidate lived before the election and how many days a candidate lived after the election, respectively. As a consequence, only politicians who are already deceased are included in this data set. This means that there are only a handful of observations from elections in the last 20 years. Most candidates from that time period are still alive and are, therefore, excluded.</p>
-<div class="sourceCode" id="cb887"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb888"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">sample_n</span><span class="op">(</span><span class="va">ch9_gov</span>, <span class="fl">5</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 5 x 6
 ##   last_name  year state        sex    alive_post alive_pre
@@ -113,7 +113,7 @@
 ## 5 Williams   1948 Michigan     Male        14333     13770</code></pre>
 <p><code>sex</code> is most often “Male,” as we might expect.</p>
 <!-- DK: Weird that this automagically creates a "TABLE 9.1: Data summary" side margin note. -->
-<div class="sourceCode" id="cb889"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb890"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://docs.ropensci.org/skimr/reference/skim.html">skim</a></span><span class="op">(</span><span class="va">ch9_gov</span><span class="op">)</span></code></pre></div>
 <div class="inline-table"><table class="table table-sm">
 <caption>
@@ -261,7 +261,7 @@
 </table></div>
 <p><code><a href="https://docs.ropensci.org/skimr/reference/skim.html">skim()</a></code> groups the variables together by type. We are given histograms of the numeric data. In looking at the histogram for <code>year</code>, we see that it is skewed right — meaning that most of the data is bunched to the left and that there is a smaller tail to the right — with half of the observations from election years between 1945 and 1962. This makes sense logically, because we are only looking at deceased candidates, and candidates from more recent elections are more likely to still be alive.</p>
 <p>In using this data set, our left-side variable will be <code>alive_post</code>. We are trying to understand/predict how many days a candidate will live after the election.</p>
-<div class="sourceCode" id="cb890"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb891"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch9_gov</span> <span class="op">%&gt;%</span>
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">year</span>, y <span class="op">=</span> <span class="va">alive_post</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
@@ -276,7 +276,7 @@
 <p>Starting with the relationship between <code>alive_post</code> and <code>year</code>, we can see that there is a rough line above which there are no observations. There are no data points in the top right portion of the graph because it is not possible to have run in 2011 and then lived 20,000 days (about 55 years) after the election took place. This edge of the data represents, approximately, the most days a candidate could have possibly lived, and still have died, given the year of the election. The reason the data is slanted downward is because the maximum value for this scenario is greater in earlier years. That is, those candidates who ran for governor in earlier years could live a long time after the election and still have died prior to the data set creation, giving them higher <code>alive_post</code> values than those who ran for office in more recent years.</p>
 <!-- DK: Explain why the line isn't perfect? (Because not everyone had the decency to die on the day directly before data set creation.) -->
 <p>There are fewer observations in later years because fewer recent candidates have died.</p>
-<div class="sourceCode" id="cb891"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb892"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch9_gov</span> <span class="op">%&gt;%</span>
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">sex</span>, y <span class="op">=</span> <span class="va">alive_post</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_boxplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
@@ -337,7 +337,7 @@ FIGURE 9.3: Courage
 <span class="header-section-number">9.3.1</span> alive_pre<a class="anchor" aria-label="anchor" href="#alive_pre"><i class="fas fa-link"></i></a>
 </h3>
 <p>To begin, let’s model candidate lifespan after the election as a function of candidate lifespan prior to the election. The data:</p>
-<div class="sourceCode" id="cb892"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb893"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch9_gov</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">alive_pre</span>, y <span class="op">=</span> <span class="va">alive_post</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
@@ -361,7 +361,7 @@ FIGURE 9.3: Courage
 <p>There are three unknown parameters — <span class="math inline">\(\beta_0\)</span>, <span class="math inline">\(\beta_1\)</span> and <span class="math inline">\(\sigma\)</span> — just as with the models we used in Chapter <a href="three-parameters.html#three-parameters">8</a>.</p>
 <p>You may recall from middle school algebra that the equation of a line is <span class="math inline">\(y = m x + b\)</span>. There are two parameters: <span class="math inline">\(m\)</span> and <span class="math inline">\(b\)</span>. The intercept <span class="math inline">\(b\)</span> is the value of <span class="math inline">\(y\)</span> when <span class="math inline">\(x = 0\)</span>. The slope coefficient <span class="math inline">\(m\)</span> for <span class="math inline">\(x\)</span> is the increase in <span class="math inline">\(y\)</span> for every increase of one in <span class="math inline">\(x\)</span>. When defining a regression line, we use slightly different notation but the fundamental relationship is the same.</p>
 <p>We can use <code>geom_smooth()</code> to create the fitted regression line:</p>
-<div class="sourceCode" id="cb893"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb894"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch9_gov</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">alive_pre</span>, y <span class="op">=</span> <span class="va">alive_post</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
@@ -380,13 +380,13 @@ FIGURE 9.3: Courage
 <p>This model, with a continuous independent (or “predictor”) variable, has an infinite number of fitted values, one for each possible value of <code>alive_pre</code>. This is very different from the models we saw in Chapter <a href="three-parameters.html#three-parameters">8</a>. Those models only had two possible fitted values because the predictor variable only took two possible values.</p>
 <!-- DK: I am nervous that alive_pre, as used here, is a different variable that alive_pre when, later, we transform it.  -->
 <p>We can implement this model with <code><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm()</a></code>.</p>
-<div class="sourceCode" id="cb894"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb895"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_gov_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">ch9_gov</span>,
                       formula <span class="op">=</span> <span class="va">alive_post</span> <span class="op">~</span> <span class="va">alive_pre</span>,
                       refresh <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
 <p>As we discussed in Chapter <a href="three-parameters.html#three-parameters">8</a>, the most common term for a model like this is a “regression.” We have “regressed” <code>alive_post</code>, our dependent variable, on <code>alive_pre</code>, our (only) independent variable.</p>
 <p>The parameter values:</p>
-<div class="sourceCode" id="cb895"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb896"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://docs.ropensci.org/skimr/reference/print.html">print</a></span><span class="op">(</span><span class="va">fit_gov_1</span>, detail <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 <pre><code>##             Median  MAD_SD 
 ## (Intercept) 26499.9   743.5
@@ -398,7 +398,7 @@ FIGURE 9.3: Courage
 <p>As is almost always the case, <span class="math inline">\(\sigma\)</span> is a nuisance parameter, somethings whose value we are not interested in. This is why <code><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm()</a></code> refers to it as an “Auxiliary” parameter.</p>
 <p>The posterior distributions of <span class="math inline">\(\beta_0\)</span> (the intercept) and <span class="math inline">\(\beta_1\)</span> (the coefficient of <span class="math inline">\(alive\_pre_i\)</span>), on the other hand, are important. Before looking at the posteriors themselves, let’s examine the fitted values:</p>
 <!-- DK: Use this trick to create parallel and non-parallel line plots later. -->
-<div class="sourceCode" id="cb897"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb898"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch9_gov</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">alive_pre</span>, y <span class="op">=</span> <span class="va">alive_post</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
@@ -424,7 +424,7 @@ FIGURE 9.3: Courage
 <!-- DK: THis is a critical point. Maybe give a precise example? Go through the math slowly, like ModernDive does? Highlight this somehow? At the very least, we should emphasize the point for each model going forward. -->
 <p>Let’s look at the posterior of <span class="math inline">\(\beta_1\)</span>, the coefficient of <span class="math inline">\(alive\_pre_i\)</span>:</p>
 <!-- DK: We should standardize what these plots look like, both in this chapter and throughout the book. -->
-<div class="sourceCode" id="cb898"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb899"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_gov_1</span> <span class="op">%&gt;%</span> 
   <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span><span class="va">alive_pre</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
@@ -442,9 +442,9 @@ FIGURE 9.3: Courage
 <!-- DK: Would using 50-year-old be better? -->
 <p>We center variables when the model’s intercept does not make substantive sense. To center a model, we pick a constant value, usually the mean of the independent variable, and subtract that constant from every value of the independent variable. Another option would be to pick a reasonable reference value, like 18,262 – the number of days that a someone who is 50 years-old has lived. Either way, the meaning of <code>alive_pre</code> changes from the raw number of days a candidate has been alive to the number of days relative to that reference value.</p>
 <p>In this example, we want to center the value for <code>alive_pre</code>, the independent variable. First, we must pick the value that we will center by. Here, we will use the mean of <code>alive_pre</code>, which is about 52 years old. Once we find this value, we will subtract it from every <code>alive_pre</code> value. We have, thereby, changed the meaning of <code>alive_pre</code>. It now means the number of days a candidate has been alive, as of Election Day, relative to the average days alive of all candidates on their respective election days.</p>
-<div class="sourceCode" id="cb899"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ch9_gov</span><span class="op">$</span><span class="va">alive_pre</span> <span class="op">&lt;-</span> <span class="va">ch9_gov</span><span class="op">$</span><span class="va">alive_pre</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">ch9_gov</span><span class="op">$</span><span class="va">alive_pre</span><span class="op">)</span></code></pre></div>
 <div class="sourceCode" id="cb900"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">ch9_gov</span><span class="op">$</span><span class="va">alive_pre</span> <span class="op">&lt;-</span> <span class="va">ch9_gov</span><span class="op">$</span><span class="va">alive_pre</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">ch9_gov</span><span class="op">$</span><span class="va">alive_pre</span><span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb901"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_gov_1.centered</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">ch9_gov</span>,
                       formula <span class="op">=</span> <span class="va">alive_post</span> <span class="op">~</span> <span class="va">alive_pre</span>,
                       refresh <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
@@ -467,12 +467,12 @@ FIGURE 9.3: Courage
 <span class="header-section-number">9.3.2</span> sex<a class="anchor" aria-label="anchor" href="#sex"><i class="fas fa-link"></i></a>
 </h3>
 <p>Let’s now regress <code>alive_post</code> on <code>sex</code> to see how candidates’ post-election lifespans differ by sex.</p>
-<div class="sourceCode" id="cb902"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb903"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_gov_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">ch9_gov</span>,
                       formula <span class="op">=</span> <span class="va">alive_post</span> <span class="op">~</span> <span class="va">sex</span> <span class="op">-</span> <span class="fl">1</span>,
                       refresh <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
 <p>Note this workflow. Try one model. Interpret it. Try another model. And then another. There is no one “true” model. There is an infinite space of possible models. Good data science involves an intelligent tour of that space.</p>
-<div class="sourceCode" id="cb903"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb904"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://docs.ropensci.org/skimr/reference/print.html">print</a></span><span class="op">(</span><span class="va">fit_gov_2</span>, detail <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 <pre><code>##           Median  MAD_SD 
 ## sexFemale  5859.3  1046.6
@@ -494,11 +494,11 @@ FIGURE 9.3: Courage
 <p>This is a strange result. Why would men live twice as long as women after the election? One explanation for this might be that women don’t run for governor until later in life, and therefore are not expected to live as long.</p>
 <!-- DK: Weird result, huh? Men live twice as long as women! Useful to discuss why that might be the case in more detail. -->
 <p>Now that we have interpreted the model using a -1 in the formula to estimate <span class="math inline">\(\beta_1\)</span> and <span class="math inline">\(\beta_2\)</span>, let’s take away the -1 and regress <code>alive_post</code> on an intercept and <code>sex</code> to see how our equation changes.</p>
-<div class="sourceCode" id="cb905"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb906"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_gov_2a</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">ch9_gov</span>,
                        formula <span class="op">=</span> <span class="va">alive_post</span> <span class="op">~</span> <span class="va">sex</span>,
                        refresh <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb906"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb907"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://docs.ropensci.org/skimr/reference/print.html">print</a></span><span class="op">(</span><span class="va">fit_gov_2a</span>, detail <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 <pre><code>##             Median MAD_SD
 ## (Intercept) 5852.4 1021.2
@@ -514,7 +514,7 @@ FIGURE 9.3: Courage
 <p>When the candidate is a male, we add the coefficient for male to the intercept value, which gives us the average lifespan of a male gubernatorial candidate after an election. As we can see from adding <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span>, this value is the same as what we got for males in the previous model.</p>
 <p>Be careful with notation! <span class="math inline">\(\beta_1\)</span> in the no-intercept model is different from <span class="math inline">\(\beta_1\)</span> in the model with an intercept! Notation varies. We must pay attention each time we make a model.</p>
 <p>The posterior distribution for <span class="math inline">\(\beta_0 + \beta_1\)</span> can be constructed via simple addition.</p>
-<div class="sourceCode" id="cb908"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb909"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_gov_2a</span> <span class="op">%&gt;%</span> 
   <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate</span><span class="op">(</span>male_intercept <span class="op">=</span> <span class="va">`(Intercept)`</span> <span class="op">+</span> <span class="va">sexMale</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -544,11 +544,11 @@ FIGURE 9.3: Courage
 <li><p><span class="math inline">\(\beta_2\)</span> is, for the entire population, the average difference in <span class="math inline">\(alive\_post_i\)</span> between two individuals, one of whom has an <span class="math inline">\(alive\_pre_i\)</span> value of 1 greater than the other.</p></li>
 </ul>
 <p>Now that we understand our model, let’s translate the following model into code.</p>
-<div class="sourceCode" id="cb909"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb910"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_gov_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">ch9_gov</span>,
                       formula <span class="op">=</span> <span class="va">alive_post</span> <span class="op">~</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">alive_pre</span>,
                       refresh <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb910"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb911"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://docs.ropensci.org/skimr/reference/print.html">print</a></span><span class="op">(</span><span class="va">fit_gov_3</span>, detail <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 <pre><code>##             Median MAD_SD
 ## (Intercept) 8066.3  854.7
@@ -562,7 +562,7 @@ FIGURE 9.3: Courage
 <p>Note that <code>sexMale</code> is around 2,250. This is our coefficient, <span class="math inline">\(\beta_1\)</span>. We need to connect this value to our intercept value to get something meaningful. Using the formula <span class="math inline">\(\beta_0\)</span> + <span class="math inline">\(\beta_1\)</span>, we find out that the number of days the average male candidate — who, on the day of election, had been alive the average number of days of all candidate — would live is around 10,300,.</p>
 <p>Now take a look at the coefficient for <span class="math inline">\(alive\_pre_i\)</span>, <span class="math inline">\(\beta_2\)</span>. The median of the posterior, -0.8, represents the slope of the model. For every unit increase in our independent variable, our dependent variable will change by this coefficient. It makes sense that this value is negative. Think about it: the more days a candidate has lived, the fewer days the candidate has left to live. So, for every extra day a candidate is alive before an election, their lifespan after the election will be 0.8 days lower, on average.</p>
 <p>Let’s now look at some posteriors.</p>
-<div class="sourceCode" id="cb912"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb913"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_gov_3</span> <span class="op">%&gt;%</span> 
   <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate</span><span class="op">(</span>male_days <span class="op">=</span> <span class="va">`(Intercept)`</span> <span class="op">+</span> <span class="va">sexMale</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -587,7 +587,7 @@ FIGURE 9.3: Courage
 <!-- DK: Much more to say here, and say it clearly! -->
 <p>The graph above displays the posterior probability distributions for <span class="math inline">\(\beta_0\)</span> and for $_0 + _1 $. The two distributions are fairly different; the distribution for females is more spread out than that for males. There were a greater number of men than women in the data. The more data we have, the more precise we can be.</p>
 <p>Let’s now take a look at a posterior distribution for <span class="math inline">\(\beta_2\)</span>, the coefficient of <span class="math inline">\(alive\_pre_i\)</span>.</p>
-<div class="sourceCode" id="cb913"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb914"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_gov_3</span> <span class="op">%&gt;%</span> 
   <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span><span class="va">alive_pre</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
@@ -624,11 +624,11 @@ FIGURE 9.3: Courage
 <li><p><span class="math inline">\(\beta_3\)</span> alone is difficult to interpret. However, when it is added to <span class="math inline">\(\beta_2\)</span>, the result in the slope for men.</p></li>
 </ul>
 <p>Code:</p>
-<div class="sourceCode" id="cb914"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb915"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_gov_4</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">ch9_gov</span>,
                       formula <span class="op">=</span> <span class="va">alive_post</span> <span class="op">~</span> <span class="va">sex</span><span class="op">*</span><span class="va">alive_pre</span>,
                       refresh <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb915"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb916"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://docs.ropensci.org/skimr/reference/print.html">print</a></span><span class="op">(</span><span class="va">fit_gov_4</span>, detail <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 <pre><code>##                   Median MAD_SD
 ## (Intercept)       6010.0 1298.4
@@ -644,7 +644,7 @@ FIGURE 9.3: Courage
 <p>The coefficient for <span class="math inline">\(alive\_pre_i\)</span>, <span class="math inline">\(\beta_2\)</span>, is -0.1. What does this mean? It is the slope for females. So for every extra day a female candidate is alive before an election, their lifespan after the election will be 0.1 days lower, on average. Now direct your attention below at the coefficient of <code>sexMale:alive_pre</code>, <span class="math inline">\(\beta_3\)</span>, which is -.8. This is the value that must be added to the coefficient of <span class="math inline">\(alive\_pre_i\)</span> (recall <span class="math inline">\(\beta_2\)</span> + <span class="math inline">\(\beta_3\)</span>) in order to find the slope for males. When the two are added together, this value, or slope, is about -0.9. For every extra day a male candidate is alive before an election, their lifespan after the election will be 0.9 days lower, on average.</p>
 <p><em>Key point</em>: The interpretation of the intercepts only apply to candidates for whom <span class="math inline">\(alive\_pre_i = 0\)</span>. Candidates who are not 52 years-old will have different expected number of days to live. The interpretation of the slope applies to everyone. In other words, the relationship between <span class="math inline">\(alive\_post_i\)</span> and <span class="math inline">\(alive\_pre_i\)</span> is the same, regardless of your gender or how old you are.</p>
 <p>The posterior:</p>
-<div class="sourceCode" id="cb917"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb918"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_gov_4</span> <span class="op">%&gt;%</span> 
   <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate</span><span class="op">(</span>male_days <span class="op">=</span> <span class="va">`(Intercept)`</span> <span class="op">+</span> <span class="va">sexMale</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -669,7 +669,7 @@ FIGURE 9.3: Courage
 <p>Male candidates live longer on average than female candidates. Note, also, that the average days to live after the election for females is about 6,000 with this model. With the previous model, it was 8,000. Why the difference? The interpretation of “average” is different! In the previous model, it was the average for all women. In this model, it is the average for all 52 years-old women. Those are different things, so we should hardly be surprised by different posteriors.</p>
 <!-- DK: Is the above right? -->
 <p>Slope posteriors:</p>
-<div class="sourceCode" id="cb918"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb919"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_gov_4</span> <span class="op">%&gt;%</span> 
   <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate</span><span class="op">(</span>slope_men <span class="op">=</span> <span class="va">alive_pre</span> <span class="op">+</span> <span class="va">`sexMale:alive_pre`</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -704,7 +704,7 @@ FIGURE 9.3: Courage
 In both cases, <span class="math inline">\(\beta_0\)</span> has the same meaning. It is the average number of days lived after the election for women, who on the day of election, have been alive the average number of days of all candidates. Plug in 0 for <span class="math inline">\(male_i\)</span> and 0 for <span class="math inline">\(alive\_pre_i\)</span> and both equations simplify to:</p>
 <p><span class="math display">\[ alive\_post_i =  \beta_0 + \epsilon_i \]</span>
 So far, so good. But, despite the fact that we are using the same data, the posterior probability distributions for <span class="math inline">\(\beta_0\)</span> are meaningfully different between the two models:</p>
-<div class="sourceCode" id="cb919"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb920"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">m_3</span> <span class="op">&lt;-</span> <span class="va">fit_gov_3</span> <span class="op">%&gt;%</span> 
   <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">select</span><span class="op">(</span><span class="va">`(Intercept)`</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -759,13 +759,13 @@ So far, so good. But, despite the fact that we are using the same data, the post
 <li><p><span class="math inline">\(\beta_0\)</span> will be the intercept for one state alone. When the model is printed, you will see that (Intercept) takes on the alive_post value for female candidates in Alabama.</p></li>
 <li><p><span class="math inline">\(\beta_{50}\)</span> is the coefficient for the explanatory variable <span class="math inline">\(male_i\)</span>. When we are trying to find the intercepts for female candidates, the explanatory variable will take on the value of 0. However, <span class="math inline">\(male_i\)</span> = 1 when we are trying to find intercept values for male candidates. Therefore, you add the <span class="math inline">\(\beta_{50}\)</span> value to the female intercept value to find the value of alive_post for male candidates. <span class="math inline">\(\beta_{51}\)</span> is the coefficient for the explanatory variable <span class="math inline">\(alive\_pre_i\)</span>. It it just the slope for women. <span class="math inline">\(\beta_{52}\)</span> is difficult to interpret. However, it gains meaning when it is added to <span class="math inline">\(\beta_{51}\)</span>, which results in the slope for men.</p></li>
 </ul>
-<div class="sourceCode" id="cb920"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb921"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_gov_5</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">ch9_gov</span>,
                       formula <span class="op">=</span> <span class="va">alive_post</span> <span class="op">~</span> <span class="va">state</span> <span class="op">+</span> <span class="va">sex</span><span class="op">*</span><span class="va">alive_pre</span>,
                       refresh <span class="op">=</span> <span class="fl">0</span>,
                       iter <span class="op">=</span> <span class="fl">10000</span><span class="op">)</span></code></pre></div>
 <p>Note it takes awhile to run. We are dealing with 55 parameters here.</p>
-<div class="sourceCode" id="cb921"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb922"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://docs.ropensci.org/skimr/reference/print.html">print</a></span><span class="op">(</span><span class="va">fit_gov_5</span>, detail <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 <pre><code>##                     Median  MAD_SD 
 ## (Intercept)          4889.2  1556.5
@@ -832,7 +832,7 @@ So far, so good. But, despite the fact that we are using the same data, the post
 <p><span class="math inline">\(\beta_{51}\)</span> + <span class="math inline">\(\beta_{52}\)</span>, our coefficients for <span class="math inline">\(alive\_pre_i\)</span> and <code>sexMale:alive_pre</code>, results in the value of around -0.8. This value is our slope for men.</p>
 <p>Posterior distribution for female candidates in Washington and South Dakota.</p>
 <!-- DK: Clean up math here. No hard coding numbers!-->
-<div class="sourceCode" id="cb923"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb924"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_gov_5</span> <span class="op">%&gt;%</span> 
   <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate</span><span class="op">(</span>Washington_females <span class="op">=</span> <span class="va">`(Intercept)`</span> <span class="op">+</span> <span class="va">stateWashington</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -881,7 +881,7 @@ FIGURE 9.4: Temperance
 </h3>
 <p>Consider the “on average” interpretation first. The answer begins with the posterior distributions of the parameters in <code>fit_gov_5</code>.</p>
 <!-- DK: We need to walk through the math. Start with the original formula. Replace the x's with the values for this person. Simplify. Plug in the parameters, which are distributions. This gives us the answer. It goes too fast to just go straight for the code. -->
-<div class="sourceCode" id="cb924"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb925"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_gov_5</span> <span class="op">%&gt;%</span> 
   <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate</span><span class="op">(</span>WA <span class="op">=</span> <span class="va">`(Intercept)`</span> <span class="op">+</span> <span class="va">stateWashington</span> <span class="op">+</span> <span class="va">sexMale</span> <span class="op">+</span> 
@@ -907,7 +907,7 @@ FIGURE 9.4: Temperance
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-715-1.png" width="672"></div>
 <p>Looking at our posterior probability distributions above, we can see that the candidates from Washington are expected to live longer. But how much longer? As in previous chapters, we can manipulate distributions in, more or less, the same way that we manipulate simple numbers. If we want to know the difference between two posterior distributions, we can simply subtract. But before we do, note that, in many ways, looking at the difference is much easier than considering the individual posteriors.</p>
 <p>We don’t really need to calculate <code>WA</code> using all those complex terms. We already know that we are going to subtract <code>SD</code> and that both <code>WA</code> and <code>SD</code> include the <code>(Intercept)</code>, <code>sexMale</code>, and so on. All those terms in common will cancel out when we subtract. So, we can go directly to <code>diff</code> being equal to the difference between <code>stateWashington</code> and <code>stateSouth Dakota</code>.</p>
-<div class="sourceCode" id="cb925"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb926"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_gov_5</span> <span class="op">%&gt;%</span> 
   <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate</span><span class="op">(</span>diff <span class="op">=</span> <span class="va">stateWashington</span> <span class="op">-</span> <span class="va">`stateSouth Dakota`</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -928,17 +928,17 @@ FIGURE 9.4: Temperance
 <p>The average value of the difference in days-to-live is almost certainly positive, with the most likely value being around 4,500. Notice that there is essentially zero chance that, on average, South Dakota candidates live longer.</p>
 <p>One annoyance of the above approach is that it requires us to do everything “by hand,” to recall the mathematical structure of the model, and then to insert the relevant values of the data for the individuals we want to predict. What a bother! Fortunately, <strong>rstanarm</strong> provides the <code><a href="https://mc-stan.org/rstanarm/reference/posterior_linpred.stanreg.html">posterior_epred()</a></code> function to make this process simpler.</p>
 <p>First, we create a tibble with the desired input for our model. In our case the tibble has a variable named <code>sex</code> which contains two observations both with the value “Male.” There is a <code>state</code> variable with the desired states. There is an <code>alive_pre</code> variable set to 10 years worth of days.</p>
-<div class="sourceCode" id="cb926"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb927"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">new_obs</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>sex <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Male"</span>, <span class="st">"Male"</span><span class="op">)</span>,
                   state <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"South Dakota"</span>, <span class="st">"Washington"</span><span class="op">)</span>,
                   alive_pre <span class="op">=</span> <span class="fl">10</span> <span class="op">*</span> <span class="fl">365</span><span class="op">)</span></code></pre></div>
 <p>Second, we pass the fitted model object and this tibble to <code><a href="https://mc-stan.org/rstanarm/reference/posterior_linpred.stanreg.html">posterior_epred()</a></code>.</p>
-<div class="sourceCode" id="cb927"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb928"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/posterior_linpred.stanreg.html">posterior_epred</a></span><span class="op">(</span><span class="va">fit_gov_5</span>, 
                       newdata <span class="op">=</span> <span class="va">new_obs</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span> </code></pre></div>
 <p>The name <code>pe</code> stands for <strong>p</strong>osterior <strong>e</strong>xpectation. This is different from the <strong>p</strong>osterior <strong>p</strong>rediction which <code><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict()</a></code> produces. Transforming the resulting object into a tibble makes later graphing easier. With <code>pe</code>, we can now reproduce our last two plots much more easily.</p>
-<div class="sourceCode" id="cb928"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb929"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pe</span> <span class="op">%&gt;%</span> 
   <span class="fu">rename</span><span class="op">(</span>SD <span class="op">=</span> <span class="va">`1`</span>,
          WA <span class="op">=</span> <span class="va">`2`</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -968,7 +968,7 @@ FIGURE 9.4: Temperance
 <p>If, instead, we interpret the question as asking for a prediction for a small number of individuals, then we need to use <code><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict()</a></code>.</p>
 <!-- DK: Try again to explain what a posterior prediction is. -->
 <p>Use <code><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict()</a></code> to create draws from the posterior probability distribution for our prediction for these cases. <code><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict()</a></code> takes two arguments: the model for which the simulations should be run, and a tibble indicating the covariate values for the individual(s) we want to predict. In this case, we are using the <code>fit_gov_5</code> model and the tibble is the one we just created above. In other words, the inputs for <code><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict()</a></code> and <code><a href="https://mc-stan.org/rstanarm/reference/posterior_linpred.stanreg.html">posterior_epred()</a></code> are identical.</p>
-<div class="sourceCode" id="cb929"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb930"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict</a></span><span class="op">(</span><span class="va">fit_gov_5</span>, 
                         newdata <span class="op">=</span> <span class="va">new_obs</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -987,7 +987,7 @@ FIGURE 9.4: Temperance
 <p>The resulting tibble has 2 columns, one for each person. The first column shows the posterior predictions for the candidate from South Dakota. The second column shows the posterior predictions for the candidate from Washington. In both cases, the forecasts depend on the values of all the covariates. That is, we would provide a different forecast if the candidates were female or if they were other ages.</p>
 <p>Why do we need the weird <code>mutate_all(as.numeric)</code> incantation? The reason is that <code><a href="https://mc-stan.org/rstanarm/reference/posterior_linpred.stanreg.html">posterior_epred()</a></code> returns a simple matrix, which is easy to transform into a tibble. <code><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict()</a></code>, on the other hand, returns a special sort of matrix which is much harder to work with. So, we need a little hackery to make the next steps easier.</p>
 <p>Let’s look at the posterior predictive distribution for each candidate.</p>
-<div class="sourceCode" id="cb931"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb932"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pp</span> <span class="op">%&gt;%</span> 
   <span class="fu">rename</span><span class="op">(</span>SD <span class="op">=</span> <span class="va">`1`</span>,
          WA <span class="op">=</span> <span class="va">`2`</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -1009,7 +1009,7 @@ FIGURE 9.4: Temperance
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-721-1.png" width="672"></div>
 <p>There is a big overlap in the predictions for individuals, even though there is almost no overlap in the averages. Random stuff happens to an individual all the time. Random stuff cancels out when you take the average for many individuals. Consider the difference in the posterior predictive distributions for the two individuals.</p>
 <!-- DK: Example "Posterior Predictive Distribution" -->
-<div class="sourceCode" id="cb932"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb933"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pp</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate</span><span class="op">(</span>diff <span class="op">=</span> <span class="va">`2`</span> <span class="op">-</span> <span class="va">`1`</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span><span class="va">diff</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
@@ -1033,7 +1033,7 @@ FIGURE 9.4: Temperance
 <span class="header-section-number">9.4.3</span> Expectation versus individual variation<a class="anchor" aria-label="anchor" href="#expectation-versus-individual-variation"><i class="fas fa-link"></i></a>
 </h3>
 <p>Let’s compare the results from <code><a href="https://mc-stan.org/rstanarm/reference/posterior_linpred.stanreg.html">posterior_epred()</a></code> and <code><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict()</a></code> for this scenario directly. Most of this code is the same as what we have shown you above, but we think it is useful to look at everything together.</p>
-<div class="sourceCode" id="cb933"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb934"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">new_obs</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>sex <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Male"</span>, <span class="st">"Male"</span><span class="op">)</span>,
                   state <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"South Dakota"</span>, <span class="st">"Washington"</span><span class="op">)</span>,
                   alive_pre <span class="op">=</span> <span class="fl">10</span> <span class="op">*</span> <span class="fl">365</span><span class="op">)</span>
@@ -1094,7 +1094,7 @@ FIGURE 9.4: Temperance
 <p>Imagine you are running for Governor and want to do a better job of getting your voters to vote. You recently read about a large-scale experiment showing the effect of sending out a voting reminder that “shames” citizens who do not vote. You are considering sending out a “shaming” voting reminder yourself. What will happen if you do? Will more voters show up to the polls? Additionally, on the day of the election a female citizen is randomly selected. What is the probability she will vote?</p>
 <p>Consider a new data set, <code>shaming</code>, corresponding to an experiment carried out by Gerber, Green, and Larimer (2008) titled “Social Pressure and Voter Turnout: Evidence from a Large-Scale Field Experiment.” This experiment used several hundred thousand registered voters and a series of mailings to determine the effect of social pressure on voter turnout.</p>
 <p>Let’s now do another EDA, starting off by running <code>glimpse()</code>.</p>
-<div class="sourceCode" id="cb934"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb935"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">glimpse</span><span class="op">(</span><span class="va">shaming</span><span class="op">)</span></code></pre></div>
 <pre><code>## Rows: 344,084
 ## Columns: 10
@@ -1117,7 +1117,7 @@ FIGURE 9.4: Temperance
 <!-- HV: should I explain why we are not using any of these variables? why they are not of great use to us? -->
 <p>By narrowing down the set of variables we are looking at and investigating, we will find more meaningful relationships among them. However, we have not yet discussed the most important variable of them all: <code>treatment</code>. The <code>treatment</code> variable is a factor variable with 5 levels, including the control. Since we are curious as to how sending mailings affects voter turnout, the treatment variable will tell us about the impact each type of mailing can make. Let’s start off by taking a broad look at the different treatments.
 <!-- HV: Is it okay to say the first sentence of this paragraph? --></p>
-<div class="sourceCode" id="cb936"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb937"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">shaming</span> <span class="op">%&gt;%</span>
   <span class="fu">count</span><span class="op">(</span><span class="va">treatment</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 5 x 2
@@ -1134,7 +1134,7 @@ FIGURE 9.4: Temperance
 <p>In the third treatment, Self, the mailing includes the recent voting record of each member of the household, placing the word “Voted” next to their name if they did in fact vote in the 2004 election or a blank space next to the name if they did not. In this mailing, the households were also told, “we intend to mail an updated chart” with the voting record of the household members after the 2006 primary. By emphasizing the public nature of voting records, this type of mailing exerts more social pressure on voting than the Hawthorne treatment.</p>
 <p>The fourth treatment, Neighbors, provides the household members’ voting records, as well as the voting records of those who live nearby. This mailing also told recipients, “we intend to mail an updated chart” of who voted in the 2006 election to the entire neighborhood.</p>
 <p>For now, let’s focus on a subset of the data. We will sample just 10,000 rows because otherwise <code><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm()</a></code> takes an annoyingly large amount of time to work. Nothing substantive changes.</p>
-<div class="sourceCode" id="cb938"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb939"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">9</span><span class="op">)</span>
 <span class="va">ch9_sham</span> <span class="op">&lt;-</span> <span class="va">shaming</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">treatment</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Control"</span>, <span class="st">"Neighbors"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -1144,7 +1144,7 @@ FIGURE 9.4: Temperance
   <span class="fu">select</span><span class="op">(</span><span class="va">primary_06</span>, <span class="va">treatment</span>, <span class="va">solo</span>, <span class="va">sex</span>, <span class="va">age</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">sample_n</span><span class="op">(</span><span class="fl">10000</span>, replace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 <p>We create the variable <code>solo</code>, which is TRUE for voters who live alone and FALSE for those that do not. We are curious to see if the treatment effect, if any, is the same for voters who live alone as it is for those who do not. We have also focused in on only two “treatments”: Control and Neighbors. This is for the sake of simplification. We want to know if social pressure impacts voting behavior, so it makes sense to look at the treatment that provides the most social pressure.</p>
-<div class="sourceCode" id="cb939"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb940"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch9_sham</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://docs.ropensci.org/skimr/reference/skim.html">skim</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <div class="inline-table"><table class="table table-sm">
@@ -1304,7 +1304,7 @@ FIGURE 9.4: Temperance
 <!-- DK: Add discussion of what you see here. No need to drop missing values since there aren't any. I think this next discussion can be dropped. -->
 <p>To get a better sense of some respondents’ information, let’s use <code>sample_n()</code> to gather a random sample of <em>n</em> observations from the data set.</p>
 <!-- HV: Does this belong here? -->
-<div class="sourceCode" id="cb940"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb941"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch9_sham</span> <span class="op">%&gt;%</span> 
   <span class="fu">sample_n</span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 10 x 5
@@ -1322,7 +1322,7 @@ FIGURE 9.4: Temperance
 ## 10          0 Neighbors FALSE Male      38</code></pre>
 <p>Now we have a table with 5 random observations and the respondents’ information in a regular table output. By taking a few random samples, we may start to see some patterns within the data. Do you notice anything in particular about the variable <code>treatment</code>?</p>
 <p>One other helpful summarizing technique we can use is <code><a href="https://docs.ropensci.org/skimr/reference/skim.html">skim()</a></code>. To make the information it contains simpler, we will only be looking at three variables: <code>primary_06</code>, <code>treatment</code>, and <code>sex</code>.</p>
-<div class="sourceCode" id="cb942"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb943"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">shaming</span> <span class="op">%&gt;%</span> 
   <span class="fu">select</span><span class="op">(</span><span class="va">primary_06</span>, <span class="va">treatment</span>, <span class="va">sex</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://docs.ropensci.org/skimr/reference/skim.html">skim</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
@@ -1485,11 +1485,11 @@ FIGURE 9.7: Courage
 </div>
 <p>Because we will be going through a series of models in this chapter, it is useful to combine the virtues of Justice and Courage. To begin, let’s model <code>primary_06</code>, which represents whether a citizen voted or not, against age and treatment to see if there is a connection.</p>
 <p>Let’s look at the relationship between primary voting and treatment + age.</p>
-<div class="sourceCode" id="cb943"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb944"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">model_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">ch9_sham</span>, 
                  formula <span class="op">=</span> <span class="va">primary_06</span> <span class="op">~</span> <span class="va">treatment</span> <span class="op">+</span> <span class="va">age</span>, 
                  refresh <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb944"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb945"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://docs.ropensci.org/skimr/reference/print.html">print</a></span><span class="op">(</span><span class="va">model_3</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></code></pre></div>
 <pre><code>## stan_glm
 ##  family:       gaussian [identity]
@@ -1513,7 +1513,7 @@ FIGURE 9.7: Courage
 <p>Second, remember that for this data, the (Intercept) does have a mathematical interpretation, but it does not have a practical interpretation. Why is this? Because the slope for age starts at zero. This is nonsensical for our purposes, as no voter can be of zero age.</p>
 <p>Therefore, this model shows that, within the control group, the percent voting is 0.084 = 8.4%. How do we then calculate our percent voting in the Neighbors group? Recall that the <code>treatmentNeighbors</code> median is not giving a standalone figure for this group, but rather represents the offset between the Control and Neighbors groups. To find the Neighbors value, we must add the offset to the original value: 0.084 + 0.079 = .163 = 16.3%. This is nearly double the rate in the Control group!</p>
 <p>Let’s turn to our age median. Begin by grouping our observations by <code>age</code> and counting by <code>primary_06</code>, which gives us counts for 1 (yes) or 0 (no) for number voting in each age category.</p>
-<div class="sourceCode" id="cb946"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb947"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">age</span> <span class="op">&lt;-</span> <span class="va">ch9_sham</span> <span class="op">%&gt;%</span> 
   <span class="fu">group_by</span><span class="op">(</span><span class="va">age</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">count</span><span class="op">(</span><span class="va">primary_06</span><span class="op">)</span> 
@@ -1535,7 +1535,7 @@ FIGURE 9.7: Courage
 ## 10    24          1    21
 ## # … with 139 more rows</code></pre>
 <p>To explore this relationship visually, let’s create a graph. We are coercing <code>primary_06</code> into a character variable as it more closely represents “yes” or “no” as opposed to a numeric value.</p>
-<div class="sourceCode" id="cb948"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb949"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">age</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate</span><span class="op">(</span>primary_06 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span><span class="op">(</span><span class="va">primary_06</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">age</span>, y <span class="op">=</span> <span class="va">n</span>, color <span class="op">=</span> <span class="va">primary_06</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
@@ -1552,7 +1552,7 @@ FIGURE 9.7: Courage
 - The spike between ages 40 and 60 illustrates that most participants exist in this age bracket.
 - The differences between voters and non-voters narrows greatly after age 60.</p>
 <p>Let’s now look at another graph that aims to show the same phenomena, but also includes a formula using <code>lm</code>. This more clearly shows the upward trend in voting as a participants age increases. We can also see that the highest concentrations in the “Voted” row exist from ages 45-50, whereas the highest concentrations for the “Did Not Vote” row exist in the 18-25 and 30-60 age groups. Again, we see that, for almost all ages, the partcipants are more likely to not vote than vote. This is illustrated by the darker concentration of dots in the “Did Not Vote” row. The slope of our regression line, however, shows a clear picture: the older you are, the more likely you are to vote.</p>
-<div class="sourceCode" id="cb949"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb950"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">shaming</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate</span><span class="op">(</span>age <span class="op">=</span> <span class="fl">2006</span> <span class="op">-</span> <span class="va">birth_year</span><span class="op">)</span> <span class="op">%&gt;%</span>  
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span><span class="va">age</span>, <span class="va">primary_06</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
@@ -1567,7 +1567,7 @@ FIGURE 9.7: Courage
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-737-1.png" width="672"></div>
 <p>Note that the median for age is 0.004. Age is therefore positively correlated with voting in the primary election. What does that mean? It means that, for every year that a participant’s age increases, their odds of voting in the primary <em>increases</em> by 0.004. Now, this might not seem like a huge difference. However, think of it like this: for every decade older that a participant is, their odds of voting increase .04 = 4%! This makes sense considering that we just learned that older citizens are more likely to vote.</p>
 <p>Now, let’s return to our voting difference between the Control and Neighbors groups. Let’s model the posterior probability distribution for the rates of voting.</p>
-<div class="sourceCode" id="cb950"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb951"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># In progress. Modify x-axis labels *10. </span>
 
 <span class="va">model_3</span> <span class="op">%&gt;%</span> 
@@ -1601,11 +1601,11 @@ Very few chances that Control votes more (though possible).-->
 </h2>
 <!-- MF: Thinking about graphs/visualizations for this section: are they necessary? I believe they help students visualize concepts, but most graphs won't show up 'pretty' because of the YES/NO as our main variable. -->
 <p>Now that we have analyzed the impact of our various treatments on voting behavior, let’s turn to three different variables together: sex, solo (living alone), and treatment.</p>
-<div class="sourceCode" id="cb951"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb952"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">model_4</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">ch9_sham</span>, 
                  formula <span class="op">=</span> <span class="va">primary_06</span> <span class="op">~</span> <span class="va">treatment</span> <span class="op">+</span> <span class="va">age</span> <span class="op">+</span> <span class="va">solo</span>, 
                  refresh <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb952"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb953"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://docs.ropensci.org/skimr/reference/print.html">print</a></span><span class="op">(</span><span class="va">model_4</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></code></pre></div>
 <pre><code>## stan_glm
 ##  family:       gaussian [identity]
@@ -1632,7 +1632,7 @@ Very few chances that Control votes more (though possible).-->
 <li>age, with a median of 0.004: as before, the age represents the positively correlated increase with voting as someone ages. For every decade older a participant is, their chance of voting increases by 4%.</li>
 <li>soloTRUE, with a median of 0.015: as compared with participants in households exceeding 1 persons, participants who live alone are more likely to vote by a factor of 0.015 = 1.5%. Note that this is only true for our baseline group of Control participants and does not include an analysis for those in Neighbors.</li>
 </ul>
-<div class="sourceCode" id="cb954"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb955"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Modify x scale</span>
 
 <span class="va">model_4</span> <span class="op">%&gt;%</span> 
@@ -1664,11 +1664,11 @@ Very few chances that Control votes more (though possible).-->
 </h2>
 <!-- MF: What posterior probability distributions would be interesting for the interactions section? DK: Ones that highlights the fact that the causal effects vary. -->
 <p>Since we’ve now studied a model with three different variables, it is time to look at interactions! Here, we will look at <code>primary_06</code> as a function of age, solo, treatment, and <code>solo*treatment</code>. What does <code>solo*treatment</code> mean for us? It means we are looking at the <code>solo</code> and <code>treatment</code> variables as they correspond to one another.</p>
-<div class="sourceCode" id="cb955"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb956"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">model_5</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">ch9_sham</span>, 
                  formula <span class="op">=</span> <span class="va">primary_06</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">solo</span> <span class="op">+</span> <span class="va">treatment</span> <span class="op">+</span> <span class="va">solo</span> <span class="op">*</span> <span class="va">treatment</span>, 
                  refresh <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb956"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb957"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://docs.ropensci.org/skimr/reference/print.html">print</a></span><span class="op">(</span><span class="va">model_5</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></code></pre></div>
 <pre><code>## stan_glm
 ##  family:       gaussian [identity]
