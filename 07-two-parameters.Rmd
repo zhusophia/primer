@@ -108,6 +108,7 @@ Let's look at the `nhanes` dataset from the National Health and Nutrition Examin
 
 
 ```{r}
+library(tidyverse)
 library(primer.data)
 library(skimr)
 glimpse(nhanes)
@@ -221,7 +222,7 @@ This is the simplest model we can construct. Note:
 
 * The parameter we most care about is $\mu$. That is the parameter with a substantively meaningful interpretation. Not only is the meaning of $\sigma$ difficult to describe, we also don't particular care about its value. Parameters like $\sigma$ in this context are *nuisance* or *auxiliary* parameters. We still have to estimate their posterior distributions, but we don't really care what those posteriors look like.
 
-* $\mu$ is not the average height of the men in the sample. We can calculate that directly. It is `r mean(ch7_male$height)`. No estimation required! Instead, $\mu$ is the average height of men in the *population*. Recall from the discussions in Chapter \@ref(one-parameter) that the population is the universe of people/units/whatever about which we seek to draw conclusions. On some level, this seems simple. On a deeper level, it is very subtle. For example, if we are walking around Copenhagen, then the population we really care about, in order to answer our three questions, is the set of adult men into which we might run today. This is not the same as the population of adult men in the US in 2009. But is it close enough? Is it better than nothing? Each case is a different and the details matter.
+* $\mu$ is not the average height of the men in the sample. We can calculate that directly. It is `r mean(ch7$height)`. No estimation required! Instead, $\mu$ is the average height of men in the *population*. Recall from the discussions in Chapter \@ref(one-parameter) that the population is the universe of people/units/whatever about which we seek to draw conclusions. On some level, this seems simple. On a deeper level, it is very subtle. For example, if we are walking around Copenhagen, then the population we really care about, in order to answer our three questions, is the set of adult men into which we might run today. This is not the same as the population of adult men in the US in 2009. But is it close enough? Is it better than nothing? Each case is a different and the details matter.
 
 <!-- DK: Should we discuss what a superpopulation is? -->
 
@@ -269,12 +270,12 @@ In data science, we deal with math, words, and code, but the most important of t
 
 Bayesian models are not hard to create in R. Sticking to the same filtered adult male 2009 data, we can reduce all the work we did for the bootstrap approach to the `stan_glm()` function which, when fed the correct inputs, creates a Bayesian generalized linear model of height. This function comes from the **rstanarm** package, which is very useful for Bayesian models in general.
 
-The first argument in the `stan_glm()` function is `data`, which in our case is the filtered `ch7_male` tibble we used in the bootstrap example. The only other mandatory argument is the formula that we want to build a model around. In this case, since we have no predictor variables, our equation will be `height ~ 1`. 
+The first argument in the `stan_glm()` function is `data`, which in our case is the filtered `ch7` tibble we used in the bootstrap example. The only other mandatory argument is the formula that we want to build a model around. In this case, since we have no predictor variables, our equation will be `height ~ 1`. 
 
 
 ```{r, cache = TRUE}
 set.seed(9)
-fit_obj <- stan_glm(data = ch7_male, 
+fit_obj <- stan_glm(data = ch7, 
                     height ~ 1, 
                     family = gaussian(), 
                     refresh = 0)
@@ -391,7 +392,7 @@ Two other important concepts in model creation are "fitted" values and residuals
 
 
 ```{r}
-ch7_male %>% 
+ch7 %>% 
   mutate(fitted_value = fitted(fit_obj)) %>% 
   mutate(residual = residuals(fit_obj)) %>% 
   sample_n(5)
@@ -407,7 +408,7 @@ The fitted value represents the model's best guess at to what the true value of 
 # using posterior_linpred rather than hard-coding the fitted value. Want to make
 # this easier to do in later chapters and standardize the approach/code.
 
-outcome <- ch7_male %>% 
+outcome <- ch7 %>% 
   ggplot(aes(height)) +
     geom_histogram(bins = 100) +
     labs(x = "Height (cm)",
