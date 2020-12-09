@@ -707,7 +707,9 @@ library(gtsummary)
 
 fit2 <- stan_glm(att_end ~ party, data = trains, refresh = 0)
 
-tbl_regression(fit2, intercept = TRUE) %>%
+tbl_regression(fit2, 
+               intercept = TRUE, 
+               estimate_fun = function(x) style_sigfig(x, digits = 2)) %>%
   as_gt() %>%
     tab_header(title = "Regression of Attitudes about Immigration", 
                subtitle = "The Effect of Party on End Attitude") %>%
