@@ -1,5 +1,8 @@
 # Create a bibliography with all the packages we are using.
 
+# It would be nice if this only ran when we are building the whole book. How can
+# we check that?
+
 knitr::write_bib(c(.packages(), "bookdown"), "bib/packages.bib")
 
 # Running snapshot from renv after a successful build to update necessary
