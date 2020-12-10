@@ -1,78 +1,20 @@
-
-<!-- * Start by saying: Wow. What a bother it was to do everything by hand in chapter 6! There must be an easier way. And, indeed, there is! Use stan_glm. Show how it produces the same answers, with family binomial, as we got at end of chapter 6. Interpret the meaning of the parameter? Show the math?  -->
-
-<!-- Good reference: https://cran.r-project.org/web/packages/rstanarm/vignettes/binomial.html -->
-
-<!-- Should use summary(fit_1) and discuss. -->
-
-
-<!-- TO-DO: --> 
-
-<!-- Use \mu everywhere. -->
-
-<!-- We should reframe the chapter. Start with the big picture involving the connection between this chapter and the other chapters. Then, invoke the bootstrap as being the equivalent of all the sampling tricks we did in previous chapters. Then, make some graphics which look a lot like the graphics from chapter 6. (Make one graphic for a fixed value of sigma and then, I hope, make a 3-D graphic which shows what we do with two unknowns.) Then, explain that this is a total pain in the butt. Then introduce stan_glm() as the solution. Then show that stan_glm() "works" by doing the repeated sampling exercise which we had previously suggested for bootstrapping.  -->
-
-<!-- Key differences: First, chapter 6 deals with a limited set of specific models: 2401 possible models. The procedure is just what we saw in chapter 5.  We, on the other hand, have a continuous parameter.  Second, chapter 5 dealt with one parameter: the number of read beads, which we can also define as $p$, defined as the number of read beads divided by 2,400.  The  model in chapter 6 was binomial, and there is only one unknown parameter p. We have two unknown parameters: the mean mu of height in the US and the standard deviation sigma, of the normally distributed error term. -->
-
-<!-- Prove that the bootstrap works, that our 95% confidence intervals provide correct coverage. We make a game and I give you a sample of like 40. Here's the 40, and you give me a 95% CI using the bootstrap tools we learned. Then I give you another 40. And another. If we do this 1,00 times, and we use the same procedure for calculating a confidence interval each time, then 950 should include the truth. That's how we know bootstraps is correct and I could only demonstrate this to you if we know what the truth is.  
-
-Plan: create function called create_ci(), which takes a tibble with a single variable called height and returns the 95% confidence interval --- i.e., a numeric vector of length 2 --- for the 75th percentile.  Note that you get to hard code everything.
-
-Then, create a tibble, first column is ID. Second column is height_sample, which is created by running sample(ch7$height, size = 40, replace = FALSE). Third column is ci, which is result mutate(ci = map(height_sample, ~ create_ci(.)). Fourth column is within_ci, which is TRUE if ci includes the TRUE value and FALSE otherwise. (If you want to have two columns, one for each limit, that is fine.)
--->
-
-
-
-<!-- c) Discuss how this exercise is still useful even if we begin with all our data. That is, don't sample. Just use all 5,000 people. Then, do the bootstrap to get a confidence interval. Note that the interval will be --- how much? --- smaller than the ones we got above, because we are using 116 times as much data. But it is also weird. I know exactly what the mean is! I have the entire Rubin Table! I don't need a confidence interval for the mean.  -->
-
-<!-- d) That is both true, and false. If all you truly care about is the mean these 5,000 people then, it is true, you are done. But that is generally not the case! The true Rubin Table is often bigger than you might initially think. You might also be interested in data from another time period (which has occurred but which may not be available to you) or from 2021, which has not even happened yet. Your Rubin Table includes rows for all those people. They are just missing. You also care about the millions of people who are not in the 5,000. You really want the mean for the country. (Or the world?) So, you use the model that you have to estimate stuff for the data that you don't. What is your best guess for the mean in 2011 (which you can check) or in 2021 (which you can't)? How confident are you are that estimate? What is your 50/50 prediction interval? -->
-
-<!-- e) Relatedly, what if I told you that your 2009 data I gave you did not include one person (or ten people or 100), which was (were) dropped at random from the data by mistake. What is your guess as to the height of that single person, or the height of the average of the 10 people or the tallest of the 10 classes? What is your confidence interval for that? Want to bet? These are all different estimands. -->
-
-<!-- 4) Recall how the probability chapter goes farther than this. It gets all the way to posterior predictions. What will be the mint year of the next penny we get from the bank? What will be the average of the next five pennies we pull? What is a reasonable uncertainty for these forecasts?  Do a posterior predictive checks. Note that we should use all the same "tools" as in that probability chapter. That is, our bootstraps has built a posterior distribution, just like the posterior distribution we built with the coin tosses. Do we then sample from this posterior to answer other questions? Or is that too hard. -->
-
-<!-- 4a) Key issue: How to we transition from this crazy bootstrap approach to using R functions to make the same calculations. Bootstraps take too long, and they are a bother. We need to show how they give the same answer as the built in R functions and then transition away from the bootstrap. Indeed, there is an argument that this chapter (or last chapter?) is the last Bayes Scatterplot we show. That was all about intuition. Once we have that, we can just go to doing things the right way. -->
-
-<!-- 4b) Key issue two: Do we go straight from the bootstrap to rstanarm functions? That would be pretty aggressive. But also pretty cool! -->
-
-<!-- 5) Need to build a Rubin Table. (Read chapter 3 for background and discussion.) We want to have the year for every penny in the world. Sadly, we don't have that! But we do have 50 pennies. Show an RT, which shows both pennies we know the year of and pennies we don't know the year of. If we knew all the pennies, we could just calculate our estimand directly. We would know exactly the mean, the median, the 3rd oldest and so on. No uncertainty. But, we don't have all the years. The question marks mock us! So, we need to infer what is in the missing rows. (And then we . . . not sure I have thought this through.) Also, we can discuss lots of possible biases in the sampling mechanism. Indeed, the sampling mechanism is the key thing to discuss in this section. -->
-
-<!-- ## Using Bootstraps with `nhanes` -->
-
-<!-- 4. Prove that the bootstrap works, that our 95% confidence intervals provide correct coverage. We make a game and I give you a sample of like 40. Here's the 40, and you give me a 95% CI using the bootstrap tools we learned. Then I give you another 40. And another. If we do this 1,00 times, and we use the same procedure for calculating a confidence interval each time, then 950 should include the truth. That's how we know bootstraps is correct and I could only demonstrate this to you if we know what the truth is.   -->
-
-<!-- Plan: create function called create_ci(), which takes a tibble with a single variable called height and returns the 95% confidence interval --- i.e., a numeric vector of length 2 --- for the 75th percentile.  Note that you get to hard code everything. -->
-
-<!-- Then, create a tibble, first column is ID. Second column is height_sample, which is created by running sample(ch7$height, size = 40, replace = FALSE). Third column is ci, which is result mutate(ci = map(height_sample, ~ create_ci(.)). Fourth column is within_ci, which is TRUE if ci includes the TRUE value and FALSE otherwise. (If you want to have two columns, one for each limit, that is fine.) -->
-
-
-
-
-<!-- Other Notes -->
-
-<!-- This is probably too hard for the chapter itself but might make for a good problem set: Estimating who is going to win an election as the votes come in. After one vote, don't know anything. After 5 votes, maybe a little. After 10 votes, more. And so on. Show how the best estimate evolves over time, as information comes in. Do this as a contest. What procedure is best? Show that some shrinkage is a very good idea. Each stage is, potentially, a new contest. See which approach wins the most contests. In the end, of course, they converge.   -->
-
-
-<!-- Show updating as each vote comes in. Then show that you get the same answer if you just include all the votes at once. -->
-
-<!-- First, look at competing models. Who is ahead, D or R? -->
-<!-- Second, add another model. D or R or tied? -->
-<!-- Third, what is D percentage of support? -->
-
-<!-- Assuming this is correct, we get to bring in prediction and betting. Then, we have the motivating question: What is a good estimate for the percentage of Democrats in this bucket? How do we combine information from the overall population and from our sample to come up with a good estimate, and confidence interval, for the percentage Democratic in that bucket? Perhaps this multi-level model is one of the last things we do. Even Mr P??  -->
-
-<!-- Workshop Statistics:  Discovery with Data, A Bayesian Approach by James H. Albert and Allan J. Rossman --- Topic 16 has some interesting stuff about how we learn a proportion.  -->
-
-<!-- DK: Add this: "an estimate for the standard deviation of the errors (i.e. variability in height after accounting for the mean)" is pretty intuitive. You can show students the sample estimate of that with something like this (or sd(resid(fit_obj)) -->
-
 # Two Parameters {#two-parameters}
 
 
-In Chapter \@ref(one-parameter), we learned how to do inference. Given certain assumptions about the problem, we created a joint distribution of the models under consideration and the data which might be observed. Once we observe the data, we could go from the joint distribution to the conditional distribution of possible models given the data which we did, in fact, observe. That conditional distribution is our posterior probability distribution over the space of possible models. With that distribution, we can answer any question we might (reasonably) ask.
 
-But what a pain in the ass that whole process was! Do professionals actually go through all those steps every time they work on a data science problem? No! Don't be absurd. Instead, professionals use standard tools which, in an automated fashion, take care of those steps, taking us directly from assumptions and data to that posterior:
+<!-- Need a better discussion of what sigma means. Something like: "an estimate for the standard deviation of the errors (i.e. variability in height after accounting for the mean)" is pretty intuitive. You can show students the sample estimate of that with something like this (or sd(resid(fit_obj)) -->
+
+
+
+
+In Chapter \@ref(one-parameter), we learned how to do inference. Given certain assumptions about the problem, we created a joint distribution of the models under consideration and the data which might be observed. Once we observe the data, we go from the joint distribution to the conditional distribution of possible models given the data which we did, in fact, observe. That conditional distribution is our posterior probability distribution over the space of possible models. With that distribution, we can answer any question we might (reasonably) ask.
+
+But what a pain in the ass that whole process was! Do professionals actually go through all those steps every time they work on a data science problem? No! Don't be absurd. Instead, professionals use standard tools which, in an automated fashion, take care of those steps, taking us directly from assumptions and data to the posterior:
 
 $$p(models | data = data\ we\ observed)$$.
+
+
+There are two key differences. First, Chapter \@ref(one-parameter) dealt with a limited set of specific models: 2401 possible models. The procedure used is just what we saw in Chapter \@ref(probability).  In this chapter, on the other hand, have a continuous parameter.  Second, Chapter \@ref(one-parameter) used models with just one parameter: the number of red beads, which we can also transform into a parameter $p$, the number of red beads divided by 2,400.  The  model in Chapter \@ref(one-parameter) was binomial, and there is only one unknown parameter $p$ in such models. Here, we have two unknown parameters: the mean $\mu$ of height in the US and the standard deviation, $\sigma$, of the normally distributed error term. 
 
 
 The purpose of this chapter is to demonstrate, slowly and thoroughly, how professionals do data science.
@@ -569,7 +511,28 @@ pp[, 1:100] %>%
 <!-- DK: Insert a demonstration which shows that the 95% confidence interval does, in fact, provide 95% coverage. -->
 
 
+## Coverage
+
+
+
+<!-- Prove that the bootstrap works, that our 95% confidence intervals provide correct coverage. We make a game and I give you a sample of like 40. Here's the 40, and you give me a 95% CI using the bootstrap tools we learned. Then I give you another 40. And another. If we do this 1,00 times, and we use the same procedure for calculating a confidence interval each time, then 950 should include the truth. That's how we know bootstraps is correct and I could only demonstrate this to you if we know what the truth is.  
+
+Plan: create function called create_ci(), which takes a tibble with a single variable called height and returns the 95% confidence interval --- i.e., a numeric vector of length 2 --- for the 2.5th and 97.5th percentiles.  Note that you get to hard code everything.
+
+Then, create a tibble, first column is ID. Second column is height_sample, which is created by running sample(ch7$height, size = 40, replace = FALSE). Third column is ci, which is result mutate(ci = map(height_sample, ~ create_ci(.)). Fourth column is within_ci, which is TRUE if ci includes the TRUE value and FALSE otherwise. (If you want to have two columns, one for each limit, that is fine.)
+-->
+
+<!-- Discuss how this exercise is still useful even if we begin with all our data. That is, don't sample. Just use all 5,000 people. Then, do the bootstrap to get a confidence interval. Note that the interval will be --- how much? --- smaller than the ones we got above, because we are using 116 times as much data. But it is also weird. I know exactly what the mean is! I have the entire Rubin Table! I don't need a confidence interval for the mean.  -->
+
+<!-- That is both true, and false. If all you truly care about is the mean these 5,000 people then, it is true, you are done. But that is generally not the case! The true Rubin Table is often bigger than you might initially think. You might also be interested in data from another time period (which has occurred but which may not be available to you) or from 2021, which has not even happened yet. Your Rubin Table includes rows for all those people. They are just missing. You also care about the millions of people who are not in the 5,000. You really want the mean for the country. (Or the world?) So, you use the model that you have to estimate stuff for the data that you don't. What is your best guess for the mean in 2011 (which you can check) or in 2021 (which you can't)? How confident are you are that estimate? What is your 50/50 prediction interval? -->
+
+<!-- Relatedly, what if I told you that your 2009 data I gave you did not include one person (or ten people or 100), which was (were) dropped at random from the data by mistake. What is your guess as to the height of that single person, or the height of the average of the 10 people or the tallest of the 10 classes? What is your confidence interval for that? Want to bet? These are all different estimands. -->
+
+
+
 ## rstanarm
+
+<!-- Good reference: https://cran.r-project.org/web/packages/rstanarm/vignettes/binomial.html -->
 
 The most popular package for doing Bayesian data science in R is **rstanarm**. Assume that, as before, we have used a shovel of size 50 to draw beads from the urn and that 17 of the 50 were red. What inferences can we draw?
 
