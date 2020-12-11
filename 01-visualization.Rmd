@@ -4,34 +4,41 @@
 
 # Visualization
 
-<!-- DK: After the first sentence. Show a cool plot of gapminder data. Then do the talkety-talk. Then show the code. And then finish by promising to make that simple by the end of the chapter. Then finish the chapter by looking back at this code. Then show that code with animations and plotly! -->
+Everyone loves visualizations. 
 
-
-People love visualizations. 
-
-
-
-
-```{r, echo = FALSE}
+```{r, echo = FALSE, out.width = "100%", message = FALSE}
 library(tidyverse)
+library(scales)
 library(gapminder)
-gapminder %>%
+
+gap_p <- gapminder %>%
   filter(continent != "Oceania") %>%
   filter(year == max(year)) %>% 
+  mutate(continent = fct_relevel(continent, 
+                                 c("Americas", "Europe"), 
+                                 after = 0)) %>% 
   ggplot(aes(gdpPercap, lifeExp, size = pop, color = continent)) +
-    geom_point(show.legend = FALSE, alpha = 0.7) +
-    facet_wrap(~continent, nrow = 1) +
-    scale_size(range = c(2, 12)) +
-    scale_x_log10() +
-    labs(
-        subtitle = "Life Expectancy and GDP per Capita (1952-2007)",
-         x = "GDP per Capita, USD",
-         y = "Life Expectancy, Years")
+    geom_point(alpha = 0.7) +
+    geom_smooth(method = "lm", 
+                formula = y ~ x,
+                se = FALSE) + 
+    facet_wrap(~continent, nrow = 2) +
+    labs(title = "Life Expectancy and GDP per Capita in 2007",
+         subtitle = "Connection between GDP and life expectancy is weakest in Africa",
+         x = "GDP per Capita in USD",
+         y = "Life Expectancy",
+         caption = "Data Source: gapminder R package") +
+    scale_x_log10(breaks = c(500, 5000, 50000),
+                  labels = scales::dollar_format(accuracy = 1)) +
+    theme(legend.position = "none")
+
+gap_p
 ```
 
+Once you have read this chapter, and completed the associated tutorials, you will be able to create graphics like this one with your data. Join us on the journey.
 
 
-
+## Getting Started
 
 This chapter focuses on **ggplot2**, one of the core packages in the **tidyverse**. To access the datasets, help pages, and functions that we will use in this chapter, load the tidyverse by running this code:
 
@@ -60,20 +67,7 @@ These packages contain datasets which we will use when creating visualizations. 
 
 If we need to be explicit about where a function (or dataset) comes from, we’ll use the special form: `package::function()`. For example, `ggplot2::ggplot()` tells you explicitly that we’re using the `ggplot()` function from the **ggplot2** package.
 
-<!-- DK: Can't we make a better graphic to get people excited? How many students even know what an iris is? -->
 
-Now that you're all set up, let's create our first data visualization in R using the `iris` dataset! This famous iris data set gives the measurements in centimeters of the variables sepal length and width and petal length and width, respectively, for 50 flowers from each of 3 species of iris (setosa, versicolor, and virginica). You can learn more about the dataset by running `?iris` to access the help page.
-
-```{r}
-ggplot(data = iris, 
-       mapping = aes(x = Petal.Length, fill = Species)) +
-  geom_histogram(binwidth = 0.1) +
-  labs(title = "Petal Length Among Three Species of Iris")
-```
-
-Wow! Just by running a few lines of code you created a nice visualization to compare the measured petal lengths for each of the 3 species of iris! You'll learn more about what these lines of code mean and how to write others like them throughout the chapter, but for now, let's learn more about coding in R.
-
-## Getting Started
 
 ### How do I code in R?
 
@@ -1655,11 +1649,47 @@ What happened here is that the second `group_by(month)` overwrote the grouping s
 
 ## Summary
 
+We began by showing you this plot.
+
+```{r, echo = FALSE}
+gap_p
+```
+
+This back to how impressed you were! You now have the tools to create plots like this on your own. Just run this code:
+
+```{r, eval = FALSE}
+library(tidyverse)
+library(scales)
+library(gapminder)
+
+gap_p <- gapminder %>%
+  filter(continent != "Oceania") %>%
+  filter(year == max(year)) %>% 
+  mutate(continent = fct_relevel(continent, 
+                                 c("Americas", "Europe"), 
+                                 after = 0)) %>% 
+  ggplot(aes(gdpPercap, lifeExp, size = pop, color = continent)) +
+    geom_point(alpha = 0.7) +
+    geom_smooth(method = "lm", 
+                formula = y ~ x,
+                se = FALSE) + 
+    facet_wrap(~continent, nrow = 2) +
+    labs(title = "Life Expectancy and GDP per Capita in 2007",
+         subtitle = "Connection between GDP and life expectancy is weakest in Africa",
+         x = "GDP per Capita in USD",
+         y = "Life Expectancy",
+         caption = "Data Source: gapminder R package") +
+    scale_x_log10(breaks = c(500, 5000, 50000),
+                  labels = scales::dollar_format(accuracy = 1)) +
+    theme(legend.position = "none")
+
+gap_p
+```
+
+
 We looked at basic concepts and terms we are dealing with when programming with R. We learned about the three basic components that make up each plot: data, mapping, and one or more geoms. The **ggplot2** package offers a wide range of geoms that we can use to create different types of plots. We explored advanced plotting features such as axis scaling, labeling and themes. Finally, we examined the "super package" **tidyverse**, which also includes **ggplot2**. Besides tools for visualization, it offers features for importing and manipulating data, which is the main topic of the next chapter.
 
-Finally, it should be mentioned that we have only seen a small part of what R offers. For example, we can use the **gganimate** package to bring our gapminder plot to life:
-
-<!-- DK: This is a nice way to end the chapter. But . . . 1) We should provide the code for all these plots, given that we are going to show them at all. 2) We should make these plots more consistent with the series which we worked through above, and with each other. For example, we should use the same axis labels. 3) We should clean up the code. For example, there is no reason that the plotly code could not start with the gapminder data. Also, isn't there a way to go straight from a ggplot2 object into a plotly object? Seems unlikely that we should be exposing the students to a radically different syntax. 4) If we are going to show rayshader, maybe make it more impressive? -->
+Finally, it should be mentioned that we have only seen a small part of what R offers. For example, we can use the **gganimate** package to bring a slightly modified version of our gapminder plot to life:
 
 ```{r, cache = TRUE, out.width = "100%"}
 library(gganimate)
@@ -1678,15 +1708,18 @@ gapminder %>%
     transition_time(year) +
     labs(title = "Year: {frame_time}") +
     shadow_wake(wake_length = 0.1, alpha = FALSE)
+
 ```
 
-<!-- Or the **plotly** package to make it an interactive 3D plot. -->
+The **plotly** package makes our plot interactive. Click on it and explore!
 
+<!-- DK: I don't like getting rid of the (concerning!) warning by force. Is plotly maintained? -->
 
-Or the **rayshader** package that allows us to create beautiful landscapes and maps.
+```{r, cache = TRUE, message = FALSE, warning = FALSE, out.width = "100%"}
+library(plotly)
 
-```{r fig.align='center', echo=FALSE}
-knitr::include_graphics("01-visualization/images/rayshader-plot.png")
+ggplotly(gap_p)
 ```
 
-Plotting is cool! 
+
+A beautiful plot is just a collection of steps, each simple enough on its own. We have taught you (some of) these steps. Time to start walking on your own.
