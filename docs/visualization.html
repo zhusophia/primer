@@ -63,6 +63,7 @@
 <h1>
 <span class="header-section-number">1</span> Visualization<a class="anchor" aria-label="anchor" href="#visualization"><i class="fas fa-link"></i></a>
 </h1>
+<!-- DK: After the first sentence. Show a cool plot. Then do the talkety-talk. Then show the code. And then finish by promising to make that simple by the end of the chapter. Then finish the chapter by looking back at this code. Then show that code with animations and plotly! -->
 <p>People love visualizations. This chapter focuses on <strong>ggplot2</strong>, one of the core packages in the <strong>tidyverse</strong>. To access the datasets, help pages, and functions that we will use in this chapter, load the tidyverse by running this code:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span></code></pre></div>
@@ -704,6 +705,11 @@ We can change <code>geom_histogram()</code> to <code>geom_density()</code> to ma
 <span class="header-section-number">1.3</span> Advanced Plots<a class="anchor" aria-label="anchor" href="#advanced-plots"><i class="fas fa-link"></i></a>
 </h2>
 <!-- DK: Other stuff needed here? after_stat; plotting two geoms at once; scale_x for changing labels; scales:: for axis formatting. coord_cartesian() and xlim/ylim, which allows for zooming/rescaling graphs. Other? -->
+<!-- - scales in general, and in particular, RColorBrewer and viridis. -->
+<!-- - using scales to change the name and labels of a legend. -->
+<!-- - facet_grid() to facet by more than 1 variable. -->
+<!-- 1) Plots are ordered alphabetically if it is a character and by levels if it is a factor. Dates appear differently in plots. reorder() is useful. Cover this at start of advanced plotting. -->
+<!-- 2) Purpose of Advanced plotting is to show the tools for making the plots that appear in socviz.co, chapters 3 and 4.  -->
 <div class="figure">
 <span id="fig:unnamed-chunk-79"></span>
 <img src="01-visualization/images/ggplot2-cheatsheet.jpg" alt="Data Visualization with ggplot2 Cheat Sheet" width="100%"><p class="caption">
@@ -1060,7 +1066,7 @@ FIGURE 1.8: Diagram of filter() rows operation.
 FIGURE 1.9: Diagram of select() columns.
 </p>
 </div>
-<p>Using the <code><a href="https://rdrr.io/r/stats/filter.html">filter()</a></code> function we were able to pick out specific rows from the dataset. The <code>select()</code> function allows R users to pick specific columns/variables instead.</p>
+<p>Using the <code><a href="https://rdrr.io/r/stats/filter.html">filter()</a></code> function we were able to pick out specific <em>rows</em> from the dataset. The <code>select()</code> function allows R users to pick specific <em>columns</em> (or variables) instead.</p>
 <p>We’ve seen that the <code>flights</code> data frame in the <code>nycflights13</code> package contains 19 different variables. You can identify the names of these 19 variables by running the <code>glimpse()</code> function from the <strong>dplyr</strong> package:</p>
 <div class="sourceCode" id="cb101"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">glimpse</span><span class="op">(</span><span class="va">flights</span><span class="op">)</span></code></pre></div>
@@ -1068,25 +1074,119 @@ FIGURE 1.9: Diagram of select() columns.
 <div class="sourceCode" id="cb102"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flights</span> <span class="op">%&gt;%</span> 
   <span class="fu">select</span><span class="op">(</span><span class="va">carrier</span>, <span class="va">flight</span><span class="op">)</span></code></pre></div>
-<p>This function makes it easier to explore large datasets since it allows us to limit the scope to only those variables we care most about. For example, if we <code>select()</code> only a smaller number of variables as is shown in Figure <a href="#fig:selectfig"><strong>??</strong></a>, it will make viewing the dataset in RStudio’s spreadsheet viewer more digestible. Using <code>select()</code> can also be useful for creating <strong>ggplot2</strong> visualizations when you only need a few variables.</p>
+<pre><code>## # A tibble: 336,776 x 2
+##    carrier flight
+##    &lt;chr&gt;    &lt;int&gt;
+##  1 UA        1545
+##  2 UA        1714
+##  3 AA        1141
+##  4 B6         725
+##  5 DL         461
+##  6 UA        1696
+##  7 B6         507
+##  8 EV        5708
+##  9 B6          79
+## 10 AA         301
+## # … with 336,766 more rows</code></pre>
+<p>This function makes it easier to explore large datasets since it allows us to limit the scope to only those variables we care most about. For example, if we <code>select()</code> only a smaller number of variables, it will make viewing the dataset in RStudio’s spreadsheet viewer more digestible.</p>
 <p>Let’s say instead you want to drop, or de-select, certain variables. For example, consider the variable <code>year</code> in the <code>flights</code> data frame. This variable isn’t quite a “variable” because it is always <code>2013</code> and hence doesn’t change. Say you want to remove this variable from the data frame. We can deselect <code>year</code> by using the <code><a href="https://rdrr.io/r/base/Arithmetic.html">-</a></code> sign:</p>
-<div class="sourceCode" id="cb103"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">flights_no_year</span> <span class="op">&lt;-</span> <span class="va">flights</span> <span class="op">%&gt;%</span> <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="va">year</span><span class="op">)</span></code></pre></div>
-<p>Another way of selecting columns/variables is by specifying a range of columns:</p>
 <div class="sourceCode" id="cb104"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">flight_arr_times</span> <span class="op">&lt;-</span> <span class="va">flights</span> <span class="op">%&gt;%</span> <span class="fu">select</span><span class="op">(</span><span class="va">month</span><span class="op">:</span><span class="va">day</span>, <span class="va">arr_time</span><span class="op">:</span><span class="va">sched_arr_time</span><span class="op">)</span>
-<span class="va">flight_arr_times</span></code></pre></div>
-<p>This will <code>select()</code> all columns between <code>month</code> and <code>day</code> (including the two specified columns), as well as between <code>arr_time</code> and <code>sched_arr_time</code>, and drop the rest.</p>
-<p>The <code>select()</code> function can also be used to reorder columns when used with the <code>everything()</code> helper function. For example, suppose we want the <code>hour</code>, <code>minute</code>, and <code>time_hour</code> variables to appear immediately after the <code>year</code>, <code>month</code>, and <code>day</code> variables, while not discarding the rest of the variables. In the following code, <code>everything()</code> will pick up all remaining variables:</p>
-<div class="sourceCode" id="cb105"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">flights_reorder</span> <span class="op">&lt;-</span> <span class="va">flights</span> <span class="op">%&gt;%</span> 
-  <span class="fu">select</span><span class="op">(</span><span class="va">year</span>, <span class="va">month</span>, <span class="va">day</span>, <span class="va">hour</span>, <span class="va">minute</span>, <span class="va">time_hour</span>, <span class="fu">everything</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-<span class="fu">glimpse</span><span class="op">(</span><span class="va">flights_reorder</span><span class="op">)</span></code></pre></div>
-<p>Lastly, the helper functions <code>starts_with()</code>, <code>ends_with()</code>, and <code>contains()</code> can be used to select variables/columns that match those conditions. As examples,</p>
+<code class="sourceCode R"><span class="va">flights</span> <span class="op">%&gt;%</span> 
+  <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="va">year</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 336,776 x 18
+##    month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
+##    &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;          &lt;int&gt;
+##  1     1     1      517            515         2      830            819
+##  2     1     1      533            529         4      850            830
+##  3     1     1      542            540         2      923            850
+##  4     1     1      544            545        -1     1004           1022
+##  5     1     1      554            600        -6      812            837
+##  6     1     1      554            558        -4      740            728
+##  7     1     1      555            600        -5      913            854
+##  8     1     1      557            600        -3      709            723
+##  9     1     1      557            600        -3      838            846
+## 10     1     1      558            600        -2      753            745
+## # … with 336,766 more rows, and 11 more variables: arr_delay &lt;dbl&gt;,
+## #   carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;,
+## #   air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
+<p>Another way of selecting columns/variables is by specifying a range of columns:</p>
 <div class="sourceCode" id="cb106"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">flights</span> <span class="op">%&gt;%</span> <span class="fu">select</span><span class="op">(</span><span class="fu">starts_with</span><span class="op">(</span><span class="st">"a"</span><span class="op">)</span><span class="op">)</span>
-<span class="va">flights</span> <span class="op">%&gt;%</span> <span class="fu">select</span><span class="op">(</span><span class="fu">ends_with</span><span class="op">(</span><span class="st">"delay"</span><span class="op">)</span><span class="op">)</span>
-<span class="va">flights</span> <span class="op">%&gt;%</span> <span class="fu">select</span><span class="op">(</span><span class="fu">contains</span><span class="op">(</span><span class="st">"time"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">flights</span> <span class="op">%&gt;%</span> 
+  <span class="fu">select</span><span class="op">(</span><span class="va">year</span><span class="op">:</span><span class="va">day</span>, <span class="va">air_time</span><span class="op">:</span><span class="va">minute</span><span class="op">)</span></code></pre></div>
+<p>This will <code>select()</code> all 3 columns between <code>year</code> and <code>day</code>, as well as all 4 columns ebtween <code>air_time</code> and <code>minute</code>.</p>
+<p>The <code>select()</code> function can also be used to rearrange columns when used with the <code>everything()</code> helper function. For example, suppose we want the <code>hour</code>, <code>minute</code>, and <code>time_hour</code> variables to appear immediately after the <code>year</code>, <code>month</code>, and <code>day</code> variables, while not discarding the rest of the variables. In the following code, <code>everything()</code> will pick up all remaining variables:</p>
+<div class="sourceCode" id="cb107"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">flights</span> <span class="op">%&gt;%</span> 
+  <span class="fu">select</span><span class="op">(</span><span class="va">year</span>, <span class="va">month</span>, <span class="va">day</span>, <span class="va">hour</span>, <span class="va">minute</span>, <span class="va">time_hour</span>, <span class="fu">everything</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 336,776 x 19
+##     year month   day  hour minute time_hour           dep_time sched_dep_time
+##    &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dttm&gt;                 &lt;int&gt;          &lt;int&gt;
+##  1  2013     1     1     5     15 2013-01-01 05:00:00      517            515
+##  2  2013     1     1     5     29 2013-01-01 05:00:00      533            529
+##  3  2013     1     1     5     40 2013-01-01 05:00:00      542            540
+##  4  2013     1     1     5     45 2013-01-01 05:00:00      544            545
+##  5  2013     1     1     6      0 2013-01-01 06:00:00      554            600
+##  6  2013     1     1     5     58 2013-01-01 05:00:00      554            558
+##  7  2013     1     1     6      0 2013-01-01 06:00:00      555            600
+##  8  2013     1     1     6      0 2013-01-01 06:00:00      557            600
+##  9  2013     1     1     6      0 2013-01-01 06:00:00      557            600
+## 10  2013     1     1     6      0 2013-01-01 06:00:00      558            600
+## # … with 336,766 more rows, and 11 more variables: dep_delay &lt;dbl&gt;,
+## #   arr_time &lt;int&gt;, sched_arr_time &lt;int&gt;, arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;,
+## #   flight &lt;int&gt;, tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;,
+## #   distance &lt;dbl&gt;</code></pre>
+<p>Lastly, the helper functions <code>starts_with()</code>, <code>ends_with()</code>, and <code>contains()</code> can be used to select variables/columns that match those conditions. Examples:</p>
+<div class="sourceCode" id="cb109"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">flights</span> <span class="op">%&gt;%</span> 
+  <span class="fu">select</span><span class="op">(</span><span class="fu">starts_with</span><span class="op">(</span><span class="st">"a"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 336,776 x 3
+##    arr_time arr_delay air_time
+##       &lt;int&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+##  1      830        11      227
+##  2      850        20      227
+##  3      923        33      160
+##  4     1004       -18      183
+##  5      812       -25      116
+##  6      740        12      150
+##  7      913        19      158
+##  8      709       -14       53
+##  9      838        -8      140
+## 10      753         8      138
+## # … with 336,766 more rows</code></pre>
+<div class="sourceCode" id="cb111"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">flights</span> <span class="op">%&gt;%</span> 
+  <span class="fu">select</span><span class="op">(</span><span class="fu">ends_with</span><span class="op">(</span><span class="st">"delay"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 336,776 x 2
+##    dep_delay arr_delay
+##        &lt;dbl&gt;     &lt;dbl&gt;
+##  1         2        11
+##  2         4        20
+##  3         2        33
+##  4        -1       -18
+##  5        -6       -25
+##  6        -4        12
+##  7        -5        19
+##  8        -3       -14
+##  9        -3        -8
+## 10        -2         8
+## # … with 336,766 more rows</code></pre>
+<div class="sourceCode" id="cb113"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">flights</span> <span class="op">%&gt;%</span> 
+  <span class="fu">select</span><span class="op">(</span><span class="fu">contains</span><span class="op">(</span><span class="st">"time"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 336,776 x 6
+##    dep_time sched_dep_time arr_time sched_arr_time air_time time_hour          
+##       &lt;int&gt;          &lt;int&gt;    &lt;int&gt;          &lt;int&gt;    &lt;dbl&gt; &lt;dttm&gt;             
+##  1      517            515      830            819      227 2013-01-01 05:00:00
+##  2      533            529      850            830      227 2013-01-01 05:00:00
+##  3      542            540      923            850      160 2013-01-01 05:00:00
+##  4      544            545     1004           1022      183 2013-01-01 05:00:00
+##  5      554            600      812            837      116 2013-01-01 06:00:00
+##  6      554            558      740            728      150 2013-01-01 05:00:00
+##  7      555            600      913            854      158 2013-01-01 06:00:00
+##  8      557            600      709            723       53 2013-01-01 06:00:00
+##  9      557            600      838            846      140 2013-01-01 06:00:00
+## 10      558            600      753            745      138 2013-01-01 06:00:00
+## # … with 336,766 more rows</code></pre>
 </div>
 <div id="slice-and-pull-and" class="section level3" number="1.4.4">
 <h3>
@@ -1094,7 +1194,7 @@ FIGURE 1.9: Diagram of select() columns.
 </h3>
 <p><code>slice()</code> and <code>pull()</code> are additional functions that you can use to pick out specific rows or columns within a data frame.</p>
 <p>Using <code>slice()</code> gives us specific rows from the <code>flights</code> tibble:</p>
-<div class="sourceCode" id="cb107"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb115"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">slice</span><span class="op">(</span><span class="va">flights</span>, <span class="fl">2</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 4 x 19
 ##    year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
@@ -1108,18 +1208,18 @@ FIGURE 1.9: Diagram of select() columns.
 ## #   hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
 <p>Unlike <code><a href="https://rdrr.io/r/stats/filter.html">filter()</a></code>, <code>slice()</code> relies on numeric order of the data.</p>
 <p><code>pull()</code> grabs out a variable as a vector, rather than leaving it within a tibble, as <code>select()</code> does:</p>
-<div class="sourceCode" id="cb109"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb117"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">slice</span><span class="op">(</span><span class="va">flights</span>, <span class="fl">2</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">pull</span><span class="op">(</span><span class="va">dep_time</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 533 542 544 554</code></pre>
 <p>This is often handy when you want to feed the data into a function, like <code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code> which requires a vector as input:</p>
-<div class="sourceCode" id="cb111"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb119"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">slice</span><span class="op">(</span><span class="va">flights</span>, <span class="fl">2</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">pull</span><span class="op">(</span><span class="va">dep_time</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 543</code></pre>
 <p>The most common way to subset vectors is to use the “bracket” operator <code>[]</code>. Example:</p>
-<div class="sourceCode" id="cb113"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb121"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flights</span><span class="op">$</span><span class="va">dep_time</span><span class="op">[</span><span class="fl">2</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></code></pre></div>
 <pre><code>## [1] 533 542 544 554</code></pre>
 </div>
@@ -1130,7 +1230,7 @@ FIGURE 1.9: Diagram of select() columns.
 <p>One of the most commonly performed data wrangling tasks is to sort a data frame’s rows in the alphanumeric order of one of the variables. Unlike <code><a href="https://rdrr.io/r/stats/filter.html">filter()</a></code> or <code>select()</code>, <code>arrange()</code> does not remove any rows or columns from the data frame. Instead, the <strong>dplyr</strong> package’s <code>arrange()</code> function allows us to sort/reorder a data frame’s rows according to the values of the specified variable.</p>
 <p>Suppose we are interested in determining the flight that covers that most distance from all domestic flights departing from New York City in 2013:</p>
 <p>First, let’s <code>select()</code> some pertinent variables to make the data more easy to read.</p>
-<div class="sourceCode" id="cb115"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb123"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flights_dist</span> <span class="op">&lt;-</span> <span class="va">flights</span> <span class="op">%&gt;%</span> 
   <span class="fu">select</span><span class="op">(</span><span class="va">origin</span>, <span class="va">dest</span>, <span class="va">air_time</span>, <span class="va">distance</span><span class="op">)</span>
 <span class="va">flights_dist</span></code></pre></div>
@@ -1149,7 +1249,7 @@ FIGURE 1.9: Diagram of select() columns.
 ## 10 LGA    ORD        138      733
 ## # … with 336,766 more rows</code></pre>
 <p>The order of this data appears is maintained from the original <code>flights</code> data set. Say instead we would like to see the same data, but sorted for the <code>distance</code> of each flight (from the farthest to the shortest distance).</p>
-<div class="sourceCode" id="cb117"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb125"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flights_dist</span> <span class="op">%&gt;%</span> 
   <span class="fu">arrange</span><span class="op">(</span><span class="va">distance</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 336,776 x 4
@@ -1167,7 +1267,7 @@ FIGURE 1.9: Diagram of select() columns.
 ## 10 EWR    PHL         27       80
 ## # … with 336,766 more rows</code></pre>
 <p>This is, however, the opposite of what we want. The rows are sorted with the flights covering the least distance displayed first. This is because <code>arrange()</code> always returns rows sorted in ascending order by default. To switch the ordering to be in “descending” order instead, we use the <code>desc()</code> function like so:</p>
-<div class="sourceCode" id="cb119"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb127"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flights_dist</span> <span class="op">%&gt;%</span> 
   <span class="fu">arrange</span><span class="op">(</span><span class="fu">desc</span><span class="op">(</span><span class="va">distance</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 336,776 x 4
@@ -1185,7 +1285,7 @@ FIGURE 1.9: Diagram of select() columns.
 ## 10 JFK    HNL        633     4983
 ## # … with 336,766 more rows</code></pre>
 <p>Let’s try this one more time with a character variable. What happens when we try to sort by the destination (<code>dest</code>) variable?</p>
-<div class="sourceCode" id="cb121"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb129"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flights_dist</span> <span class="op">%&gt;%</span>
   <span class="fu">arrange</span><span class="op">(</span><span class="va">dest</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 336,776 x 4
@@ -1209,7 +1309,7 @@ FIGURE 1.9: Diagram of select() columns.
 <span class="header-section-number">1.4.6</span> <code>mutate()</code><a class="anchor" aria-label="anchor" href="#mutate"><i class="fas fa-link"></i></a>
 </h3>
 <div class="figure">
-<span id="fig:unnamed-chunk-123"></span>
+<span id="fig:unnamed-chunk-125"></span>
 <img src="01-visualization/images/mutate.png" alt="Diagram of mutate() columns."><p class="caption">
 FIGURE 1.10: Diagram of mutate() columns.
 </p>
@@ -1219,18 +1319,18 @@ FIGURE 1.10: Diagram of mutate() columns.
 \text{temp in C} = \frac{\text{temp in F} - 32}{1.8}
 \]</span></p>
 <p>We can apply this formula to the <code>temp</code> variable using the <code>mutate()</code> function from the <strong>dplyr</strong> package, which takes existing variables and mutates them to create new ones.</p>
-<div class="sourceCode" id="cb123"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb131"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">weather</span> <span class="op">&lt;-</span> <span class="va">weather</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate</span><span class="op">(</span>temp_in_C <span class="op">=</span> <span class="op">(</span><span class="va">temp</span> <span class="op">-</span> <span class="fl">32</span><span class="op">)</span> <span class="op">/</span> <span class="fl">1.8</span><span class="op">)</span></code></pre></div>
 <p>In this code, we <code>mutate()</code> the <code>weather</code> data frame by creating a new variable <code>temp_in_C = (temp - 32) / 1.8</code> and then <em>overwrite</em> the original <code>weather</code> data frame. Why did we overwrite the data frame <code>weather</code>, instead of assigning the result to a new data frame like <code>weather_new</code>? As a rough rule of thumb, as long as you are not losing original information that you might need later, it’s acceptable practice to overwrite existing data frames with updated ones, as we did here. On the other hand, why did we not overwrite the variable <code>temp</code>, but instead created a new variable called <code>temp_in_C</code>? Because if we did this, we would have erased the original information contained in <code>temp</code> of temperatures in Fahrenheit that may still be valuable to us.</p>
 <p>Let’s now compute monthly average temperatures in both °F and °C using the <code>group_by()</code> and <code>summarize()</code> code we saw in Section <a href="#groupby"><strong>??</strong></a>:</p>
-<div class="sourceCode" id="cb124"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb132"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">summary_monthly_temp</span> <span class="op">&lt;-</span> <span class="va">weather</span> <span class="op">%&gt;%</span> 
   <span class="fu">group_by</span><span class="op">(</span><span class="va">month</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">summarize</span><span class="op">(</span>mean_temp_in_F <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">temp</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, 
             mean_temp_in_C <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">temp_in_C</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
-<div class="sourceCode" id="cb126"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb134"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">summary_monthly_temp</span></code></pre></div>
 <pre><code>## # A tibble: 12 x 3
 ##    month mean_temp_in_F mean_temp_in_C
@@ -1248,7 +1348,7 @@ FIGURE 1.10: Diagram of mutate() columns.
 ## 11    11           45.0           7.22
 ## 12    12           38.4           3.58</code></pre>
 <p>Let’s consider another example. Passengers are often frustrated when their flight departs late, but aren’t as annoyed if, in the end, pilots can make up some time during the flight. This is known in the airline industry as <em>gain</em>, and we will create this variable using the <code>mutate()</code> function:</p>
-<div class="sourceCode" id="cb128"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb136"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flights</span> <span class="op">&lt;-</span> <span class="va">flights</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate</span><span class="op">(</span>gain <span class="op">=</span> <span class="va">dep_delay</span> <span class="op">-</span> <span class="va">arr_delay</span><span class="op">)</span></code></pre></div>
 <p>Let’s take a look at only the <code>dep_delay</code>, <code>arr_delay</code>, and the resulting <code>gain</code> variables for the first 5 rows in our updated <code>flights</code> data frame in Table <a href="#tab:first-five-flights"><strong>??</strong></a>.</p>
@@ -1262,7 +1362,7 @@ FIGURE 1.10: Diagram of mutate() columns.
 ## 5        -6       -25    19</code></pre>
 <p>The flight in the first row departed 2 minutes late but arrived 11 minutes late, so its “gained time in the air” is a loss of 9 minutes, hence its <code>gain</code> is 2 - 11 = -9. On the other hand, the flight in the fourth row departed a minute early (<code>dep_delay</code> of -1) but arrived 18 minutes early (<code>arr_delay</code> of -18), so its “gained time in the air” is <span class="math inline">\(-1 - (-18) = -1 + 18 = 17\)</span> minutes, hence its <code>gain</code> is +17.</p>
 <p>Recall from Section <a href="#histograms"><strong>??</strong></a> that since <code>gain</code> is a numerical variable, we can visualize its distribution using a histogram.</p>
-<div class="sourceCode" id="cb130"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb138"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">flights</span>, mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">gain</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_histogram</span><span class="op">(</span>color <span class="op">=</span> <span class="st">"white"</span>, bins <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></code></pre></div>
 <pre><code>## Warning: Removed 9430 rows containing non-finite values (stat_bin).</code></pre>
@@ -1274,7 +1374,7 @@ FIGURE 1.11: Histogram of gain variable.
 </div>
 <p>The resulting histogram in Figure <a href="visualization.html#fig:gain-hist">1.11</a> provides a different perspective on the <code>gain</code> variable than the summary statistics we computed earlier. For example, note that most values of <code>gain</code> are right around 0.</p>
 <p>To close out our discussion on the <code>mutate()</code> function to create new variables, note that we can create multiple new variables at once in the same <code>mutate()</code> code. Furthermore, within the same <code>mutate()</code> code we can refer to new variables we just created. As an example, consider this code from <span class="citation"><a href="references-1.html#ref-rds2016" role="doc-biblioref">Grolemund and Wickham</a> (<a href="references-1.html#ref-rds2016" role="doc-biblioref">2017</a>)</span>:</p>
-<div class="sourceCode" id="cb132"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb140"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flights</span> <span class="op">&lt;-</span> <span class="va">flights</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate</span><span class="op">(</span>gain <span class="op">=</span> <span class="va">dep_delay</span> <span class="op">-</span> <span class="va">arr_delay</span>,
          hours <span class="op">=</span> <span class="va">air_time</span> <span class="op">/</span> <span class="fl">60</span>,
@@ -1283,9 +1383,10 @@ FIGURE 1.11: Histogram of gain variable.
 <h4>
 <span class="header-section-number">1.4.6.1</span> <code>ifelse()</code><a class="anchor" aria-label="anchor" href="#ifelse"><i class="fas fa-link"></i></a>
 </h4>
+<!-- Discuss case_when()? -->
 <!-- DK: Edit these lines from R4DS. Are there other functions which we should mention here? Do something sensible with group_by. To get `_` to work in caption title. Found at https://github.com/rstudio/bookdown/issues/209  -->
 <p><code><a href="https://rdrr.io/r/base/ifelse.html">ifelse()</a></code> has three arguments. The first argument <code>test</code> should be a logical vector. The result will contain the value of the second argument, <code>yes</code>, when test is TRUE, and the value of the third argument, <code>no</code>, when it is FALSE. Imagine that we want to create a new variable <code>E</code>, which is TRUE when the color of the diamond is “E” and FALSE otherwise.</p>
-<div class="sourceCode" id="cb133"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb141"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">diamonds</span> <span class="op">%&gt;%</span> 
   <span class="fu">select</span><span class="op">(</span><span class="va">carat</span>, <span class="va">color</span>, <span class="va">price</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate</span><span class="op">(</span>E <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">color</span> <span class="op">==</span> <span class="st">"E"</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></code></pre></div>
@@ -1355,7 +1456,7 @@ FIGURE 1.12: (ref:groupby)
 <p>This function offers an array of summary statistics for each of the columns of the dataset, but <code>summarize()</code> (or alternatively <code>summarise()</code>) allows us to calculate these statistics on individual columns of the dataset.</p>
 <p>More precisely, we’ll use the <code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code> and <code><a href="https://rdrr.io/r/stats/sd.html">sd()</a></code> summary functions within the <code>summarize()</code> function from the <strong>dplyr</strong> package. Note you can also use the British English spelling of <code>summarise()</code>. The <code>summarize()</code> function takes in a data frame and returns a data frame with only one row corresponding to the summary statistics.</p>
 <p>We’ll save the results in a new data frame called <code>summary_temp</code> that will have two columns/variables: the <code>mean</code> and the <code>std_dev</code>:</p>
-<div class="sourceCode" id="cb136"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb144"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">summary_temp</span> <span class="op">&lt;-</span> <span class="va">weather</span> <span class="op">%&gt;%</span> 
   <span class="fu">summarize</span><span class="op">(</span>mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">temp</span><span class="op">)</span>, std_dev <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html">sd</a></span><span class="op">(</span><span class="va">temp</span><span class="op">)</span><span class="op">)</span>
 <span class="va">summary_temp</span></code></pre></div>
@@ -1366,7 +1467,7 @@ FIGURE 1.12: (ref:groupby)
 <p>Why are the values returned <code>NA</code>?`<code>NA</code> is how R encodes <em>missing values</em> where <code>NA</code> indicates “not available” or “not applicable.” If a value for a particular row and a particular column does not exist, <code>NA</code> is stored instead. Values can be missing for many reasons. Perhaps the data was collected but someone forgot to enter it? Perhaps the data was not collected at all because it was too difficult to do so? Perhaps there was an erroneous value that someone entered that has been corrected to read as missing? You’ll often encounter issues with missing values when working with real data.</p>
 <p>Going back to our <code>summary_temp</code> output, by default any time you try to calculate a summary statistic of a variable that has one or more <code>NA</code> missing values in R, <code>NA</code> is returned. To work around this fact, you can set the <code>na.rm</code> argument to <code>TRUE</code>, where <code>rm</code> is short for “remove”; this will ignore any <code>NA</code> missing values and only return the summary value for all non-missing values.</p>
 <p>The code that follows computes the mean and standard deviation of all non-missing values of <code>temp</code>:</p>
-<div class="sourceCode" id="cb138"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb146"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">summary_temp</span> <span class="op">&lt;-</span> <span class="va">weather</span> <span class="op">%&gt;%</span> 
   <span class="fu">summarize</span><span class="op">(</span>mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">temp</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, 
             std_dev <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html">sd</a></span><span class="op">(</span><span class="va">temp</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
@@ -1402,7 +1503,7 @@ FIGURE 1.12: (ref:groupby)
 <p>We will next discuss the <em>standard deviation</em> (<span class="math inline">\(sd\)</span>) of a variable. The formula can be a little intimidating at first but it is important to remember that it is essentially a measure of how far we expect a given data value will be from its mean:</p>
 <p><span class="math display">\[sd = \sqrt{\frac{(x_1 - Mean)^2 + (x_2 - Mean)^2 + \cdots + (x_n - Mean)^2}{n - 1}}\]</span></p>
 <p>Let’s return to the <code>gain</code> variable from the previous chapter and look at some summary statistics by considering multiple summary functions at once in the same <code>summarize()</code> code:</p>
-<div class="sourceCode" id="cb140"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb148"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flights</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate</span><span class="op">(</span>gain <span class="op">=</span> <span class="va">arr_delay</span> <span class="op">-</span> <span class="va">dep_delay</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">summarize</span><span class="op">(</span>min <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">min</a></span><span class="op">(</span><span class="va">gain</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,
@@ -1419,7 +1520,7 @@ FIGURE 1.12: (ref:groupby)
 ## 1  -109   -17     -7     3   196 -5.66  18.0    9430</code></pre>
 <p>We see for example that the average gain is +5 minutes, while the largest is +109 minutes! However, this code would take some time to type out in practice.</p>
 <p>We can also run summary statistics <code>across()</code> multiple columns at the same time. To get a better understanding of the <code>across()</code> helper function, run <code>?across</code> in your console and see what arguments it takes. Suppose we wanted to take the <code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code> of both the <code>temp</code> and the <code>dewp</code> variables.</p>
-<div class="sourceCode" id="cb142"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb150"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">weather</span> <span class="op">%&gt;%</span>
   <span class="fu">summarize</span><span class="op">(</span><span class="fu">across</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">temp</span>, <span class="va">dewp</span><span class="op">)</span>, <span class="va">mean</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 1 x 2
@@ -1428,14 +1529,14 @@ FIGURE 1.12: (ref:groupby)
 ## 1    NA    NA</code></pre>
 <p>Again, we encounter <code>NA</code> values missing values, and have to set <code>na.rm = TRUE</code> as an argument for the <code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code> function.</p>
 <!-- Explain the  ~ and . thoroughly. -->
-<div class="sourceCode" id="cb144"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb152"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">weather</span> <span class="op">%&gt;%</span>
   <span class="fu">summarize</span><span class="op">(</span><span class="fu">across</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">temp</span>, <span class="va">dewp</span><span class="op">)</span>, <span class="op">~</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">.</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 1 x 2
 ##    temp  dewp
 ##   &lt;dbl&gt; &lt;dbl&gt;
 ## 1  55.3  41.4</code></pre>
-<div class="sourceCode" id="cb146"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb154"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">weather</span> <span class="op">%&gt;%</span>
   <span class="fu">summarize</span><span class="op">(</span><span class="fu">across</span><span class="op">(</span><span class="fu">where</span><span class="op">(</span><span class="va">is.numeric</span><span class="op">)</span>, <span class="op">~</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">.x</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 1 x 14
@@ -1450,7 +1551,7 @@ FIGURE 1.12: (ref:groupby)
 <span class="header-section-number">1.4.9</span> <code>group_by()</code><a class="anchor" aria-label="anchor" href="#group_by"><i class="fas fa-link"></i></a>
 </h3>
 <p>Say instead of a single mean temperature for the whole year, you would like 12 mean temperatures, one for each of the 12 months separately. In other words, we would like to compute the mean temperature split by month. We can do this by “grouping” temperature observations by the values of another variable, in this case by the 12 values of the variable <code>month</code>. Run the following code:</p>
-<div class="sourceCode" id="cb148"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb156"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">weather</span> <span class="op">%&gt;%</span> 
   <span class="fu">group_by</span><span class="op">(</span><span class="va">month</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">summarize</span><span class="op">(</span>mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">temp</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, 
@@ -1473,7 +1574,7 @@ FIGURE 1.12: (ref:groupby)
 ## 12    12  38.4    9.98</code></pre>
 <!-- DK: This whole section stinks. Please fix! -->
 <p>Notice the warning. R is trying to save us from ourselves. The warning means that the tibble which issues forth from the end of the pipe has been ungrouped, meaning that it no longer has any group attribute. This is probably what we want to have happen, which is why it is the default behavior. But there are many cases in which we want to keep the group attribute, i.e., we want the resulting tibble to still be grouped by month. The warning is urging us to be sure what we want. The proper way to handle the situation, here and everywhere else that we use <code>group_by()</code> and <code>summarize()</code>, is to specify the <code>.groups</code> argument.</p>
-<div class="sourceCode" id="cb151"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb159"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">weather</span> <span class="op">%&gt;%</span> 
   <span class="fu">group_by</span><span class="op">(</span><span class="va">month</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">summarize</span><span class="op">(</span>mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">temp</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, 
@@ -1498,7 +1599,7 @@ FIGURE 1.12: (ref:groupby)
 <p>This code is identical to the previous code that created <code>summary_temp</code>, but with an extra <code>group_by(month)</code> added before the <code>summarize()</code>. Grouping the <code>weather</code> dataset by <code>month</code> and then applying the <code>summarize()</code> functions yields a data frame that displays the mean and standard deviation temperature split by the 12 months of the year.</p>
 <p>It is important to note that the <code>group_by()</code> function doesn’t change data frames by itself. Rather it changes the <em>meta-data</em>, or data about the data, specifically the grouping structure. It is only after we apply the <code>summarize()</code> function that the data frame changes.</p>
 <p>Run this code (do not forget to load its package <code>nycflights13</code> in your console if you have not already):</p>
-<div class="sourceCode" id="cb153"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb161"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flights</span></code></pre></div>
 <pre><code>## # A tibble: 336,776 x 22
 ##     year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
@@ -1518,7 +1619,7 @@ FIGURE 1.12: (ref:groupby)
 ## #   air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;,
 ## #   gain &lt;dbl&gt;, hours &lt;dbl&gt;, gain_per_hour &lt;dbl&gt;</code></pre>
 <p>Observe that the first line of the output reads <code># A tibble: 336,776 x 20</code>. This is an example of meta-data, in this case the number of observations/rows and variables/columns in <code>flights</code>. The actual data itself are the subsequent table of values. Now let’s pipe the <code>flights</code> data frame into <code>group_by(origin)</code>:</p>
-<div class="sourceCode" id="cb155"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb163"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flights</span> <span class="op">%&gt;%</span> 
   <span class="fu">group_by</span><span class="op">(</span><span class="va">origin</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 336,776 x 22
@@ -1542,7 +1643,7 @@ FIGURE 1.12: (ref:groupby)
 <p>Observe that now there is additional meta-data: <code># Groups: origin [3]</code> indicating that the grouping structure meta-data has been set based on the 3 possible levels of the categorical variable <code>origin</code>: <code>"EWR"</code>, <code>"JFK"</code>, and <code>"LGA"</code>. On the other hand, observe that the data has not changed: it is still a table of 336,776 <span class="math inline">\(\times\)</span> 19 values.</p>
 <p>Only by combining a <code>group_by()</code> with another data wrangling operation, in this case <code>summarize()</code>, will the data actually be transformed.</p>
 <p>Let’s revisit the <code>n()</code> counting summary function we briefly introduced previously. Recall that the <code>n()</code> function counts rows. This is opposed to the <code><a href="https://rdrr.io/r/base/sum.html">sum()</a></code> summary function that returns the sum of a numerical variable. For example, suppose we’d like to count how many flights departed each of the three airports in New York City:</p>
-<div class="sourceCode" id="cb157"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb165"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">by_origin</span> <span class="op">&lt;-</span> <span class="va">flights</span> <span class="op">%&gt;%</span> 
   <span class="fu">group_by</span><span class="op">(</span><span class="va">origin</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">summarize</span><span class="op">(</span>count <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span>, 
@@ -1557,7 +1658,7 @@ FIGURE 1.12: (ref:groupby)
 ## 3 LGA    104662</code></pre>
 <p>We see that Newark (<code>"EWR"</code>) had the most flights departing in 2013 followed by <code>"JFK"</code> and lastly by LaGuardia (<code>"LGA"</code>). Note there is a subtle but important difference between <code><a href="https://rdrr.io/r/base/sum.html">sum()</a></code> and <code>n()</code>; while <code><a href="https://rdrr.io/r/base/sum.html">sum()</a></code> returns the sum of a numerical variable, <code>n()</code> returns a count of the number of rows/observations.</p>
 <p>If you would like to remove this grouping structure meta-data, we can pipe the resulting data frame into the <code>ungroup()</code> function:</p>
-<div class="sourceCode" id="cb159"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb167"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flights</span> <span class="op">%&gt;%</span> 
   <span class="fu">group_by</span><span class="op">(</span><span class="va">origin</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">ungroup</span><span class="op">(</span><span class="op">)</span></code></pre></div>
@@ -1584,7 +1685,7 @@ FIGURE 1.12: (ref:groupby)
 <span class="header-section-number">1.4.9.1</span> Grouping by more than one variable<a class="anchor" aria-label="anchor" href="#grouping-by-more-than-one-variable"><i class="fas fa-link"></i></a>
 </h4>
 <p>You are not limited to grouping by one variable. Say you want to know the number of flights leaving each of the three New York City airports <em>for each month</em>. We can also group by a second variable <code>month</code> using <code>group_by(origin, month)</code>:</p>
-<div class="sourceCode" id="cb161"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb169"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flights</span> <span class="op">%&gt;%</span> 
   <span class="fu">group_by</span><span class="op">(</span><span class="va">origin</span>, <span class="va">month</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">summarize</span><span class="op">(</span>count <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span>,
@@ -1605,7 +1706,7 @@ FIGURE 1.12: (ref:groupby)
 ## # … with 26 more rows</code></pre>
 <p>Observe that there are 36 rows to <code>by_origin_monthly</code> because there are 12 months for 3 airports (<code>EWR</code>, <code>JFK</code>, and <code>LGA</code>).</p>
 <p>Why do we <code>group_by(origin, month)</code> and not <code>group_by(origin)</code> and then <code>group_by(month)</code>? Let’s investigate:</p>
-<div class="sourceCode" id="cb163"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb171"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flights</span> <span class="op">%&gt;%</span> 
   <span class="fu">group_by</span><span class="op">(</span><span class="va">origin</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">group_by</span><span class="op">(</span><span class="va">month</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -1634,10 +1735,10 @@ FIGURE 1.12: (ref:groupby)
 <h2>
 <span class="header-section-number">1.5</span> Summary<a class="anchor" aria-label="anchor" href="#summary"><i class="fas fa-link"></i></a>
 </h2>
-<p>In the first section we looked at basic concepts and terms we are dealing with when programming with R. In section two, we learned about the three basic components that make up each plot: Data, mapping, and one or multiple geoms. The <strong>ggplot2</strong> package offers a wide range of geoms that we can use to create different types of plots. In the third section we looked at some additional elements that we can use to modify our plots. These include features such as axis scaling, labeling and themes. Finally, in the fourth section, we took a look at the “super package” <strong>tidyverse</strong>, which also includes <strong>ggplot2</strong>. Besides tools for visualization, it offers features for importing and manipulating data, which is the main topic of the next chapter.</p>
-<p>Finally, it should be mentioned that we have only seen a small part of what R offers. Since R is an open source software, there are many independent developers who are constantly releasing new R packages with new features and functions. For example, we can use the <strong>gganimate</strong> package to bring our gapminder plot to life:</p>
+<p>We looked at basic concepts and terms we are dealing with when programming with R. We learned about the three basic components that make up each plot: data, mapping, and one or more geoms. The <strong>ggplot2</strong> package offers a wide range of geoms that we can use to create different types of plots. We explored advanced plotting features such as axis scaling, labeling and themes. Finally, we examined the “super package” <strong>tidyverse</strong>, which also includes <strong>ggplot2</strong>. Besides tools for visualization, it offers features for importing and manipulating data, which is the main topic of the next chapter.</p>
+<p>Finally, it should be mentioned that we have only seen a small part of what R offers. For example, we can use the <strong>gganimate</strong> package to bring our gapminder plot to life:</p>
 <!-- DK: This is a nice way to end the chapter. But . . . 1) We should provide the code for all these plots, given that we are going to show them at all. 2) We should make these plots more consistent with the series which we worked through above, and with each other. For example, we should use the same axis labels. 3) We should clean up the code. For example, there is no reason that the plotly code could not start with the gapminder data. Also, isn't there a way to go straight from a ggplot2 object into a plotly object? Seems unlikely that we should be exposing the students to a radically different syntax. 4) If we are going to show rayshader, maybe make it more impressive? -->
-<div class="sourceCode" id="cb165"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb173"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://gganimate.com">gganimate</a></span><span class="op">)</span>
 
 <span class="va">gapminder</span> <span class="op">%&gt;%</span>
@@ -1654,12 +1755,11 @@ FIGURE 1.12: (ref:groupby)
     <span class="fu"><a href="https://gganimate.com/reference/transition_time.html">transition_time</a></span><span class="op">(</span><span class="va">year</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Year: {frame_time}"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu"><a href="https://gganimate.com/reference/shadow_wake.html">shadow_wake</a></span><span class="op">(</span>wake_length <span class="op">=</span> <span class="fl">0.1</span>, alpha <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-144-1.gif" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-146-1.gif" width="100%"></div>
 <!-- Or the **plotly** package to make it an interactive 3D plot. -->
-<!-- DK: There are two problems with the below code. First, it is absurdly hacky. We need an example to show students which is clean. Second, uncommenting out this mess causes all math formatting to fail. -->
 <p>Or the <strong>rayshader</strong> package that allows us to create beautiful landscapes and maps.</p>
 <div class="inline-figure"><img src="01-visualization/images/rayshader-plot.png" style="display: block; margin: auto;"></div>
-<p>Plotting is cool! At the end of this course, you will know how to create things like this (and much more) on your own.</p>
+<p>Plotting is cool!</p>
 
 </div>
 </div>

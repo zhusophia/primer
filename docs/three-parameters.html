@@ -71,12 +71,12 @@
 <!-- DK: Still need to standardize the method we use for providing references. -->
 <!-- DK: Fix Enos reference. -->
 <p>Always explore your data. To demonstrate modeling with three parameters, we will use the <code>trains</code> data set from the <strong>primer.data</strong> package. Recall the discussion from Chapter <a href="rubin-causal-model.html#rubin-causal-model">3</a>. Enos (2014) randomly placed Spanish-speaking confederates on nine train platforms around Boston, Massachusetts. Exposure to Spanish-speakers – the <code>treatment</code> – influenced attitudes toward immigration. These reactions were measured through changes in answers to three survey questions. Let’s load the libraries we will need in this chapter, all of which we have used before, and look at the data.</p>
-<div class="sourceCode" id="cb854"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb874"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">primer.data</span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://mc-stan.org/rstanarm/">rstanarm</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://docs.ropensci.org/skimr">skimr</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb855"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb875"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">glimpse</span><span class="op">(</span><span class="va">trains</span><span class="op">)</span></code></pre></div>
 <pre><code>## Rows: 115
 ## Columns: 8
@@ -89,11 +89,11 @@
 ## $ treatment &lt;fct&gt; Treated, Treated, Treated, Treated, Control, Treated, Contr…
 ## $ att_end   &lt;dbl&gt; 11, 10, 5, 11, 5, 13, 13, 11, 12, 10, 9, 9, 13, 7, 8, 13, 8…</code></pre>
 <p>Here, we can see information about each respondent’s gender, political affiliations, age, and income. Additionally, <code>treatment</code> indicates whether a subject was in the control or treatment group, and their attitudes toward immigration both before (<code>att_start</code>) and after (<code>att_end</code>) the experiment. You can type <code><a href="https://rdrr.io/pkg/primer.data/man/trains.html">?trains</a></code> to read the help page for more information about each variable. Let’s restrict attention to a subset of the variables.</p>
-<div class="sourceCode" id="cb857"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb877"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch8</span> <span class="op">&lt;-</span> <span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu">select</span><span class="op">(</span><span class="va">age</span>, <span class="va">att_end</span>, <span class="va">party</span>, <span class="va">treatment</span><span class="op">)</span></code></pre></div>
 <p>It is always smart to look at a some random samples of the data:</p>
-<div class="sourceCode" id="cb858"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb878"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch8</span> <span class="op">%&gt;%</span> 
   <span class="fu">sample_n</span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 5 x 4
@@ -105,7 +105,7 @@
 ## 4    52      13 Democrat   Treated  
 ## 5    37       7 Republican Control</code></pre>
 <p><code>att_end</code> is a measure of person’s attitude toward immigration. A higher number means more conservative, i.e., a more exclusionary stance toward immigration into the United States.</p>
-<div class="sourceCode" id="cb860"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb880"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch8</span> <span class="op">%&gt;%</span> 
   <span class="fu">glimpse</span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## Rows: 115
@@ -115,12 +115,12 @@
 ## $ party     &lt;chr&gt; "Democrat", "Republican", "Democrat", "Democrat", "Democrat…
 ## $ treatment &lt;fct&gt; Treated, Treated, Treated, Treated, Control, Treated, Contr…</code></pre>
 <p>Pay attention to the variable types. Do they make sense? Perhaps. But there are certainly grounds for suspicion. Why are <code>age</code> and <code>att_end</code> doubles rather than integers? All the values in the data appear to be integers, so there is no benefit to having these variables be doubles. Why is <code>party</code> a character variable and <code>treatment</code> a factor variable? It could be that these are intentional choices made by the creator of the tibble, i.e., us. These could be mistakes. Or, most likely, these choices are a mixture of sensible and arbitrary. Regardless, it is your responsibility to notice them. You can’t make a good model without looking closely at the data which you are using.</p>
-<div class="sourceCode" id="cb862"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb882"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch8</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://docs.ropensci.org/skimr/reference/skim.html">skim</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <div class="inline-table"><table class="table table-sm">
 <caption>
-<span id="tab:unnamed-chunk-646">TABLE 8.1: </span>Data summary</caption>
+<span id="tab:unnamed-chunk-653">TABLE 8.1: </span>Data summary</caption>
 <tbody>
 <tr class="odd">
 <td align="left">Name</td>
@@ -252,7 +252,7 @@
 </table></div>
 <p><code><a href="https://docs.ropensci.org/skimr/reference/skim.html">skim()</a></code> shows us what the different values of <code>treatment</code> are because it is a factor. Unfortunately, it does not do the same for character variables like <code>party</code>. The ranges for <code>age</code> and <code>att_end</code> seem reasonable. Recall that participants were asked three questions about immigration issues, each of which allowed for an answer indicated strength of agreement on a scale form 1 to 5, with higher values indicating more agreement with conservative viewpoints. <code>att_end</code> is the sum of the responses to the three questions, so the most liberal possible value is 3 and the most conservative is 15.</p>
 <p>Always plot your data.</p>
-<div class="sourceCode" id="cb863"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb883"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch8</span> <span class="op">%&gt;%</span>
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">party</span>, y <span class="op">=</span> <span class="va">age</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">geom_jitter</span><span class="op">(</span>width <span class="op">=</span> <span class="fl">0.1</span>, height <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span> 
@@ -260,9 +260,9 @@
        subtitle <span class="op">=</span> <span class="st">"Where are the old Republicans?"</span>,
        x <span class="op">=</span> <span class="st">"Party"</span>,
        y <span class="op">=</span> <span class="st">"Age"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-647-1.png" width="672"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-654-1.png" width="672"></div>
 <p>There are more Democrats in this dataset than Republicans. Democrats also span a wider range of ages than Republicans.</p>
-<div class="sourceCode" id="cb864"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb884"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch8</span> <span class="op">%&gt;%</span>
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">treatment</span>, y <span class="op">=</span> <span class="va">att_end</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">geom_boxplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
@@ -270,7 +270,7 @@
        subtitle <span class="op">=</span> <span class="st">"Did the treatment make people more conservative?"</span>,
        x <span class="op">=</span> <span class="st">"Treatment"</span>,
        y <span class="op">=</span> <span class="st">"Attitude After Experiment"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-648-1.png" width="672"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-655-1.png" width="672"></div>
 <p>On a boxplot, the top and bottom borders of the box denotes the 75th and 25th percentiles, respectively. The line inside the box denotes the median of the data. Treated individuals have a higher mean <code>att_end</code> than the control group, and a higher distribution in general.</p>
 <p>In this chapter, we will make two models. The first explains <code>age</code> as a function of <code>party</code>. The second uses <code>att_end</code> as the dependent variable and <code>treatment</code> as the independent variable.</p>
 </div>
@@ -284,7 +284,7 @@
 <span class="header-section-number">8.2.1</span> Wisdom<a class="anchor" aria-label="anchor" href="#wisdom-3"><i class="fas fa-link"></i></a>
 </h3>
 <div class="figure">
-<span id="fig:unnamed-chunk-649"></span>
+<span id="fig:unnamed-chunk-656"></span>
 <img src="other/images/Wisdom.jpg" alt="Wisdom" width="100%"><p class="caption">
 FIGURE 8.1: Wisdom
 </p>
@@ -299,7 +299,7 @@ FIGURE 8.1: Wisdom
 <span class="header-section-number">8.2.2</span> Justice<a class="anchor" aria-label="anchor" href="#justice-3"><i class="fas fa-link"></i></a>
 </h3>
 <div class="figure">
-<span id="fig:unnamed-chunk-650"></span>
+<span id="fig:unnamed-chunk-657"></span>
 <img src="other/images/Justice.jpg" alt="Justice" width="100%"><p class="caption">
 FIGURE 8.2: Justice
 </p>
@@ -745,14 +745,14 @@ FIGURE 8.2: Justice
 <span class="header-section-number">8.2.3</span> Courage<a class="anchor" aria-label="anchor" href="#courage-3"><i class="fas fa-link"></i></a>
 </h3>
 <div class="figure">
-<span id="fig:unnamed-chunk-652"></span>
+<span id="fig:unnamed-chunk-659"></span>
 <img src="other/images/Courage.jpg" alt="Courage" width="100%"><p class="caption">
 FIGURE 8.3: Courage
 </p>
 </div>
 <p>Courage allows us to translate math to code.</p>
 <p>To get posterior distributions for our three parameters, we will again use <code><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm()</a></code>, just as we did in Chapter <a href="two-parameters.html#two-parameters">7</a>. If we take a look at the formula, we can see that it is similar to the equation from before.</p>
-<div class="sourceCode" id="cb865"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb885"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span><span class="va">age</span> <span class="op">~</span> <span class="va">party</span> <span class="op">-</span> <span class="fl">1</span>, 
                     data <span class="op">=</span> <span class="va">trains</span>, 
                     refresh <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
@@ -762,7 +762,7 @@ FIGURE 8.3: Courage
 <li><p>We have also added <code>-1</code> at the end of the equation, indicating that we do not want an intercept, which would otherwise be added by default.</p></li>
 </ul>
 <p>The resulting output:</p>
-<div class="sourceCode" id="cb866"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb886"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_obj</span></code></pre></div>
 <pre><code>## stan_glm
 ##  family:       gaussian [identity]
@@ -784,7 +784,7 @@ FIGURE 8.3: Courage
 <p><code>partyDemocrat</code> corresponds to <span class="math inline">\(\beta_1\)</span>, the average age of Democrats in the population. <code>partyRepublican</code> corresponds to <span class="math inline">\(\beta_2\)</span>, the average age of Republicans in the population. Since we don’t really care about the posterior distribution for <span class="math inline">\(\sigma\)</span>, we won’t discuss it here. Graphically:</p>
 <!-- DK: Lots to clean up about this plot! -->
 <!-- DK: Should we use different parameter names like beta_r? -->
-<div class="sourceCode" id="cb868"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb888"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_obj</span> <span class="op">%&gt;%</span> 
   <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="va">sigma</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -803,7 +803,7 @@ FIGURE 8.3: Courage
          y <span class="op">=</span> <span class="st">"Probability"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_y_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org//reference/label_percent.html">percent_format</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">theme_classic</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-655-1.png" width="672"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-662-1.png" width="672"></div>
 <p>The unknown parameters <span class="math inline">\(\beta_1\)</span> (partyDemocrat) and <span class="math inline">\(\beta_2\)</span> (partyRepublican) are still unknown. We can never know the true average age of all Democrats in the population. But we can calculate a posterior probability distribution for the parameters. Comments:</p>
 <ul>
 <li><p>Democrats seem slightly older than Republicans. That was true in our sample and so, almost (but not quite!) by definition, it will be true in our the posterior probability distributions.</p></li>
@@ -1219,7 +1219,7 @@ FIGURE 8.3: Courage
 <p>The fitted values are the same for all Republicans and for all Democrats, as the model produces one fitted value for each condition. This table shows how just a sample of 8 individuals captures a wide range of residuals, making it difficult to predict the age of a new individual. We can get a better picture of the unmodeled variation in our sample if we plot these three variables for all the individuals in our data.</p>
 <p>The following three histograms show the actual outcomes, fitted values, and residuals of all people in <code>trains</code>:</p>
 <!-- DK: Clean up these plots to be similar across chapters! Also, we should ensure that the width of 10 units is the same in each plot. Or does that already happen? Want the intuition that, the more predictive the model, the smaller the remaining variation in the residuals. -->
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-657-1.png" width="100%" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-664-1.png" width="100%" style="display: block; margin: auto;"></div>
 <p>The three plots are structured like our equation and table above. A value in the left plot is the sum of one value from the middle plot plus one from the right plot.</p>
 <ul>
 <li><p>The actual age distribution looks like a normal distribution. It is centered around 43, and it has a standard deviation of about 12 years.</p></li>
@@ -1233,7 +1233,7 @@ FIGURE 8.3: Courage
 <span class="header-section-number">8.2.4</span> Temperance<a class="anchor" aria-label="anchor" href="#temperance-3"><i class="fas fa-link"></i></a>
 </h3>
 <div class="figure">
-<span id="fig:unnamed-chunk-658"></span>
+<span id="fig:unnamed-chunk-665"></span>
 <img src="other/images/Temperance.jpg" alt="Temperance" width="100%"><p class="caption">
 FIGURE 8.4: Temperance
 </p>
@@ -1244,11 +1244,11 @@ FIGURE 8.4: Temperance
 </ul>
 <p>So far we have only tried our model on people from our data set whose real age we already knew. This is helpful to understand the model, but our ultimate goal is to understand more about the real world, about people we don’t yet know much about. Temperance guides us to make meaningful predictions and to become aware of their known and unknown limitations.</p>
 <p>Start with a simple question, what are the chances that a random Democrat is over 50 years old? First, we create a tibble with the desired input for our model. In our case the tibble has a variable named “party” which contains a single observation with the value “Democrat.” This is a bit different than Chapter <a href="two-parameters.html#two-parameters">7</a>.</p>
-<div class="sourceCode" id="cb869"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb889"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">new_obs</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>party <span class="op">=</span> <span class="st">"Democrat"</span><span class="op">)</span></code></pre></div>
 <p>Next, we’ll use the <code><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict()</a></code> function to get some draws from the posterior for this scenario. Note that we have a new posterior distribution under consideration here. The unknown parameter, call it <span class="math inline">\(D_{age}\)</span>, is the age of a Democrat. This could be the age of a randomly selected Democrat from the population or of the next Democrat we meet or of the next Democrat we interview on the train platform. The definition of “population” determines the appropriate interpretation. Yet, regardless, <span class="math inline">\(D_{age}\)</span> is an unknown parameter. But it is not one — like <span class="math inline">\(\beta_1\)</span>, <span class="math inline">\(\beta_2\)</span>, or <span class="math inline">\(\sigma\)</span> — for which we have already created a posterior probability distribution. That is why we need <code><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict()</a></code>.</p>
 <p><code><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict()</a></code> takes two arguments: the model for which the simulations should be run, and a tibble indicating for which and how many parameters we want to run these simulations. In this case, the model is the one from Courage and the tibble is the one we just created.</p>
-<div class="sourceCode" id="cb870"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb890"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">9</span><span class="op">)</span>
 <span class="va">pp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict</a></span><span class="op">(</span><span class="va">fit_obj</span>, newdata <span class="op">=</span> <span class="va">new_obs</span><span class="op">)</span> <span class="op">%&gt;%</span>
     <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -1270,7 +1270,7 @@ FIGURE 8.4: Temperance
 ## 10  35.5</code></pre>
 <p>We might expect that we can use <code>as_tibble()</code> directly after the object returned <code><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict()</a></code>. Sadly, for obscure technical reasons, that won’t quite work. So, we need the incantation <code>mutate_all(as.numeric)</code> to make sure that the resulting tibble is well-behaved. This command ensures that every column in the tibble is a simple numeric vector, which is what we want.</p>
 <p>A look at the first few observations shows that we simply get ten draws from the model’s posterior distribution of the age of a Democrat. It is important to understand that this is not a concrete person from the <code>trains</code> dataset - the algorithm in <code><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict()</a></code> simply uses the existing data from <code>trains</code> to estimate this posterior distribution.</p>
-<div class="sourceCode" id="cb872"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb892"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pp</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">`1`</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">geom_histogram</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y <span class="op">=</span> <span class="fu">after_stat</span><span class="op">(</span><span class="va">count</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">count</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
@@ -1280,9 +1280,9 @@ FIGURE 8.4: Temperance
          y <span class="op">=</span> <span class="st">"Probability"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_y_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org//reference/label_percent.html">percent_format</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">theme_classic</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-661-1.png" width="672"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-668-1.png" width="672"></div>
 <p>Once we have the posterior distribution, we can answer (almost) any reasonable question. In this case, the probability that the next Democrat will be over 50 is around 27%.</p>
-<div class="sourceCode" id="cb873"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb893"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">tibble</span><span class="op">(</span>age <span class="op">=</span> <span class="va">pp</span><span class="op">$</span><span class="va">`1`</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate</span><span class="op">(</span>ot_50 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">age</span> <span class="op">&gt;</span> <span class="fl">50</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">summarize</span><span class="op">(</span>perc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">ot_50</span><span class="op">)</span><span class="op">/</span><span class="fu">n</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
@@ -1295,7 +1295,7 @@ FIGURE 8.4: Temperance
 <li>In a group of three Democrats and three Republicans, what age difference should we expect between the oldest Democrat and the youngest Republican?</li>
 </ul>
 <p>As before we start by creating a tibble with the desired input. Note that the name of the column (“party”) and the observations (“Democrat,” “Republican”) must always be <em>exactly</em> as they are in the original data set. This tibble as well as our model can then be used as arguments for <code><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict()</a></code>:</p>
-<div class="sourceCode" id="cb875"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb895"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">new</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>party <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Democrat"</span>, <span class="st">"Democrat"</span>, <span class="st">"Democrat"</span>, 
                         <span class="st">"Republican"</span>, <span class="st">"Republican"</span>,<span class="st">"Republican"</span><span class="op">)</span><span class="op">)</span>
 
@@ -1322,7 +1322,7 @@ FIGURE 8.4: Temperance
 <p>A look at the output shows that we now have 6 columns: one for each person. R does not name the columns, but they are arranged in the same order in which we specified the persons in the tibble (D, D, D, R, R, R). To determine the expected age difference, we can then proceed as follows:</p>
 <!-- DK: I am unsure about this code. Would c() in place of c_across() work as well? -->
 <!-- DK: This works, but it takes much more time than it should because the the pp object still has every column as a ppd object, even after as_tibble(). The rest of the code still works, but takes a 100x longer than it should. Maybe this is the best approach for handling the ppd problem? Just ignore it and take the time hit? -->
-<div class="sourceCode" id="cb877"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb897"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pp</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://magrittr.tidyverse.org/reference/aliases.html">set_names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"dem_1"</span>, <span class="st">"dem_2"</span>, <span class="st">"dem_3"</span>, 
               <span class="st">"rep_1"</span>, <span class="st">"rep_2"</span>, <span class="st">"rep_3"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -1353,7 +1353,7 @@ FIGURE 8.4: Temperance
          y <span class="op">=</span> <span class="st">"Probability"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_y_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org//reference/label_percent.html">percent_format</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">theme_classic</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-664-1.png" width="672"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-671-1.png" width="672"></div>
 <p>In words, we would expect the oldest Democrat to be about 22 years older than the youngest Republican, but we would not be surprised if the oldest Democrat was actually younger than the youngest Republican in a group of 6.</p>
 </div>
 </div>
@@ -1367,7 +1367,7 @@ FIGURE 8.4: Temperance
 <span class="header-section-number">8.3.1</span> Wisdom<a class="anchor" aria-label="anchor" href="#wisdom-4"><i class="fas fa-link"></i></a>
 </h3>
 <div class="figure">
-<span id="fig:unnamed-chunk-665"></span>
+<span id="fig:unnamed-chunk-672"></span>
 <img src="other/images/Wisdom.jpg" alt="Wisdom" width="100%"><p class="caption">
 FIGURE 8.5: Wisdom
 </p>
@@ -1381,7 +1381,7 @@ FIGURE 8.5: Wisdom
 <span class="header-section-number">8.3.2</span> Justice<a class="anchor" aria-label="anchor" href="#justice-4"><i class="fas fa-link"></i></a>
 </h3>
 <div class="figure">
-<span id="fig:unnamed-chunk-666"></span>
+<span id="fig:unnamed-chunk-673"></span>
 <img src="other/images/Justice.jpg" alt="Justice" width="100%"><p class="caption">
 FIGURE 8.6: Justice
 </p>
@@ -1429,13 +1429,13 @@ FIGURE 8.6: Justice
 <span class="header-section-number">8.3.3</span> Courage<a class="anchor" aria-label="anchor" href="#courage-4"><i class="fas fa-link"></i></a>
 </h3>
 <div class="figure">
-<span id="fig:unnamed-chunk-667"></span>
+<span id="fig:unnamed-chunk-674"></span>
 <img src="other/images/Courage.jpg" alt="Courage" width="100%"><p class="caption">
 FIGURE 8.7: Courage
 </p>
 </div>
 <p>With Justice satisfied, we gather our Courage and fit the model. Note that, except for the change in variable names, the code is exactly the same as it was above, in our predictive model for age. <em>Predictive models and causal models use the same math and the same code.</em> The differences, and they are very important, lie in the interpretation of the results, not in their creation.</p>
-<div class="sourceCode" id="cb878"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb898"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">9</span><span class="op">)</span>
 <span class="va">fit_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span><span class="va">att_end</span> <span class="op">~</span> <span class="va">treatment</span> <span class="op">-</span> <span class="fl">1</span>, 
                     data <span class="op">=</span> <span class="va">trains</span>, 
@@ -1464,7 +1464,7 @@ FIGURE 8.7: Courage
 <p>Up until now, we have used the Bayesian interpretation of “confidence interval.” This is also the intuitive meaning which, outside of academia, is almost universal. There is a truth out there. We don’t know, and sometimes can’t know, the truth. A confidence interval, and its associated confidence level, tells us how likely the truth is to lie within a specific range. If your boss asks you for a confidence interval, she almost certainly is using this interpretation.</p>
 <p>But, in contemporary academic research, the phrase “confidence interval” is usually given a “Frequentist” interpretation. (The biggest divide in statistics is between Bayesians and Frequentist interpretations. The Frequentist approach, also known as “Classical” statistics, has been dominant for 100 years. Its power is fading, which is why this textbook uses the Bayesian approach.) For a Frequentist, a 95% confidence interval means that, if we were to apply the procedure we used in an infinite number of future situations like this, we would expect the true value to fall within the calculated confidence intervals 95% of the time. In academia, a distinction is sometimes made between confidence intervals (which use the Frequentist interpretation) and credible intervals (which use the Bayesian interpretation). We won’t worry about that difference in this book.</p>
 <p>Let’s look at the entire posteriors for both <span class="math inline">\(\beta_1\)</span> and <span class="math inline">\(\beta_2\)</span>.</p>
-<div class="sourceCode" id="cb880"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb900"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_obj</span> <span class="op">%&gt;%</span> 
   <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="va">sigma</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -1482,10 +1482,10 @@ FIGURE 8.7: Courage
          y <span class="op">=</span> <span class="st">"Probability"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_y_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org//reference/label_percent.html">percent_format</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
     <span class="fu">theme_classic</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-669-1.png" width="672"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-676-1.png" width="672"></div>
 <p>It appears that the affect of the treatment is to change people’s attitudes to be more conservative about immigration issues. Which is somewhat surprising!</p>
 <p>We can decompose the the dependent variable, <code>att_end</code> into two parts: the fitted values and the residuals. There are only two possible fitted values, one for the Treated and one for the Control. The residuals, as always, are simply the difference between the outcomes and the fitted values.</p>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-670-1.png" width="672"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-677-1.png" width="672"></div>
 <p>The smaller the spread of the residuals, the better a job the model is doing of explaining the outcomes.</p>
 <!-- DK: more details! -->
 </div>
@@ -1494,7 +1494,7 @@ FIGURE 8.7: Courage
 <span class="header-section-number">8.3.4</span> Temperance<a class="anchor" aria-label="anchor" href="#temperance-4"><i class="fas fa-link"></i></a>
 </h3>
 <div class="figure">
-<span id="fig:unnamed-chunk-671"></span>
+<span id="fig:unnamed-chunk-678"></span>
 <img src="other/images/Temperance.jpg" alt="Temperance" width="100%"><p class="caption">
 FIGURE 8.8: Temperance
 </p>
@@ -1504,7 +1504,7 @@ FIGURE 8.8: Temperance
 <li>What is the average treatment effect, of exposing people to Spanish-speakers, on their attitudes toward immigration?</li>
 </ul>
 <!-- DK: Below is also not clear. --><p>Recall from Chapter <a href="rubin-causal-model.html#rubin-causal-model">3</a> the discussion of the <em>average treatment effect</em>. One simple estimator of the average treatment effect is the difference between <span class="math inline">\(\beta_1\)</span> and <span class="math inline">\(\beta_2\)</span>. After all, the definition of <span class="math inline">\(\beta_1\)</span> is the average attitude toward immigration, of the population, for anyone, under exposure to the treatment. So, <span class="math inline">\(\beta_1 - \beta_2\)</span> is the average treatment effect for the population, roughly 1.5. However, estimating the posterior probability distribution for this parameter is tricky, unless we make use of the posterior distributions of <span class="math inline">\(\beta_1\)</span> and <span class="math inline">\(\beta_2\)</span>. With that information, the problem is simple:</p>
-<div class="sourceCode" id="cb881"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb901"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">14</span><span class="op">)</span>
 <span class="va">fit_obj</span> <span class="op">%&gt;%</span> 
   <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -1518,7 +1518,7 @@ FIGURE 8.8: Temperance
          y <span class="op">=</span> <span class="st">"Probability"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_y_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org//reference/label_percent.html">percent_format</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">theme_classic</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-672-1.png" width="672"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-679-1.png" width="672"></div>
 <p>Could the true value of the average treatment effect be as much as 2 or as little as 1? Of course! The most likely value is around 1.5, but the variation in the data and the smallness of our sample cause the estimate to be imprecise. However, it is quite unlikely that the true average treatment effect is below zero.</p>
 <!-- DK: Much more discussion. Explain what a test might be used for in this situation and why we should reject testing. -->
 <p>Our second question:</p>
@@ -1526,12 +1526,12 @@ FIGURE 8.8: Temperance
 <li>What is the largest effect size which still has a 1 in 10 chance of occurring?</li>
 </ul>
 <p>To answer this question, we first need to create a tibble which we can pass to <code><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict()</a></code>. The variables in the tibbles which will be passed in as <code>newdata</code> must be exactly the same as their counterparts in the original data. For example, <code>treatment</code> must be a factor, with the same levels as it has in <code>trains</code>.</p>
-<div class="sourceCode" id="cb882"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb902"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ate_data</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>treatment <span class="op">=</span>
                      <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Treated"</span>, <span class="st">"Control"</span><span class="op">)</span>,
                             levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Treated"</span>, <span class="st">"Control"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>Consider the result of posterior_predict() for someone treated and someone in the control group.</p>
-<div class="sourceCode" id="cb883"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb903"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict</a></span><span class="op">(</span><span class="va">fit_obj</span>, 
                         newdata <span class="op">=</span> <span class="va">ate_data</span><span class="op">)</span> <span class="op">%&gt;%</span>
     <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -1551,7 +1551,7 @@ FIGURE 8.8: Temperance
          y <span class="op">=</span> <span class="st">"Probability"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_y_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org//reference/label_percent.html">percent_format</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">theme_classic</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-674-1.png" width="672"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-681-1.png" width="672"></div>
 <p>In this case, we are looking at the distribution of the treatment effect for a single individual. This is very different than the <em>average</em> treatment effect. In particular, it is much more variable. We are looking at one row in the Preceptor Table. For a single individual, <code>att_end</code> can be anywhere from 3 to 15, both under treatment and under control. The causal effect — the difference between the two potential outcomes can, in theory, be anywhere from -12 to +12. Such extreme values are rare, but not impossible.</p>
 <p>The question, however, was interested in the value at the 90th percentile. For this model, that is 6.78. We would not expect a treatment effect of this magnitude to be common, but, at the same time, effects this big and bigger will occur about 10% of the time.</p>
 <!-- DK: Conclusion -->
