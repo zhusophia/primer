@@ -1,43 +1,15 @@
 
 # Wrangling {#wrangling}
 
-<!-- TODO: -->
+<!-- TODO: --> 
 
-<!-- Look at the code used in the Temperance section of chapter 7. Explain all the key parts here, including rowwise, ungroup and matrices. -->
-
-<!-- Add sample() to random numbers. -->
-
-<!-- Create vectors of lots of draws from the random numbers. -->
-
-<!-- Make a tibble and then pipe tibble to ggplot -->
-
-<!-- tibble(heads = rbinom . .. .) %>%  -->
-<!--  ggplot() -->
-
-<!-- Include math formulas (sort of?) in the margin. $C ~ binomial(n, p)$, where $C \subset (H,T)$  -->
-
-<!-- Last example might be create two rnorm variables with different means and sd (rnorm_5_1, rnorm_0_3, where the first number is the mean and the second the sd), then add them to make a third. Then, pivot_longer to make it easier for them to be plotted together as overlapping densities.  -->
-
-<!-- Are these commands worth covering? -->
-
-<!-- tidyr::separate_rows() -->
-<!-- dplyr::coalesce() -->
-<!-- expand(data, ...) -->
-<!-- crossing(...) -->
-<!-- nesting(...) -->
-
-
-<!-- Add discussion of allowed variable names, the use of ``, and  early in the book. skimr() also. You can have a variable name be a number, but in order to refer to that variable, you need to use backticks. -->
 
 <!-- Maybe make a big set of FEC data from the 2016 election for use as the practice data? Ought to use something different from airlines . . . which are boring. -->
 
-<!-- Get rid of some of these garbage data packages which we don't really use. Why not use primer.data for everything? -->
+<!-- Get rid of some of these garbage data packages which we don't really use. Why not use primer.data (or built in tidyverse data) for everything? -->
 
 Start by loading the packages which we will need in this chapter.
-```{r message=FALSE, warning=FALSE, echo=FALSE}
-library(ggrepel)
-library(knitr)
-```
+
 
 ```{r, message=FALSE}
 library(tidyverse)
@@ -289,6 +261,44 @@ json
 The file above actually represents a data frame. To read it, we can use the function `fromJSON` from the jsonlite package. Note that JSON files are often made available via the internet. Several organizations provide a JSON API or a web service that you can connect directly to and obtain data. 
 
 You can learn much more by examining tutorials and help files from the jsonlite package. This package is intended for relatively simple tasks such as converging data into tables. For more flexibility, we recommend `rjson`.
+
+## Tibbles
+
+<!-- Add a Tibble section after data gathering. Could include discussion of allowed variable names, the use of ``, and  early in the book. clean_names() and skim() also. You can have a variable name be a number, but in order to refer to that variable, you need to use backticks. -->
+
+
+Tibbles are a kind of data frame, useful for storing data in which we have the same number of observations for each variable. 
+
+### `clean_names()`
+
+Another useful function is the `clean_names()` function, which is included in the **janitor** package. This function allows you to standardize the column names of a dataset. This can be particularly useful when reading in a dataset from the web. Look at the `flights` dataset, again. 
+
+```{r}
+glimpse(flights)
+```
+
+As you can see the column names are in all lowercase, and each space in between words is represented by an underscore character. This is the default result of `clean_names()`, so running `clean_names(flights)` will have no effect. 
+
+Suppose, instead, we wanted to change the column names to camel case, where word boundaries are demarcated by an upper case letter.  
+
+```{r}
+flights %>% clean_names("small_camel")
+```
+
+Nonetheless, you will likely only ever be required to use `clean_names()` with the default snake case. 
+
+### `skim()`
+
+The `skim()` function from the **skimr** package is a useful summary function that offers an overview of a tibble  The function creates a report of the tibble, organized by variable type. Example:
+
+```{r out.width="100%"}
+skim(flights)
+```
+
+
+Take a quick look at the section containing numeric variables. This is of particular interest because the right-most column offers insight into the potential distribution of the data. 
+
+Although most data scientists use tibbles, or similar structures, to organize their work, we should remember that tibbles are composed of variables, the individual columns which, together, make up the tibble. Each column, or variable, can be of a different type: character, factor, date and so on. The next few sections will explore different variable types and how to work with them.
 
 ## Characters 
 
@@ -1740,7 +1750,9 @@ You can also view examples of both `pivot_longer()` and `pivot_wider()` on the [
 
 
 
-## Distributions 
+## Distributions {#distributions}
+
+<!-- Include math formulas (sort of?) in the margin. $C ~ binomial(n, p)$, where $C \subset (H,T)$  -->
 
 What is a distribution? The distribution of a variable shows how frequently different values of a variable occur. Looking at the visualization of a distribution can show where the values are centered and how the values vary. It can also alert us to the presence of outliers. 
 
@@ -1828,6 +1840,7 @@ The most important distribution is the *normal distributions*. This bell-shaped 
 1. The dashed normal curve has mean $\mu = 15$ \& standard deviation $\sigma = 2$.
 
 ```{r, echo=FALSE, fig.cap="Three normal distributions."}
+library(ggrepel)
 all_points <- tibble(
   domain = seq(from = -10, to = 25, by = 0.01),
   `mu = 5, sigma = 2` = dnorm(x = domain, mean = 5, sd = 2),
@@ -2011,9 +2024,47 @@ Note how cavalier we are in sometimes using the word "distribution" and sometime
 
 By assumption, we analyze the draws to make inferences about the distribution.
 
+Although distributions (and the draws therefrom) are complex, we can often treat them in the same way that we treat simple numbers. For example, we can add two distributions together.
+
+```{r}
+n <- 100000
+tibble(Normal = rnorm(n, mean = 1),
+       Uniform = runif(n, min = 2, max = 3),
+       Combined = Normal + Uniform) %>% 
+  pivot_longer(cols = everything(),
+               names_to = "Distribution",
+               values_to = "draw") %>% 
+  ggplot(aes(x = draw, fill = Distribution)) +
+    geom_histogram(aes(y = after_stat(count/sum(count))),
+                   alpha = 0.5, 
+                   bins = 100, 
+                   position = "identity") +
+    labs(title = "Two Distributions and Their Sum",
+         subtitle = "You can sum distributions just like you sum numbers",
+         x = "Value",
+         y = "Probability")
+```
+
+
 <!-- DK: Could do more here, like look at prediction games, betting and so on. -->
 
 ## Other Commands
+
+<!-- Look at the code used in the Temperance section of chapter 7. Explain all the key parts here, including rowwise, ungroup and matrices. Also, see the Preliminaries parts of the associated tutorials.  -->
+
+<!-- Are these commands worth covering? -->
+
+<!-- tidyr::separate_rows() -->
+<!-- dplyr::coalesce() -->
+<!-- expand(data, ...) -->
+<!-- crossing(...) -->
+<!-- nesting(...) -->
+
+<!-- - dplyr's function (cut?) to turn continuous data into categorical data. -->
+
+
+
+
 
 Here are some commands which will prove useful for the rest of the book.
 
@@ -2078,35 +2129,9 @@ Comparing it with the previous mean variable we see that the computed value is d
 
 There are many additional ways to manipulate missing values, but these three functions cover most of the ways you will need to work with such observations in your data.   
 
-### `clean_names()`
-
-Another useful function is the `clean_names()` function, which is included in the **janitor** package. This function allows you to standardize the column names of a dataset. This can be particularly useful when reading in a dataset from the web. Look at the `flights` dataset, again. 
-```{r}
-glimpse(flights)
-```
-
-As you can see the column names are in all lowercase, and each space in between words is represented by an underscore character. This is the default result of `clean_names()`, so running `clean_names(flights)` will have no effect. 
-
-Suppose, instead, we wanted to change the column names to camel case, where word boundaries are demarcated by an upper case letter.  
-
-```{r}
-flights %>% clean_names("small_camel")
-```
-
-Nonetheless, you will likely only ever be required to use `clean_names()` with the default snake case. 
-
-### `skim()`
-
-The `skim()` function from the **skimr** package is a useful summary function that offers an overview of a dataframe.  It offers users the abilities to see potential trends and outliers for each of the variables in a dataframe. The function creates a report of the dataframe according to variable type. We'll run skim on the `flights` dataset. 
-
-```{r out.width="100%"}
-skim(flights)
-```
 
 
-Take a quick look at the section containing numeric variables. This is of particular interest because the rightmost column offers insight into the potential distribution of the data, something that will be discussed in later depth below. 
-
-### Summary
+## Summary
 
 This chapter covered many, many commands. You should have them all memorized by now.
 

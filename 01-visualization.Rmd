@@ -1,37 +1,11 @@
 
-<!-- DK: There are way too many warnings in this chapter. A few are fine, all the better to explain what warnings are and how to think about them. But the rest should go!  -->
+<!-- There are way too many warnings in this chapter. A few are fine, all the better to explain what warnings are and how to think about them. But the rest should go! Maybe a better tibble choice would solve this problem. -->
 
-<!-- Jake Berg: for chapters 1 and 2. Functions/other things to include in the textbook: -->
-<!-- - How to remove columns with the select() function (as opposed to keeping columns—i.e. using a minus sign) -->
-<!-- - . -->
-<!-- - if_else() and case_when() from dplyr, especially alongside mutate(). -->
-<!-- - as.factor(), especially alongside mutate(). -->
-<!-- - scales in general, and in particular, RColorBrewer and viridis. -->
-<!-- - using scales to change the name and labels of a legend. -->
-<!-- - tidyr's drop_na(). -->
-<!-- - facet_grid() to facet by more than 1 variable. -->
-<!-- - %%, the modulo operator. -->
-
-<!-- - dplyr's function to turn continuous data into categorical data. -->
-
-<!-- 0) No warnings or other messages. -->
-
-<!-- 1) Plots are ordered alphabetically if it is a character and by levels if it is a factor. Dates appear differently in plots. reorder() is useful. Cover this at start of advanced plotting. -->
-
-<!-- 2) Purpose of Advanced plotting is to show the tools for making the plots that appear in socviz.co, chapters 3 and 4.  -->
-
-
-<!-- 4) Good stuff here: https://www.tidyverse.org/blog/2020/03/ggplot2-3-3-0/. Like scale_x_binned(); geom_histogram(aes(y = after_stat(density)))  -->
-
-<!-- 5) Add Conclusion. Include brief descriptions, pretty pictures from cool packages like: ggrepel, gghighlights, plotly. Others? -->
-
-<!-- 6) Make a conclusion. What have we learned? What can you do now? What's coming next? Maybe finish with one last data pipe into a nice graphic, sort of a graduation exercise. -->
-
-<!-- 7) Use r scales::comma() throughout -->
-
-<!-- 8) Give enough detail that you can do Congressional age exercise. -->
 
 # Visualization
+
+<!-- DK: After the first sentence. Show a cool plot. Then do the talkety-talk. Then show the code. And then finish by promising to make that simple by the end of the chapter. Then finish the chapter by looking back at this code. Then show that code with animations and plotly! -->
+
 
 People love visualizations. This chapter focuses on **ggplot2**, one of the core packages in the **tidyverse**. To access the datasets, help pages, and functions that we will use in this chapter, load the tidyverse by running this code:
 
@@ -798,6 +772,15 @@ ggplot(data = weather, mapping = aes(x = temp)) +
 
 <!-- DK: Other stuff needed here? after_stat; plotting two geoms at once; scale_x for changing labels; scales:: for axis formatting. coord_cartesian() and xlim/ylim, which allows for zooming/rescaling graphs. Other? -->
 
+<!-- - scales in general, and in particular, RColorBrewer and viridis. -->
+<!-- - using scales to change the name and labels of a legend. -->
+
+<!-- - facet_grid() to facet by more than 1 variable. -->
+
+<!-- 1) Plots are ordered alphabetically if it is a character and by levels if it is a factor. Dates appear differently in plots. reorder() is useful. Cover this at start of advanced plotting. -->
+
+<!-- 2) Purpose of Advanced plotting is to show the tools for making the plots that appear in socviz.co, chapters 3 and 4.  -->
+
 ```{r, echo=FALSE, fig.cap="Data Visualization with ggplot2 Cheat Sheet", out.width="100%"}
 knitr::include_graphics("01-visualization/images/ggplot2-cheatsheet.jpg")
 ```
@@ -1219,7 +1202,7 @@ As a final note, we recommend that `filter()` should often be among the first ve
 knitr::include_graphics("01-visualization/images/select.png")
 ```
 
-Using the `filter()` function we were able to pick out specific rows from the dataset. The `select()` function allows R users to pick specific columns/variables instead.
+Using the `filter()` function we were able to pick out specific *rows* from the dataset. The `select()` function allows R users to pick specific *columns* (or variables) instead.
 
 We've seen that the `flights` data frame in the `nycflights13` package contains 19 different variables. You can identify the names of these 19 variables by running the `glimpse()` function from the **dplyr** package:
 
@@ -1229,43 +1212,53 @@ glimpse(flights)
 
 However, say you only need two of these 19 variables, say `carrier` and `flight`. You can `select()`  these two variables:
 
-```{r, eval=FALSE}
+```{r}
 flights %>% 
   select(carrier, flight)
 ```
 
-This function makes it easier to explore large datasets since it allows us to limit the scope to only those variables we care most about. For example, if we `select()` only a smaller number of variables as is shown in Figure \@ref(fig:selectfig), it will make viewing the dataset in RStudio's spreadsheet viewer more digestible. Using `select()` can also be useful for creating **ggplot2** visualizations when you only need a few variables. 
+This function makes it easier to explore large datasets since it allows us to limit the scope to only those variables we care most about. For example, if we `select()` only a smaller number of variables, it will make viewing the dataset in RStudio's spreadsheet viewer more digestible. 
 
 Let's say instead you want to drop, or de-select, certain variables. For example, consider the variable `year` in the `flights` data frame. This variable isn't quite a "variable" because it is always `2013` and hence doesn't change. Say you want to remove this variable from the data frame. We can deselect `year` by using the `-` sign:
 
-```{r, eval=FALSE}
-flights_no_year <- flights %>% select(-year)
+```{r}
+flights %>% 
+  select(-year)
 ```
 
 Another way of selecting columns/variables is by specifying a range of columns:
 
 ```{r, eval=FALSE}
-flight_arr_times <- flights %>% select(month:day, arr_time:sched_arr_time)
-flight_arr_times
+flights %>% 
+  select(year:day, air_time:minute)
 ```
 
-This will `select()` all columns between `month` and `day` (including the two specified columns), as well as between `arr_time` and `sched_arr_time`, and drop the rest. 
+This will `select()` all 3 columns between `year` and `day`, as well as all 4 columns ebtween  `air_time` and `minute`. 
 
-The `select()` function can also be used to reorder columns when used with the `everything()` helper function.  For example, suppose we want the `hour`, `minute`, and `time_hour` variables to appear immediately after the `year`, `month`, and `day` variables, while not discarding the rest of the variables. In the following code, `everything()` will pick up all remaining variables: 
+The `select()` function can also be used to rearrange columns when used with the `everything()` helper function.  For example, suppose we want the `hour`, `minute`, and `time_hour` variables to appear immediately after the `year`, `month`, and `day` variables, while not discarding the rest of the variables. In the following code, `everything()` will pick up all remaining variables: 
 
-```{r, eval=FALSE}
-flights_reorder <- flights %>% 
+```{r}
+flights %>% 
   select(year, month, day, hour, minute, time_hour, everything())
-glimpse(flights_reorder)
 ```
 
-Lastly, the helper functions `starts_with()`, `ends_with()`, and `contains()` can be used to select variables/columns that match those conditions. As examples,
+Lastly, the helper functions `starts_with()`, `ends_with()`, and `contains()` can be used to select variables/columns that match those conditions. Examples:
 
-```{r, eval=FALSE}
-flights %>% select(starts_with("a"))
-flights %>% select(ends_with("delay"))
-flights %>% select(contains("time"))
+```{r}
+flights %>% 
+  select(starts_with("a"))
 ```
+
+```{r}
+flights %>% 
+  select(ends_with("delay"))
+```
+
+```{r}
+flights %>% 
+  select(contains("time"))
+```
+
 
 ### `slice()` and `pull()` and `[]`
 
@@ -1405,6 +1398,8 @@ flights <- flights %>%
 ```
 
 #### `ifelse()`
+
+<!-- Discuss case_when()? -->
 
 <!-- DK: Edit these lines from R4DS. Are there other functions which we should mention here? Do something sensible with group_by. To get `_` to work in caption title. Found at https://github.com/rstudio/bookdown/issues/209  -->
 
@@ -1568,7 +1563,7 @@ It is important to note that the `group_by()` function doesn't change data frame
 
 Run this code (do not forget to load its package `nycflights13` in your console if you have not already):
 
-```{r, eval=TRUE}
+```{r}
 flights
 ```
 
@@ -1633,9 +1628,9 @@ What happened here is that the second `group_by(month)` overwrote the grouping s
 
 ## Summary
 
-In the first section we looked at basic concepts and terms we are dealing with when programming with R. In section two, we learned about the three basic components that make up each plot: Data, mapping, and one or multiple geoms. The **ggplot2** package offers a wide range of geoms that we can use to create different types of plots. In the third section we looked at some additional elements that we can use to modify our plots. These include features such as axis scaling, labeling and themes. Finally, in the fourth section, we took a look at the "super package" **tidyverse**, which also includes **ggplot2**. Besides tools for visualization, it offers features for importing and manipulating data, which is the main topic of the next chapter.
+We looked at basic concepts and terms we are dealing with when programming with R. We learned about the three basic components that make up each plot: data, mapping, and one or more geoms. The **ggplot2** package offers a wide range of geoms that we can use to create different types of plots. We explored advanced plotting features such as axis scaling, labeling and themes. Finally, we examined the "super package" **tidyverse**, which also includes **ggplot2**. Besides tools for visualization, it offers features for importing and manipulating data, which is the main topic of the next chapter.
 
-Finally, it should be mentioned that we have only seen a small part of what R offers. Since R is an open source software, there are many independent developers who are constantly releasing new R packages with new features and functions. For example, we can use the **gganimate** package to bring our gapminder plot to life:
+Finally, it should be mentioned that we have only seen a small part of what R offers. For example, we can use the **gganimate** package to bring our gapminder plot to life:
 
 <!-- DK: This is a nice way to end the chapter. But . . . 1) We should provide the code for all these plots, given that we are going to show them at all. 2) We should make these plots more consistent with the series which we worked through above, and with each other. For example, we should use the same axis labels. 3) We should clean up the code. For example, there is no reason that the plotly code could not start with the gapminder data. Also, isn't there a way to go straight from a ggplot2 object into a plotly object? Seems unlikely that we should be exposing the students to a radically different syntax. 4) If we are going to show rayshader, maybe make it more impressive? -->
 
@@ -1660,47 +1655,6 @@ gapminder %>%
 
 <!-- Or the **plotly** package to make it an interactive 3D plot. -->
 
-<!-- DK: There are two problems with the below code. First, it is absurdly hacky. We need an example to show students which is clean. Second, uncommenting out this mess causes all math formatting to fail. -->
-
-```{r, message=FALSE, warning=FALSE, echo=FALSE}
-# library(plotly)
-# 
-# data <- read.csv("https://raw.githubusercontent.com/plotly/datasets/master/gapminderDataFiveYear.csv")
-# 
-# data_2007 <- data[which(data$year == 2007),]
-# data_2007 <- data_2007[order(data_2007$continent, data_2007$country),]
-# data_2007$size <- data_2007$pop
-# colors <- c('#4AC6B7', '#1972A4', '#965F8A', '#FF7070', '#C61951')
-# 
-# fig <- plot_ly(data_2007, x = ~gdpPercap, y = ~lifeExp, z = ~pop, color = ~continent, size = ~size, colors = colors,
-#                marker = list(symbol = 'circle', sizemode = 'diameter'), sizes = c(5, 150),
-#                text = ~paste('Country:', country, '<br>Life Expectancy:', lifeExp, '<br>GDP:', gdpPercap,
-#                              '<br>Pop.:', pop))
-# fig <- fig %>% layout(title = 'Life Expectancy v. Per Capita GDP, 2007',
-#                       scene = list(xaxis = list(title = 'GDP per capita (2000 dollars)',
-#                                                 gridcolor = 'rgb(255, 255, 255)',
-#                                                 range = c(2.003297660701705, 5.191505530708712),
-#                                                 type = 'log',
-#                                                 zerolinewidth = 1,
-#                                                 ticklen = 5,
-#                                                 gridwidth = 2),
-#                                    yaxis = list(title = 'Life Expectancy (years)',
-#                                                 gridcolor = 'rgb(255, 255, 255)',
-#                                                 range = c(36.12621671352166, 91.72921793264332),
-#                                                 zerolinewidth = 1,
-#                                                 ticklen = 5,
-#                                                 gridwith = 2),
-#                                    zaxis = list(title = 'Population',
-#                                                 gridcolor = 'rgb(255, 255, 255)',
-#                                                 type = 'log',
-#                                                 zerolinewidth = 1,
-#                                                 ticklen = 5,
-#                                                 gridwith = 2)),
-#                       paper_bgcolor = 'rgb(243, 243, 243)',
-#                       plot_bgcolor = 'rgb(243, 243, 243)')
-# 
-# fig
-```
 
 Or the **rayshader** package that allows us to create beautiful landscapes and maps.
 
@@ -1708,4 +1662,4 @@ Or the **rayshader** package that allows us to create beautiful landscapes and m
 knitr::include_graphics("01-visualization/images/rayshader-plot.png")
 ```
 
-Plotting is cool! At the end of this course, you will know how to create things like this (and much more) on your own. 
+Plotting is cool! 

@@ -1,10 +1,6 @@
 # Two Parameters {#two-parameters}
 
-
-
 <!-- Need a better discussion of what sigma means. Something like: "an estimate for the standard deviation of the errors (i.e. variability in height after accounting for the mean)" is pretty intuitive. You can show students the sample estimate of that with something like this (or sd(resid(fit_obj)) -->
-
-
 
 
 In Chapter \@ref(one-parameter), we learned how to do inference. Given certain assumptions about the problem, we created a joint distribution of the models under consideration and the data which might be observed. Once we observe the data, we go from the joint distribution to the conditional distribution of possible models given the data which we did, in fact, observe. That conditional distribution is our posterior probability distribution over the space of possible models. With that distribution, we can answer any question we might (reasonably) ask.
@@ -156,7 +152,7 @@ with $\epsilon_i \sim N(0, \sigma^2)$. $height_i$ is the height of male $i$. $\m
 
 This is the simplest model we can construct. Note: 
 
-* The model has two unknown parameters: $\mu$ and $\sigma$. Before we can do anything else we need to estimate the values of these parameters. Can we ever know their exact value? No! Perfection lies only in God's own R code. But, by using a Bayesian approach similar to what we used in Chapters \@ref(probability) and \@ref(one-parameter), we will be able to create *posterior probability distributions* for each parameter.
+* The model has two unknown parameters: $\mu$ and $\sigma$. Before we can do anything else we need to estimate the values of these parameters. Can we ever know their exact value? No! Perfection lies only in God's own R code. But, by using a Bayesian approach similar to what we used in Chapters \@ref(probability) and \@ref(one-parameter), we will be able to create a *posterior probability distribution* for each parameter.
 
 <!-- DK: Box quote. -->
 
@@ -211,6 +207,11 @@ In data science, we deal with math, words, and code, but the most important of t
 #### stan_glm
 
 Bayesian models are not hard to create in R. Sticking to the same filtered adult male 2009 data, we can reduce all the work we did for the bootstrap approach to the `stan_glm()` function which, when fed the correct inputs, creates a Bayesian generalized linear model of height. This function comes from the **rstanarm** package, which is very useful for Bayesian models in general.
+
+```{r, message = FALSE}
+library(rstanarm)
+```
+
 
 The first argument in the `stan_glm()` function is `data`, which in our case is the filtered `ch7` tibble we used in the bootstrap example. The only other mandatory argument is the formula that we want to build a model around. In this case, since we have no predictor variables, our equation will be `height ~ 1`. 
 
@@ -540,7 +541,6 @@ First, after loading **tidyverse**, we need to create an object which contains t
 
 ```{r, message=FALSE}
 library(tidyverse)
-library(rstanarm)
 
 shovel <- tibble(red = c(rep(1, 17), rep(0, 33))) %>% 
   sample_frac() %>% 

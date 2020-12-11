@@ -288,19 +288,19 @@ The *posterior distribution* in the election case is something data scientists d
 
 ```{r, echo=FALSE}
 # DK: Some comments about this. Where did you get this data from? Why those
-# columns? Don't use read.csv!
+# columns? 
 
 
-posterior_prez <- read.csv("./05-probability/data/election-forecasts-2020/prez_1.csv") %>%
-  select(c(9,11))
-
-ggplot(posterior_prez, aes(total_ev, evprob_chal)) +
-  geom_bar(stat = 'identity') +
-  labs(title = "Posterior Probability Distribution Based on FiveThirtyEight Forecast",
-       subtitle = "Presidential Elections",
-       y = "Probability",
-       x = "Outcome\nElectoral Vote Total for Democratic Candidate",
-       caption = "Data from August 13, 2020") +
+read_csv("./05-probability/data/election-forecasts-2020/prez_1.csv") %>%
+  select(evprob_chal, total_ev)  %>% 
+  rename(prob = evprob_chal, electoral_votes = total_ev) %>% 
+  ggplot(aes(electoral_votes, prob)) +
+    geom_bar(stat = 'identity') +
+    labs(title = "Posterior Probability Distribution Based on FiveThirtyEight Forecast",
+         subtitle = "Presidential Elections",
+         y = "Probability",
+         x = "Outcome\nElectoral Vote Total for Democratic Candidate",
+         caption = "Data from August 13, 2020") +
   theme_classic()
 
 ```
@@ -328,14 +328,62 @@ These two models, built by smart people using the similar data sources, have rea
 knitr::include_graphics("05-probability/images/538_versus_Economist.png")
 ```
 
-
-
-
 There are many political science questions you could explore with posterior distributions and they can relate to the past, present, and future.
 
 * Past: How many electoral votes would Hilary Clinton have won if she picked a different VP?
 * Present: What is the median height of Harvard students?
 * Future: How many electoral votes will a presidential candidate win?
+
+### Working with probability distributions
+
+A probability distribution is not always easy to work with. It is a complex object. And, in many contexts, we don't really care about all that complexity. So, instead of providing the full probability distribution, we often just use a summary measure, a number or two or three which captures the aspect of the entire distribution which is relevant to the matter at hand. Let's explore these issues using the 538 posterior probability distribution, as of August 13, 2020, for the number of electoral votes which will be won by Joe Biden. Here is a tibble with 1,000,000 draws from that distribution:
+
+
+```{r, message = FALSE, echo = FALSE}
+# DK: This code is a mess! Please fix!
+
+z <- read_csv("https://raw.githubusercontent.com/PPBDS/primer/master/05-probability/data/election-forecasts-2020/prez_1.csv") %>%
+       select(evprob_chal, total_ev)  %>% 
+       rename(prob = evprob_chal, electoral_votes = total_ev) %>% 
+       mutate(obs = round(prob * 1000000))  %>% 
+       select(-prob) %>% 
+       uncount(weights = obs) %>% 
+       pull(electoral_votes)
+
+
+
+draws <- tibble(ID = 1:1000000,
+                electoral_votes = as.integer(sample(z)))                     
+                          
+```
+
+```{r}
+draws
+```
+
+Recall the discussion from Section \@ref(distributions). A distribution and a sample of draws from that distribution are different things. But, if you squint, there are sort of the same thing, at least for our purposes. For example, if you want to know the mean of the distribution, then the mean of the draws will be a fairly good estimate, especially if the number of draws is large enough.
+
+The second way to represent a probability distribution in the computer is as a "draws" object. Recall from Chapter \@ref(wrangling) how we can draw randomly from specified probability distributions as so:
+
+```{r}
+rnorm(10)
+```
+
+```{r}
+runif(10)
+```
+
+These elements of these vectors are all "draws" from the specified probability distributions. In most appplied situations, our tools will produce draws rather than summary objects. We can translate a summary object into a draws object like this:
+
+
+```{r}
+
+```
+
+
+Again, in practice, we almost never have to perform this transformation. We will just be given the draws object automatically. Fortunately, draws objects are very easy to work with:
+
+
 
 ### Unnormalized distributions
 
