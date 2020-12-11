@@ -7,7 +7,33 @@
 <!-- DK: After the first sentence. Show a cool plot of gapminder data. Then do the talkety-talk. Then show the code. And then finish by promising to make that simple by the end of the chapter. Then finish the chapter by looking back at this code. Then show that code with animations and plotly! -->
 
 
-People love visualizations. This chapter focuses on **ggplot2**, one of the core packages in the **tidyverse**. To access the datasets, help pages, and functions that we will use in this chapter, load the tidyverse by running this code:
+People love visualizations. 
+
+
+
+
+```{r, echo = FALSE}
+library(tidyverse)
+library(gapminder)
+gapminder %>%
+  filter(continent != "Oceania") %>%
+  filter(year == max(year)) %>% 
+  ggplot(aes(gdpPercap, lifeExp, size = pop, color = continent)) +
+    geom_point(show.legend = FALSE, alpha = 0.7) +
+    facet_wrap(~continent, nrow = 1) +
+    scale_size(range = c(2, 12)) +
+    scale_x_log10() +
+    labs(
+        subtitle = "Life Expectancy and GDP per Capita (1952-2007)",
+         x = "GDP per Capita, USD",
+         y = "Life Expectancy, Years")
+```
+
+
+
+
+
+This chapter focuses on **ggplot2**, one of the core packages in the **tidyverse**. To access the datasets, help pages, and functions that we will use in this chapter, load the tidyverse by running this code:
 
 ```{r} 
 library(tidyverse)
@@ -1635,7 +1661,7 @@ Finally, it should be mentioned that we have only seen a small part of what R of
 
 <!-- DK: This is a nice way to end the chapter. But . . . 1) We should provide the code for all these plots, given that we are going to show them at all. 2) We should make these plots more consistent with the series which we worked through above, and with each other. For example, we should use the same axis labels. 3) We should clean up the code. For example, there is no reason that the plotly code could not start with the gapminder data. Also, isn't there a way to go straight from a ggplot2 object into a plotly object? Seems unlikely that we should be exposing the students to a radically different syntax. 4) If we are going to show rayshader, maybe make it more impressive? -->
 
-```{r cache=TRUE, out.width="100%"}
+```{r, cache = TRUE, out.width = "100%"}
 library(gganimate)
 
 gapminder %>%
