@@ -1,5 +1,8 @@
 # Visualization
 
+<!-- BG: Move labels (and other stuff?) to the end of basic plots and then ensure that basic plots have labels in the tutorial. -->
+
+
 Everyone loves visualizations. 
 
 <!-- DK: Should simplify this plot a bit. No fct_relevel since we don't learn that till chapter 2, for example. -->
@@ -264,7 +267,8 @@ Let's take a tour of some of the more useful geoms.
 Let's go over the code that will creates the desired scatterplot below, piece-by-piece.
 
 ```{r, eval = FALSE}
-ggplot(data = gapminder, mapping = aes(x = gdpPercap, y = lifeExp)) + 
+ggplot(data = gapminder, 
+       mapping = aes(x = gdpPercap, y = lifeExp)) + 
   geom_point()
 ```
 
@@ -297,7 +301,8 @@ We can change the transparency/opacity of the points by setting the `alpha` argu
 *Note:* how the following code is identical to the code that created the scatterplot with overplotting, but with `alpha = 0.2` added to the `geom_point()` function:
 
 ```{r fig.align = "center", warning = FALSE}
-ggplot(data = gapminder, mapping = aes(x = gdpPercap, y = lifeExp)) + 
+ggplot(data = gapminder, 
+       mapping = aes(x = gdpPercap, y = lifeExp)) + 
   geom_point(alpha = .2)
 ```
 
@@ -321,7 +326,7 @@ As can be seen in the resulting plot, in this case jittering doesn't really prov
 
 Linegraphs show the relationship between two numerical variables when the variable on the x-axis, also called the *explanatory* variable, is of a sequential nature. In other words, there is an inherent ordering to the variable. 
 
-```{r echo=FALSE, fig.margin=TRUE}
+```{r, echo = FALSE, out.width = "100%"}
 knitr::include_graphics("https://imgs.xkcd.com/comics/decline.png")
 ```
 
@@ -342,8 +347,9 @@ A histogram is a plot that visualizes the *distribution* of a numerical value as
 Let's consider the `lifeExp` in Asia in the `gapminder` data frame once again, but unlike with the linegraphs, let's say we don't care about its relationship with time, but rather we only care about how the values of `lifeExp` *distribute*. In other words:
 
 
-```{r echo = FALSE, fig.align = "center"}
-ggplot(data = gapminder, mapping = aes(x = lifeExp)) +
+```{r}
+ggplot(data = gapminder, 
+       mapping = aes(x = lifeExp)) +
   geom_histogram()
  
 ```
@@ -406,7 +412,8 @@ fruits
 Using the `fruits` data frame where all 5 fruits are listed individually in 5 rows, we map the `fruit` variable to the x-position aesthetic and add a `geom_bar()` layer:
 
 ```{r}
-ggplot(data = fruits, mapping = aes(x = fruit)) +
+ggplot(data = fruits, 
+       mapping = aes(x = fruit)) +
   geom_bar()
 ```
 
@@ -426,15 +433,17 @@ Barplots are a very common way to visualize the frequency of different categorie
 
 The code below creates a barplot of `class` frequency:
 
-```{r, eval = FALSE}
-ggplot(data = mpg, mapping = aes(x = class)) + 
+```{r}
+ggplot(data = mpg, 
+       mapping = aes(x = class)) + 
   geom_bar()
 ```
 
 We can now map the additional variable `model` by adding a `fill = model` inside the `aes()` aesthetic mapping.
 
-```{r eval = FALSE}
-ggplot(data = mpg, mapping = aes(x = class, fill = model)) +
+```{r}
+ggplot(data = mpg, 
+       mapping = aes(x = class, fill = model)) +
   geom_bar()
 ```
 
@@ -442,22 +451,25 @@ This is an example of a *stacked barplot*.  While simple to make, in certain asp
 
 Before we continue, let's address some common points of confusion among new R users. First, the `fill` aesthetic corresponds to the color used to fill the bars, while the `color` aesthetic corresponds to the color of the outline of the bars. Observe that mapping `model` to `color` and not `fill` yields grey bars with different colored outlines.
 
-```{r eval = FALSE}
-ggplot(data = mpg, mapping = aes(x = class, color = model)) +
+```{r}
+ggplot(data = mpg, 
+       mapping = aes(x = class, color = model)) +
   geom_bar()
 ```
 
 Second, note that `fill` is another aesthetic mapping much like `x`-position; thus we were careful to include it within the parentheses of the `aes()` mapping. The following code, where the `fill` aesthetic is specified outside the `aes()` mapping will yield an error. This is a fairly common error that new `ggplot` users make:
 
-```{r, eval = FALSE}
-ggplot(data = mog, mapping = aes(x = class), fill = model) +
+```{r, error=TRUE}
+ggplot(data = mpg, 
+       mapping = aes(x = class), fill = model) +
   geom_bar()
 ```
 
 An alternative to stacked barplots are *side-by-side barplots*, also known as *dodged barplots*. The code to create a side-by-side barplot is identical to the code to create a stacked barplot, but with a `position = "dodge"` argument added to `geom_bar()`. In other words, we are overriding the default barplot type, which is a *stacked* barplot, and specifying it to be a side-by-side barplot instead.
 
-```{r eval = FALSE}
-ggplot(data = mpg, mapping = aes(x = class, fill = model)) +
+```{r}
+ggplot(data = mpg, 
+       mapping = aes(x = class, fill = model)) +
   geom_bar(position = "dodge")
 ```
 
@@ -474,6 +486,8 @@ ggplot(data = mpg, mapping = aes(x = class, fill = model)) +
 
 
 ### `geom_smooth()`
+
+<!-- DK: Will handle geom_smooth(). -->
 
 Now let's go back to the `geom_point()` section and add a smooth line using the `geom_smooth()` function. 
 
@@ -527,6 +541,9 @@ We can change `geom_histogram()` to `geom_density()` to make a density plot, whi
 ggplot(data = gapminder, mapping = aes(x = lifeExp)) +
   geom_density()
 ```
+
+<!-- DK: Other stuff to finish this section with? -->
+
 
 ## The Tidyverse
 
@@ -612,7 +629,7 @@ Keep in mind, there are many more advanced data wrangling functions than just th
 
 ### `filter()` rows
 
-```{r filter, echo = FALSE, fig.cap="Diagram of filter() rows operation."}
+```{r, echo = FALSE, out.width = "100%", fig.cap="Diagram of filter() rows operation."}
 knitr::include_graphics("01-visualization/images/filter.png")
 ```
 
@@ -705,7 +722,7 @@ As a final note, we recommend that `filter()` should often be among the first ve
 
 ### `select` variables
 
-```{r, echo = FALSE, fig.cap = "Diagram of select() columns."}
+```{r, echo = FALSE, out.width = "100%", fig.cap = "Diagram of select() columns."}
 knitr::include_graphics("01-visualization/images/select.png")
 ```
 
@@ -844,7 +861,7 @@ As you can see, character variables will be sorted alphabetically. Using the `de
 
 ### `mutate()` 
 
-```{r, echo=FALSE, fig.cap="Diagram of mutate() columns."}
+```{r, echo = FALSE, out.width = "100%", fig.cap="Diagram of mutate() columns."}
 knitr::include_graphics("01-visualization/images/mutate.png")
 ```
 
@@ -863,15 +880,6 @@ airquality <- airquality %>%
 
 In this code, we `mutate()` the `airquality` data frame by creating a new variable `Temp_in_C = (Temp - 32) / 1.8` and then *overwrite* the original `airquality` data frame. Why did we overwrite the data frame `airquality`, instead of assigning the result to a new data frame like `airquality_new`? As a rough rule of thumb, as long as you are not losing original information that you might need later, it's acceptable practice to overwrite existing data frames with updated ones, as we did here. On the other hand, why did we not overwrite the variable `Temp`, but instead created a new variable called `Temp_in_C`?  Because if we did this, we would have erased the original information contained in `Temp` of temperatures in Fahrenheit that may still be valuable to us.
 
-Let's now compute monthly average temperatures in both &deg;F and &deg;C using the `group_by()` and `summarize()` code we saw in Section \@ref(groupby):
-
-```{r}
-summary_monthly_temp <- airquality %>% 
-  group_by(Month) %>% 
-  summarize(mean_temp_in_F = mean(Temp, na.rm = TRUE), 
-            mean_temp_in_C = mean(Temp_in_C, na.rm = TRUE))
-summary_monthly_temp
-```
 
 
 #### `ifelse()`
@@ -903,7 +911,7 @@ Return to a the `airquality` dataset. Let's calculate two summary statistics of 
 
 Recall the output of the `summary()` function. 
 
-```{r, echo = FALSE}
+```{r}
 summary(airquality)
 ```
 
@@ -921,7 +929,7 @@ summary_temp
 
 
 
-### Basic Statistical Terms
+### Statistics and missing values
 
 <!-- DK: Maybe ntile()? Others? Discuss na.rm = TRUE; quantile; is.na(); acting on logical vectors -->
 
@@ -941,6 +949,25 @@ What are other summary functions we can use inside the `summarize()` verb to com
 The *mean* is the most commonly reported measure of center.  It is commonly called the *average* though this term can be a little ambiguous.  The mean is the sum of all of the data elements divided by how many elements there are. If we have $n$ data points, the mean is given by: 
 
 $$Mean = \frac{x_1 + x_2 + \cdots + x_n}{n}$$
+
+
+<!-- > nhanes %>% summarize(mean_age = mean(age)) -->
+<!-- # A tibble: 1 x 1 -->
+<!--   mean_age -->
+<!--      <dbl> -->
+<!-- 1     36.7 -->
+<!-- > nhanes %>% summarize(mean_height = mean(height)) -->
+<!-- # A tibble: 1 x 1 -->
+<!--   mean_height -->
+<!--         <dbl> -->
+<!-- 1          NA -->
+<!-- > nhanes %>% summarize(mean_height = mean(height, na.rm = TRUE)) -->
+<!-- # A tibble: 1 x 1 -->
+<!--   mean_height -->
+<!--         <dbl> -->
+<!-- 1        162. -->
+
+<!-- Teach drop_na() and drop_na(height) -->
 
 **`median()`**
 
@@ -1087,11 +1114,6 @@ However, one needs to be cautious whenever ignoring missing values as we've just
 
 <!-- 2) Purpose of Advanced plotting is to show the tools for making the plots that appear in socviz.co, chapters 3 and 4.  -->
 
-```{r, echo = FALSE, fig.cap = "Data Visualization with ggplot2 Cheat Sheet", out.width = "100%"}
-
-knitr::include_graphics("01-visualization/images/ggplot2-cheatsheet.jpg")
-
-```
 
 In the previous section we have seen the three components that every plot must include: data, data mappings, and a geom. You may have found that the graphics from before look a bit boring. Luckily, the Grammar of Graphics allows us to add more layers on our own in order to customize our plots. We will go over some of the additional layers here, but the [Data Visualization with ggplot2 Cheat Sheet](https://rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf) is a great resource to refer to as your ggplot visualizations get more complicated.
 
