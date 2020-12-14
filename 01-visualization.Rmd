@@ -1,7 +1,3 @@
-
-<!-- DK: There are way too many warnings in this chapter. A few are fine, all the better to explain what warnings are and how to think about them. But the rest should go! Maybe a better tibble choice would solve this problem. -->
-
-
 # Visualization
 
 Everyone loves visualizations. 
@@ -532,263 +528,6 @@ ggplot(data = gapminder, mapping = aes(x = lifeExp)) +
   geom_density()
 ```
 
-
-## Advanced Plots
-
-<!-- DK: Other stuff needed here? after_stat; plotting two geoms at once; scale_x for changing labels; scales:: for axis formatting. coord_cartesian() and xlim/ylim, which allows for zooming/rescaling graphs. Other? -->
-
-<!-- - scales in general, and in particular, RColorBrewer and viridis. -->
-<!-- - using scales to change the name and labels of a legend. -->
-
-<!-- - facet_grid() to facet by more than 1 variable. -->
-
-<!-- 1) Plots are ordered alphabetically if it is a character and by levels if it is a factor. Dates appear differently in plots. reorder() is useful. Cover this at start of advanced plotting. -->
-
-<!-- 2) Purpose of Advanced plotting is to show the tools for making the plots that appear in socviz.co, chapters 3 and 4.  -->
-
-```{r, echo = FALSE, fig.cap = "Data Visualization with ggplot2 Cheat Sheet", out.width = "100%"}
-
-knitr::include_graphics("01-visualization/images/ggplot2-cheatsheet.jpg")
-
-```
-
-In the previous section we have seen the three components that every plot must include: data, data mappings, and a geom. You may have found that the graphics from before look a bit boring. Luckily, the Grammar of Graphics allows us to add more layers on our own in order to customize our plots. We will go over some of the additional layers here, but the [Data Visualization with ggplot2 Cheat Sheet](https://rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf) is a great resource to refer to as your ggplot visualizations get more complicated.
-
-<!-- Links to relevant readings in Healy.  -->
-
-To keep it simple, we will change the Gapminder plot from the beginning of the chapter layer by layer. We begin by creating a subset of the data and then plotting that subset.
-
-```{r}
-gapminder_07 <- gapminder %>% 
-                    filter(year == 2007, continent != "Oceania")
-```
-
-```{r}
-ggplot(data = gapminder_07, 
-       mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) +
-  geom_point()
-```
-
-At the moment it consists of only three necessary elements: 
-
-* A subset of the gapminder dataset
-* GDP per capita on the x-axis, and life expectancy on the y-axis (mappings)
-* `geom_point()`, which creates a scatterplot
-
-### Faceting
-
-Let's start by introducing a new concept called *faceting*.  Faceting is used when we'd like to split a particular visualization by the values of another variable. This will create multiple copies of the same type of plot with matching x and y axes, but whose content will differ. 
-
-If we look at the plot above, it is quite difficult to compare the continents despite the colors. It would be much easier if we could "split" this scatterplot by the 5 continents in the dataset. In other words, we would create plots of `gdpPercap` and `lifeExp` for each `continent` separately. We do this by adding a `facet_wrap(~ continent)` layer. Note the `~` is a "tilde" and can generally be found on the key next to the "1" key on US keyboards. The tilde is required and you'll receive the error `Error in as.quoted(facets) : object 'month' not found` if you don't include it here. 
-
-```{r}
-ggplot(data = gapminder_07, 
-       mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) +
-  geom_point() +
-  facet_wrap(~ continent)
-```
-
-This is way better! However, R chooses by default 2 plots per row, so that Asia and Europe are below the other two continents. We can specify the number of rows and columns in the grid by using the `nrow` and `ncol` arguments inside of `facet_wrap()`. Let's get all continents in a row by setting nrow = 1:
-
-```{r}
-ggplot(data = gapminder_07, 
-       mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) +
-  geom_point() +
-  facet_wrap(~ continent, nrow = 1)
-```
-
-Note that, as expected, we can see a positive correlation between economic development and life expectancy on all continents. Now it is also clearer that Asia is on average at about the same level as the Americas, but there are more countries in Asia that are at both extremes.
-
-
-### Stats
-
-<!-- DK: This section is confusing. And irrelevant? Should we explain after_stat() here or elsewhere? -->
-
-The next layer are stats, or `stat`istical transformations. ggplot provides us with many different ones, but most of them are only suitable for certain types of geoms. Take for example `stat_boxplot()`, which is applicable to scatterplots and adds boxplots to our plot:
-
-```{r}
-ggplot(data = gapminder_07, 
-       mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) +
-  geom_point() +
-  facet_wrap(~ continent, nrow = 1) +
-  stat_boxplot()
-```
-
-Now we not only recognize the differences between the continents, but also within the continents better. However, the interpretation of box plots is not so intuitive, at least at first glance. An easier to understand alternative is a line of best fit, which we can add with `stat_smooth(formula = y ~ x, method = "lm", se = FALSE)`:
-
-```{r}
-ggplot(data = gapminder_07, 
-       mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) +
-  geom_point() +
-  facet_wrap(~ continent, nrow = 1) +
-  stat_smooth(formula = y ~ x, method = "lm", se = FALSE)
-```
-
-These were only two stats, but there are many more for different purposes. If you type "stat" in the console, you will get suggestions for the different options that ggplot offers.
-
-### Coordinate Systems
-
-Next, we can specify the type of coordinate system. In most cases we will use Cartesian coordinate systems, which are set with `coord_cartesian()`. R draws every plot by default with this method, so we don't need to determine it specifically. Depending on the data we are working with, more exotic variants like `coord_polar()` or `coord_map()` may be helpful. 
-
-A coordinate system that is used more often is `coord_flip()`. This is actually just a Cartesian coordinate system, but as the name suggests, it simply swaps the axes:
-
-```{r}
-ggplot(data = gapminder_07, 
-       mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) +
-  geom_point() +
-  facet_wrap(~ continent, nrow = 1) +
-  stat_smooth(formula = y ~ x, method = "lm", se = FALSE) + 
-  coord_flip()
-```
-
-As can be seen, lifeExp is now on the x-axis and gdpPercap on the y-axis. Compared to the previous plot it is now easier to observe the distribution of life expectancy in the respective continents. For example, we can see that many countries in Africa are at about 55 years, in the Americas and Asia at 75 years, and in Europe at 80 years. However, we think it makes more sense to consider `lifeExp` as the dependent variable, so don't use `coord_flip()` in the subsequent plots.
-
-
-### Positions, Axis Limits and Scales
-
-We can also use ggplot to change the position of the plot content. Positions are rather "cosmetic" elements, which make plots easier to understand. As before, there are many different options to do this, which often only work for certain geoms. For example, when we work with barplots, we can use `position_dodge()` or `position_stack()` to specify whether we want to arrange the bars in the plot side by side or on top of each other. For scatterplots like ours, `position_jitter()` can be used:
-
-```{r}
-ggplot(data = gapminder_07, 
-       mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) +
-  geom_point(position = position_jitter(width = 10, height = 15)) +
-  facet_wrap(~ continent, nrow = 1) +
-  stat_smooth(formula = y ~ x, method = "lm", se = FALSE)
-```
-
-Notice several things about this code. First, positions should be placed in the geom they refer to (in our case `geom_point()`). Second, positions always start with `position =` followed by the position type (in our case `position_jitter()`). The width and height are optional and can be freely defined. You might wonder what the difference between `position_jitter()` and `geom_jitter()` is. The answer is: Nothing. In R there are often several functions which can lead to the same result. However, it is practical to start with `geom_point()` first, because then you still have the choice of changing the position by shaking the dots - with `geom_jitter()` the plot is constructed like this from the beginning.
-
-Besides the position we can also manipulate the limits of the axes by using `xlim()` and `ylim()`. For example, assume that we are only interested in countries with a GDP per capita from 0 to 30000. We can tell R as follows that we only want to see this range. Note that, because `data` is the first argument and `mapping` is the second to `ggplot()`, we don't actually have to name the arguments. We can just provide them, as long as they are in the correct order.
-
-```{r}
-ggplot(gapminder_07, 
-       aes(x = gdpPercap, y = lifeExp, color = continent)) +
-  geom_point() +
-  facet_wrap(~ continent, nrow = 1) +
-  stat_smooth(formula = y ~ x, method = "lm", se = FALSE) + 
-  xlim(0, 30000)
-```
-
-We can see that the GDP per capita on the y-axis is now only shown from 0 to 30000. 
-
-Finally we can change the scaling of the axes. For example, it might be useful to display the axes with `scale_x_log10()` or `scale_y_log10()` on a logarithmic scale. Let's try this out on GDP per capita. Also, note that we can (lazily!) not provide the explicit `x` and `y` argument names to `aes()` as long as we provide the values in the right order: `x` comes before `y`. 
-
-```{r}
-ggplot(gapminder_07, 
-       aes(gdpPercap, lifeExp, color = continent)) +
-  geom_point() +
-  facet_wrap(~ continent, nrow = 1) +
-  stat_smooth(formula = y ~ x, method = "lm", se = FALSE) + 
-  scale_x_log10()
-```
-
-Notice how the scale of GDP per capita has changed (for now, don't worry about the overlapping labels).
-
-
-### Labels and Text
-
-The last plot we made looks quite good, but it is not perfect yet. You will have noticed that by default R simply uses the names of variables for axes and legends. Also, the plot has no title yet. We can easily change this by using `labs()`:
-
-```{r}
-ggplot(gapminder_07, 
-       aes(gdpPercap, lifeExp, color = continent)) +
-  geom_point() +
-  facet_wrap(~ continent, nrow = 1) +
-  stat_smooth(formula = y ~ x, method = "lm", se = FALSE) + 
-  scale_x_log10() +
-  labs(title = "Life Expectancy and GDP per Capita (2007)",
-       subtitle = "Selected Nations by Continent",
-       x = "GDP per Capita, USD",
-       y = "Life Expectancy, Years",
-       caption = "Source: Gapminder") 
-```
-
-
-
-If a `title` or other `labs()` argument is too long, you can insert a newline character --- a "\\n" --- in the middle, which will cause the `title` to take up two lines rather than one. This is the simplest way to deal with titles or axis labels which are too long.
-
-It is up to us, which or how many of the arguments in `labs()` we use. While most arguments are probably self-explanatory, it makes sense to have a look at the last one. It determines the title of the legend, and should always be named after the aesthetic to which the legend refers. Since the legend was created by the *color* argument in the density plot, we can refer to it with `color =`.
-
-We can also change labels within the plots. Wouldn't it be great if we knew which country each point refers to? We can do this with the help of `geom_text()`:
-
-```{r}
-ggplot(gapminder_07, 
-       aes(gdpPercap, lifeExp, color = continent)) +
-  geom_point() +
-  facet_wrap(~ continent, nrow = 1) +
-  stat_smooth(formula = y ~ x, method = "lm", se = FALSE) + 
-  scale_x_log10() +
-  labs(title = "Life Expectancy and GDP per Capita (2007)",
-       subtitle = "Selected Nations by Continent",
-       x = "GDP per Capita, USD",
-       y = "Life Expectancy, Years",
-       caption = "Source: Gapminder") +
-  geom_text(aes(label = country), size = 2, 
-            color = "black", check_overlap = TRUE)
-```
-
-Great! Notice that we need to determine an aesthetic called *label*. This defines the character variable which will be used as the basis for the labels.
-
-
-### Themes
-
-We are almost finished, but our plot still has the boring default design. ggplot provides so called *themes*, which can be used to change the overall appearance of a plot without much effort. For example, `theme_linedraw()` uses a white background and black text:
-
-```{r}
-ggplot(gapminder_07, 
-       aes(gdpPercap, lifeExp, color = continent)) +
-  geom_point() +
-  facet_wrap(~ continent, nrow = 1) +
-  stat_smooth(formula = y ~ x, method = "lm", se = FALSE) + 
-  scale_x_log10() +
-  labs(title = "Life Expectancy and GDP per Capita (2007)",
-       subtitle = "Selected Nations by Continent",
-       x = "GDP per Capita, USD",
-       y = "Life Expectancy, Years",
-       caption = "Source: Gapminder",
-       color = "Continent") +
-  geom_text(aes(label = country), size = 2, 
-            color = "black", check_overlap = TRUE) +
-  theme_linedraw()
-```
-
-You can find an overview of the different themes in ggplot [here](https://ggplot2.tidyverse.org/reference/ggtheme.html). The **ggthemes** package even adds some additional themes.
-
-In addition to ready-to-use themes, the `theme()` function also offers a wide [selection](https://ggplot2.tidyverse.org/reference/theme.html) of functions for manually changing individual elements. Let's remove the legend, change the font in the plot and enlarge the axis labels a bit:
-
-```{r}
-ggplot(gapminder_07, 
-       aes(gdpPercap, lifeExp, color = continent)) +
-  geom_point() +
-  facet_wrap(~ continent, nrow = 1) +
-  stat_smooth(formula = y ~ x, method = "lm", se = FALSE) + 
-  scale_x_log10() +
-  labs(title = "Life Expectancy and GDP per Capita (2007)",
-       subtitle = "Selected Nations by Continent",
-       x = "GDP per Capita, USD",
-       y = "Life Expectancy, Years",
-       caption = "Source: Gapminder",
-       color = "Continent") +
-  geom_text(aes(label = country), size = 2, 
-            color = "black", check_overlap = TRUE) +
-  theme_linedraw() +
-  theme(legend.position = "none", 
-        text = element_text(family = "Palatino"),
-        axis.text.x = element_text(size = 11),
-        axis.text.y = element_text(size = 10))
-```
-
-Now take a moment to compare this plot with the one we started with:
-
-```{r}
-ggplot(data = gapminder_07, 
-       mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) +
-  geom_point()
-```
-
-You can see that while some things are not *necessary* to create a plot, they can make a big difference in how much information we can derive from it. By the way, do you remember when we mentioned the Grammar of Graphics and said we will build plots layer by layer? This is exactly how you do it.
-
-
 ## The Tidyverse
 
 Let's go over some important points about specifying the arguments (i.e., inputs) to functions. Run the following two segments of code:
@@ -1308,7 +1047,7 @@ airquality %>%
 <!-- What happened here is that the second `group_by(month)` overwrote the grouping structure meta-data of the earlier `group_by(origin)`, so that in the end we are only grouping by `month`. The lesson here is if you want to `group_by()` two or more variables, you should include all the variables at the same time in the same `group_by()` adding a comma between the variable names. -->
 
 
-## NA values 
+### NA values 
 
 In some datasets, some values are returned as `NA`? `NA` is how R encodes *missing values*  where `NA` indicates "not available" or "not applicable." If a value for a particular row and a particular column does not exist, `NA` is stored instead. Values can be missing for many reasons. Perhaps the data was collected but someone forgot to enter it? Perhaps the data was not collected at all because it was too difficult to do so? Who knows! You'll often encounter issues with missing values when working with real data.
 
@@ -1333,6 +1072,265 @@ airquality %>%
 Notice how the `na.rm = TRUE` are used as arguments to the `mean()` and `sd()` summary functions individually, and not to the `summarize()` function.
 
 However, one needs to be cautious whenever ignoring missing values as we've just done. There are possible ramifications of blindly sweeping rows with missing values "under the rug." This is in fact why the `na.rm` argument to any summary statistic function in R is set to `FALSE` by default. In other words, R does not ignore rows with missing values by default. R is alerting you to the presence of missing data and that you should be mindful of its absence.
+
+
+## Advanced Plots
+
+<!-- DK: Other stuff needed here? after_stat; plotting two geoms at once; scale_x for changing labels; scales:: for axis formatting. coord_cartesian() and xlim/ylim, which allows for zooming/rescaling graphs. Other? -->
+
+<!-- - scales in general, and in particular, RColorBrewer and viridis. -->
+<!-- - using scales to change the name and labels of a legend. -->
+
+<!-- - facet_grid() to facet by more than 1 variable. -->
+
+<!-- 1) Plots are ordered alphabetically if it is a character and by levels if it is a factor. Dates appear differently in plots. reorder() is useful. Cover this at start of advanced plotting. -->
+
+<!-- 2) Purpose of Advanced plotting is to show the tools for making the plots that appear in socviz.co, chapters 3 and 4.  -->
+
+```{r, echo = FALSE, fig.cap = "Data Visualization with ggplot2 Cheat Sheet", out.width = "100%"}
+
+knitr::include_graphics("01-visualization/images/ggplot2-cheatsheet.jpg")
+
+```
+
+In the previous section we have seen the three components that every plot must include: data, data mappings, and a geom. You may have found that the graphics from before look a bit boring. Luckily, the Grammar of Graphics allows us to add more layers on our own in order to customize our plots. We will go over some of the additional layers here, but the [Data Visualization with ggplot2 Cheat Sheet](https://rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf) is a great resource to refer to as your ggplot visualizations get more complicated.
+
+<!-- Links to relevant readings in Healy.  -->
+
+To keep it simple, we will change the Gapminder plot from the beginning of the chapter layer by layer. We begin by creating a subset of the data and then plotting that subset.
+
+```{r}
+gapminder_07 <- gapminder %>% 
+                    filter(year == 2007, continent != "Oceania")
+```
+
+```{r}
+ggplot(data = gapminder_07, 
+       mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) +
+  geom_point()
+```
+
+At the moment it consists of only three necessary elements: 
+
+* A subset of the gapminder dataset
+* GDP per capita on the x-axis, and life expectancy on the y-axis (mappings)
+* `geom_point()`, which creates a scatterplot
+
+### Faceting
+
+Let's start by introducing a new concept called *faceting*.  Faceting is used when we'd like to split a particular visualization by the values of another variable. This will create multiple copies of the same type of plot with matching x and y axes, but whose content will differ. 
+
+If we look at the plot above, it is quite difficult to compare the continents despite the colors. It would be much easier if we could "split" this scatterplot by the 5 continents in the dataset. In other words, we would create plots of `gdpPercap` and `lifeExp` for each `continent` separately. We do this by adding a `facet_wrap(~ continent)` layer. Note the `~` is a "tilde" and can generally be found on the key next to the "1" key on US keyboards. The tilde is required and you'll receive the error `Error in as.quoted(facets) : object 'month' not found` if you don't include it here. 
+
+```{r}
+ggplot(data = gapminder_07, 
+       mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) +
+  geom_point() +
+  facet_wrap(~ continent)
+```
+
+This is way better! However, R chooses by default 2 plots per row, so that Asia and Europe are below the other two continents. We can specify the number of rows and columns in the grid by using the `nrow` and `ncol` arguments inside of `facet_wrap()`. Let's get all continents in a row by setting nrow = 1:
+
+```{r}
+ggplot(data = gapminder_07, 
+       mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) +
+  geom_point() +
+  facet_wrap(~ continent, nrow = 1)
+```
+
+Note that, as expected, we can see a positive correlation between economic development and life expectancy on all continents. Now it is also clearer that Asia is on average at about the same level as the Americas, but there are more countries in Asia that are at both extremes.
+
+
+### Stats
+
+<!-- DK: This section is confusing. And irrelevant? Should we explain after_stat() here or elsewhere? -->
+
+The next layer are stats, or `stat`istical transformations. ggplot provides us with many different ones, but most of them are only suitable for certain types of geoms. Take for example `stat_boxplot()`, which is applicable to scatterplots and adds boxplots to our plot:
+
+```{r}
+ggplot(data = gapminder_07, 
+       mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) +
+  geom_point() +
+  facet_wrap(~ continent, nrow = 1) +
+  stat_boxplot()
+```
+
+Now we not only recognize the differences between the continents, but also within the continents better. However, the interpretation of box plots is not so intuitive, at least at first glance. An easier to understand alternative is a line of best fit, which we can add with `stat_smooth(formula = y ~ x, method = "lm", se = FALSE)`:
+
+```{r}
+ggplot(data = gapminder_07, 
+       mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) +
+  geom_point() +
+  facet_wrap(~ continent, nrow = 1) +
+  stat_smooth(formula = y ~ x, method = "lm", se = FALSE)
+```
+
+These were only two stats, but there are many more for different purposes. If you type "stat" in the console, you will get suggestions for the different options that ggplot offers.
+
+### Coordinate Systems
+
+Next, we can specify the type of coordinate system. In most cases we will use Cartesian coordinate systems, which are set with `coord_cartesian()`. R draws every plot by default with this method, so we don't need to determine it specifically. Depending on the data we are working with, more exotic variants like `coord_polar()` or `coord_map()` may be helpful. 
+
+A coordinate system that is used more often is `coord_flip()`. This is actually just a Cartesian coordinate system, but as the name suggests, it simply swaps the axes:
+
+```{r}
+ggplot(data = gapminder_07, 
+       mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) +
+  geom_point() +
+  facet_wrap(~ continent, nrow = 1) +
+  stat_smooth(formula = y ~ x, method = "lm", se = FALSE) + 
+  coord_flip()
+```
+
+As can be seen, lifeExp is now on the x-axis and gdpPercap on the y-axis. Compared to the previous plot it is now easier to observe the distribution of life expectancy in the respective continents. For example, we can see that many countries in Africa are at about 55 years, in the Americas and Asia at 75 years, and in Europe at 80 years. However, we think it makes more sense to consider `lifeExp` as the dependent variable, so don't use `coord_flip()` in the subsequent plots.
+
+
+### Positions, Axis Limits and Scales
+
+We can also use ggplot to change the position of the plot content. Positions are rather "cosmetic" elements, which make plots easier to understand. As before, there are many different options to do this, which often only work for certain geoms. For example, when we work with barplots, we can use `position_dodge()` or `position_stack()` to specify whether we want to arrange the bars in the plot side by side or on top of each other. For scatterplots like ours, `position_jitter()` can be used:
+
+```{r}
+ggplot(data = gapminder_07, 
+       mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) +
+  geom_point(position = position_jitter(width = 10, height = 15)) +
+  facet_wrap(~ continent, nrow = 1) +
+  stat_smooth(formula = y ~ x, method = "lm", se = FALSE)
+```
+
+Notice several things about this code. First, positions should be placed in the geom they refer to (in our case `geom_point()`). Second, positions always start with `position =` followed by the position type (in our case `position_jitter()`). The width and height are optional and can be freely defined. You might wonder what the difference between `position_jitter()` and `geom_jitter()` is. The answer is: Nothing. In R there are often several functions which can lead to the same result. However, it is practical to start with `geom_point()` first, because then you still have the choice of changing the position by shaking the dots - with `geom_jitter()` the plot is constructed like this from the beginning.
+
+Besides the position we can also manipulate the limits of the axes by using `xlim()` and `ylim()`. For example, assume that we are only interested in countries with a GDP per capita from 0 to 30000. We can tell R as follows that we only want to see this range. Note that, because `data` is the first argument and `mapping` is the second to `ggplot()`, we don't actually have to name the arguments. We can just provide them, as long as they are in the correct order.
+
+```{r}
+ggplot(gapminder_07, 
+       aes(x = gdpPercap, y = lifeExp, color = continent)) +
+  geom_point() +
+  facet_wrap(~ continent, nrow = 1) +
+  stat_smooth(formula = y ~ x, method = "lm", se = FALSE) + 
+  xlim(0, 30000)
+```
+
+We can see that the GDP per capita on the y-axis is now only shown from 0 to 30000. 
+
+Finally we can change the scaling of the axes. For example, it might be useful to display the axes with `scale_x_log10()` or `scale_y_log10()` on a logarithmic scale. Let's try this out on GDP per capita. Also, note that we can (lazily!) not provide the explicit `x` and `y` argument names to `aes()` as long as we provide the values in the right order: `x` comes before `y`. 
+
+```{r}
+ggplot(gapminder_07, 
+       aes(gdpPercap, lifeExp, color = continent)) +
+  geom_point() +
+  facet_wrap(~ continent, nrow = 1) +
+  stat_smooth(formula = y ~ x, method = "lm", se = FALSE) + 
+  scale_x_log10()
+```
+
+Notice how the scale of GDP per capita has changed (for now, don't worry about the overlapping labels).
+
+
+### Labels and Text
+
+The last plot we made looks quite good, but it is not perfect yet. You will have noticed that by default R simply uses the names of variables for axes and legends. Also, the plot has no title yet. We can easily change this by using `labs()`:
+
+```{r}
+ggplot(gapminder_07, 
+       aes(gdpPercap, lifeExp, color = continent)) +
+  geom_point() +
+  facet_wrap(~ continent, nrow = 1) +
+  stat_smooth(formula = y ~ x, method = "lm", se = FALSE) + 
+  scale_x_log10() +
+  labs(title = "Life Expectancy and GDP per Capita (2007)",
+       subtitle = "Selected Nations by Continent",
+       x = "GDP per Capita, USD",
+       y = "Life Expectancy, Years",
+       caption = "Source: Gapminder") 
+```
+
+
+
+If a `title` or other `labs()` argument is too long, you can insert a newline character --- a "\\n" --- in the middle, which will cause the `title` to take up two lines rather than one. This is the simplest way to deal with titles or axis labels which are too long.
+
+It is up to us, which or how many of the arguments in `labs()` we use. While most arguments are probably self-explanatory, it makes sense to have a look at the last one. It determines the title of the legend, and should always be named after the aesthetic to which the legend refers. Since the legend was created by the *color* argument in the density plot, we can refer to it with `color =`.
+
+We can also change labels within the plots. Wouldn't it be great if we knew which country each point refers to? We can do this with the help of `geom_text()`:
+
+```{r}
+ggplot(gapminder_07, 
+       aes(gdpPercap, lifeExp, color = continent)) +
+  geom_point() +
+  facet_wrap(~ continent, nrow = 1) +
+  stat_smooth(formula = y ~ x, method = "lm", se = FALSE) + 
+  scale_x_log10() +
+  labs(title = "Life Expectancy and GDP per Capita (2007)",
+       subtitle = "Selected Nations by Continent",
+       x = "GDP per Capita, USD",
+       y = "Life Expectancy, Years",
+       caption = "Source: Gapminder") +
+  geom_text(aes(label = country), size = 2, 
+            color = "black", check_overlap = TRUE)
+```
+
+Great! Notice that we need to determine an aesthetic called *label*. This defines the character variable which will be used as the basis for the labels.
+
+
+### Themes
+
+We are almost finished, but our plot still has the boring default design. ggplot provides so called *themes*, which can be used to change the overall appearance of a plot without much effort. For example, `theme_linedraw()` uses a white background and black text:
+
+```{r}
+ggplot(gapminder_07, 
+       aes(gdpPercap, lifeExp, color = continent)) +
+  geom_point() +
+  facet_wrap(~ continent, nrow = 1) +
+  stat_smooth(formula = y ~ x, method = "lm", se = FALSE) + 
+  scale_x_log10() +
+  labs(title = "Life Expectancy and GDP per Capita (2007)",
+       subtitle = "Selected Nations by Continent",
+       x = "GDP per Capita, USD",
+       y = "Life Expectancy, Years",
+       caption = "Source: Gapminder",
+       color = "Continent") +
+  geom_text(aes(label = country), size = 2, 
+            color = "black", check_overlap = TRUE) +
+  theme_linedraw()
+```
+
+You can find an overview of the different themes in ggplot [here](https://ggplot2.tidyverse.org/reference/ggtheme.html). The **ggthemes** package even adds some additional themes.
+
+In addition to ready-to-use themes, the `theme()` function also offers a wide [selection](https://ggplot2.tidyverse.org/reference/theme.html) of functions for manually changing individual elements. Let's remove the legend, change the font in the plot and enlarge the axis labels a bit:
+
+```{r}
+ggplot(gapminder_07, 
+       aes(gdpPercap, lifeExp, color = continent)) +
+  geom_point() +
+  facet_wrap(~ continent, nrow = 1) +
+  stat_smooth(formula = y ~ x, method = "lm", se = FALSE) + 
+  scale_x_log10() +
+  labs(title = "Life Expectancy and GDP per Capita (2007)",
+       subtitle = "Selected Nations by Continent",
+       x = "GDP per Capita, USD",
+       y = "Life Expectancy, Years",
+       caption = "Source: Gapminder",
+       color = "Continent") +
+  geom_text(aes(label = country), size = 2, 
+            color = "black", check_overlap = TRUE) +
+  theme_linedraw() +
+  theme(legend.position = "none", 
+        text = element_text(family = "Palatino"),
+        axis.text.x = element_text(size = 11),
+        axis.text.y = element_text(size = 10))
+```
+
+Now take a moment to compare this plot with the one we started with:
+
+```{r}
+ggplot(data = gapminder_07, 
+       mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) +
+  geom_point()
+```
+
+You can see that while some things are not *necessary* to create a plot, they can make a big difference in how much information we can derive from it. By the way, do you remember when we mentioned the Grammar of Graphics and said we will build plots layer by layer? This is exactly how you do it.
+
+
+
 
 
 ## Summary
