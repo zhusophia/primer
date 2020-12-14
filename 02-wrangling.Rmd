@@ -1754,51 +1754,54 @@ You can also view examples of both `pivot_longer()` and `pivot_wider()` on the [
 
 <!-- Include math formulas (sort of?) in the margin. $C ~ binomial(n, p)$, where $C \subset (H,T)$  -->
 
-What is a distribution? The distribution of a variable shows how frequently different values of a variable occur. Looking at the visualization of a distribution can show where the values are centered and how the values vary. It can also alert us to the presence of outliers. 
+What is a distribution? Think of the distribution of a variable as an urn from which we can pull out, at random, values for that variable. Drawing a thousand or so values from that urn, and then looking at a histogram or density plot, can show where the values are centered and how the values vary. 
 
-Before we examine distributions in greater depth, let's first explore the `sample()` function. `sample()` takes a sample of some size from some vector either with replacement or without replacement. This might seem very abstract, so consider a six-sided dice represented as a vector. 
+Consider the distribution of the possible values from rolling a fair die. We can use the `sample()` function to create draws from this distribution: 
 
 ```{r}
-dice <- c(1, 2, 3, 4, 5, 6)
+die <- c(1, 2, 3, 4, 5, 6)
+
+sample(x = die, size = 1)
 ```
 
-Suppose we wanted to simulate rolling this dice once. We can use the `sample()` function to achieve this. 
+This produces one "draw" from the distribution of the possible values of one roll of six-sided die.
+
+Now, suppose we wanted to roll this die 10 times. One of the arguments of the `sample()` function is `replace`. We must specify if values can appear more than once. Since, when rolling a die 10 times, we expect that a value like 3 can appear more than once, we need to set `replace = TRUE`. 
 
 ```{r}
-sample(x = dice, size = 1)
-```
-
-Now, suppose we wanted to roll this dice 10 times. One of the arguments of the `sample()` function is `replace`. We must specify if values can appear more than once. Since, when rolling a dice 10 times, we expect that a value like 3 can appear more than once, we need to set `replace = TRUE`. 
-
-```{r}
-sample(x = dice, size = 10, replace = TRUE)
+sample(x = die, size = 10, replace = TRUE)
 ```
 
 In other words, rolling a 1 on the first roll should not preclude you from rolling a 1 on a later roll. 
 
-The final argument of the `sample()` function is the prob argument. It takes a vector (of the same length as the initial vector `x`) that contains all of the probabilities of selecting one of the elements of `x`. Suppose that the probability of rolling a 1 was 0.5, and the probability of rolling any other value is 0.1. Note, these probabilities should sum to 1. 
+What if the die is not "fair," meaning that some sides are more likely to appear then others? The final argument of the `sample()` function is the `prob` argument. It takes a vector (of the same length as the initial vector `x`) that contains all of the probabilities of selecting each one of the elements of `x`. Suppose that the probability of rolling a 1 was 0.5, and the probability of rolling any other value is 0.1. (These probabilities should sum to 1. If they don't `sample()` will automatically rescale them.) 
 
 ```{r}
-probs = c(0.5, 0.1, 0.1, 0.1, 0.1, 0.1)
-
-sample(x = dice, size = 10, replace = TRUE, prob = probs)
-
+sample(x = die, 
+       size = 10, 
+       replace = TRUE, 
+       prob = c(0.5, 0.1, 0.1, 0.1, 0.1, 0.1))
 ```
 
-With that as background, let's return to our discussion of distributions. 
+`sample()` is just one of many functions for creating draws --- or, more colloquially, "drawing" --- from a distribution. Three of the most important functions are: `runif()`, `rbinom()`, and `rnorm()`.
 
 ### `runif()`
 
-Consider a "uniform" distribution. This is the case in which every outcome in the range of possible outcomes has the same chance of occurring.  In R, the function `runif()` (spoken as "r-unif") corresponds to a uniform contribution. `runif()` has three arguments: `n`, `min`, and `max`. `runif()` will produce `n` draws from between `min` and `max`, with each value having an equal chance of occurring.
+Consider a "uniform" distribution. This is the case in which every outcome in the range of possible outcomes has the same chance of occurring.  The function `runif()` (spoken as "r-unif") enables us to draw from a uniform contribution. `runif()` has three arguments: `n`, `min`, and `max`. `runif()` will produce `n` draws from between `min` and `max`, with each value having an equal chance of occurring.
 
 ```{r}
 runif(n = 10, min = 4, max = 6)
 ```
 
+Mathematically, we would write
+
+$$y_i \sim U(4, 6)$$, 
+
+meaning that the each value for $y$ is drawn from a uniform distribution between four and six.
 
 ### `rbinom()`
 
-Now consider binomial distribution, the case in which the probability of some boolean variable (for instance success or failure) is calculated for repeated, independent trials. One common example would be the probability of flipping a coin and landing on heads. In R, the function `rbinom()` simulates such a distribution. This function takes three arguments, `n`, `size`, and `prob`. `n` is the number of observations, the `size` is the number of trials, and `prob` is the probability of success on each trial. Suppose we wanted to flip a fair coin one time, and let landing on hands represent success. 
+Consider binomial distribution, the case in which the probability of some boolean variable (for instance success or failure) is calculated for repeated, independent trials. One common example would be the probability of flipping a coin and landing on heads. The function `rbinom()` allows us to draw from a binomial distribution. This function takes three arguments, `n`, `size`, and `prob`. `n` is the number of values we seek to draw, the `size` is the number of trials, and `prob` is the probability of success on each trial. Suppose we wanted to flip a fair coin one time, and let landing on hands represent success. 
 
 ```{r}
 rbinom(n = 1 , size = 1, prob = 0.5)
@@ -1807,33 +1810,53 @@ rbinom(n = 1 , size = 1, prob = 0.5)
 Do the same thing 100 times and look at the results:
 
 ```{r}
-coin_flip <- tibble(heads = rbinom(n = 100, size = 1, prob = 0.5))
-
-ggplot(data = coin_flip, aes(x = heads)) +
+tibble(heads = rbinom(n = 100, size = 1, prob = 0.5)) %>% 
+ggplot(aes(x = heads)) +
   geom_bar() +
-  labs(title = "Flipping a Fair Coin 100 Times") +
-  xlab(label = "Flips") +
-  ylab(label = "Count")
-
+    labs(title = "Flipping a Fair Coin 100 Times",
+         x = "Result",
+         y = "Count") +
+    scale_x_continuous(breaks = c(0, 1),
+                       labels = c("Tails", "Heads"))
 ```
 
-There is a fairly even distribution of heads (1s) and tails (0s). An larger number of draws would result in a more equal split between heads and tails. 
+There is a fairly even distribution of Tails and Heads. More draws would typically result in an even more equal split. 
 
 Suppose instead we wanted to simulate an unfair coin, where the probability of landing on Heads was 0.75 instead of 0.25. 
 
 ```{r}
-coin_flip_2 <- tibble(heads = rbinom(n = 100, size = 1, prob = 0.75))
-
-ggplot(data = coin_flip_2, aes(x = heads)) +
+tibble(heads = rbinom(n = 100, size = 1, prob = 0.75)) %>% 
+ggplot(aes(x = heads)) +
   geom_bar() +
-  labs(title = "Flipping a Fair Coin 100 Times") +
-  xlab(label = "Flips") +
-  ylab(label = "Count")
+    labs(title = "Flipping a Fair Coin 100 Times",
+         x = "Result",
+         y = "Count") +
+    scale_x_continuous(breaks = c(0, 1),
+                       labels = c("Tails", "Heads"))
 ```
+
+The distribution --- the imaginary urn --- from which we draw the results of a coin flip for a fair coin is a different distribution --- a different imaginary urn --- from the distribution for a biased coin. In fact, tthere are an infinite number of distributions. Yet as long as we can draw values from a distribution, we can work with it. Mathematics:
+
+$$y_i \sim B(n, p)$$. 
+
+Each value for $y$ is drawn from a binomial distribution with parameters $n$ for the number of trials and $p$ for the probability of success. 
+
+
 
 ### `rnorm()`
 
-The most important distribution is the *normal distributions*. This bell-shaped distribution is defined by two parameters: (1) the *mean* $\mu$ (spoken as "mu") which locates the center of the distribution and (2) the *standard deviation* $\sigma$ (spoken as "sigma") which determines the variation of values around that center. In the figure below, we plot three normal distributions where:
+<!-- DK: Given that we have a cool plot at the end, maybe we don't need these earlier plots.  -->
+
+<!-- DK: Need to discuss the fact that we use y_i each time. -->
+
+The most important distribution is the *normal distributions*. Mathematics:
+
+$$y_i \sim N(\mu, \sigma^2)$$. 
+
+Each value $y_i$ is drawn from a normal distribution with parameters $\mu$ for the mean and $\sigma$ for the standard deviation. 
+
+
+This bell-shaped distribution is defined by two parameters: (1) the *mean* $\mu$ (spoken as "mu") which locates the center of the distribution and (2) the *standard deviation* $\sigma$ (spoken as "sigma") which determines the variation of values around that center. In the figure below, we plot three normal distributions where:
 
 1. The solid normal curve has mean $\mu = 5$ \& standard deviation $\sigma = 2$.
 1. The dotted normal curve has mean $\mu = 5$ \& standard deviation $\sigma = 5$.
@@ -1940,7 +1963,7 @@ ggplot(data = tibble(x = c(-4, 4)), aes(x)) +
 set.seed(5)
 ```
 
-The function `rnorm()` (spoken as "r-norm") returns draws from a normal distribution. `rnorm()` has three arguments: `n`, `mean`, and `sd`. `n` corresponds to the number of draws, `mean` and `sd` are the $\mu$ and $\sigma$ of the distribution from which we want to draw. 
+The function `rnorm()` (spoken as "r-norm") returns draws from a normal distribution. `rnorm()` has three arguments: `n`, `mean`, and `sd`. `n` corresponds to the number of draws, `mean` and `sd` are the $\mu$ and $\sigma$ of the distribution from which we want to draw.  Again, imagine an urn filled with beads. Each bead has a number written on it. If the distribution is standard normal, then we can draw 10 beads from the urn by running: 
 
 ```{r}
 rnorm(10)
@@ -1949,25 +1972,22 @@ rnorm(10)
 These 10 draws come from a distribution with the default `mean` of 0 and the default `sd` of 1. What if we create a histogram of the values?
 
 ```{r}
-distrib <- tibble(value = rnorm(10))
-
-ggplot(distrib, aes(x = value)) + 
+tibble(value = rnorm(10)) %>% 
+ggplot(aes(x = value)) + 
   geom_histogram(bins = 10)
 ```
 
-As you can see, it's not as symmetrical as the one displayed before. Now what if we try taking 100 observations, then 100,000?
+As you can see, it is not as symmetrical as the one displayed above. This is not surprising! If you just draw 10 beads from the urn, you can not possibly have a very good sense of what all the numbers on all the beads in the urn look like. What if we draw 100 values? What about 100,000?
 
 ```{r}
-distrib_2 <- tibble(value = rnorm(100))
-
-ggplot(distrib_2, aes(x = value)) +
+tibble(value = rnorm(100)) %>% 
+ggplot(aes(x = value)) +
   geom_histogram(bins = 10)
 ```
 
 ```{r}
-distrib_3 <- tibble(value = rnorm(100000))
-
-ggplot(distrib_3, aes(x = value)) +
+tibble(value = rnorm(100000)) %>% 
+ggplot(aes(x = value)) +
   geom_histogram(bins = 10)
 ```
 
@@ -1976,21 +1996,22 @@ Now it's looking a lot more similar (although imperfect)!
 Now, let's compare normal distributions with varying means and standard deviations, which can be set using the mean and sd arguments included with the function. 
 
 ```{r}
-normal_distrib <- tibble(rnorm_5_1 = rnorm(n = 1000, mean = 5, sd = 1), 
-                        rnorm_0_3 = rnorm(n = 1000, mean = 0, sd = 3),
-                        rnorm_0_1 = rnorm(n = 1000, mean = 0, sd = 1)) %>%
+tibble(rnorm_5_1 = rnorm(n = 1000, mean = 5, sd = 1), 
+       rnorm_0_3 = rnorm(n = 1000, mean = 0, sd = 3),
+       rnorm_0_1 = rnorm(n = 1000, mean = 0, sd = 1)) %>%
   pivot_longer(cols = everything(), 
                names_to = "distribution", 
-               values_to = "samples")
-
-ggplot(normal_distrib, aes(x = samples, fill = distribution)) +
-  geom_density(alpha = 0.5) +
-  labs(title = "Comparison of Normal Distributions with Differing Mean and Standard Deviation Values", 
-       fill = "Distribution") +
-  xlab("X") + 
-  ylab("Density")
-
+               values_to = "value") %>% 
+  ggplot(aes(x = value, fill = distribution)) +
+    geom_density(alpha = 0.5) +
+    labs(title = "Comparison of Normal Distributions with Differing Mean and Standard Deviation Values", 
+         fill = "Distribution",
+         x = "Value",
+         y = "Density")
 ```
+
+
+
 
 ### Working with draws
 
@@ -2010,7 +2031,7 @@ mean(draws)
 sd(draws)
 ```
 
-In practice, we will not know the exact distribution which generates our data. (If we did know, then estimation is unncessary.) The point to keep in mind is that the inherent randomness of the world means that calculated statistics will not match the underlying truth perfectly. But the more data that we collect, the closer the match will be.
+In practice, we will not know the exact distribution which generates our data. (If we did know, then estimation would be unnecessary.) The inherent randomness of the world means that calculated statistics will not match the underlying truth perfectly. But the more data that we collect, the closer the match will be.
 
 In addition to the mean and standard deviation of the draws, we will often be interested in various quantiles of the distribution. Example:
 
