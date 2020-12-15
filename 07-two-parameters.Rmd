@@ -1,17 +1,18 @@
 # Two Parameters {#two-parameters}
 
-<!-- Need a better discussion of what sigma means. Something like: "an estimate for the standard deviation of the errors (i.e. variability in height after accounting for the mean)" is pretty intuitive. You can show students the sample estimate of that with something like this (or sd(resid(fit_obj)) -->
 
 
-In Chapter \@ref(one-parameter), we learned how to do inference. Given certain assumptions about the problem, we created a joint distribution of the models under consideration and the data which might be observed. Once we observe the data, we go from the joint distribution to the conditional distribution of possible models given the data which we did, in fact, observe. That conditional distribution is our posterior probability distribution over the space of possible models. With that distribution, we can answer any question we might (reasonably) ask.
+
+In Chapter \@ref(one-parameter), we learned how to do inference. Given certain assumptions about the problem, we created a joint distribution of the models under consideration and the data which might be observed. Once we observe the data, we go from the joint distribution to the conditional distribution of possible models given the data which we did, in fact, observe. That conditional distribution, suitably normalized, is our posterior probability distribution over the space of possible models. With that distribution, we can answer any question we might (reasonably) ask.
 
 But what a pain in the ass that whole process was! Do professionals actually go through all those steps every time they work on a data science problem? No! Don't be absurd. Instead, professionals use standard tools which, in an automated fashion, take care of those steps, taking us directly from assumptions and data to the posterior:
 
 $$p(models | data = data\ we\ observed)$$.
 
+Even then, however, the relative likelihood of different models is not that important. Models are invisible, mental entities with no more fiscal presence than unicorns or leprechauns. In the world itself, we make and test predictions. How many red beads will come from the urn next time we use our shovel? People with better models make better predictions. That is what matters.
 
-There are two key differences. First, Chapter \@ref(one-parameter) dealt with a limited set of specific models: 2401 possible models. The procedure used is just what we saw in Chapter \@ref(probability).  In this chapter, on the other hand, have a continuous parameter.  Second, Chapter \@ref(one-parameter) used models with just one parameter: the number of red beads, which we can also transform into a parameter $p$, the number of red beads divided by 2,400.  The  model in Chapter \@ref(one-parameter) was binomial, and there is only one unknown parameter $p$ in such models. Here, we have two unknown parameters: the mean $\mu$ of height in the US and the standard deviation, $\sigma$, of the normally distributed error term. 
 
+In addition to a change in tools, there are two more key differences in this chapter. First, Chapter \@ref(one-parameter) dealt with a limited set of specific models: 2401 possible models. The procedure used is just what we saw in Chapter \@ref(probability).  In this chapter, on the other hand, have a continuous parameter.  Second, Chapter \@ref(one-parameter) used models with just one parameter: the number of red beads, which we can also transform into a parameter $p$, the number of red beads divided by 2,400.  The  model in Chapter \@ref(one-parameter) was binomial, and there is only one unknown parameter $p$ in such models. Here, we have two unknown parameters: the mean $\mu$ of height in the US and the standard deviation, $\sigma$, of the normally distributed error term. 
 
 The purpose of this chapter is to demonstrate, slowly and thoroughly, how professionals do data science.
 
@@ -25,17 +26,19 @@ knitr::include_graphics("other/images/Wisdom.jpg")
 
 What decision do we face? The reason for making models is not, primarily that making models is fun, although it is! The reason is that we face a decision. We must decide between X or Y. We must choose from A, B or C. We must set D to a specific numeric value. Given that decision, we should make a model of the world to help us.
 
-In any textbook, it will be tough to avoid the "toy problem" trap. The real world is complex. Any substantive decision problem includes a great deal of complexity and requires a great deal of context. We do not have the time to get into that level of detail. So, we simplify. We are going to create a model of height for adult men. We will then use that model to answer four questions:
+In any textbook, it will be tough to avoid the "toy problem" trap. The real world is complex. Any substantive decision problem includes a great deal of complexity and requires even more context. We do not have the time to get into that level of detail. So, we simplify. We are going to create a model of height for adult men. We will then use that model to answer four questions:
 
-* What is the average height of men in the population?
+* What is the average height of men?
 
-* What is the probability that the next adult male we meet will be taller than 180 centimeters?
+* What is the probability that the next man we meet will be taller than 180 centimeters?
 
 * What is the probability that, among the next 4 men we meet, the tallest is at least 10 cm taller than the shortest?
 
 * What is our posterior probability distribution for the height of the 3rd tallest man out of the next 100 we meet?
 
-The middle two questions have a single number, a single probability, as their answer. The first and third questions require a full scale posterior probability distribution.
+<!-- DK: This is awkward. Why not just ppd everywhere? -->
+
+The first and fourth questions require a full scale posterior probability distribution as an answer. The middle two questions have a single number as their answer, but we first create a posterior probability distribution in order to derive that number.
 
 Before starting that process, however, we need to look at the data we have.
 
@@ -141,18 +144,20 @@ The other aspect of Wisdom is ethics. Just because we *can* make a model does no
 knitr::include_graphics("other/images/Justice.jpg")
 ```
 
-Having looked at our data and decided that it is "close enough" to our questions that creating a model will help us, we move on to Justice.
+Having looked at our data and decided that it is "close enough" to our questions that creating a model will help us derive better answers, we move on to Justice. A mathematical model and a Preceptor Table are the two components of Justice. 
 
 Mathematical knowledge is the least important skill for a data scientist. 
 
 However, a little mathematical notation will make our modeling assumptions clear, will bring some precision to our approach. In this case:
 
-$$ height_i =  \mu + \epsilon_i $$
-with $\epsilon_i \sim N(0, \sigma^2)$. $height_i$ is the height of male $i$. $\mu$ is the average height of all males in the population. $\epsilon_i$ is the "error term," the difference between the height of male $i$ and the average height of all males.  $\epsilon_i$ is, by assumption, normally distributed with a mean of 0 and a standard deviation of $\sigma$. 
+$$ y_i =  \mu + \epsilon_i $$
+with $\epsilon_i \sim N(0, \sigma^2)$. $y_i$ is the height of male $i$. $\mu$ is the average height of all males in the population. $\epsilon_i$ is the "error term," the difference between the height of male $i$ and the average height of all males.  $\epsilon_i$ is, by assumption, normally distributed with a mean of 0 and a standard deviation of $\sigma$. 
 
 This is the simplest model we can construct. Note: 
 
 * The model has two unknown parameters: $\mu$ and $\sigma$. Before we can do anything else we need to estimate the values of these parameters. Can we ever know their exact value? No! Perfection lies only in God's own R code. But, by using a Bayesian approach similar to what we used in Chapters \@ref(probability) and \@ref(one-parameter), we will be able to create a *posterior probability distribution* for each parameter.
+
+
 
 <!-- DK: Box quote. -->
 
@@ -161,6 +166,10 @@ This is the simplest model we can construct. Note:
 * The parameter we most care about is $\mu$. That is the parameter with a substantively meaningful interpretation. Not only is the meaning of $\sigma$ difficult to describe, we also don't particular care about its value. Parameters like $\sigma$ in this context are *nuisance* or *auxiliary* parameters. We still have to estimate their posterior distributions, but we don't really care what those posteriors look like.
 
 * $\mu$ is not the average height of the men in the sample. We can calculate that directly. It is `r mean(ch7$height)`. No estimation required! Instead, $\mu$ is the average height of men in the *population*. Recall from the discussions in Chapter \@ref(one-parameter) that the population is the universe of people/units/whatever about which we seek to draw conclusions. On some level, this seems simple. On a deeper level, it is very subtle. For example, if we are walking around Copenhagen, then the population we really care about, in order to answer our three questions, is the set of adult men into which we might run today. This is not the same as the population of adult men in the US in 2009. But is it close enough? Is it better than nothing? Each case is a different and the details matter.
+
+* $\sigma$ is an estimate for the standard deviation of the errors, i.e. variability in height after accounting for the mean.
+
+<!-- You can show students the sample estimate of that with something like this (or sd(resid(fit_obj)) -->
 
 <!-- DK: Should we discuss what a superpopulation is? -->
 
@@ -196,39 +205,39 @@ tibble(ID = c("1", "2", "...", "473", "474",
 
 Since this is not a causal model, there is only one potential outcome --- which is to say, only one outcome: an individual's height. 
 
+
 ## Courage
 
 ```{r echo=FALSE, out.width="100%"}
 knitr::include_graphics("other/images/Courage.jpg")
 ```
 
-In data science, we deal with math, words, and code, but the most important of these is code. We need Courage to create the model, to take the leap of faith that we can make our ideas real. 
+In data science, we deal with words, math, and code, but the most important of these is code. We need Courage to create the model, to take the leap of faith that we can make our ideas real. 
 
 #### stan_glm
 
-Bayesian models are not hard to create in R. Sticking to the same filtered adult male 2009 data, we can reduce all the work we did for the bootstrap approach to the `stan_glm()` function which, when fed the correct inputs, creates a Bayesian generalized linear model of height. This function comes from the **rstanarm** package, which is very useful for Bayesian models in general.
+Bayesian models are not hard to create in R. TTe **rstanarm** package provides the tools we need, most importantly the function `stan_glm()`.
 
 ```{r, message = FALSE}
 library(rstanarm)
 ```
 
-
-The first argument in the `stan_glm()` function is `data`, which in our case is the filtered `ch7` tibble we used in the bootstrap example. The only other mandatory argument is the formula that we want to build a model around. In this case, since we have no predictor variables, our equation will be `height ~ 1`. 
+The first argument in the `stan_glm()` function is `data`, which in our case is the filtered `ch7` tibble we used in the bootstrap example. The only other mandatory argument is the formula that we want to use to build the model. In this case, since we have no predictor variables, our equation will be `height ~ 1`. 
 
 
 ```{r, cache = TRUE}
-set.seed(9)
 fit_obj <- stan_glm(data = ch7, 
                     height ~ 1, 
                     family = gaussian(), 
-                    refresh = 0)
+                    refresh = 0,
+                    seed = 9)
 ```
 
 Details:
 
-* This may take time. Bayesian models, especially ones with large amounts of data, can take longer than we might like. Indeed, computational limits were the main reason why Bayesian approaches were --- and, to some extent, still are --- little used. When creating your own models, you will often want to use the `cache = TRUE` code chunk option. This saves the result of the model so that you don't recalculate it every time you knit.
+* This may take time. Bayesian models, especially ones with large amounts of data, can take longer than we might like. Indeed, computational limits were the main reason why Bayesian approaches were --- and, to some extent, still are --- little used. When creating your own models, you will often want to use the `cache = TRUE` code chunk option. This saves the result of the model so that you don't recalculate it every time you knit your document.
 
-* The `data` argument, like all such usage in R, is used for the input data for the model.
+* The `data` argument, like all such usage in R, is for the input data.
 
 * If you don't set `refresh = 0`, the model will puke out many lines of confusing output. You can learn more about that output by reading the help page for `stan_glm()`. The output provides details on the fitting process as it runs as well as diagnostics about the final result. All of those details are beyond the scope of this book.
 
@@ -236,7 +245,9 @@ Details:
 
 * There is a direct connection between the mathematical form of the model created under Justice and the code we use to fit the model under Courage. `height ~ 1` is the code equivalent of $y_i =  \mu$. 
 
-* The default value for `family` is `gaussian()`, so we did not need to include it in the call above. From the Justice section, the assumption that $\epsilon_i \sim N(0, \sigma^2)$ is equivalent to using `gaussian()`. If $\epsilon_i$ has a different distribution, we would need to use a different `family`.
+* The default value for `family` is `gaussian`, so we did not need to include it in the call above. From the Justice section, the assumption that $\epsilon_i \sim N(0, \sigma^2)$ is equivalent to using `gaussian`. If $\epsilon_i$ had a different distribution, we would need to use a different `family`. We will see an example of such a situation at the end of this chapter, when we redo the Chapter \@ref(one-parameter) urn analysis using `stan_glm()`.
+
+* Although you can use the standalone function `set.seed()` in order to make your code reproducible, it is more convenient to use the `seed` argument within `stan_glm()`. Even though the fitting process, unavoidably, contains a random component, we will get the exact same answer if we set `seed = 9` and rerun this code.
 
 
 ##### Printed model
@@ -258,39 +269,41 @@ The fourth and fifth lines of the output tell us that we have `r nobs(fit_obj)` 
 
 We knew all this information before we fit the model. R records it in the `fit_obj` because we don't want to forget what we did. The second half of the display gives a summary of the parameter values.
 
-We see the output for the two parameters of the model: intercept and sigma. This can be confusing! Recall that the thing we care most about is $\mu$, the average height in the population. If we had the ideal Preceptor Table --- with a row for every adult male in the population we care about and no missing data --- $\mu$ would be trivial to calculate, and with no uncertainty. But only we know that we named that parameter $\mu$. All that R sees is the `1` in the formula. In most fields of statistics, this constant term is called the "intercept." So, now we have three things --- $\mu$ (from the math), `1` (from the code), and "intercept" (from the output) --- all of which refer to the exact same concept. This will not be the last time that terminology will be confusing.
+We see the output for the two parameters of the model: "(Intercept)" and "sigma". This can be confusing! Recall that the thing we care most about is $\mu$, the average height in the population. If we had the ideal Preceptor Table --- with a row for every adult male in the population we care about and no missing data --- $\mu$ would be trivial to calculate, and with no uncertainty. But only we know that we named that parameter $\mu$. All that R sees is the `1` in the formula. In most fields of statistics, this constant term is called the "intercept." So, now we have three things --- $\mu$ (from the math), `1` (from the code), and "(Intercept)" (from the output) --- all of which refer to the exact same concept. This will not be the last time that terminology will be confusing.
 
-At this point, `stan_glm()` --- or rather the `print()` method for rstan objects --- has a problem. We have full posteriors for both $\mu$ and $\sigma$. But this is a simple printed summary. We can't show the entire distribution. So, what are the best few numbers to provide? There is no right answer to this question! Here, the choice is to provide the median of the posterior and the "MAD_SD." 
+At this point, `stan_glm()` --- or rather the `print()` method for rstan objects --- has a problem. We have full posteriors for both $\mu$ and $\sigma$. But this is a simple printed summary. We can't show the entire distribution. So, what are the best few numbers to provide? There is no right answer to this question! Here, the choice is to provide the "Median" of the posterior and the "MAD_SD". 
 
 * Anytime you have a distribution, whether posterior probability or otherwise, the most important single number associated with it is some measure of its *location*. Where is the data? The two most common choices for this measure are the mean and median. We use the median here because posterior distributions can often be quite skewed, making the mean a less stable measure.
 
 * The second most important number for summarizing a distribution concerns its *spread*. How far is the data spread around its center? The most common measure used for this is the standard deviation. MAD SD, the scaled standard deviations of the absolute difference between each observation and the median of all observations, is another. If the variable has a normal distribution, then the standard deviation and the MAD SD will be very similar. But the MAD SD is much more robust to outliers, which is why it is used here.
 
 
-Instead of printing the whole model, we can just print out the parameter values:
+Instead of printing the whole model, we can just print out the parameter values and also change the number of digits shown:
 
 ```{r}
-print(fit_obj, detail = FALSE)
+print(fit_obj, detail = FALSE, digits = 2)
 ```
 
-<!-- DK: Are we sure that coef() and sigma() give us the median values? -->
+<!-- DK: Are we sure that coef() and sigma() give us the median values?  -->
 
 Now that we understand the meaning of Median and MAD_SD in the above display, we can interpret the actual numbers. The median of the intercept, `r coef(fit_obj)`, is the median of our posterior distribution for $\mu$, the average height of all American men in 2009. The median of sigma, `r sigma(fit_obj)`, is the median of our posterior distribution for the true $\sigma$, which can be roughly understood as the variability in the height of men, once we account for our estimate of $\mu$.
 
-The MAD_SD for each parameter is a measure of the variability of our posterior distributions. How spread out are they? Speaking roughly, 95% of the mass of a posterior distribution is located within +/- 2 MAD SDs from the median. For example, we would be about 95% confident that the true value of $\mu$ is somewhere between 175.6 and 176.3. 
+The MAD SD for each parameter is a measure of the variability of our posterior distributions for that parameter. How spread out are they? Speaking roughly, 95% of the mass of a posterior distribution is located within +/- 2 MAD SDs from the median. For example, we would be about 95% confident that the true value of $\mu$ is somewhere between 175.6 and 176.3. 
 
 ##### Plotting the posterior distributions
 
 Instead of doing this math in our heads, we can display both posterior distributions. *Pictures speak where math mumbles.* Fortunately, getting draws from those posteriors is easy:
 
-<!-- DK: Why don't we see decimals for the intercept in this print out? -->
+<!-- DK: Why don't we see decimals for the intercept in this print out? The decimals are there when I run it here. -->
 
 ```{r}
 fit_obj %>% 
   as_tibble()
 ```
 
-These 4,000 rows are "draws" from the estimated posteriors, each in its own column. These are like the vectors which result from calling functions like `rnorm()` or `rbinom()`. We can create the plot in a similar way:
+These 4,000 rows are draws from the estimated posteriors, each in its own column. These are like the vectors which result from calling functions like `rnorm()` or `rbinom()`. We can create the plot in a similar way:
+
+<!-- DK: More here. Drawing the connectuon to what we have done in earlier chapters. -->
 
 
 ```{r}
@@ -322,17 +335,15 @@ fit_obj %>%
     theme_classic()
 ```
 
-Again, $\sigma$ is usually a nuisance parameter. We don't really care what its value us, so we rarely plot it.
+Again, $\sigma$ is usually a nuisance parameter. We don't really care what its value is, so we rarely plot it.
 
 <!-- DK: Discuss the meaning in more detail. -->
 
-<!-- DK: Fun problem set exercise is to pull this data, pivot it, and then create one graphic with all distributions showing. -->
+<!-- DK: Fun problem set exercise is to pull this data, pivot it, and then create one graphic with both distributions on the same scale. Then you could . . . -->
 
 #### Decomposing the outcome
 
-Two other important concepts in model creation are "fitted" values and residuals. 
-
-
+Two other important concepts in model creation are fitted values and residuals. 
 
 ```{r}
 ch7 %>% 
