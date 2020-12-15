@@ -1,10 +1,24 @@
 # Functions {#functions}
 
-<!-- * This will now be week 3. Need to focus more on functions which actually do something useful, something that teaches concepts which will be valuable later. Should also delete material that is not that useful. Think about what aspects of functions are helpful for using Shiny and for final projects in general. -->
+<!-- Start by reading the distribution section of Chapter 2: -->
 
-<!-- Key concept to focus on is the idea of a distribution and draws therefrom. This connects to chapter 2, where we introduced distributions and to chapter 5, where we explain probability distributions. In particular, we should show various ways to measure center and variability. These are cool and important concepts. Is "center" the mean or the median or the trimmed mean or . . . Is "variability" the standard deviation, the mean absolute deviation, the standard deviation of the median absolute deviation or . . . There is nothing explicitly "statistical" here. We are just trying to connect English words to specific formulas. We might show the distributions for which these measures give the same answers and then some (mainly skewed) for which they don't. But how to explore these concepts in the context of function writing? -->
+<!-- https://ppbds.github.io/primer/wrangling.html#distributions -->
 
-<!-- Related: Teach random draws. We introduce random variables at the end of chapter 2. Do more with them here. For example, with a data set, calculated a mean and sd. Then do 1,000 draws form that. Then, plot the densities of the raw data and the simulated data on top of one another. -->
+<!-- This is the knowledge which readers start with. Remind them of it. -->
+
+<!-- Then read the virtual sampling sectioon of Chapter 6: -->
+
+<!-- https://ppbds.github.io/primer/one-parameter.html#virtual-sampling -->
+
+<!-- This is what we are preparing readers for. We want that to be easy for them, once they get there. We should also do a better job of connecting this code to the code in Chapter 5 but, right now, we don't show that to readers. -->
+
+<!-- * Need to focus more on functions which actually do something useful, something that teaches concepts which will be valuable later. -->
+
+<!-- Read, and then delete, the Crooked Casino section. -->
+
+<!-- Key concept to focus on is the idea of a distribution and draws therefrom. This connects to chapter 2, where we introduced distributions and to chapter 5, where we explain probability distributions. In particular, we should show various ways to measure center and variability. These are cool and important concepts. Is "center" the mean or the median or the trimmed mean or . . . Is "variability" the standard deviation, the mean absolute deviation, the standard deviation of the median absolute deviation or . . . There is nothing explicitly "statistical" here. We are just trying to connect English words to specific formulas. We might show the distributions for which these measures give the same answers and then some (mainly skewed) for which they don't. How to explore these concepts in the context of function writing? Perhaps by writing functions like my_mean() and my_median()? Or maybe focus on a function which calculates MAD SD? Then use list-columns to compare this function to other choices? -->
+
+<!-- Related: Teach random draws. We introduce random variables at the end of chapter 2. Do more with them here. For example, with a data set, calculated a mean and sd. Then do 1,000 draws fromm that. Then, plot the densities of the raw data and the simulated data on top of one another. -->
 
 <!-- Standard errors, qua standard errors, are a tricky thing to teach. But what if, instead of teaching them as standard errors, we just introduce the formula as a simple way to approximate something which, when multiplied by 2, and then added/subtracted from the mean, gives you a pretty useful 95% confidence interval. Then we could do the same for MAD SD, and show how that works better for skewed variables! Here, "works better" means that, if you do it 1,000 times, it works better on average. -->
 
@@ -40,11 +54,11 @@
 
 The goal of this chapter is to reveal the __process__ a long-time useR employs for writing functions. We also want to illustrate why the process is the way it is. Merely looking at the finished product, e.g. source code for R packages, can be extremely deceiving. Reality is generally much uglier ... but more interesting! Powerful packages like **dplyr** and **purrr** are ready and waiting to apply your purpose-built functions to various bits of your data. If you can express your analytic wishes in a function, these tools will give you great power.
 
-## Introduction to Functions
+## Introduction
 
 First, let's introduce the concept of functions. A function is a piece of code that is packaged in a way that makes it easy to reuse. Functions make it easy for you to `filter()`, `arrange()`, `select()`, and create a `tibble()`, as you have seen in the last few chapters. Functions also allow you to transform variables and perform a bunch of useful mathematical calculations, such as finding the `min()`, `max()`, and `quantile()`s of a dataset. Functions are also important in generating data and values, such as using `rnorm()` to randomly generate a normal distribution.
 
-Note that every time we mention a function, we include the parentheses. This is because you call a function by including its parentheses and any necessary arguments in those parentheses. If you run the function name without its parentheses, R will return the code that makes up the function. 
+Note that every time we discuss a function, we include the parentheses. This is because you call a function by including its parentheses and any necessary arguments in those parentheses. This is a correct call of `rnorm()`:
 
 ```{r}
 rnorm(1)
@@ -62,7 +76,7 @@ Functions can do all sorts of things. Below, `sample()` takes a vector of values
 sample(x = 1:6, size = 1)
 ```
 
-Functions can also take in other functions as arguments. For example, `replicate()` takes an expression and repeats it for `n` specified times. This is really useful when you want to generate many iterations of data. What if we replicated the rolling of a die ten times?
+Functions can also take in other functions as arguments. For example, `replicate()` takes an expression and repeats it `n` times. What if we replicated the rolling of a die ten times?
 
 ```{r}
 replicate(10, sample(1:6, 1))
@@ -70,10 +84,14 @@ replicate(10, sample(1:6, 1))
 
 An especially useful type of function is the family of `map_*` functions. `map_*` functions come from the **purrr** package, which you will have loaded if you have loaded **tidyverse**. These functions apply the same function to every row in a tibble.
 
+```{r, include = FALSE}
+library(tidyverse)
+```
+
+
 Let's create a tibble with 3 values: 3, 7, and 2.
 
 ```{r}
-library(tidyverse)
 tibble(x = c(3, 7, 2))
 ```
 
@@ -127,7 +145,7 @@ tibble(x = c(3, 7, 2)) %>%
 
 Only... what exactly is a list-column? Our next section will give you a quick refresher on lists, then dive into how lists, list-columns, and `map_*` functions relate.
 
-## Lists and List-columns
+## Lists and list-columns
 
 Let's quickly refresh on what lists are and functions that commonly deal with lists. Recall that a list is different from an atomic vector. Atomic vectors are familiar to us: each element of the vector has one value, and thus if an atomic vector is a column in your dataset, each observation gets a single value.  Lists, however, can contain vectors as elements.
 
@@ -537,7 +555,7 @@ For functions that will be used again -- which is not all of them! -- it is good
 
 > Rule of Repair: When you must fail, fail noisily and as soon as possible.
 
-#### stop if not
+#### `stopifnot()`
 
 `stopifnot()` is the entry level solution. We use it here to make sure the input `x` is a numeric vector.
 
@@ -585,19 +603,7 @@ If it is easy to do so, we highly recommend this template: "you gave me THIS, bu
 
 The tidyverse style guide has a very useful [chapter on how to construct error messages](https://style.tidyverse.org/error-messages.html).
 
-### Wrap-up and what's next?
 
-Here's the function we've written as an introduction to built-in and custom functions:
-
-```{r}
-mmm2
-```
-
-What we've accomplished:
-
-* We've written our first function.
-* We are checking the validity of its input, argument `x`.
-* We've done a good amount of informal testing.
   
 ## Argument Specifications and Default Values
 
@@ -833,43 +839,7 @@ quantile_diff(z)
 quantile_diff(z, na.rm = FALSE)
 ```
 
-### The useful but mysterious `...` argument
 
-You probably could have lived a long and happy life without knowing there are at least 9 different algorithms for computing quantiles. [Go read about the `type` argument][rdocs-quantile] of `quantile()`. TLDR: If a quantile is not unambiguously equal to an observed data point, you must somehow average two data points. You can weight this average different ways, depending on the rest of the data, and `type =` controls this.
-
-Let's say we want to give the user of our function the ability to specify how the quantiles are computed, but we want to accomplish with as little fuss as possible. In fact, we don't even want to clutter our function's interface with this! This calls for the very special `...` argument. In English, this set of three dots is frequently called an "ellipsis".
-
-```{r}
-quantile_diff <- function(x, probs = c(0, 1), na.rm = TRUE, ...) {
-  the_quantiles <- quantile(x = x, probs = probs, na.rm = na.rm, ...)
-  max(the_quantiles) - min(the_quantiles)
-}
-```
-
-Thanks to [\@wrathematics][twitter-wrathematics], here's a small example where we can (barely) detect a difference due to `type`.
-
-```{r}
-set.seed(1234)
-z <- rnorm(10)
-quantile(z, type = 1)
-quantile(z, type = 4)
-all.equal(quantile(z, type = 1), quantile(z, type = 4))
-```
-
-Now we can call our function, requesting that quantiles be computed in different ways.
-
-```{r}
-quantile_diff(z, probs = c(0.25, 0.75), type = 1)
-quantile_diff(z, probs = c(0.25, 0.75), type = 4)
-```
-
-While the difference may be subtle, __it's there__. Marvel at the fact that we have passed `type = 1` through to `quantile()` *even though it was not a formal argument of our own function*.
-
-The special argument `...` is very useful when you want the ability to pass arbitrary arguments down to another function, but without constantly expanding the formal arguments to your function. This leaves you with a less cluttered function definition and gives you future flexibility to specify these arguments only when you need to. This is why the `...` argument is used in conjunction with `map_*` functions.
-
-There are also downsides to `...`, so use it with intention. In a package, you will have to work harder to create truly informative documentation for your user. Also, the quiet, absorbent properties of `...` mean it can sometimes silently swallow other named arguments, when the user has a typo in the name. Depending on whether or how this fails, it can be a little tricky to find out what went wrong.
-
-The [ellipsis package](https://ellipsis.r-lib.org) provides tools that help package developers use `...` more safely. The in-progress tidyverse principles guide provides further guidance on the design of functions that take `...` in [Data, dots, details](https://principles.tidyverse.org/dots-position.html).
 
 ## The Crooked Casino
 
