@@ -2,23 +2,33 @@
 
 <!-- * This will now be week 3. Need to focus more on functions which actually do something useful, something that teaches concepts which will be valuable later. Should also delete material that is not that useful. Think about what aspects of functions are helpful for using Shiny and for final projects in general. -->
 
-<!-- Key concept to focus on is the idea of a distribution and draws therefrom. This connects to chapter 2, where we introduced distributions and to chapter 5, where we explain probability.  -->
+<!-- Key concept to focus on is the idea of a distribution and draws therefrom. This connects to chapter 2, where we introduced distributions and to chapter 5, where we explain probability distributions. In particular, we should show various ways to measure center and variability. These are cool and important concepts. Is "center" the mean or the median or the trimmed mean or . . . Is "variability" the standard deviation, the mean absolute deviation, the standard deviation of the median absolute deviation or . . . There is nothing explicitly "statistical" here. We are just trying to connect English words to specific formulas. We might show the distributions for which these measures give the same answers and then some (mainly skewed) for which they don't. But how to explore these concepts in the context of function writing? -->
 
-<!-- Key question: Do we explain standard error here? I think No. But we should explain everything short of standard error. In particular, we should show various ways to measure center and variability. These are cool and important concepts. Is "center" the mean or the median or the trimmed mean or . . . Is "variability" the standard deviation, the mean absolute deviation, the standard deviation of the median absolute deviation or . . . There is nothing explicitly "statistical" here. We are just trying to connect English words to specific formulas. -->
+<!-- Related: Teach random draws. We introduce random variables at the end of chapter 2. Do more with them here. For example, with a data set, calculated a mean and sd. Then do 1,000 draws form that. Then, plot the densities of the raw data and the simulated data on top of one another. -->
 
-<!-- This allows us to get into the "objective function" and even the prediction game. Indeed, the key demonstration at the end, instead of the crooked casino, might be to build a simple prediction game and see who wins. Perhaps showing that median is better than mean if the objective function is the mean absolute deviation. -->
+<!-- Standard errors, qua standard errors, are a tricky thing to teach. But what if, instead of teaching them as standard errors, we just introduce the formula as a simple way to approximate something which, when multiplied by 2, and then added/subtracted from the mean, gives you a pretty useful 95% confidence interval. Then we could do the same for MAD SD, and show how that works better for skewed variables! Here, "works better" means that, if you do it 1,000 times, it works better on average. -->
 
-<!-- These below are older comments which might not be wrong . . . -->
+<!-- The main use case is the "Guessing Game." Imagine that you are I are using the kenya data set and the distance, pop_density or rv13 variables. (All of which are quite skewed. We might also experiment with the poverty variable, which is less skewed. But skewed variables make this more interesting.) -->
 
-<!-- * Teach standard error. This is something we can do before probability. Calculating mean and sd is easy. Divide the first by the second times root n and --- voila! That is much more productive than crooked casinos. -->
+<!-- In the Guessing Game, you guess a number and I guess a number. The goal is to get closest to a random draw from all the values of distance (or whatever). We do this 1,000 times. Whoever gets closer more often, wins the Guessing Game.  -->
 
-<!-- * Teach confidence intervals. Again, we can do this before probability, I think. Think of it as, roughly, plus/minus 2 times the standard error. Then, show what coverege is of confidence intervals. -->
+<!-- This is a useful exercise for several reasons. First, coding it up is a good practice for writing a function. Indeed, we might re-write the whole chapter to focus on this example. Second, once we have a function, which runs one iteration of the Game --- maybe it takes the data set (or maybe a vector of values?), my guess and your guess, and then returns the winner --- we can use list columns and map_functions to run it a thousand times. This is all more fun and more interesting that stupid max-minus-min functions. -->
 
-<!-- * Teach random draws. We introduce random variables at the end of chapter 2. Do more with them here. For example, with a data set, calculated a mean and sd. Then do 1,000 draws form that. Then, plot the densities of the raw data and the simulated data on top of one another.  -->
+<!-- Third, the Guessing Game gets at key statistical issues. There is a lot of meat there, all things that we will revisit many times. Some things to highlight, many of which can be put into the Guessing Game. -->
 
-<!-- * Maybe cut of lot of the extra stuff? -->
+<!-- 1) Guess a formula rather than a number. Presumably, you and I get to see (all of?) the data before playing the game. In the simplest version, we look at the data and give you a number. (The mean and median both do well in this game, obviously.) But, in a more advanced form of the game, we might be allowed to provide a function. The goal of inference is to come up with a function which wins the prediction game.) -->
 
-<!-- 4) Add group_nest()? -->
+<!-- 2) Change the objective function. The simplest form of the Guessing Game just counts each contest separately. A more advanced for would give you a penalty which varies depending on how wrong you are. (This, obviously, is one way to think about minimizing the squared residuals.) This is very fun because there are many different penalty functions, each of which may lead to a different function winning the Guessing Game. -->
+
+<!-- 3) The chapter climaxes with the following cool result: If you are minimizing the sum (or average) of the squared residuals, guessing the mean wins the Guessing Game. However, if you are minimizing the sum (or average) of the absolute values of the residuals, you should guess the median. -->
+
+<!-- 4) Another form of the Guessing Game is like a casino. One person (the Casino) gives a 50% confidence interval. The other person gets to pick either inside or outside. Then there is a draw. The Casino wins if the second person can't consistently win. -->
+
+<!-- Key question: Do we explain standard error here? Could be easy! Calculate the mean. Calculate the sd. Divide and scale by the square root of n. Voila! But, still, I think No. But we should explain everything short of standard error.  -->
+
+<!-- group_nest() might be a useful function.  -->
+
+<!-- Might also show how to add lots of plots to a tibble and then pick out the ones that show cool stuff. If you run 1,000 experiments, show the plots of the 5 extreme ones. -->
 
 
 <!-- Useful reference, maybe -->
@@ -158,14 +168,6 @@ You might be wondering, how is the list `x` different from the lists `list_1` an
 
 There are a number of built-in R functions that output lists. For example, the ***ggplot***s you have been making store all of the graph information in lists.
 
-<!-- EC: Keep thing about ggplot? -->
-
-```{r}
-y <- ggplot(mtcars, aes(x = cyl, y = mpg)) +
-  geom_col()
-y %>% str()
-```
-
 Any function that returns multiple values can be used to create a list output.  For example, consider the following list `x` again:
 
 ```{r}
@@ -197,8 +199,6 @@ Notice this is a 1x1 tibble with one observation, which is a list of one element
 
 Lesson: If a function returns multiple values as a vector, like `range()` does, you can't use it directly to obtain a list-column, but you can wrap `list()` around it in order to get the same behavior.
 
-
-<!-- EC: Commenting out this sentence for now. We are now going to learn about [**list columns**](https://r4ds.had.co.nz/many-models.html#list-columns-1).^[If I were going to give a lecture on these topics, it would look like [this one](https://resources.rstudio.com/webinars/how-to-work-with-list-columns-garrett-grolemund).] -->
 
 A list column is a column of your data which is a [list](https://adv-r.hadley.nz/vectors-chap.html#lists) rather than an atomic vector.  Like with lists, you can pipe in `str()` to read the column more easily.
 
@@ -233,7 +233,7 @@ library(primer.data)
 kenya %>%
   select(block, poverty) %>%
   group_by(block) %>%
-  mutate(povertyQuantile = list(quantile(poverty)))
+  mutate(poverty_quantile = list(quantile(poverty)))
 ```
 
 Or let's say that we wanted 1) to subset the dataset to the those with `treatment == "control"`, 2) group by `block`, and 3) get a `summary()` of the `distance` variable by continent:
@@ -243,7 +243,7 @@ kenya %>%
   select(treatment, block, distance) %>%
   filter(treatment == "control") %>%
   group_by(block) %>%
-  summarize(distSummary = list(summary(distance)))
+  summarize(dist_summary = list(summary(distance)))
 ```
 
 ### Using `map_*` functions to create list-columns
@@ -298,7 +298,8 @@ nhanes %>%
   group_by(age, gender) %>%
   summarize(all_weights = list(weight)) %>%
   mutate(log_weights = map(all_weights, log),
-         sorted_log_weights = map(log_weights, ~ sort(., decreasing = TRUE)),
+         sorted_log_weights = map(log_weights, 
+                                  ~ sort(., decreasing = TRUE)),
          top5_log_weights = map(sorted_log_weights, ~ .[1:5]))
 ```
 
@@ -713,7 +714,7 @@ What we've accomplished:
 * We've generalized our dice throwing function to take in a custom value for `n`
 * We've specified a default value: `n=2`
   
-## Formal Testing
+## Formal testing
 
 In this section, we tackle `NA`s, the special argument `...` and formal testing.
 
@@ -1036,4 +1037,6 @@ crooked_x <- tibble(throws = map(rep(10, 10), crooked_craps))
 crooked_x %>%
   str()
 ```
+
+## Summary
 
