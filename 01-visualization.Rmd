@@ -9,15 +9,13 @@ Everyone loves visualizations.
 
 ```{r, echo = FALSE, out.width = "100%", message = FALSE}
 library(tidyverse)
+library(ggthemes)
 library(scales)
 library(gapminder)
 
 gap_p <- gapminder %>%
   filter(continent != "Oceania") %>%
   filter(year == max(year)) %>% 
-  mutate(continent = fct_relevel(continent, 
-                                 c("Americas", "Europe"), 
-                                 after = 0)) %>% 
   ggplot(aes(gdpPercap, lifeExp, size = pop, color = continent)) +
     geom_point(alpha = 0.7) +
     geom_smooth(method = "lm", 
@@ -31,6 +29,7 @@ gap_p <- gapminder %>%
          caption = "Data Source: gapminder R package") +
     scale_x_log10(breaks = c(500, 5000, 50000),
                   labels = scales::dollar_format(accuracy = 1)) +
+    theme_economist() +
     theme(legend.position = "none")
 
 gap_p
@@ -1320,25 +1319,26 @@ You can find an overview of the different themes in ggplot [here](https://ggplot
 In addition to ready-to-use themes, the `theme()` function also offers a wide [selection](https://ggplot2.tidyverse.org/reference/theme.html) of functions for manually changing individual elements. Let's remove the legend, change the font in the plot and enlarge the axis labels a bit:
 
 ```{r}
-ggplot(gapminder_07, 
-       aes(gdpPercap, lifeExp, color = continent)) +
-  geom_point() +
-  facet_wrap(~ continent, nrow = 1) +
-  stat_smooth(formula = y ~ x, method = "lm", se = FALSE) + 
-  scale_x_log10() +
-  labs(title = "Life Expectancy and GDP per Capita (2007)",
-       subtitle = "Selected Nations by Continent",
-       x = "GDP per Capita, USD",
-       y = "Life Expectancy, Years",
-       caption = "Source: Gapminder",
-       color = "Continent") +
-  geom_text(aes(label = country), size = 2, 
-            color = "black", check_overlap = TRUE) +
-  theme_linedraw() +
-  theme(legend.position = "none", 
-        text = element_text(family = "Palatino"),
-        axis.text.x = element_text(size = 11),
-        axis.text.y = element_text(size = 10))
+library(ggthemes)
+
+gapminder %>% 
+  filter(year == 2007) %>% 
+  filter(continent != "Oceania") %>% 
+  ggplot(aes(gdpPercap, lifeExp, color = continent)) +
+    geom_point() +
+    geom_smooth(formula = y ~ x, method = "lm", se = FALSE) + 
+    facet_wrap(~ continent, nrow = 2) +
+    scale_x_log10(breaks = c(500, 5000, 50000),
+                  labels = scales::dollar_format(accuracy = 1)) +
+    labs(title = "Life Expectancy and GDP per Capita (2007)",
+         subtitle = "Selected Nations by Continent",
+         x = "GDP per Capita, USD",
+         y = "Life Expectancy, Years",
+         caption = "Source: Gapminder",
+         color = "Continent") +
+    theme_economist() +
+    theme(legend.position = "none")
+
 ```
 
 Now take a moment to compare this plot with the one we started with:
@@ -1373,9 +1373,6 @@ library(gapminder)
 gap_p <- gapminder %>%
   filter(continent != "Oceania") %>%
   filter(year == max(year)) %>% 
-  mutate(continent = fct_relevel(continent, 
-                                 c("Americas", "Europe"), 
-                                 after = 0)) %>% 
   ggplot(aes(gdpPercap, lifeExp, size = pop, color = continent)) +
     geom_point(alpha = 0.7) +
     geom_smooth(method = "lm", 
