@@ -352,15 +352,13 @@ ch7 %>%
   sample_n(5)
 ```
 
-The fitted value represents the model's best guess at to what the true value of the outcome should be for that individual, given information about any covariates. This is a tricky concept since, after all, we already know what the actual value is. The residual is the difference between the outcome and the fitted value. These definitions lead to a natural decomposition of the outcome data:
+The fitted value represents the model's best guess at to what the true value of the outcome should be for that individual, given information about any covariates. This is a tricky concept since, after all, *we already know what the actual value is.* We commonly use "hat" notation for fitted values. $y_i$ is the actual height for man $i$. $\hat{y_i}$ is the fitted (or predicted or modeled) height for man $i$. It is the height we would guess if we did not know his true height. The residual, $r_i$, is the difference between the outcome ($y_i$) and the fitted value $\hat{y_i}$. These definitions lead to a natural decomposition of the outcome data:
 
 
-```{r, echo = FALSE}
-# These are tough to create! Why does scale_x_continuous(limits = c(140, 210))
-# cause some weird warnings in the first graphic? Seems like it would be nice to
-# have similar axes across the first two plots at least. I suspect I should be
-# using posterior_linpred rather than hard-coding the fitted value. Want to make
-# this easier to do in later chapters and standardize the approach/code.
+```{r, echo = FALSE, out.width="100%"}
+# Seems like it would be nice to have similar axes across the first two plots at
+# least. Want to make this easier to do in later chapters and standardize the
+# approach/code.
 
 outcome <- ch7 %>% 
   ggplot(aes(height)) +
@@ -388,8 +386,11 @@ outcome + fitted + res +
 
 
 
-<!-- DK: More details. And don't forget to compare this confidence interval to the bootstrapped one. And do a posterior predictive check! -->
+<!-- DK: More details. Can we add $y_i$ and other math terms to these graphs? And do a posterior predictive check! -->
 
+<!-- DK: Is there other stuff to do within Courage? Might show how to make a regression table. Should discuss how there is only one model and that we have different views of that model by looking at the printed output, the posterior probability distributions of the parameters and graphics of the fitted values and residuals.  -->
+
+<!-- Discuss testing for the first time? Yes! Takes Courage to Not Test! Also, foreshadow the difficulties we will have in deciding what to include in the model. And transformations. Or maybe discuss transformations now? -->
 
 
 ## Temperance
@@ -398,134 +399,178 @@ outcome + fitted + res +
 knitr::include_graphics("other/images/Temperance.jpg")
 ```
 
-<!-- DK: Should introduce matrices in chapter 2. -->
 
-Recall that a "matrix" in R is a rectangular array of data, shaped like a data frame or tibble, but containing only one type of data, e.g., numeric. Large matrices also print out ugly. (There are other differences, none of which we care about here.) Example:
+We have a model. What can we do with it? Let's answer the four questions with which we started this section.
 
-```{r}
-m <- matrix(c(3, 4, 8, 9, 12, 13), ncol = 2)
-m
-```
+### Question 1
 
-The easiest way to pull information from a matrix is to use `[]`, the subset operator. Here is how we grab the second column of `m`:
+* What is the average height of men?
+
+If we had the ideal Preceptor Table, one with a row for every man alive, and with their actual height, we could calculate this number easily. Just take the average of those 3 billion or so rows! Alas, in our actual Preceptor Table, the vast majority of heights are missing. Question marks make simple algebra impossible. So, as with any unknown number, we need estimate a posterior probability distribution. Objects created by `stan_glm()` make this easy to do.
 
 ```{r}
-m[, 2]
+newobs <- tibble(here = "hack")
+
+pe <- posterior_epred(object = fit_obj,
+                newdata = newobs) %>% 
+        as_tibble()
 ```
 
-Note how matrices with just one dimension "collapse" into single vectors. Tibbles, on the other hand, always maintain their rectangular shapes, even with only one column or row. Matrices are important because `posterior_predict()` and other functions from **rstanarm** return matrices.
+The key function is `posterior_epred()`. The two arguments we provide are `object`, the fitted model object returned by `stan_glm()` and, newdata, which are the covariates associated with the unit for each we want to make a forecast. (In this case, `newdata` can be any tibble because an intercept-only model does not make use of covariates.) The `epred` in `posterior_epred()` stands for "**e**expected **pred**iction. In other words, if we pick a random adult male what do we "expect" his height to be. We also call this the "expected value."
 
-<!-- DK: Teach about rowwise, c_across, and ungroup? Or do that earlier? -->
+<!-- DK: Tell the story about "mathematical hope." Maybe give more details on what the tibble is doing. Once new version comes out, replace with tibble(.rows = 1). -->
 
-<!-- DK: Need better explanations about what a draw is, why it is not the same thing as the posterior, but why graphing the draws gives you the posterior. -->
+We use `as_tibble()` to convert the matrix which is returned by `posterior_epred()`. Converting these 4,000 draws into a posterior probability distribution is straightforward.
 
-We have a model. What can we do with it? Let's answer the three questions with which we started this section.
+```{r, out.width="100%"}
+pe %>% 
+  ggplot(aes(x = `1`)) +
+    geom_histogram(aes(y = after_stat(count/sum(count))),
+                   bins = 100) +
+    labs(title = "Posterior Probability Distribution",
+         subtitle = "For average adult male height",
+         x = "Average Height in Centimeters",
+         y = "Probability",
+         caption = "Data source: NHANES") + 
+    scale_x_continuous(labels = scales::number_format()) +
+    scale_y_continuous(labels = scales::percent_format()) 
+```
+
+The rest of the *Primer* will be filled with graphics like this one. You will make dozens of them yourself. The fundamental structure for doing algebra is the real number. The fundamental structure for data science is a probability distribution. We need to be able to interpret them and create them.
+
+<!-- DK: Add something about how expected value means we can ignore the epsilon. Perhaps walk through what the different parts of the graphic code is doing. Add theme_classic()? -->
+
+### Question 2
 
 * What is the probability that the next adult male we meet will be taller than 180 centimeters?
 
-We have a model of American male height from 2009, `fit_obj`, which we can use for this purpose.
+There are two fundamentally different kinds of unknowns which we care about: *expected values* (as in the previous question) and *predicted values*. With the former, we are not interested in any specific individual. The individual value is irrelavant. With predicted values, we care, not about the average, but about this specific person. With the former, we use `posterior_epred()`. With the latter, the relevant function is `posterior_predict()`. Both functions return draws from a posterior probability distribution, but the unknown number which underlies the posterior is very different.
+
+Recall the mathematics:
 
 
-```{r}
-set.seed(11)
-pp <- posterior_predict(fit_obj)
+$$ y_i =  \mu + \epsilon_i $$
 
-```
-
-Unfortunately, `posterior_predict()` returns a weird object with class "ppd", which stands for posterior probability distribution. There are some advanced use cases in which this is a useful class of object to work with. But, for the purposes of this book, the "ppd" class is too complex. So, whenever we call `posterior_predict()`, we will always transform it into a tibble like so:
+With expected values or averages, we can ignore the $\epsilon_i$ term in this model. The expected value of $$\epsilon_i$$ is zero since, by assumption, $\epsilon_i \sim N(0, \sigma^2)$. However, we can't ignore $\epsilon_i$ when predicting the height for a single individual.
 
 ```{r}
-set.seed(11)
-pp <- posterior_predict(fit_obj) %>%
-    as_tibble() %>%
-    mutate_all(as.numeric)
+newobs <- tibble(here = "hack")
+
+pp <- posterior_predict(object = fit_obj,
+                  newdata = newobs) %>% 
+        as_tibble()
+
+pp
 ```
 
-Doing so requires two steps. First, use `as_tibble()`, just as you might expect. In R, we often transform one thing into another thing with functions which begin with `as_`. Unfortunately, that does not solve our problem because each column is still of class `ppd`. So, second, we use the `mutate_all(as.numeric)` incantation to transform each column. The resulting object, `pp`, is still not easy to work with, both because the variable names are all numbers and because of how big it is.
 
-```{r}
-dim(pp)
+As before, it is straightforward to turn draws from the posterior probability distribution into a graphic:
+
+```{r, out.width="100%"}
+pp %>% 
+  ggplot(aes(x = `1`)) +
+    geom_histogram(aes(y = after_stat(count/sum(count))),
+                   bins = 100) +
+    labs(title = "Posterior Probability Distribution",
+         subtitle = "For the height of a random adult male",
+         x = "Height in Centimeters",
+         y = "Probability",
+         caption = "Data source: NHANES") + 
+    scale_x_continuous(labels = scales::number_format()) +
+    scale_y_continuous(labels = scales::percent_format()) 
 ```
 
-There are `r nrow(pp)` rows because, by default, `stan_glm()` gives us `r nrow(pp)` draws from the posterior distribution, both for the distribution of the parameters (which we looked at above under Courage) and for the predicted values. There 
-are `r ncol(pp)` because the matrix provides draws from the same posterior predictive distribution for each of the input data rows. (In this case, they are all the same --- all draws from the same posterior predictive distribution --- because the model does not use any covariates. In more complex models, the columns in the `pp` tibble can be draws from very different distributions.) 
+Note:
 
-Why do we want a posterior prediction for each observation? After all, we already know the value for each observation! We know everyone's height in our data set. No prediction is necessary.
+* The posterior for an individual is much wider than the posterior for the expected value.  
 
-The reason is that, in order to confirm that our model is consistent with the data, *we should compare the posterior probability distribution for each observation to the actual value for that observation.* They should be consistent. That is, if the model is sensible, about 95% of the true observations should lie within the 95% confidence interval of their respective posterior probability distributions. The process of doing this comparison is a *posterior predictive check.*
+* Eyeballing, seems like there is a 1 out of 3 chance that the next man we meet, or any randomly chosen man, is taller than 180 cm.
 
-<!-- DK: Do this now or save for later? -->
+* Can calculate the exact probability.
 
-In the meantime, we can still use any column in `pp` to answer our question. (We will use the first column for convenience.) Consider:
 
-```{r}
-tibble(pred = pp$`1`) %>% 
-  mutate(gt_180 = ifelse(pred > 180, TRUE, FALSE))
-```
+Again, the key conceptual difficulty is the population. The problem we actually have involves walking around London, or wherever, today. The data we have involve America in 2009. Those are not the same things! But they are not totally different. Knowing whether the data we have is "close enough" to the problem we want to solve is at the heart of Wisdom. Yet that was the decision we made at the start of the process, the decision to create a model in the first place. Now that we have created a model, we look to the virtue of Temperance for guidance in using that model. The data we have is never a perfect match for the world we face. We need to temper our confidence and act with humility. Our forecasts will never be as good as a naive use of the model might suggest. Reality will surprise us. We need to take the model's claims with a family-sized portion of salt.
 
-We don't have to put the posterior predictions in a tibble, but doing so makes everything easier. What are the odds that the next adult male will be taller than 180 centimeters?
+<!-- DK: More on temperance and the many ways that we should be less confident. Move material from Chapters 3 and 5 here? -->
 
-```{r}
-tibble(pred = pp$`1`) %>% 
-  mutate(gt_180 = ifelse(pred > 180, TRUE, FALSE)) %>% 
-  summarize(answer = sum(gt_180) / n())
-```
-
-Somewhere around 29% or so. 
-
-Again, the key difficulty is the population. The problem we actually have involves walking around London, or wherever, today. The data we have involve America in 2009. Those are not the same things! But they are not totally different. Knowing whether the data we have is "close enough" to the problem we want to solve is at the heart of Wisdom. Yet that was the decision we made at the start of the process, the decision to create a model in the first place. Now that we have created a model, we look to the virtue of Temperance for guidance in using that model. The data we have is never a perfect match for the world we face. We need to temper our confidence and act with humility. Our forecasts will never be as good as a naive use of the model might suggest. Reality will surprise us. We need to take the model's claims with a family-sized portion of salt.
-
-<!-- DK: More on temperance and the many ways that we should be less confident. -->
+### Question 3
 
 * What is the probability that, among the next 4 men we meet, the tallest is at least 10 cm taller than the shortest?
 
-Bayesian models are beautiful because, via the magic of simulation, we can answer (almost!) any question. With simulation, we just need to answer this step by step.
+Bayesian models are beautiful because, via the magic of simulation, we can answer (almost!) any question. With simulation, we just need to answer this step by step. Because the question is about four random individuals, we need `posterior_predict()` to give us four sets of draws from four identical posterior probability distributions, each one like the one from the previous question.
 
 ```{r}
-tibble(pred_1 = pp$`1`,
-       pred_2 = pp$`2`,
-       pred_3 = pp$`3`,
-       pred_4 = pp$`4`) %>% 
+newobs <- tibble(here = rep("hack", 4))
+
+pp <- posterior_predict(object = fit_obj,
+                  newdata = newobs) %>% 
+        as_tibble() %>% 
+        mutate_all(as.numeric)
+```
+
+Note we need to add `mutate_all(as.numeric)` to the end of the pipe. This is caused by a bug --- or at least an awkwardness --- whereby the variable type provided by posterior_predict(), at least in the case of more than one observation, is `ppd` rather than `dbl`. The new code changes each column to numeric. Doing so makes each column of type double.
+
+
+```{r, out.width="100%"}
+pp %>% 
   rowwise() %>% 
-  mutate(tallest = max(c_across(pred_1:pred_4))) %>% 
-  mutate(shortest = min(c_across(pred_1:pred_4))) %>% 
+  mutate(tallest = max(c_across(everything()))) %>% 
+  mutate(shortest = min(c_across(everything()))) %>% 
   mutate(diff = tallest - shortest) %>% 
-  mutate(gt_10 = ifelse(diff >= 10, TRUE, FALSE)) %>% 
-  ungroup() %>% 
-  summarize(answer = sum(gt_10) / n())
+  ggplot(aes(x = diff)) +
+    geom_histogram(aes(y = after_stat(count/sum(count))),
+                   bins = 100) +
+    labs(title = "Posterior Probability Distribution",
+         subtitle = "Max difference in height among four men",
+         x = "Height Difference in Centimeters",
+         y = "Probability",
+         caption = "Data source: NHANES") + 
+    scale_x_continuous(labels = scales::number_format()) +
+    scale_y_continuous(labels = scales::percent_format()) 
 ```
 
 There is about a 75% chance that, when meeting 4 random men, the tallest will be at least 10 cm taller than the shortest.
 
-<!-- DK: Discuss all the reasons why this might not be true. -->
+<!-- DK: Discuss all the reasons why this might not be true. Show how to give the exact answer. -->
 
-* What is our posterior probability of the height of the 3rd tallest man out of the next 100 we meet?
+### Question 4
+
+* What is our posterior probability distribution of the height of the 3rd tallest man out of the next 100 we meet?
 
 The same approach will work for almost any question.
 
 ```{r}
-pp[, 1:100] %>% 
+newobs <- tibble(here = rep("hack", 100))
+
+pp <- posterior_predict(object = fit_obj,
+                  newdata = newobs) %>% 
+        as_tibble() %>% 
+        mutate_all(as.numeric)
+```
+
+```{r, out.width="100%"}
+pp %>% 
   rowwise() %>% 
-  mutate(third_tallest = sort(c_across(`1`:`100`), decreasing = TRUE)[3]) %>% 
+  mutate(third_tallest = sort(c_across(everything()), 
+                              decreasing = TRUE)[3]) %>% 
   ungroup() %>% 
   ggplot(aes(x = third_tallest, y = after_stat(count / sum(count)))) +
     geom_histogram(bins = 100) +
-    labs(title = "Posterior Probability of the Height",
-         subtitle = "of the 3rd Tallest from One Hundred Random Men",
-         x = "Height (cm)",
-         y = "Probability")
+    labs(title = "Posterior Probability Distribution",
+         subtitle = "Height of 3rd tallest from one hundred men",
+         x = "Height in Centimeters",
+         y = "Probability",
+         caption = "Data source: NHANES") + 
+    scale_x_continuous(labels = scales::number_format()) +
+    scale_y_continuous(labels = scales::percent_format()) 
     
 ```
 
 
 <!-- DK: Need more text. Explain all the things that could be wrong with the model. Explain what is going on in different columns. Explain all the cool R code tricks.  -->
 
-<!-- DK: Insert a demonstration which shows that the 95% confidence interval does, in fact, provide 95% coverage. -->
-
 
 ## Coverage
-
-
 
 <!-- Prove that the bootstrap works, that our 95% confidence intervals provide correct coverage. We make a game and I give you a sample of like 40. Here's the 40, and you give me a 95% CI using the bootstrap tools we learned. Then I give you another 40. And another. If we do this 1,00 times, and we use the same procedure for calculating a confidence interval each time, then 950 should include the truth. That's how we know bootstraps is correct and I could only demonstrate this to you if we know what the truth is.  
 
@@ -559,9 +604,11 @@ shovel <- tibble(red = c(rep(1, 17), rep(0, 33))) %>%
 shovel
 ```
 
-`sample_frac()` just re-arranges the rows of `shovel`. Doing so does not matter since the order of the beads in the shovel is irrelevant to estimating the proportion of red beads in the urn. `shovel` is a tibble with two variables: `ID` and `red`, which takes the value 1 if that bead is red, and the value 0 if it is white.
+`sample_frac()` just re-arranges the rows of `shovel`. Doing so is aesthetically please but does not matter since the order of the beads in the shovel is irrelevant to estimating the proportion of red beads in the urn. `shovel` is a tibble with two variables: `ID` and `red`, which takes the value 1 if that bead is red, and the value 0 if it is white.
 
 Second, with the data, we can now create a model, using `stan_glm()`. The basic call to `stan_glm()` uses the same arguments as before. The only difference is that we can no longer use the default (`gaussian`) for the `family` argument. Instead, we set `family = binomial`. Recall that the `family` argument indicates our assumption about the error term for this model, along with the link function. Because `red` only takes the values 0 and 1, we use the `binomial` family. 
+
+<!-- DK: Explain link functions? -->
 
 
 ```{r}
