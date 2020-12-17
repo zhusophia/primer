@@ -4,7 +4,7 @@
 Everyone loves visualizations. 
 
 
-```{r out.width = "100%", message = FALSE}
+```{r out.width = "100%", message = FALSE, echo = FALSE}
 library(tidyverse)
 library(ggthemes)
 library(scales)
@@ -23,7 +23,8 @@ gap_p <- gapminder %>%
          subtitle = "Connection between GDP and life expectancy is weakest in Africa",
          x = "GDP per Capita in USD",
          y = "Life Expectancy") +
-    scale_x_log10(breaks = c(500, 5000, 50000)) +
+    scale_x_log10(breaks = c(500, 5000, 50000),
+                  labels = scales::dollar_format(accuracy = 1)) + 
     theme_economist() +
     theme(legend.position = "none")
 
@@ -35,19 +36,19 @@ Once you have read this chapter, and completed the associated tutorials, you wil
 
 ## Getting Started
 
-This chapter focuses on **ggplot2**, one of the core packages in the **tidyverse**. To access the datasets, help pages, and functions that we will use in this chapter, load the tidyverse by running this code:
+This chapter focuses on **ggplot2**, one of the core packages in the **tidyverse**. To access the datasets, help pages, and functions that we will use in this chapter, load the tidyverse:
 
 ```{r} 
 library(tidyverse)
 ```
 
-That one line of code loads all the packages associated with the **tidyverse**, packages which you will use in almost every data analysis. It also tells you which functions from the tidyverse conflict with functions in base R or with other packages you might have loaded. (We hide these and other messages because they are ugly.)
+That one line of code loads all the packages associated with the **tidyverse**, packages which you will use in almost every data analysis. It also tells you which functions from the tidyverse conflict with functions in base R or with other packages you might have loaded. (We hide these and other messages in this book because they are ugly.)
 
 
 If you run this code and get the error message “there is no package called ‘tidyverse’”, you’ll need to install the package, and then run `library(tidyverse)` once again.
 
 
-```{r}
+```{r, eval = FALSE}
 install.packages("tidyverse")
 ```
 
@@ -1357,6 +1358,8 @@ gapminder %>%
 
 This looks pretty good. However, notice the legend the top of our graph.  It crowds our graph and takes away from the most important part: the data. We can use `theme()` to customize the non-data parts of our plots such as background, gridlines, and legends. Let's de-clutter the graph by removing our legend. We can do this by using the `legend.position` argument and setting it to "none".
 
+<!-- DK: Make this new code consistent with the above. -->
+
 ```{r}
 gapminder %>%
   filter(continent != "Oceania") %>%
@@ -1371,9 +1374,10 @@ gapminder %>%
          subtitle = "Connection between GDP and life expectancy is weakest in Africa",
          x = "GDP per Capita in USD",
          y = "Life Expectancy") +
-    scale_x_log10(breaks = c(500, 5000, 50000)) +
-  theme_economist() +  
-  theme(legend.position = "none")
+    scale_x_log10(breaks = c(500, 5000, 50000),
+                  labels = scales::dollar_format(accuracy = 1)) + 
+    theme_economist() +
+    theme(legend.position = "none")
   
 ```
 
@@ -1385,7 +1389,7 @@ Great. Now our graph is easier to visualize. In addition, note that the `theme()
 In this chapter, we first looked at basic coding terminology and concepts that we deal with when programming with R. We then learned about the three basic components that make up each plot: data, mapping, and one or more geoms. The **ggplot2** package offers a wide range of geoms that we can use to create different types of plots. Next, we examined the "super package" **tidyverse**, which includes helpful tools for visualization. It also offers features for importing and manipulating data, which is the main topic of the next chapter. Lastly, we explored advanced plotting features such as axis scaling, faceting, and themes. When we put this all together, we were able to create the following visualization:
 
 
-```{r}
+```{r, echo = FALSE}
 gap_p
 ```
 
@@ -1418,7 +1422,7 @@ The **plotly** package makes our plot interactive. Click on it and explore!
 ```{r, cache = TRUE, message = FALSE, warning = FALSE, out.width = "100%"}
 library(plotly)
 
-ggplotly(gap_anim)
+ggplotly(gap_p)
 ```
 
 A beautiful plot is just a collection of steps, each simple enough on its own. We have taught you (some of) these steps. Time to start walking on your own.
