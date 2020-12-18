@@ -46,7 +46,7 @@
 <li><a class="" href="two-parameters.html"><span class="header-section-number">7</span> Two Parameters</a></li>
 <li><a class="" href="three-parameters.html"><span class="header-section-number">8</span> Three Parameters</a></li>
 <li><a class="" href="n-parameters.html"><span class="header-section-number">9</span> N Parameters</a></li>
-<li><a class="" href="other-outcomes.html"><span class="header-section-number">10</span> Other Outcomes</a></li>
+<li><a class="" href="interactions.html"><span class="header-section-number">10</span> Interactions</a></li>
 <li><a class="" href="building-models.html"><span class="header-section-number">11</span> Building Models</a></li>
 <li><a class="" href="model-selection.html"><span class="header-section-number">12</span> Model Selection</a></li>
 <li><a class="" href="tools.html">Tools</a></li>
@@ -117,27 +117,27 @@
 </h2>
 <p>First, let’s introduce the concept of functions. A function is a piece of code that is packaged in a way that makes it easy to reuse. Functions make it easy for you to <code><a href="https://dplyr.tidyverse.org/reference/filter.html">filter()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/select.html">select()</a></code>, and create a <code>tibble()</code>, as you have seen in the last few chapters. Functions also allow you to transform variables and perform a bunch of useful mathematical calculations, such as finding the <code><a href="https://rdrr.io/r/base/Extremes.html">min()</a></code>, <code><a href="https://rdrr.io/r/base/Extremes.html">max()</a></code>, and <code><a href="https://rdrr.io/r/stats/quantile.html">quantile()</a></code>s of a dataset. Functions are also important in generating data and values, such as using <code><a href="https://rdrr.io/r/stats/Normal.html">rnorm()</a></code> to randomly generate a normal distribution.</p>
 <p>Note that every time we discuss a function, we include the parentheses. This is because you call a function by including its parentheses and any necessary arguments in those parentheses. This is a correct call of <code><a href="https://rdrr.io/r/stats/Normal.html">rnorm()</a></code>:</p>
-<div class="sourceCode" id="cb538"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb540"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 0.98</code></pre>
 <p>If you run the function name without its parentheses, R will return the code that makes up the function.</p>
-<div class="sourceCode" id="cb540"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb542"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">rnorm</span></code></pre></div>
 <pre><code>## function (n, mean = 0, sd = 1) 
 ## .Call(C_rnorm, n, mean, sd)
-## &lt;bytecode: 0x7fd750309ee0&gt;
+## &lt;bytecode: 0x7fd2e5c2c840&gt;
 ## &lt;environment: namespace:stats&gt;</code></pre>
 <p>Functions can do all sorts of things. Below, <code><a href="https://rdrr.io/r/base/sample.html">sample()</a></code> takes a vector of values and spits out a number of random values from that vector. You can specify the number of random values with the argument <code>size</code>. Let’s take it for a spin. This is the equivalent of rolling a die!</p>
-<div class="sourceCode" id="cb542"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb544"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, size <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 2</code></pre>
 <p>Functions can also take in other functions as arguments. For example, <code><a href="https://rdrr.io/r/base/lapply.html">replicate()</a></code> takes an expression and repeats it <code>n</code> times. What if we replicated the rolling of a die ten times?</p>
-<div class="sourceCode" id="cb544"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb546"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/lapply.html">replicate</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>##  [1] 2 4 6 2 4 2 3 3 1 6</code></pre>
 <p>An especially useful type of function is the family of <code>map_*</code> functions. <code>map_*</code> functions come from the <strong>purrr</strong> package, which you will have loaded if you have loaded <strong>tidyverse</strong>. These functions apply the same function to every row in a tibble.</p>
 <p>Let’s create a tibble with 3 values: 3, 7, and 2.</p>
-<div class="sourceCode" id="cb546"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb548"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">tibble</span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">7</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 3 x 1
 ##       x
@@ -146,7 +146,7 @@
 ## 2     7
 ## 3     2</code></pre>
 <p>What if we wanted to take the square root of each value?</p>
-<div class="sourceCode" id="cb548"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb550"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">tibble</span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">7</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>new <span class="op">=</span> <span class="fu">map_dbl</span><span class="op">(</span><span class="va">x</span>, <span class="va">sqrt</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 3 x 2
@@ -156,7 +156,7 @@
 ## 2     7  2.65
 ## 3     2  1.41</code></pre>
 <p><code>map_dbl()</code> (pronounced “map-double”) took the function <code><a href="https://rdrr.io/r/base/MathFun.html">sqrt()</a></code> and applied it to each element of <code>x</code>. Note that, when we passed the function <code><a href="https://rdrr.io/r/base/MathFun.html">sqrt()</a></code> to <code>map_dbl()</code>, we passed in just its name, without the closing parentheses. This code fails:</p>
-<div class="sourceCode" id="cb550"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb552"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">tibble</span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">7</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>new <span class="op">=</span> <span class="fu">map_dbl</span><span class="op">(</span><span class="va">x</span>, <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## Error: Problem with `mutate()` input `new`.
@@ -183,7 +183,7 @@
 <p>So, since our example produces numeric output, we use <code>map_dbl()</code> instead of <code>map()</code>.</p>
 <p>Now, you may be wondering, what’s the difference between using <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> and <code>map_*</code> functions? The answer lies in iteration, which is the specialization of the <strong>purrr</strong> package. <code>map_*</code> functions are powerful because of their ability to apply functions to every single element of a list, which <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> cannot handle.</p>
 <p>Speaking of lists, <code>map_*</code> functions are known to take in list inputs, and sometimes even create list-columns depending on the specific <code>map_*</code> function.</p>
-<div class="sourceCode" id="cb552"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb554"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">tibble</span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">7</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>new <span class="op">=</span> <span class="fu">map</span><span class="op">(</span><span class="va">x</span>, <span class="va">sqrt</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 3 x 2
@@ -193,7 +193,7 @@
 ## 2     7 &lt;dbl [1]&gt;
 ## 3     2 &lt;dbl [1]&gt;</code></pre>
 <p>Notice that we changed the <code>map_dbl()</code> to <code>map()</code>, which returns a list-column. You can use <code>str</code> to easily view the contents of a list-column.</p>
-<div class="sourceCode" id="cb554"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb556"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">tibble</span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">7</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>new <span class="op">=</span> <span class="fu">map</span><span class="op">(</span><span class="va">x</span>, <span class="va">sqrt</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
@@ -210,18 +210,18 @@
 <span class="header-section-number">3.2</span> Lists and list-columns<a class="anchor" aria-label="anchor" href="#lists-and-list-columns"><i class="fas fa-link"></i></a>
 </h2>
 <p>Let’s quickly refresh on what lists are and functions that commonly deal with lists. Recall that a list is different from an atomic vector. Atomic vectors are familiar to us: each element of the vector has one value, and thus if an atomic vector is a column in your dataset, each observation gets a single value. Lists, however, can contain vectors as elements.</p>
-<div class="sourceCode" id="cb556"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb558"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">7</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span>
 <span class="va">x</span></code></pre></div>
 <pre><code>## [[1]]
 ## [1] 3 7 2</code></pre>
 <p>The above object, x, contains a numeric vector as an element. How do we extract the first element of the list?</p>
-<div class="sourceCode" id="cb558"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb560"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">x</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></code></pre></div>
 <pre><code>## [1] 3</code></pre>
 <p>Right! Recall the example from Chapter 2 in which lists are a pepper jar that contain more pepper packets. Don’t forget the square brackets!</p>
 <p>Let’s index through more lists to make sure it works. Remember that lists can contain a multitude of data types. First, let’s create a few new lists. Pay attention to the placement of <code><a href="https://rdrr.io/r/base/list.html">list()</a></code>.</p>
-<div class="sourceCode" id="cb560"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb562"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">list_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">"Three"</span>, <span class="fl">7</span>, <span class="st">"Two"</span><span class="op">)</span>
 <span class="va">list_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">"7"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>
 
@@ -230,48 +230,48 @@
 ##  $ : chr "Three"
 ##  $ : num 7
 ##  $ : chr "Two"</code></pre>
-<div class="sourceCode" id="cb562"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb564"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">list_2</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## List of 3
 ##  $ : num 3
 ##  $ : chr "7"
 ##  $ : num 2</code></pre>
-<div class="sourceCode" id="cb564"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb566"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">x</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## List of 1
 ##  $ : num [1:3] 3 7 2</code></pre>
 <p>As you can see, the two objects defined above are lists. It also displays the data type of each element. <code>list_1</code> is a list of length 3, with a character, a numeric, and a character. <code>list_2</code> is also a list of length 3, with a numeric, a character, and a numeric. Note that the <code>[1:3]</code> denotes a numeric vector of length 3 for <code>x</code>.</p>
 <p>Now, let’s extract the first element of each of the new lists.</p>
-<div class="sourceCode" id="cb566"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb568"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">list_1</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></code></pre></div>
 <pre><code>## [1] "Three"</code></pre>
-<div class="sourceCode" id="cb568"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb570"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">list_2</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></code></pre></div>
 <pre><code>## [1] 3</code></pre>
 <p>You might be wondering, how is the list <code>x</code> different from the lists <code>list_1</code> and <code>list_2</code>? Besides the contents of the lists, we wanted to demonstrate how there are various ways to create lists. You can directly input values inside <code><a href="https://rdrr.io/r/base/list.html">list()</a></code>, or wrap the values in <code><a href="https://rdrr.io/r/base/c.html">c()</a></code> first to create a vector element.</p>
 <p>There are a number of built-in R functions that output lists. For example, the <strong><em>ggplot</em></strong>s you have been making store all of the graph information in lists.</p>
 <p>Any function that returns multiple values can be used to create a list output. For example, consider the following list <code>x</code> again:</p>
-<div class="sourceCode" id="cb570"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb572"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">x</span></code></pre></div>
 <pre><code>## [[1]]
 ## [1] 3 7 2</code></pre>
 <p>If we take the <code><a href="https://rdrr.io/r/base/range.html">range()</a></code> of <code>x</code>, we expect two values to be returned: the minimum value and the maximum value in the numeric vector.</p>
-<div class="sourceCode" id="cb572"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb574"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/range.html">range</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 2 7</code></pre>
-<div class="sourceCode" id="cb574"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb576"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/class.html">class</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/range.html">range</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "numeric"</code></pre>
 <p>The output of <code><a href="https://rdrr.io/r/base/range.html">range(x)</a></code> is a numeric vector with two values, 2 and 7. To turn the output into a list, simply wrap the line of code with <code><a href="https://rdrr.io/r/base/list.html">list()</a></code>.</p>
-<div class="sourceCode" id="cb576"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb578"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/range.html">range</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## [[1]]
 ## [1] 2 7</code></pre>
-<div class="sourceCode" id="cb578"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb580"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/class.html">class</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/range.html">range</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "list"</code></pre>
 <p>What if we want to create a tibble with the values of <code><a href="https://rdrr.io/r/base/range.html">range(x)</a></code>?</p>
-<div class="sourceCode" id="cb580"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb582"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">tibble</span><span class="op">(</span>col_1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/range.html">range</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 1 x 1
 ##   col_1    
@@ -280,14 +280,14 @@
 <p>Notice this is a 1x1 tibble with one observation, which is a list of one element. The element is a vector of the integers 2 and 7. Voila! You have just created a *list-column**.</p>
 <p>Lesson: If a function returns multiple values as a vector, like <code><a href="https://rdrr.io/r/base/range.html">range()</a></code> does, you can’t use it directly to obtain a list-column, but you can wrap <code><a href="https://rdrr.io/r/base/list.html">list()</a></code> around it in order to get the same behavior.</p>
 <p>A list column is a column of your data which is a <a href="https://adv-r.hadley.nz/vectors-chap.html#lists">list</a> rather than an atomic vector. Like with lists, you can pipe in <code><a href="https://rdrr.io/r/utils/str.html">str()</a></code> to read the column more easily.</p>
-<div class="sourceCode" id="cb582"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb584"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">tibble</span><span class="op">(</span>col_1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/range.html">range</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## tibble [1 × 1] (S3: tbl_df/tbl/data.frame)
 ##  $ col_1:List of 1
 ##   ..$ : num [1:2] 2 7</code></pre>
 <p>Note that this is a case where it is crucial to use <code>tibble()</code>, not <code><a href="https://rdrr.io/r/base/data.frame.html">data.frame()</a></code>! If we had used <code><a href="https://rdrr.io/r/base/data.frame.html">data.frame()</a></code> in the last example, it wouldn’t have worked how we wanted:</p>
-<div class="sourceCode" id="cb584"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb586"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>col_1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/range.html">range</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>##   c.2..7.
 ## 1       2
@@ -295,7 +295,7 @@
 <p>Note that the output is a 2 x 1 dataframe with double observations, not one singular list.</p>
 <p>Wrapping a function with <code><a href="https://rdrr.io/r/base/list.html">list()</a></code> is often how we will go about creating list columns. Let’s practice with the <code>kenya</code> dataset. How could we add a column to the dataset that included the quantiles of the <code>poverty</code> variable?</p>
 <p>First, we load the necessary <strong>primer.data</strong> library, select the relevant variables, and group by <code>block</code>. We are grouping because we are curious as to how the poverty rates look when aggregated by block, rather than as individual observations.</p>
-<div class="sourceCode" id="cb586"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb588"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">primer.data</span><span class="op">)</span>
 <span class="va">kenya</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">block</span>, <span class="va">poverty</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -316,7 +316,7 @@
 ## 10 KWALE/16   0.398
 ## # … with 1,662 more rows</code></pre>
 <p>Next, we will create a list-column by wrapping <code><a href="https://rdrr.io/r/stats/quantile.html">quantile()</a></code> with <code><a href="https://rdrr.io/r/base/list.html">list()</a></code>. <code><a href="https://rdrr.io/r/stats/quantile.html">quantile()</a></code> naturally produces a numeric vector of the quantiles of <code>poverty</code>, and wrapping with <code><a href="https://rdrr.io/r/base/list.html">list()</a></code> will capture this numeric vector as a list.</p>
-<div class="sourceCode" id="cb588"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb590"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">primer.data</span><span class="op">)</span>
 <span class="va">kenya</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">block</span>, <span class="va">poverty</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -338,7 +338,7 @@
 ## 10 KWALE/16   0.398 &lt;dbl [5]&gt;       
 ## # … with 1,662 more rows</code></pre>
 <p>Or let’s say that we wanted 1) to subset the dataset to the those with <code>treatment == "control"</code>, 2) group by <code>block</code>, and 3) get a <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code> of the <code>distance</code> variable by continent:</p>
-<div class="sourceCode" id="cb590"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb592"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">kenya</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">treatment</span>, <span class="va">block</span>, <span class="va">distance</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">treatment</span> <span class="op">==</span> <span class="st">"control"</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -364,12 +364,12 @@
 </h3>
 <p>For this example, we will use the <code>nhanes</code> dataset from the <strong>primer.data</strong> package to demonstrate how to use <code>map_*</code> functions to create list columns.</p>
 <p>First, let’s wrangle the data so each observation is grouped by age and gender. We’ll create a list column <code>all_weights</code> that consists of every subject’s weight, grouped by age and gender.</p>
-<div class="sourceCode" id="cb592"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb594"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">nhanes</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">gender</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">summarize</span><span class="op">(</span>all_weights <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">weight</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>Now that we have a list column, we can use it as the input to <code>map()</code>, outputting another list column. Let’s say we wanted a new list column, <code>log_weights</code>, which takes the logarithmic value of each weight observation.</p>
-<div class="sourceCode" id="cb593"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb595"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">nhanes</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">gender</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">summarize</span><span class="op">(</span>all_weights <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">weight</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -382,7 +382,7 @@
 ## ℹ The error occurred in group 1: age = 0.</code></pre>
 <p>Again, this is because the <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> function is ill-equipped to handle lists. We could have avoided creating the list-columns in the first place and found the log weight of each observation, but then we would be losing out on the grouping ability of lists. Do you see how <code>map_*</code> functions are equipped to handle inputs different from <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code>?</p>
 <p>You can also use <code>map_*</code> functions to take a list column as an input and return an atomic vector – a column with a single value per observation – as an output. For instance, let’s say we now wanted the mean of the log weights:</p>
-<div class="sourceCode" id="cb595"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb597"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">nhanes</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">gender</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">summarize</span><span class="op">(</span>all_weights <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">weight</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -390,7 +390,7 @@
          mean_log_weights <span class="op">=</span> <span class="fu">map_dbl</span><span class="op">(</span><span class="va">log_weights</span>, <span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>Here, we also see that the <code>map_*</code> functions have the <code>...</code> argument, which allows <code>na.rm = TRUE</code> to be passed along to <code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code>.
 What if we wanted to extract the top five log weights per row?</p>
-<div class="sourceCode" id="cb596"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb598"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">nhanes</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">gender</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">summarize</span><span class="op">(</span>all_weights <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">weight</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -424,7 +424,7 @@ What if we wanted to extract the top five log weights per row?</p>
 <p>We can create functions that do operations “on the fly” without bothering to give them a name. These nameless functions are called <a href="https://coolbutuseless.github.io/2019/03/13/anonymous-functions-in-r-part-1/">anonymous functions.</a></p>
 <p>You can use anonymous functions in conjunction with the <code>map_*</code> family of functions. They’re commonly used to conduct mathematical operations repeatedly.</p>
 <p>You can call an anonymous function using a <code><a href="https://rdrr.io/r/base/tilde.html">~</a></code> operator and then using a <code>.</code> to represent the current element.</p>
-<div class="sourceCode" id="cb597"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb599"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">tibble</span><span class="op">(</span>old <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">7</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>new <span class="op">=</span> <span class="fu">map_dbl</span><span class="op">(</span><span class="va">old</span>, <span class="op">~</span> <span class="op">(</span><span class="va">.</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 3 x 2
@@ -434,7 +434,7 @@ What if we wanted to extract the top five log weights per row?</p>
 ## 2     7     8
 ## 3     2     3</code></pre>
 <p>Note that the parentheses are not necessary. As long as everything after the <code><a href="https://rdrr.io/r/base/tilde.html">~</a></code> works as R code, the anonymous function should work, each time replace the <code>.</code> with the value of the <code>.x</code> variable — which is <code>old</code> in this case — with its value in that row.</p>
-<div class="sourceCode" id="cb599"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb601"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">tibble</span><span class="op">(</span>old <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">7</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>new <span class="op">=</span> <span class="fu">map_dbl</span><span class="op">(</span><span class="va">old</span>, <span class="op">~</span> <span class="va">.</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 3 x 2
@@ -445,12 +445,12 @@ What if we wanted to extract the top five log weights per row?</p>
 ## 3     2     3</code></pre>
 <p>The <code><a href="https://rdrr.io/r/base/tilde.html">~</a></code> shorthand is very convenient once you get used to it. Let’s see it in an example. We’ll use the <code>weather</code> dataset in the <code>nycflights13</code> package. Let’s say that we want to return a list-column with all the recorded temperatures in a day in Celsius and basic summary statistics.</p>
 <p>First, let’s wrangle the data so each observation is a day rather than an hour. We will do so by selecting for the necessary variables and grouping by <code>origin</code>, <code>year</code>, <code>month</code>, and <code>day</code>.</p>
-<div class="sourceCode" id="cb601"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb603"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">weather</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">origin</span>, <span class="va">year</span>, <span class="va">month</span>, <span class="va">day</span>, <span class="va">temp</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">origin</span>, <span class="va">year</span>, <span class="va">month</span>, <span class="va">day</span><span class="op">)</span></code></pre></div>
 <p>Next, we’ll create a list column <code>temps_F</code> that consists of all the temperatures recorded that day at a particular origin. Note that the temperatures are Fahrenheit by default.</p>
-<div class="sourceCode" id="cb602"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb604"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">weather</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">origin</span>, <span class="va">year</span>, <span class="va">month</span>, <span class="va">day</span>, <span class="va">temp</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">origin</span>, <span class="va">year</span>, <span class="va">month</span>, <span class="va">day</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -472,7 +472,7 @@ What if we wanted to extract the top five log weights per row?</p>
 ## # … with 1,082 more rows</code></pre>
 <p>Now that we have a list-column, we can use it as the input to <code>map()</code>, outputting another list-column. Let’s say we wanted a new list-column, <code>temps_C</code>, which records the temperature in Celsius.</p>
 <p>The formula to convert from Fahrenheit to Celsius is <span class="math inline">\(\frac{(F-32)*5}{9}\)</span>. Let’s “eyeball” the results using <code><a href="https://rdrr.io/r/utils/str.html">str()</a></code>.</p>
-<div class="sourceCode" id="cb604"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb606"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">weather</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">origin</span>, <span class="va">year</span>, <span class="va">month</span>, <span class="va">day</span>, <span class="va">temp</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">origin</span>, <span class="va">year</span>, <span class="va">month</span>, <span class="va">day</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -494,7 +494,7 @@ What if we wanted to extract the top five log weights per row?</p>
 ## 10 EWR     2013     1    10 &lt;dbl [24]&gt; &lt;dbl [24]&gt;
 ## # … with 1,082 more rows</code></pre>
 <p>Let’s “eyeball” the first few results using <code><a href="https://rdrr.io/r/utils/str.html">str()</a></code>.</p>
-<div class="sourceCode" id="cb606"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb608"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">weather</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">origin</span>, <span class="va">year</span>, <span class="va">month</span>, <span class="va">day</span>, <span class="va">temp</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">origin</span>, <span class="va">year</span>, <span class="va">month</span>, <span class="va">day</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -527,48 +527,48 @@ What if we wanted to extract the top five log weights per row?</p>
 <span class="header-section-number">3.3.2</span> Creating your own functions<a class="anchor" aria-label="anchor" href="#creating-your-own-functions"><i class="fas fa-link"></i></a>
 </h3>
 <p>There are plenty of built-in functions in R, such as the ones mentioned above. You can also create your own custom functions, which may look something like this:</p>
-<div class="sourceCode" id="cb608"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb610"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">add_one_and_one</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
   <span class="fl">1</span> <span class="op">+</span> <span class="fl">1</span>
 <span class="op">}</span>
 <span class="fu">add_one_and_one</span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p>You just created a function! This function will return <code>1+1</code> whenever called.</p>
 <p>Now what if we wanted to leave some mystery in the function? That is to say, we want to add the number 6 to a value <code>x</code>, that the user provides for us.</p>
-<div class="sourceCode" id="cb609"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb611"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">add_six_to_something</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span>
   <span class="va">x</span> <span class="op">+</span> <span class="fl">6</span>
 <span class="op">}</span>
 <span class="fu">add_six_to_something</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 7</code></pre>
 <p>Congratulations! You have incorporated your first <strong>formal argument</strong>. Formal arguments in functions are additional parameters that allow the user to customize the use of your function. Instead of adding 1+1 over and over again, your function takes in a number <code>x</code> that the user defines and adds 6. Now let’s drive it home and make a function with <em>two</em> formal arguments.</p>
-<div class="sourceCode" id="cb611"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb613"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">add_x_to_y</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span><span class="op">)</span> <span class="op">{</span>
   <span class="va">x</span> <span class="op">+</span> <span class="va">y</span>
 <span class="op">}</span>
 
 <span class="fu">add_x_to_y</span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 3</code></pre>
-<div class="sourceCode" id="cb613"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb615"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">add_x_to_y</span><span class="op">(</span><span class="fl">4</span>,<span class="fl">3</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 7</code></pre>
 <p>Great work! Now let’s create an example that we will apply to the <code>kenya</code> dataset.</p>
 <p>What if we were interested in taking the difference between the highest poverty rate and the lowest poverty rate? First, develop some working code for interactive use, using a representative input. Use the <code>poverty</code> variable. Built-in R functions that will be useful: <code><a href="https://rdrr.io/r/base/Extremes.html">min()</a></code>, <code><a href="https://rdrr.io/r/base/Extremes.html">max()</a></code>, <code><a href="https://rdrr.io/r/base/range.html">range()</a></code>.</p>
-<div class="sourceCode" id="cb615"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb617"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">min</a></span><span class="op">(</span><span class="va">kenya</span><span class="op">$</span><span class="va">poverty</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 0.18</code></pre>
-<div class="sourceCode" id="cb617"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb619"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">kenya</span><span class="op">$</span><span class="va">poverty</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 0.9</code></pre>
-<div class="sourceCode" id="cb619"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb621"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/range.html">range</a></span><span class="op">(</span><span class="va">kenya</span><span class="op">$</span><span class="va">poverty</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 0.18 0.90</code></pre>
-<div class="sourceCode" id="cb621"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb623"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">kenya</span><span class="op">$</span><span class="va">poverty</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">min</a></span><span class="op">(</span><span class="va">kenya</span><span class="op">$</span><span class="va">poverty</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 0.72</code></pre>
-<div class="sourceCode" id="cb623"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb625"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/range.html">range</a></span><span class="op">(</span><span class="va">kenya</span><span class="op">$</span><span class="va">poverty</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html">range</a></span><span class="op">(</span><span class="va">kenya</span><span class="op">$</span><span class="va">poverty</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></code></pre></div>
 <pre><code>## [1] 0.72</code></pre>
-<div class="sourceCode" id="cb625"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb627"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/diff.html">diff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/range.html">range</a></span><span class="op">(</span><span class="va">kenya</span><span class="op">$</span><span class="va">poverty</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 0.72</code></pre>
 <p>Internalize this “answer” because our informal testing relies on you noticing departures from this.</p>
@@ -579,7 +579,7 @@ What if we wanted to extract the top five log weights per row?</p>
 </h3>
 <p>This image — widely attributed to the Spotify development team — conveys an important point.</p>
 <div class="figure" style="text-align: center">
-<span id="fig:unnamed-chunk-360"></span>
+<span id="fig:unnamed-chunk-361"></span>
 <img src="03-functions/images/mvp.jpg" alt="From [Your ultimate guide to Minimum Viable Product (+great examples)](https://blog.fastmonkeys.com/2014/06/18/minimum-viable-product-your-ultimate-guide-to-mvp-great-examples/)" width="60%"><p class="caption">
 FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable-product-your-ultimate-guide-to-mvp-great-examples/">Your ultimate guide to Minimum Viable Product (+great examples)</a>
 </p>
@@ -595,20 +595,20 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
 <span class="header-section-number">3.3.4</span> Turn the working interactive code into a function<a class="anchor" aria-label="anchor" href="#turn-the-working-interactive-code-into-a-function"><i class="fas fa-link"></i></a>
 </h3>
 <p>Add NO new functionality! Just write your very first R function.</p>
-<div class="sourceCode" id="cb627"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb629"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">max_minus_min</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">min</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
 <span class="fu">max_minus_min</span><span class="op">(</span><span class="va">kenya</span><span class="op">$</span><span class="va">poverty</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 0.72</code></pre>
 <p>Check that you’re getting the same answer as you did with your interactive code. Test it eyeball-o-metrically at this point.</p>
 <p>One thing to note about functions is that functions have selective memory. In fact, functions only “remember” what happens within the function itself.</p>
 <p>For example, I have saved value <code>x</code> as 1.</p>
-<div class="sourceCode" id="cb629"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb631"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">x</span> <span class="op">&lt;-</span> <span class="fl">1</span></code></pre></div>
 <p>Defining <code>x</code> inside a function will not change its value outside of the function.</p>
-<div class="sourceCode" id="cb630"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb632"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span> <span class="op">&lt;-</span> <span class="fl">2</span></code></pre></div>
 <pre><code>## function(x) x &lt;- 2</code></pre>
-<div class="sourceCode" id="cb632"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb634"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">x</span></code></pre></div>
 <pre><code>## [1] 1</code></pre>
 </div>
@@ -621,10 +621,10 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
 <span class="header-section-number">3.3.5.1</span> Test on new inputs<a class="anchor" aria-label="anchor" href="#test-on-new-inputs"><i class="fas fa-link"></i></a>
 </h4>
 <p>Pick some new artificial inputs where you know (at least approximately) what your function should return.</p>
-<div class="sourceCode" id="cb634"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb636"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">max_minus_min</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 9</code></pre>
-<div class="sourceCode" id="cb636"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb638"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">max_minus_min</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">1000</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 1</code></pre>
 <p>I know that 10 minus 1 is 9. I know that random uniform [0, 1] variates will be between 0 and 1. Therefore max - min should be less than 1. If I take LOTS of them, max - min should be pretty close to 1.</p>
@@ -635,10 +635,10 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
 <span class="header-section-number">3.3.5.2</span> Test on real data but <em>different</em> real data<a class="anchor" aria-label="anchor" href="#test-on-real-data-but-different-real-data"><i class="fas fa-link"></i></a>
 </h4>
 <p>Back to the real world now. Two additional quantitative variables are lying around: <code>distance</code> and <code>rv13</code>. Let’s have a go.</p>
-<div class="sourceCode" id="cb638"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb640"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">max_minus_min</span><span class="op">(</span><span class="va">kenya</span><span class="op">$</span><span class="va">distance</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 179</code></pre>
-<div class="sourceCode" id="cb640"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb642"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">max_minus_min</span><span class="op">(</span><span class="va">kenya</span><span class="op">$</span><span class="va">rv13</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 6764</code></pre>
 <p>Either check these results “by hand” or apply the “does that even make sense?” test.</p>
@@ -648,20 +648,20 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
 <span class="header-section-number">3.3.5.3</span> Test on weird stuff<a class="anchor" aria-label="anchor" href="#test-on-weird-stuff"><i class="fas fa-link"></i></a>
 </h4>
 <p>Now we try to break our function. Don’t get truly diabolical (yet). Just make the kind of mistakes you can imagine making at 2am when, 3 years from now, you rediscover this useful function you wrote. Give your function inputs it’s not expecting.</p>
-<div class="sourceCode" id="cb642"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb644"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">max_minus_min</span><span class="op">(</span><span class="va">kenya</span><span class="op">)</span></code></pre></div>
 <pre><code>## Error in FUN(X[[i]], ...): only defined on a data frame with all numeric variables</code></pre>
-<div class="sourceCode" id="cb644"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb646"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Hey, sometimes things "just work" on data.frames!</span>
 
 <span class="fu">max_minus_min</span><span class="op">(</span><span class="va">kenya</span><span class="op">$</span><span class="va">treatment</span><span class="op">)</span></code></pre></div>
 <pre><code>## Error in Summary.factor(structure(c(2L, 4L, 3L, 5L, 4L, 3L, 6L, 2L, 1L, : 'max' not meaningful for factors</code></pre>
-<div class="sourceCode" id="cb646"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb648"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Factors are kind of like integer vectors, no?</span>
 
 <span class="fu">max_minus_min</span><span class="op">(</span><span class="st">"eggplants are purple"</span><span class="op">)</span></code></pre></div>
 <pre><code>## Error in max(x) - min(x): non-numeric argument to binary operator</code></pre>
-<div class="sourceCode" id="cb648"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb650"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># I have no excuse for this one</span></code></pre></div>
 <p>How happy are you with those error messages? You must imagine that some entire <strong>script</strong> has failed and that you were hoping to just <code><a href="https://rdrr.io/r/base/source.html">source()</a></code> it without re-reading it. If a colleague or future you encountered these errors, do you run screaming from the room? How hard is it to pinpoint the usage problem?</p>
 </div>
@@ -670,10 +670,10 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
 <span class="header-section-number">3.3.5.4</span> I will scare you now<a class="anchor" aria-label="anchor" href="#i-will-scare-you-now"><i class="fas fa-link"></i></a>
 </h4>
 <p>Here are some great examples where the function <strong>should break but it does not.</strong></p>
-<div class="sourceCode" id="cb649"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb651"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">max_minus_min</span><span class="op">(</span><span class="va">kenya</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'poverty'</span>, <span class="st">'distance'</span>, <span class="st">'rv13'</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 6764</code></pre>
-<div class="sourceCode" id="cb651"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb653"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">max_minus_min</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="cn">TRUE</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>, <span class="cn">TRUE</span>, <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 1</code></pre>
 <p>In both cases, R’s eagerness to make sense of our requests is unfortunately successful. In the first case, a tibble containing just the quantitative variables is eventually coerced into numeric vector. We can compute max minus min, even though it makes absolutely no sense at all. In the second case, a logical vector is converted to zeroes and ones, which might merit an error or at least a warning.</p>
@@ -692,23 +692,23 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
 <span class="header-section-number">3.3.6.1</span> <code>stopifnot()</code><a class="anchor" aria-label="anchor" href="#stopifnot"><i class="fas fa-link"></i></a>
 </h4>
 <p><code><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot()</a></code> is the entry level solution. We use it here to make sure the input <code>x</code> is a numeric vector.</p>
-<div class="sourceCode" id="cb653"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb655"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mmm</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">is.numeric</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>
   <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">min</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
 <span class="op">}</span>
 <span class="fu">mmm</span><span class="op">(</span><span class="va">kenya</span><span class="op">)</span></code></pre></div>
 <pre><code>## Error in mmm(kenya): is.numeric(x) is not TRUE</code></pre>
-<div class="sourceCode" id="cb655"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb657"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">mmm</span><span class="op">(</span><span class="va">kenya</span><span class="op">$</span><span class="va">treatment</span><span class="op">)</span></code></pre></div>
 <pre><code>## Error in mmm(kenya$treatment): is.numeric(x) is not TRUE</code></pre>
-<div class="sourceCode" id="cb657"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb659"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">mmm</span><span class="op">(</span><span class="st">"eggplants are purple"</span><span class="op">)</span></code></pre></div>
 <pre><code>## Error in mmm("eggplants are purple"): is.numeric(x) is not TRUE</code></pre>
-<div class="sourceCode" id="cb659"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb661"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">mmm</span><span class="op">(</span><span class="va">kenya</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'poverty'</span>, <span class="st">'distance'</span>, <span class="st">'rv13'</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></code></pre></div>
 <pre><code>## Error in mmm(kenya[c("poverty", "distance", "rv13")]): is.numeric(x) is not TRUE</code></pre>
-<div class="sourceCode" id="cb661"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb663"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">mmm</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="cn">TRUE</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>, <span class="cn">TRUE</span>, <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## Error in mmm(c(TRUE, TRUE, FALSE, TRUE, TRUE)): is.numeric(x) is not TRUE</code></pre>
 <p>And we see that it catches all of the self-inflicted damage we would like to avoid.</p>
@@ -718,7 +718,7 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
 <span class="header-section-number">3.3.6.2</span> if then stop<a class="anchor" aria-label="anchor" href="#if-then-stop"><i class="fas fa-link"></i></a>
 </h4>
 <p><code><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot()</a></code> doesn’t provide a very good error message. The next approach is very widely used. Put your validity check inside an <code>if()</code> statement and call <code><a href="https://rdrr.io/r/base/stop.html">stop()</a></code> yourself, with a custom error message, in the body.</p>
-<div class="sourceCode" id="cb663"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb665"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mmm2</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span>
   <span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">is.numeric</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
     <span class="kw"><a href="https://rdrr.io/r/base/stop.html">stop</a></span><span class="op">(</span><span class="st">'I am so sorry, but this function only works for numeric input!\n'</span>,
@@ -749,31 +749,31 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
 <p>In this section, we create a new function, generalize it, and learn more technical details about R functions.</p>
 <p>Our goal is to write a function that simulates throwing dice.</p>
 <p>We will begin by creating a minimally viable function, <code>starter_die()</code>, which throws one die one time.</p>
-<div class="sourceCode" id="cb665"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb667"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">starter_die</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, <span class="fl">1</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
 <p>From here, we can add a formal argument <code>n</code>, which requires the number of dice to be specified. However, if more than one dice is thrown, we want to make sure that any number from <code>1-6</code> has the chance of being returned. To do so, make sure the <code>replace</code> argument in <code><a href="https://rdrr.io/r/base/sample.html">sample()</a></code> is set to <code>TRUE</code>. Now we have generalized the function <code>starter_dice()</code>!</p>
-<div class="sourceCode" id="cb666"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb668"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">starter_die</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, <span class="va">n</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
 <p>What if we wanted to add a formal argument, <code>n</code>, that would be passed into <code><a href="https://rdrr.io/r/base/sample.html">sample()</a></code>’s n specification? Now let’s create an intermediate function <code>add_dice()</code> which throws n dice and adds the results.</p>
-<div class="sourceCode" id="cb667"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb669"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">add_dice</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, <span class="va">n</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
 <p>Congratulations! We have just generalized our function to take in any number of dice. But wait… is it really <em>any</em> value? Let’s add in a few checks that make sure no weird inputs break our function.</p>
-<div class="sourceCode" id="cb668"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb670"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">add_dice</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">is.numeric</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span>
   <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, <span class="va">n</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
-<div class="sourceCode" id="cb669"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb671"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">add_dice</span><span class="op">(</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span></code></pre></div>
 <pre><code>## Error in sample.int(length(x), size, replace, prob): invalid 'size' argument</code></pre>
 <p>Oops! As you can see, we tried to use a negative number of dice, which will not fly. Let’s alter the informal checks to stop the function if <code>n</code> is negative.</p>
-<div class="sourceCode" id="cb671"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb673"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">add_dice</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">is.numeric</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span>
   <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="va">n</span> <span class="op">&gt;=</span> <span class="fl">0</span><span class="op">)</span>
@@ -785,7 +785,7 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
 <span class="header-section-number">3.4.1</span> Argument names: freedom and conventions<a class="anchor" aria-label="anchor" href="#argument-names-freedom-and-conventions"><i class="fas fa-link"></i></a>
 </h3>
 <p>Understand the importance of argument names. We can name my arguments almost anything we like. Proof:</p>
-<div class="sourceCode" id="cb672"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb674"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">add_dice</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">bob_ross</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">is.numeric</a></span><span class="op">(</span><span class="va">bob_ross</span><span class="op">)</span><span class="op">)</span>
   <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="va">bob_ross</span> <span class="op">&gt;=</span> <span class="fl">0</span><span class="op">)</span>
@@ -803,21 +803,21 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
 <span class="header-section-number">3.4.2</span> Default values: freedom to NOT specify the arguments<a class="anchor" aria-label="anchor" href="#default-values-freedom-to-not-specify-the-arguments"><i class="fas fa-link"></i></a>
 </h3>
 <p>What happens if we call our function but neglect to specify the probabilities?</p>
-<div class="sourceCode" id="cb674"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb676"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">add_dice</span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## Error in stopifnot(is.numeric(bob_ross)): argument "bob_ross" is missing, with no default</code></pre>
 <p>Oops! At the moment, this causes a fatal error. It can be nice to provide some reasonable default values for certain arguments. Setting <code>n = 1</code> is a reasonable default value.</p>
-<div class="sourceCode" id="cb676"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb678"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">add_dice</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n</span> <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">is.numeric</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span>
   <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="va">n</span> <span class="op">&gt;=</span> <span class="fl">0</span><span class="op">)</span>
   <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, <span class="va">n</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
 <p>Again we check how the function works by specifying <code>n</code> and not specifying <code>n</code>.</p>
-<div class="sourceCode" id="cb677"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb679"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">add_dice</span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 1</code></pre>
-<div class="sourceCode" id="cb679"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb681"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">add_dice</span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 30</code></pre>
 <p>Note that you do not necessarily need to supply the argument name. R tries its best to understand you based on the order you provide your argument values in. However, it is usually best practice to specify the argument name.</p>
@@ -827,14 +827,14 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
 <span class="header-section-number">3.4.3</span> Wrap-up and what’s next?<a class="anchor" aria-label="anchor" href="#wrap-up-and-whats-next"><i class="fas fa-link"></i></a>
 </h3>
 <p>Here’s the function we’ve written so far:</p>
-<div class="sourceCode" id="cb681"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb683"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">add_dice</span></code></pre></div>
 <pre><code>## function(n = 1) {
 ##   stopifnot(is.numeric(n))
 ##   stopifnot(n &gt;= 0)
 ##   sum(sample(1:6, n, replace = TRUE))
 ## }
-## &lt;bytecode: 0x7fd748ba6cd8&gt;</code></pre>
+## &lt;bytecode: 0x7fd2e2e62520&gt;</code></pre>
 <p>What we’ve accomplished:</p>
 <ul>
 <li>We’ve generalized our dice throwing function to take in a custom value for <code>n</code>
@@ -857,13 +857,13 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
 <p>The [testthat][testthat-web] package ([CRAN][testthat-cran]; [GitHub][testthat-github]) provides excellent facilities for this, with a distinct emphasis on automated unit testing of entire packages. However, we can take it out for a test drive even with our one measly function.</p>
 <p>We will construct a test with <code><a href="https://testthat.r-lib.org/reference/test_that.html">test_that()</a></code> and, within it, we put one or more <em>expectations</em> that check actual against expected results. You simply harden your informal, interactive tests into formal unit tests. Here are some examples of tests and indicative expectations.</p>
 <p>Let’s keep our very first function around as a baseline.</p>
-<div class="sourceCode" id="cb683"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb685"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">add_dice</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n</span> <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">is.numeric</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span>
   <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="va">n</span> <span class="op">&gt;=</span> <span class="fl">0</span><span class="op">)</span>
   <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, <span class="va">n</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
-<div class="sourceCode" id="cb684"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb686"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://testthat.r-lib.org">testthat</a></span><span class="op">)</span>
 
 <span class="fu"><a href="https://testthat.r-lib.org/reference/test_that.html">test_that</a></span><span class="op">(</span><span class="st">'invalid args are detected'</span>, <span class="op">{</span>
@@ -872,7 +872,7 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
 <span class="op">}</span><span class="op">)</span></code></pre></div>
 <pre><code>## Test passed 🌈</code></pre>
 <p>No news is good news! Let’s see what test failure would look like. Let’s revert to a version of our function that does not check for a positive <code>n</code> value and test it. We can watch it fail.</p>
-<div class="sourceCode" id="cb686"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb688"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">add_dice</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n</span> <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">is.numeric</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span>
   <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, <span class="va">n</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
@@ -887,17 +887,17 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
 <span class="header-section-number">3.5.2</span> What a function returns<a class="anchor" aria-label="anchor" href="#what-a-function-returns"><i class="fas fa-link"></i></a>
 </h3>
 <p>By default, a function returns the result of the last line of the body. We are just letting that happen with the line <code><a href="https://rdrr.io/r/base/sum.html">sum(sample(1:6, n, replace = TRUE))</a></code>. However, there is an explicit function for this: <code><a href="https://rdrr.io/r/base/function.html">return()</a></code>. We could just as easily make this the last line of my function’s body:</p>
-<div class="sourceCode" id="cb688"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb690"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, <span class="va">n</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>You absolutely must use <code><a href="https://rdrr.io/r/base/function.html">return()</a></code> if you want to return early based on some condition, i.e. before execution gets to the last line of the body. Otherwise, you can decide your own conventions about when you use <code><a href="https://rdrr.io/r/base/function.html">return()</a></code> and when you don’t.</p>
 <p>Right now, running <code>add_dice(5)</code> gives us an integer. What if we want the output to be a list of each roll outcome?</p>
-<div class="sourceCode" id="cb689"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb691"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">show_dice</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n</span> <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">is.numeric</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span>
   <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="va">n</span> <span class="op">&gt;=</span> <span class="fl">0</span><span class="op">)</span>
   <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, <span class="va">n</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
-<div class="sourceCode" id="cb690"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb692"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">show_dice</span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></code></pre></div>
 <pre><code>## [[1]]
 ## [1] 2 5 6 3 6</code></pre>
@@ -908,22 +908,22 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
 <span class="header-section-number">3.5.3</span> Handling <code>NA</code>s<a class="anchor" aria-label="anchor" href="#handling-nas"><i class="fas fa-link"></i></a>
 </h3>
 <p>The upside to creating our own dice-rolling function is that there have been no missing values. In real life, missing data will make your life a living hell. If you are lucky, it will be properly indicated by the special value <code>NA</code>, but don’t hold your breath. Many built-in R functions have an <code>na.rm =</code> argument through which you can specify how you want to handle <code>NA</code>s. Typically the default value is <code>na.rm = FALSE</code> and typical default behavior is to either let <code>NA</code>s propagate or to raise an error. Let’s see how <code><a href="https://rdrr.io/r/stats/quantile.html">quantile()</a></code> handles <code>NA</code>s:</p>
-<div class="sourceCode" id="cb692"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb694"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">z</span> <span class="op">&lt;-</span> <span class="va">kenya</span><span class="op">$</span><span class="va">poverty</span>
 <span class="va">z</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA</span>
 <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html">quantile</a></span><span class="op">(</span><span class="va">kenya</span><span class="op">$</span><span class="va">poverty</span><span class="op">)</span></code></pre></div>
 <pre><code>##   0%  25%  50%  75% 100% 
 ## 0.18 0.35 0.43 0.49 0.90</code></pre>
-<div class="sourceCode" id="cb694"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb696"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/quantile.html">quantile</a></span><span class="op">(</span><span class="va">z</span><span class="op">)</span></code></pre></div>
 <pre><code>## Error in quantile.default(z): missing values and NaN's not allowed if 'na.rm' is FALSE</code></pre>
-<div class="sourceCode" id="cb696"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb698"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/quantile.html">quantile</a></span><span class="op">(</span><span class="va">z</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <pre><code>##   0%  25%  50%  75% 100% 
 ## 0.18 0.35 0.43 0.49 0.90</code></pre>
 <p>So <code><a href="https://rdrr.io/r/stats/quantile.html">quantile()</a></code> simply will not operate in the presence of <code>NA</code>s unless <code>na.rm = TRUE</code>. How shall we modify our function?</p>
 <p>If we wanted to hardwire <code>na.rm = TRUE</code>, we could. Focus on our call to <code><a href="https://rdrr.io/r/stats/quantile.html">quantile()</a></code> inside our definition of a new function, <code>quantile_diff()</code>.</p>
-<div class="sourceCode" id="cb698"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb700"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">quantile_diff</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">probs</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">is.numeric</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>
   <span class="va">the_quantiles</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html">quantile</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">probs</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
@@ -931,12 +931,12 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
 <span class="op">}</span>
 <span class="fu">quantile_diff</span><span class="op">(</span><span class="va">kenya</span><span class="op">$</span><span class="va">poverty</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 0.72</code></pre>
-<div class="sourceCode" id="cb700"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb702"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">quantile_diff</span><span class="op">(</span><span class="va">z</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 0.72</code></pre>
 <p>This works but it is dangerous to invert the default behavior of a well-known built-in function and to provide the user with no way to override this.</p>
 <p>We could add an <code>na.rm =</code> argument to our own function. We might even enforce our preferred default – but at least we’re giving the user a way to control the behavior around <code>NA</code>s.</p>
-<div class="sourceCode" id="cb702"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb704"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">quantile_diff</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">probs</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, <span class="va">na.rm</span> <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">is.numeric</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>
   <span class="va">the_quantiles</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html">quantile</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">probs</span>, na.rm <span class="op">=</span> <span class="va">na.rm</span><span class="op">)</span>
@@ -944,10 +944,10 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
 <span class="op">}</span>
 <span class="fu">quantile_diff</span><span class="op">(</span><span class="va">kenya</span><span class="op">$</span><span class="va">poverty</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 0.72</code></pre>
-<div class="sourceCode" id="cb704"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb706"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">quantile_diff</span><span class="op">(</span><span class="va">z</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 0.72</code></pre>
-<div class="sourceCode" id="cb706"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb708"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">quantile_diff</span><span class="op">(</span><span class="va">z</span>, na.rm <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 <pre><code>## Error in quantile.default(x, probs, na.rm = na.rm): missing values and NaN's not allowed if 'na.rm' is FALSE</code></pre>
 </div>
@@ -962,26 +962,26 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
 </h3>
 <p>In this section, we will be bringing together <code>map_*</code> functions, list-columns, and function writing. We’ll also be introducing some important conditional functions (<code><a href="https://rdrr.io/r/base/ifelse.html">ifelse()</a></code>, <code><a href="https://rdrr.io/r/base/any.html">any()</a></code>, <code><a href="https://rdrr.io/r/base/all.html">all()</a></code>, and <code>case_when()</code>).</p>
 <p>Let’s return to our dice-throwing function, <code>add_dice()</code>.</p>
-<div class="sourceCode" id="cb708"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb710"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">add_dice</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n</span> <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">is.numeric</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span>
   <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="va">n</span> <span class="op">&gt;=</span> <span class="fl">0</span><span class="op">)</span>
   <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, <span class="va">n</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
 <p>Next, we will create <code>roll_dice()</code>, which calls <code>add_dice(n = 2)</code> as many times as the user specifies. To do so, we will be combining the <code><a href="https://rdrr.io/r/base/rep.html">rep()</a></code> function with <code>map_int()</code>.</p>
-<div class="sourceCode" id="cb709"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb711"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">roll_dice</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n</span> <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">is.numeric</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span>
   <span class="fu">map_int</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">2</span>, <span class="va">n</span><span class="op">)</span>, <span class="va">add_dice</span><span class="op">)</span>
 <span class="op">}</span>
 <span class="fu">roll_dice</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 11</code></pre>
-<div class="sourceCode" id="cb711"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb713"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">roll_dice</span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 10  8  5  5 10</code></pre>
 <p><code><a href="https://rdrr.io/r/base/rep.html">rep()</a></code> is a useful input to <code>map_*</code> when you want to call a function with the same input multiple times. <code><a href="https://rdrr.io/r/base/rep.html">rep(2, n)</a></code> creates a vector of length n where every element is 2. We use that as the input to <code>map_int()</code> because we want the input to <code>add_dice()</code> to be 2 every time (we are always throwing a pair of dice) and we want to perform the operation n times, chosen by the user.</p>
 <p>Create a tibble named <code>x</code> with one variable: <code>throws</code>. <code>throws</code> is a list column, each element of which is three throws of the dice pair, i.e., the result of calling <code>roll_dice(n = 3)</code>. Thus, our tibble will have ten rows and two columns.</p>
-<div class="sourceCode" id="cb713"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb715"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>throws <span class="op">=</span> <span class="fu">map</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">10</span><span class="op">)</span>, <span class="va">roll_dice</span><span class="op">)</span><span class="op">)</span>
 <span class="va">x</span></code></pre></div>
 <pre><code>## # A tibble: 10 x 1
@@ -998,7 +998,7 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
 ##  9 &lt;int [3]&gt;
 ## 10 &lt;int [3]&gt;</code></pre>
 <p>Add a variable to <code>x</code> called <code>first_seven</code> which is TRUE if the first roll in <code>throws</code> is a 7.</p>
-<div class="sourceCode" id="cb715"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb717"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org">magrittr</a></span><span class="op">)</span>
 
 <span class="co"># The magrittr package allows us to use %&lt;&gt;%, the compound assignment pipe</span>
@@ -1008,12 +1008,12 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>first_seven <span class="op">=</span> <span class="fu">map_lgl</span><span class="op">(</span><span class="va">throws</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">.</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">==</span> <span class="fl">7</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>We see here that <code>[[1]]</code> is how we extract the first element of a list, just like <code>[1]</code> extracts the first element of an atomic vector. <code><a href="https://rdrr.io/r/base/ifelse.html">ifelse()</a></code> takes as its first argument a condition; if it is TRUE it returns the second argument (here TRUE) and if not the third (here FALSE).</p>
 <p>Add a variable to <code>x</code> called <code>a_winner</code> which is TRUE if at least one of the three throws is a 7 or an 11 and is FALSE otherwise.</p>
-<div class="sourceCode" id="cb716"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb718"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">x</span> <span class="op">%&lt;&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>a_winner <span class="op">=</span> <span class="fu">map_lgl</span><span class="op">(</span><span class="va">throws</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/any.html">any</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">7</span>, <span class="fl">11</span><span class="op">)</span> <span class="op">%in%</span> <span class="va">.</span><span class="op">)</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>Here we use <code><a href="https://rdrr.io/r/base/any.html">any()</a></code>: <code><a href="https://rdrr.io/r/base/any.html">any()</a></code> checks if any element in its input is TRUE. So, let’s say a particular throw was 4, 6, and 7: <code>c(7, 11) %in% c(4, 6, 7)</code> returns the vector <code>TRUE FALSE</code> (since 7 is in the vector but 11 isn’t); then, <code><a href="https://rdrr.io/r/base/any.html">any(c(7, 11) %in% c(4, 6, 7))</a></code> returns TRUE because one of the conditions is TRUE.</p>
 <p>Run <code><a href="https://rdrr.io/r/utils/str.html">str()</a></code> on <code>x</code> and show the results.</p>
-<div class="sourceCode" id="cb717"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb719"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></code></pre></div>
 <pre><code>## tibble [10 × 3] (S3: tbl_df/tbl/data.frame)
 ##  $ throws     :List of 10
@@ -1035,7 +1035,7 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
 <span class="header-section-number">3.6.2</span> Running Simulations<a class="anchor" aria-label="anchor" href="#running-simulations"><i class="fas fa-link"></i></a>
 </h3>
 <p>Calculate how “surprised” you should be if someone rolls three winners in a row. First, create a tibble with 10,000 rows. Include a <code>throws</code> list column with three throws of our dice, just as in part a). Second, create a column called <code>perfection</code> which is TRUE if all three of the throws are either 7 or 11.</p>
-<div class="sourceCode" id="cb719"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb721"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">surprised</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>throws <span class="op">=</span> <span class="fu">map</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">10000</span><span class="op">)</span>, <span class="va">roll_dice</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>perfection <span class="op">=</span> <span class="fu">map_lgl</span><span class="op">(</span><span class="va">throws</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.html">all</a></span><span class="op">(</span><span class="va">.</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">7</span>, <span class="fl">11</span><span class="op">)</span><span class="op">)</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 
@@ -1046,7 +1046,7 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
 <p>Here, we use <code><a href="https://rdrr.io/r/base/all.html">all()</a></code>, which has the same structure as <code><a href="https://rdrr.io/r/base/any.html">any()</a></code>, but checks whether <em>all</em> the elements in the input are TRUE.</p>
 <p>Approximately 1.1% of three rolls of a pair of fair dice are all equal to either 7 or 11.</p>
 <p>Your friend proposes the following bet. You will roll a pair of fair dice 10 times. Side A gets the second highest of the first 4 rolls. Side B gets 1 plus the the median of the remaining 6 rolls. Which side is more likely to win? What’s the chance of a tie?</p>
-<div class="sourceCode" id="cb721"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb723"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">bet</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>throws <span class="op">=</span> <span class="fu">map</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">10000</span><span class="op">)</span>, <span class="va">roll_dice</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>A <span class="op">=</span> <span class="fu">map_dbl</span><span class="op">(</span><span class="va">throws</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html">sort</a></span><span class="op">(</span><span class="va">.</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span>,
          B <span class="op">=</span> <span class="fu">map_dbl</span><span class="op">(</span><span class="va">throws</span>, <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html">median</a></span><span class="op">(</span><span class="va">.</span><span class="op">[</span><span class="fl">5</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>,
@@ -1058,7 +1058,7 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
           <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">bet</span><span class="op">$</span><span class="va">winner</span> <span class="op">==</span> <span class="st">"B"</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">bet</span><span class="op">$</span><span class="va">winner</span> <span class="op">==</span> <span class="st">"A"</span><span class="op">)</span> <span class="op">~</span> <span class="st">"B"</span>,
           <span class="cn">TRUE</span> <span class="op">~</span> <span class="st">"Same # Victories"</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "B"</code></pre>
-<div class="sourceCode" id="cb723"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb725"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">bet</span><span class="op">$</span><span class="va">winner</span> <span class="op">==</span> <span class="st">"tie"</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">bet</span><span class="op">$</span><span class="va">winner</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 0.11</code></pre>
 <p>You can think of <code>case_when()</code> as a generalized <code><a href="https://rdrr.io/r/base/ifelse.html">ifelse()</a></code>. The syntax is a little more complicated. Each expression is followed by <code><a href="https://rdrr.io/r/base/tilde.html">~</a></code> and what should be returned if that expression is TRUE. The final expression, TRUE, is always true, and thus is the residual category if none of the above expression are TRUE. Thus, the second <code>case_when()</code> in our above code will print “A” if A is the winner in more replications than B, “B” if B is the winner more than A, and “Same # Victories” otherwise.</p>
@@ -1071,7 +1071,7 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
 </h3>
 <p>Say we are at an establishment known as the Crooked Casino. In a game of craps, you win if you roll 7 or 11 as the sum of a pair of dice. The Crooked Casino is infamous for rigging its games so that it is more difficult to obtain 7 or 11 as a sum. Our job is to write a function that mimics this behavior.</p>
 <p>First, let’s use what we have. We will add a line of code in <code>add_dice()</code> that assigns <code><a href="https://rdrr.io/r/base/sum.html">sum(sample(1:6, n, replace = TRUE))</a></code> to a variable, <code>roll</code>, and returns <code>roll</code>.</p>
-<div class="sourceCode" id="cb725"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb727"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">crooked_dice</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n</span> <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">is.numeric</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span>
   <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="va">n</span> <span class="op">&gt;=</span> <span class="fl">0</span><span class="op">)</span>
@@ -1083,7 +1083,7 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
 <pre><code>## [1] 8</code></pre>
 <p>How is this any different from <code>add_dice()</code>, you may ask? It is not. We are merely assigning the outcome of the roll of a pair of dice to a variable <code>roll</code>, which will be useful in a moment. Recall that functions only “remember” what takes place within themselves. This means that each call of <code>crooked_dice()</code> creates a new variable <code>roll</code> that takes place inside the function.</p>
 <p>Now, let’s use <code><a href="https://rdrr.io/r/base/ifelse.html">ifelse()</a></code> to check whether a 7 or 11 was rolled, and if so, to assign a roll of <code>2</code> instead.</p>
-<div class="sourceCode" id="cb727"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb729"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">crooked_dice</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n</span> <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">is.numeric</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span>
   <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="va">n</span> <span class="op">&gt;=</span> <span class="fl">0</span><span class="op">)</span>
@@ -1092,7 +1092,7 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
 <span class="op">}</span></code></pre></div>
 <p>The Crooked Casino is a bit more sly, however. They know if they have an overtly crooked game of craps that never returned 7 or 11, that no one would play. They want to be a little more subtle about their crookedness, so they determine that only half of the time a 7 or 11 is rolled will the outcome be altered.</p>
 <p>We can simulate this decision by generating a random variable using <code><a href="https://rdrr.io/r/stats/Uniform.html">runif()</a></code> and checking whether the result is greater than or equal to 0.5.</p>
-<div class="sourceCode" id="cb728"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb730"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">crooked_dice</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n</span> <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">is.numeric</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span>
   <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="va">n</span> <span class="op">&gt;=</span> <span class="fl">0</span><span class="op">)</span>
@@ -1100,18 +1100,18 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
   <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="op">(</span><span class="va">roll</span> <span class="op">==</span> <span class="fl">7</span> <span class="op">|</span> <span class="va">roll</span> <span class="op">==</span> <span class="fl">11</span><span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">0.5</span>, <span class="fl">2</span>, <span class="va">roll</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
 <p>Now we can create a function named <code>crooked_craps()</code> that calls <code>crooked_dice()</code> as many times as specified.</p>
-<div class="sourceCode" id="cb729"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb731"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">crooked_craps</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n</span> <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">is.numeric</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span>
   <span class="fu">map_dbl</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">2</span>, <span class="va">n</span><span class="op">)</span>, <span class="va">crooked_dice</span><span class="op">)</span>
 <span class="op">}</span>
 <span class="fu">crooked_craps</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 5</code></pre>
-<div class="sourceCode" id="cb731"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb733"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">crooked_craps</span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 6 7 8 6 6</code></pre>
 <p>It’s hard to tell whether <code>crooked_craps()</code> is working properly by rolling just once, or even ten times. Let’s follow the steps we took above to create a tibble of 10 observations each of 10 rolls named <code>crooked_x</code>.</p>
-<div class="sourceCode" id="cb733"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb735"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">crooked_x</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>throws <span class="op">=</span> <span class="fu">map</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, <span class="va">crooked_craps</span><span class="op">)</span><span class="op">)</span>
 <span class="va">crooked_x</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
