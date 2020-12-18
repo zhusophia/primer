@@ -1,7 +1,10 @@
 # Two Parameters {#two-parameters}
 
+<!-- DK: Get axis labels and titles to use \sigma and \mu -->
 
+<!-- DK: Add a second logistic model after urn, with an explanatory variable this time? Show why posterior_ functions are better than parameter games? -->
 
+<!-- Show posterior_interval() -->
 
 In Chapter \@ref(one-parameter), we learned how to do inference. Given certain assumptions about the problem, we created a joint distribution of the models under consideration and the data which might be observed. Once we observe the data, we go from the joint distribution to the conditional distribution of possible models given the data which we did, in fact, observe. That conditional distribution, suitably normalized, is our posterior probability distribution over the space of possible models. With that distribution, we can answer any question we might (reasonably) ask.
 
@@ -44,6 +47,7 @@ Before starting that process, however, we need to look at the data we have.
 
 ### EDA for `nhanes`
 
+<!-- DK: This EDA is not very good and does not build naturally to where we want to be. -->
 
 Let's look at the `nhanes` dataset from the National Health and Nutrition Examination Survey conducted by the Centers for Disease Control and Prevention and covering children and adults in the United States. 
 
@@ -90,7 +94,7 @@ nhanes %>%
   skim()
 ```
 
-Interesting! There are 353 missing values of height in our subset of data. Just using `glimpse()` does not show us that.  Let's filter out the NA's using `drop_na`. This will delete the rows in which the value of any variable is missing. For simplicity, let's only consider adults.
+Interesting! There are 353 missing values of height in our subset of data. Just using `glimpse()` does not show us that.  Let's filter out the NA's using `drop_na`. This will delete the rows in which the value of any variable is missing. For simplicity, let's only consider adults. 
 
 ```{r}
 ch7 <- nhanes %>% 
@@ -114,13 +118,20 @@ ch7 %>%
 We can see the the most probable heights for both genders and that men are generally taller than women. 
 
 
-Let's focus on a subset of the `nhanes` data, designed to answer our questions:
+Let's focus on a subset of the `nhanes` data, designed to answer our questions. And, instead of using all the data, let's just use 50 randomly selected observations. (The `set.seed()` function ensures that the same 50 observations are selected every time this code is run.) Using just 50 observations sets the stage for our discussion of *coverage* in Section \@ref(coverage).
+
+<!-- DK: Make the above flow more smoothly. -->
 
 ```{r}
-ch7 <- nhanes %>%
+
+ch7_all <- nhanes %>%
   filter(survey == 2009, gender == "Male", age >= 18) %>%
   select(height) %>%
-  drop_na()
+  drop_na() 
+
+set.seed(9)
+ch7 <- ch7_all %>% 
+  sample_n(50)
 ```
 
 
@@ -132,7 +143,7 @@ Yet, this data is relevant. Right? It is certainly better than nothing. That is,
 
 Is not-perfect data always better? No! If your problem is estimating the median height of 5th grade girls in Tokyo, we doubt that our data is at all relevant. Wisdom recognizes the danger of using non-relevant data to build a model and then mistakenly using that model in a way which will only make the situation worse. If the data won't help, don't use the data, don't build a model. Better to just use your common sense and experience. Or find better data.
 
-<!-- DK: Discuss the Rubin Table. More on population. -->
+<!-- DK: More on population. -->
 
 The statistical term "population" is often relevant here. Recall from Chapter \@ref(one-parameter) that the "population" is the set of units which we are interested in. 
 
@@ -216,19 +227,19 @@ In data science, we deal with words, math, and code, but the most important of t
 
 #### stan_glm
 
-Bayesian models are not hard to create in R. TTe **rstanarm** package provides the tools we need, most importantly the function `stan_glm()`.
+Bayesian models are not hard to create in R. The **rstanarm** package provides the tools we need, most importantly the function `stan_glm()`.
 
 ```{r, message = FALSE}
 library(rstanarm)
 ```
 
-The first argument in the `stan_glm()` function is `data`, which in our case is the filtered `ch7` tibble we used in the bootstrap example. The only other mandatory argument is the formula that we want to use to build the model. In this case, since we have no predictor variables, our equation will be `height ~ 1`. 
+The first argument in `stan_glm()` is `data`, which in our case is the filtered `ch7` tibble which contains 50 observations. The only other mandatory argument is the `formula` that we want to use to build the model. In this case, since we have no predictor variables, our equation will be `height ~ 1`. 
 
 
 ```{r, cache = TRUE}
 fit_obj <- stan_glm(data = ch7, 
-                    height ~ 1, 
-                    family = gaussian(), 
+                    formula = height ~ 1, 
+                    family = gaussian, 
                     refresh = 0,
                     seed = 9)
 ```
@@ -247,23 +258,22 @@ Details:
 
 * The default value for `family` is `gaussian`, so we did not need to include it in the call above. From the Justice section, the assumption that $\epsilon_i \sim N(0, \sigma^2)$ is equivalent to using `gaussian`. If $\epsilon_i$ had a different distribution, we would need to use a different `family`. We will see an example of such a situation at the end of this chapter, when we redo the Chapter \@ref(one-parameter) urn analysis using `stan_glm()`.
 
-* Although you can use the standalone function `set.seed()` in order to make your code reproducible, it is more convenient to use the `seed` argument within `stan_glm()`. Even though the fitting process, unavoidably, contains a random component, we will get the exact same answer if we set `seed = 9` and rerun this code.
+* Although you can use the standalone function `set.seed()` in order to make your code reproducible, it is more convenient to use the `seed` argument within `stan_glm()`. Even though the fitting process, unavoidably, contains a random component, you will get the exact same answer if we set `seed = 9` and rerun this code.
 
 
 ##### Printed model
 
-There are several ways to examine the fitted model. The simplest is to print it:
+There are several ways to examine the fitted model. The simplest is to print it. Recall that just typing `x` at the prompt is the same as writing `print(x)`.
 
 ```{r}
 fit_obj
 ```
 
-
 The first line is telling us which model we used, in our case a `stan_glm()`. 
 
-The second line tells us this model is using a Gaussian, or normal, distribution. We discussed this distribution in Section \@ref(normal). The normal is a probability distribution that is symmetric about the mean and unimodal. For that reason, we typically leave it as the default unless we are working with a lefthand variable that is extremely non-normal, e.g., something which only takes two values like 0/1 or TRUE/FALSE. Since height is (very roughly) normally distributed, the Gaussian distribution is a good choice.
+The second line tells us this model is using a Gaussian, or normal, distribution. We discussed this distribution in Section \@ref(normal). We typically use this default unless we are working with a lefthand variable that is extremely non-normal, e.g., something which only takes two values like 0/1 or TRUE/FALSE. Since height is (very roughly) normally distributed, the Gaussian distribution is a good choice.
 
-The third line gives us back the formula we provided. We are creating a model predicting height with a constant --- which is just about the simplest model you can create. Formulas in R are constructed in two parts. First, on the left side of the tilde (the "~" symbol) is the "response" or "dependent" variable, the thing which we are trying to explain. Since this is a model about `height`, `height` goes on the lefthand side. Second, we have the "explanatory" or "independent"  variables on the righthand side of the tilde. There will often be many such variables but in this, the simplest possible model, there is only one, a single constant.  (The number `1` indicates that constant. It does not mean that we think that everyone is height `1`.) 
+The third line gives us back the formula we provided. We are creating a model predicting height with a constant --- which is just about the simplest model you can create. Formulas in R are constructed in two parts. First, on the left side of the tilde (the "~" symbol) is the "response" or "dependent" variable, the thing which we are trying to explain. Since this is a model about `height`, `height` goes on the lefthand side. Second, we have the "explanatory" or "independent" or "predictor" variables on the righthand side of the tilde. There will often be many such variables but in this, the simplest possible model, there is only one, a single constant.  (The number `1` indicates that constant. It does not mean that we think that everyone is height `1`.) 
 
 The fourth and fifth lines of the output tell us that we have `r nobs(fit_obj)`  observations and that we only have one predictor (the constant). Again, the terminology is a bit confusing. What does it mean to suggest that $\mu$ is "constant?" It means that, although $\mu$'s value is unknown, it is *fixed*. It does not change from person to person. The `1` in the formula corresponds to the parameter $\mu$ in our mathematical definition of the model. 
 
@@ -317,6 +327,7 @@ fit_obj %>%
          subtitle = "Average height among American adult men in 2009",
          x = "Height in Centimeters",
          y = "Probability") +
+    scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
     theme_classic()
 ```
 
@@ -326,12 +337,13 @@ Although it is possible to have variable names like "(Intercept)", it is not rec
 fit_obj %>% 
   as_tibble() %>% 
   ggplot(aes(x = sigma)) +
-    geom_histogram(aes(y = after_stat(count/sum(count))), binwidth = 0.01, 
-                   color = "white") +
+    geom_histogram(aes(y = after_stat(count/sum(count))), 
+                   bins = 100) +
     labs(title = "Posterior Probability Distribution",
          subtitle = "Height standard deviation among American adult men in 2009",
          x = "Sigma in Centimeters",
          y = "Probability") +
+    scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
     theme_classic()
 ```
 
@@ -386,7 +398,7 @@ outcome + fitted + res +
 
 
 
-<!-- DK: More details. Can we add $y_i$ and other math terms to these graphs? And do a posterior predictive check! -->
+<!-- DK: More details. Can we add $y_i$ and other math terms to these graphs? And do a posterior predictive check! Need to discuss how the unique values are because we only have 50 observations. Maybe show all observations? -->
 
 <!-- DK: Is there other stuff to do within Courage? Might show how to make a regression table. Should discuss how there is only one model and that we have different views of that model by looking at the printed output, the posterior probability distributions of the parameters and graphics of the fitted values and residuals.  -->
 
@@ -497,6 +509,8 @@ Again, the key conceptual difficulty is the population. The problem we actually 
 
 ### Question 3
 
+<!-- DK: Discuss how each row of pp is like a random draw from the scenario of 4 new men. So, we can look at each row without considering any other row. Makes simulation studies much easier. -->
+
 * What is the probability that, among the next 4 men we meet, the tallest is at least 10 cm taller than the shortest?
 
 Bayesian models are beautiful because, via the magic of simulation, we can answer (almost!) any question. With simulation, we just need to answer this step by step. Because the question is about four random individuals, we need `posterior_predict()` to give us four sets of draws from four identical posterior probability distributions, each one like the one from the previous question.
@@ -572,7 +586,7 @@ pp %>%
 <!-- DK: Need more text. Explain all the things that could be wrong with the model. Explain what is going on in different columns. Explain all the cool R code tricks.  -->
 
 
-## Coverage
+## Coverage {#coverage}
 
 <!-- Prove that the bootstrap works, that our 95% confidence intervals provide correct coverage. We make a game and I give you a sample of like 40. Here's the 40, and you give me a 95% CI using the bootstrap tools we learned. Then I give you another 40. And another. If we do this 1,00 times, and we use the same procedure for calculating a confidence interval each time, then 950 should include the truth. That's how we know bootstraps is correct and I could only demonstrate this to you if we know what the truth is.  
 
@@ -587,71 +601,105 @@ Then, create a tibble, first column is ID. Second column is height_sample, which
 
 <!-- Relatedly, what if I told you that your 2009 data I gave you did not include one person (or ten people or 100), which was (were) dropped at random from the data by mistake. What is your guess as to the height of that single person, or the height of the average of the 10 people or the tallest of the 10 classes? What is your confidence interval for that? Want to bet? These are all different estimands. -->
 
+You now understand how to use `stan_glm()` to estimate posterior probability distributions. But we have not, yet, offered evidence that these distributions are accurate, that they "work." More importantly, does the 95% confidence interval really include the true value 95% of the time? The technical term for this is "coverage," derived from the idea that any X% confidence interval for an unknown value should include that unknown value, should "cover" the value, X% of the time. We can explore coverage with a simple simulation.
 
+<!-- DK: Easier way to code this? More explanation of the coding tricks? -->
 
-## Revisiting the urn
+<!-- DK: Useful problem set might be looking at coverage for a skewed variable like kenya$distance. Presumably, coverage would not be great, but that is because the variable isn't well behaved. If we take the log of it and then do the analysis, coverage is probably a lot better. Right?  -->
 
-<!-- Good reference: https://cran.r-project.org/web/packages/rstanarm/vignettes/binomial.html -->
+<!-- DK: Another problem set question could very the sample size in each row. -->
 
-Now that we know how to use `stan_glm()`, let's revisit the urn example from Chapter \@ref(one-parameter). Instead of building the joint and conditional probability distributions "by hand," we can just use `stan_glm()`. Assume that, as before, we have used a shovel of size 50 to draw beads from the urn and that 17 of the 50 were red. What inferences can we make?
+<!-- DK: Could make a fun plot which shows, first, all 1000 confidence intervals as lines in order, with the 50 or so who misssed the truth in red. And, next to it, show the same but ordered by lower bound. Then, the misses would be 25 at the top and 25 at the bottom. -->
 
-First, we need to create an object which contains this data.
+```{r, cache = TRUE}
+# Calculating key values, and giving them useful names, at the top of a block of
+# code is handy.
 
-```{r}
-shovel <- tibble(red = c(rep(1, 17), rep(0, 33))) %>% 
-  sample_frac() %>% 
-  mutate(ID = 1:nrow(.)) %>% 
-  select(ID, red)
+true_value <- mean(ch7_all$height)
+
+# Always run initial versions of the simulation with n = 3. That is enough
+# iterations to make sure that the code is working. Once it is, switch n to a
+# larger number.
+
+n <- 1000
+
+# Using set.seed() ensures that you will get the same result when you run this
+# code as we did in writing the book.
+
+set.seed(97)
+
+# Simulations like this demonstrate the power of list-columns and map functions.
+# It is always a good idea to start with a tibble that only includes an ID or
+# counter variable. Then, we add columns to this tibble as we, step-by-step,
+# conduct the simulation.
+
+cov_analysis <- tibble(ID = 1:n) %>% 
   
-shovel
+  # It is easy to forget both the ~. Note how sample_id is a tibble, not just a
+  # number, as we are used to in tibbles. List-columns can contain almost
+  # anything. The first argument to map() is the thing that we are iterating
+  # over. In this case, ID does not matter since we are not using its value in
+  # the function call to sample_n().
+  
+  mutate(sample_data = map(ID, ~ sample_n(ch7_all, 50))) %>% 
+  
+  # 
+  
+  mutate(model = map(sample_data, ~ stan_glm(data = ., 
+                                             height ~ 1, 
+                                             refresh = 0))) %>% 
+  
+  mutate(conf_interval = map(model, 
+                             ~ posterior_interval(., 
+                                                  pars = "(Intercept)",
+                                                  prob = 0.95))) %>% 
+  mutate(lower = map_dbl(conf_interval, ~ .[1, 1])) %>% 
+  mutate(upper = map_dbl(conf_interval, ~ .[1, 2])) %>% 
+  mutate(coverage = ifelse(true_value > lower & 
+                             true_value < upper,
+                           TRUE, FALSE))
+
 ```
 
-`sample_frac()` just re-arranges the rows of `shovel`. Doing so is aesthetically please but does not matter since the order of the beads in the shovel is irrelevant to estimating the proportion of red beads in the urn. `shovel` is a tibble with two variables: `ID` and `red`, which takes the value 1 if that bead is red, and the value 0 if it is white.
+```{r}
+summary(cov_analysis$coverage)
+```
 
-Second, with the data, we can now create a model, using `stan_glm()`. The basic call to `stan_glm()` uses the same arguments as before. The only difference is that we can no longer use the default (`gaussian`) for the `family` argument. Instead, we set `family = binomial`. Recall that the `family` argument indicates our assumption about the error term for this model, along with the link function. Because `red` only takes the values 0 and 1, we use the `binomial` family. 
+Given randomness, coverage will only be precisely correct by luck. The key point is that, *about* 95% of the time, a 95% confidence interval includes the true value.
 
-<!-- DK: Explain link functions? -->
+<!-- DK: More to say? -->
+
+
+## 0/1 Outcomes
+
+Variables with well-behaved, continuous ranges are the easiest to handle. We started with `height` because it was simple. Sadly, however, many variables are not like `height`. Consider `diabetes`, a variable in `nhanes` which takes on two possible values: 0 (if you do not have diabetes) and 1 (if you do). In the same way that we would like to construct a model which explains or predicts `height`, we would like to build a model which explains or predicts `diabetes`. 
+
+<!-- DK: Discuss cardinal virtues? -->
+
+
+
+Before we do that, however, let's revisit the urn example from Chapter \@ref(one-parameter). 
+
+
+
+### gender ~ height
+
+```{r}
+ch7_diabetes <- nhanes %>% 
+  select(diabetes, age) %>% 
+  drop_na()
+
+
+fit_3 <- stan_glm(diabetes ~ age,
+                  data = ch7_diabetes,
+                  family = binomial,
+                  refresh = 0)
+```
 
 
 ```{r}
-fit_2 <- stan_glm(formula = red ~ 1, 
-         data = shovel,
-         family = binomial,
-         refresh = 0,
-         seed = 2020)
+fit_3
 ```
-
-This single function call has done all the work which we did "by hand" in Chapter \@ref(one-parameter): created the joint distribution and then estimated the posterior probability distribution, conditional on the data which was passed in to the `data` argument. Let's explore that resulting object:
-
-```{r}
-fit_2
-```
-
-The top half of this print out gives us highlights of the model. It reminds us of the assumptions we used to create it. First, the family is binomial and we have used logit, the default link function. Second, the assumed model has `red` as a function of a single predictor, a constant term. Third, there are 50 observations in our data set.
-
-The second half of this output shows the estimating parameter values in our model. We will discuss these numbers and what they mean later. In the meantime, let's generate the posterior probability distribution for the percentage of red beads in the urn.
-
-```{r}
-fit_2 %>% 
-  posterior_epred() %>% 
-  as_tibble() %>% 
-  pivot_longer(cols = everything(), values_to = "p") %>% 
-  ggplot(aes(x = p,
-             y = after_stat(count/sum(count)))) +
-    geom_histogram(bins = 100) +
-    labs(title = "Posterior Probability Distribution",
-         subtitle = "Proportion of red beads is centered at 34%",
-         x = "Percent of Beads in Urn which Are Red",
-         y = "Probability") + 
-    scale_x_continuous(labels = scales::percent_format()) +
-    scale_y_continuous(labels = scales::percent_format()) +
-    theme_classic()
-```
-
-This is, more or less, the same result we got in the previous chapter, but with much less work.
-
-<!-- Similar, we can estimate the posterior *predictive* distribution   -->
-
 
 
 ## Summary
