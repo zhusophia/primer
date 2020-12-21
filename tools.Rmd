@@ -2,16 +2,18 @@
 <!-- Explain importance of scripting versus click-and-drag and copy-pasting.
 Add section about useful keyboard shortcuts. -->
 
+<!-- Add material from merely useful, especially description of command line and file organization. -->
+
 <!-- Add a section about creating a place, perhaps ~/Desktop/projects, for all your projects and making that the default. -->
 
 <!-- Find a place to mention all the high quality sources listed below. Maybe with a webshot of their title pages?  -->
 
-<!-- Use high quality sources: -->
 <!-- Happy Git for the R User. -->
 <!-- Anything associated with RStudio. -->
 <!-- [The UNIX Workbench](https://seankross.com/the-unix-workbench/), but with all the work done form the terminal window in RStudio.  -->
 <!-- [What They Forgot to Teach You About R](https://rstats.wtf/) -->
 <!-- https://usethis.r-lib.org/articles/articles/usethis-setup. Might just pull out the key sections of this. We can't just link to it since some of it --- like devtools --- is too confusing. -->
+<!-- https://merely-useful.github.io/py-rse/ -->
 
 
 <!-- Consider making the **fs** package a major part of the presentation. This helps avoid dealing with cross-OS issues ourselves. Also teaches students that there is more than one way to interact with the file system. -->
@@ -271,26 +273,34 @@ Restart R and everything should just work.
 
 ## Style guide {-}
 
-Much of this material comes from the *[Tidyverse Style Guide](https://style.tidyverse.org/index.html)*.  We will take off points on work submitted which violates these guidelines. *In extremis*, you may go against this advice, if you add a comment in your code explaining your decision to do so.
+Much of this material comes from the *[Tidyverse Style Guide](https://style.tidyverse.org/index.html)*.  We will take off points on work submitted which violates these guidelines. *In extremis*, you may go against this advice, if you add a code comment in your work explaining your decision to do so.
 
 ### Comments {-}
 
-Include comments in your code. It is OK if easy-to-understand chunks of code have no comments. The code is self-explanatory. But other code will merit many, many lines of comments, more lines than the code itself. In a project, you should have about as many lines of comments as you have lines of code.
+Include comments in your code. Easy-to-understand chunks of code should not have comments. The code is the comment. But other code will merit many, many lines of comments, more lines than the code itself. In a given file, *you should have about as many total lines of comments as you have lines of code*.
 
-Make your comments meaningful. They should not be a simple description of what your code does. The best comments are descriptions about why you did what you did and which other approaches you tried or considered. (The code already tells us what you did.) Good comments often have a “Dear Diary” quality: “I did this. Then I tried that. I finally chose this other thing because of reasons X, Y and Z. If I work on this again, I should look into this other approach.” Because of this, the structure is often a several lines of comments followed by several lines of code. 
+Make your comments meaningful. They should not be a simple description of what your code does. The best comments are descriptions about why you did what you did and which other approaches you tried or considered. (The code already tells us what you did.) Good comments often have a “Dear Diary” quality: “I did this. Then I tried that. I finally chose this other thing because of reasons X, Y and Z. If I work on this again, I should look into this other approach.” Because of this, the structure is often a paragraph of comments followed by several lines of code. 
 
 Each line of a comment should begin with the comment symbol (a "hash") followed by a single space: `# `. Code comments must be separated from code by one empty line on both sides. Format your code comments neatly. Ctrl-Shift-/ is the easiest way to do that. Name your R code chunks. Spelling matters. Comments should be constructed as sentences, with appropriate capitalization and punctuation. 
+
+### Graphics {-}
+
+Use captions, titles, axis labels and so on to make it clear what your tables and graphics mean.
+
+Anytime you make a graphic without a title (explaining what the graphic is), a subtitle (highlighting a key conclusion to draw), a caption (with some information about the source of the data) and axis labels (with information about your variables), you should justify that decision in a code comment. We (try to) always include these items but there are situations in which that makes less sense. Ultimately, these decisions are yours, but we need to understand your reasoning.
+
+Use your best judgment. For example, sometimes axis labels are unnecessary. Read *[Data Visualization: A practical introduction](https://socviz.co/)* by Kieran Healy for guidance on making high quality graphics.
+
+### Formating
 
 #### Long Lines {-}
 
 Limit your code to 80 characters per line. This fits comfortably on a printed page with a reasonably sized font.  When calling functions, you can omit the argument names for very common arguments (i.e. for arguments that are used in almost every invocation of the function). Short unnamed arguments  can also go on the same line as the function name, even if the whole function call spans multiple lines.
 
 
-<!-- DK: Missing code chunk. And fix the code chunks below to use modern tidyverse code. -->
-
 #### Whitespace {-}
 
-`%>%` should always have a space before it, and should usually be followed by a new line. After the first step, each line should be indented by two spaces. This structure makes it easier to add new steps (or rearrange existing steps) and harder to overlook a step.
+`%>%` should always have a space before it, and should usually be followed by a new line. After the first step in the pipe, each line should be indented by two spaces. This structure makes it easier to add new steps (or rearrange existing steps) and harder to overlook a step.
 
 ```{r, eval=FALSE}
 # Good
@@ -308,6 +318,28 @@ iris %>% group_by(Species) %>% summarize_all(mean) %>%
 ungroup %>% gather(measure, value, -Species) %>%
 arrange(value)
 ```
+
+**ggplot2** code is handled in a similar fashion. All commands after the initial invocation of `ggplot()` are indented.
+
+```{r, eval=FALSE}
+# Good
+
+diamonds %>% 
+  ggplot(aes(x = depth)) +
+    geom_histogram(bins = 100) +
+    labs(title = "Distribution of Depth",
+         x = "Depth",
+         y = "Count")
+
+# Bad
+
+diamonds %>% 
+ggplot(aes(x = depth)) +
+geom_histogram(bins = 100) + labs(title = "Distribution of Depth",
+         x = "Depth",
+         y = "Count")
+```
+
 
 
 #### Commas {-}
@@ -344,10 +376,9 @@ mean( x, na.rm = TRUE )
 
 #### Infix operators {-}
 
-Most infix operators (`==`, `+`, `-`, `<-`, etc.) should always be surrounded by spaces:
+Most infix operators (`=`, `==`, `+`, `-`, `<-`, et cetera) should be surrounded by one space.
 
 ```{r, eval = FALSE}
-
 # Good
 
 height <- (feet * 12) + inches
@@ -359,11 +390,7 @@ height<-feet*12+inches
 mean(x, na.rm=TRUE)
 ```
 
-There are a few exceptions, which should never be surrounded by spaces:
-
-* The operators with [high precedence](https://rdrr.io/r/base/Syntax.html): `::`, `:::`, `$`, `@`, `[`, `[[`, `^`, unary `-`, unary `+`,  
-and `:`.
-
+Other operators ---  like `~`, `::`, `:::`, `$`, `@`, `[`, `[[`, `^`, and `:` --- should never be surrounded by spaces.
 
 ```{r, eval = FALSE}
 # Good
@@ -371,57 +398,16 @@ and `:`.
 sqrt(x^2 + y^2)
 df$z
 x <- 1:10
+y ~ a + b
 
 # Bad
 
 sqrt(x ^ 2 + y ^ 2)
 df $ z
 x <- 1 : 10
+y~a + b
 ```
 
-* Single-sided formulas when the right-hand side is a single identifier:
-
-```{r, eval=FALSE}
-# Good
-
-~foo
-tribble(~col1, ~col2,
-         "a",   "b")
-
-# Bad
-
-~ foo
-tribble( ~ col1, ~ col2,
-        "a", "b")
-```
-
-Note that single-sided formulas with a complex right-hand side do need a space:
-
-```{r, eval = FALSE}
-# Good
-
-~ .x + .y
-
-# Bad
-
-~.x + .y
-```
-
-* The help operator
-
-```{r, eval=FALSE}
-# Good
-
-package?stats
-?mean
-
-# Bad
-
-package ? stats
-? mean
-```
-
-#### Extra spaces {-}
 
 You may add extra spaces if it improves alignment of `=` or `<-`.
 
@@ -434,15 +420,9 @@ Do not add extra spaces to places where space is not usually allowed.
 
 ### Messages/Warnings/Errors  {-}
 
-R messages/warnings/errors should never appear in a submitted document. The right way to deal with these issues is to find out their cause and then fix the underlying problem. Students sometimes use “hacks” to make these messages/warnings/errors disappear. The most common hacks involve using code chunk options like `message=FALSE`, `warning=FALSE`, `results="hide"`, `include=FALSE` and others. Don’t do this, in general. A message/warning/error is worth understanding and then fixing. Don’t close your eyes (metaphorically) and pretend that the problem doesn’t exist. There are some situations, however, in which, no matter what you try, you can’t fix the problem. In those few cases, you can use one of these hacks, but you must make a code comment directly below it, explaining the situation. The only exception is the “setup” chunk (included by default in every new Rmd) which comes with `include=FALSE`. In that chunk, no explanation is necessary, by convention.
+R messages/warnings/errors should never appear in a submitted document. The right way to deal with these issues is to find out their cause and then fix the underlying problem. Students sometimes use “hacks” to make these messages/warnings/errors disappear. The most common hacks involve using code chunk options like `message = FALSE`, `warning = FALSE`, `results = "hide"`, `include = FALSE` and others. Don’t do this, in general. A message/warning/error is worth understanding and then fixing. Don’t close your eyes (metaphorically) and pretend that the problem doesn’t exist. There are some situations, however, in which, no matter what you try, you can’t fix the problem. In those few cases, you can use one of these hacks, but you must make a code comment directly below it, explaining the situation. The only exception is the “setup” chunk (included by default in every new Rmd) which comes with `include = FALSE`. In that chunk, no explanation is necessary, by convention.
 
-### Graphics {-}
 
-Use captions, titles, axis labels and so on to make it clear what your tables and graphics mean.
-
-Anytime you make a graphic without a title (explaining what the graphic is), a subtitle (highlighting a key conclusion to draw), a caption (with some information about the source of the data) and axis labels (with information about your variables), you should justify that decision in a code comment. We (try to) always include all four but there are situations in which that makes less sense. Ultimately, these decisions are yours, but we need to understand your reasoning.
-
-Use your best judgment. For example, sometimes axis labels are unnecessary. Read *[Data Visualization: A practical introduction](https://socviz.co/)* by Kieran Healy for guidance on making high quality graphics.
 
 ## How to use Rpubs {-}
 
@@ -706,7 +686,6 @@ tbl_regression(fit2,
 
 &nbsp;
 
-## References {-}
 
 
 
