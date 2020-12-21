@@ -1,8 +1,30 @@
-
 # Wrangling {#wrangling}
 
 <!-- TODO: --> 
 
+<!-- Explain where the csv file is located. Maybe use a different one? -->
+
+<!-- Explain error = TRUE trick. -->
+
+<!-- Don't use small camel. Find a csv file with problems. -->
+
+<!-- Show fruit before working on fruit, or at least beginning of fruit, or random sample of fruit. Maybe put fruit in a tibble and work on it from there. Students are not used to, and rarely do, work on vectors directly . ..  -->
+
+<!-- Showing all the countries is bad. No walls of text! -->
+
+<!-- Cut some character stuff. Look at all my cuts from tidy. -->
+
+<!-- Country plots too small. Put them in separate code chunks, one on top of the other. Show the code for at least one of them. -->
+
+<!-- Package names are bolded. -->
+
+<!-- Cut aggresively! Example: "The most recent release" -->
+
+<!-- Explain what (ijps <- inner_join(publishers, superheroes)) is doing. -->
+
+<!-- Avoid eval = FALSE. If you are showing them the code, show them the results. (Example: tidy section.) How do you know the code works? -->
+
+<!-- Make out.width = "100%" the default? -->
 
 <!-- Maybe make a big set of FEC data from the 2016 election for use as the practice data? Ought to use something different from airlines . . . which are boring. -->
 
@@ -23,16 +45,17 @@ library(fivethirtyeight)
 ```
 
 <!-- BG: no more flights. fivethirtyeight? -->
+
 The **tidyverse** package will be used in every chapter. **primer.data** is the data package created specifically for this course. **lubridate** is a package for working with dates and times. **janitor** offers functions for cleaning up dirty data. **skimr** contains functions that are useful for providing summary statistics. **nycflights** includes data associated with flights out of New York City's three major airports. **gapminder** has data for countries across decades. **fivethirtyeight** cleans up data from the [FiveThirtyEight](https://fivethirtyeight.com/) team.
 
 ## Data Gathering
 
 <!-- DK: Not sure I like this example. We should do our own thing. -->
 
-The `read_csv()` function turns flat files into data frames. More specifically, it turns files whose values are separated by commas (hence CSV). Let’s import a Comma Separated Values .csv file that exists on the internet. The .csv file dem_score.csv contains ratings of the level of democracy in different countries spanning 1952 to 1992 and is accessible at https://moderndive.com/data/dem_score.csv. Let’s use the read_csv() function from the **readr** package to read it off the web, import it into R, and save it in a data frame called dem_score. 
+The `read_csv()` function turns flat files into data frames. More specifically, it turns files whose values are separated by commas (hence CSV). Let’s import a Comma Separated Values file that exists on the internet. The csv file `dem_score.csv` contains ratings of the level of democracy in different countries spanning 1952 to 1992. Let’s use the `read_csv()` function from the **readr** package to read it off the web, import it into R, and save it in a tibble called `dem_score`. 
 
 ```{r}
-dem_score <- read_csv(file = "https://moderndive.com/data/dem_score.csv")
+dem_score <- read_csv(file = "https://raw.githubusercontent.com/PPBDS/primer/master/02-wrangling/data/dem_score.csv")
 ```
 
 In this `dem_score` data frame, the minimum value of -10 corresponds to a highly autocratic nation, whereas a value of 10 corresponds to a highly democratic nation. Note also that backticks surround the different variable names. Variable names in R by default are not allowed to start with a number nor include spaces, but we can get around this fact by surrounding the column name with backticks.
@@ -285,7 +308,7 @@ tibble(`54` = 1, `my var` = 2, c = 3)
 
 If we did not include the backticks, R would give us an error.
 
-```{r error, eval = FALSE}
+```{r, error = TRUE}
 tibble(54 = 1, my var = 2, c = 3)
 ```
 
@@ -330,6 +353,8 @@ We've spent a lot of time working with big, beautiful data frames that are clean
 A data frame or tibble will consist of one or more *atomic vectors* of a certain class. An atomic vector is one of the two types of vectors. There are six types: logical, integer, double, character. This lesson deals with things you can do with vectors of class `character`.
 
 At the beginning of the chapter, we loaded the **tidyverse**, which includes `stringr`. This package allows users to manipulate strings with its functions that being with `str_`.
+
+<!-- DK: Is this long list useful?  Not that I can see, unless you tell us the commands which do it. -->
 
 There are some basic string manipulation tasks:
 
@@ -990,7 +1015,7 @@ They work as follows:
 
 ### From strings
 
-Date/time data often comes as strings. The lubridate functions automatically work out the format once you specify the order of the component. To use them, identify the order in which year, month, and day appear in your dates, then arrange "y", "m", and "d" in the same order. That gives you the name of the lubridate function that will parse your date. For example:
+Date/time data often comes as strings. The **lubridate** functions automatically work out the format once you specify the order of the component. To use them, identify the order in which year, month, and day appear in your dates, then arrange "y", "m", and "d" in the same order. That gives you the name of the **lubridate** function that will parse your date. For example:
 
 ```{r}
 ymd("2017-01-31")
@@ -1094,7 +1119,7 @@ ymd("2015-02-01") %>%
 
 ### Time zones 
 
-Time zones are an enormously complicated topic because of their interaction with geopolitical entities. Fortunately we don't need to dig into all the details as they're not all that important for data analysis. You can see the complete list of possible timezones with the function `OlsonNames()`. Unless otherwise specified, lubridate always uses UTC (Coordinated Universal Time).
+Time zones are an enormously complicated topic because of their interaction with geopolitical entities. Fortunately we don't need to dig into all the details as they're not all that important for data analysis. You can see the complete list of possible timezones with the function `OlsonNames()`. Unless otherwise specified, **lubridate** always uses UTC (Coordinated Universal Time).
 
 In R, the time zone is an attribute of the date-time that only controls printing. For example, these three objects represent the same instant in time:
 
@@ -1520,13 +1545,8 @@ View(flights_weather_joined)
 
 ## Tidy data
 
-Now, we will explore the topic of "tidy" data, a manner of data formatting particularly suited to the creation of graphics and the manipulation of the dataframe. You will see that having data stored in "tidy" format is about more than just what the everyday definition of the term "tidy" might suggest: having your data "neatly organized." Instead, we define the term "tidy" as it's used by data scientists who use R, outlining a set of rules by which data is saved.
 
-Knowledge of this type of data formatting was not necessary for our treatment of data visualization in Chapter 1 and in previous data wrangling topics. This is because all the data used were already in "tidy" format. In this chapter, we'll now see that this format is essential to using the tools we covered up until now. Furthermore, it will also be useful for all subsequent chapters in this book when we cover regression and statistical inference.
-
-Let's switch gears and learn about the concept of "tidy" data format with a motivating example from the `fivethirtyeight` package. The `fivethirtyeight` package provides access to the datasets used in many articles published by the data journalism website, [FiveThirtyEight.com](https://fivethirtyeight.com/).
-
-Let's focus our attention on the `drinks` data frame and look at its first 5 rows:
+Consider the first five rows from the `drinks` data frame from the **fivethirtyeight** package:
 
 ```{r, echo = FALSE}
 drinks %>%  
@@ -1552,38 +1572,7 @@ drinks_smaller
 ```
 
 
-Let's now ask ourselves a question: "Using the `drinks_smaller` data frame, how would we create the side-by-side barplot below. 
 
-<!-- # ```{r, fig.cap = "Comparing alcohol consumption in 4 countries."} -->
-<!-- # drinks_smaller_tidy <- drinks_smaller %>%  -->
-<!-- #   pivot_longer(cols = -country,  -->
-<!-- #                names_to = "type",  -->
-<!-- #                values_to = "servings") -->
-<!-- #  -->
-<!-- # drinks_smaller_tidy_plot <- ggplot(drinks_smaller_tidy,  -->
-<!-- #                                    aes(x = country,  -->
-<!-- #                                        y = servings,  -->
-<!-- #                                        fill = type)) +  -->
-<!-- #   geom_col(position = "dodge") +  -->
-<!-- #                               labs(x = "country", y = "servings") -->
-<!-- #  -->
-<!-- # ``` -->
-<!-- #  -->
-<!-- # Let's break down the graphic: -->
-<!-- #  -->
-<!-- # 1. The categorical variable `country` with four levels (China, Italy, Saudi Arabia, USA) would have to be mapped to the `x`-position of the bars. -->
-<!-- # 1. The numerical variable `servings` would have to be mapped to the `y`-position of the bars (the height of the bars). -->
-<!-- # 1. The categorical variable `type` with three levels (beer, spirit, wine) would have to be mapped to the `fill` color of the bars. -->
-<!-- #  -->
-<!-- # Observe, however, that `drinks_smaller` has three separate variables `beer`, `spirit`, and `wine`. In order to use the `ggplot()` function to recreate the barplot we need a single variable `type` with three possible values: `beer`, `spirit`, and `wine`.  We could then map this `type` variable to the `fill` aesthetic of our plot.  In other words, to recreate the barplot, our data frame would have to look like this: -->
-<!-- #  -->
-<!-- # ```{r} -->
-<!-- # drinks_smaller_tidy -->
-<!-- # ``` -->
-<!-- #  -->
-<!-- # Observe that while `drinks_smaller` and `drinks_smaller_tidy` are both rectangular in shape and contain the same 12 numerical values (3 alcohol types by 4 countries), they are formatted differently. `drinks_smaller` is formatted in what's known as  ["wide"](https://en.wikipedia.org/wiki/Wide_and_narrow_data) format, whereas `drinks_smaller_tidy` is formatted in what's known as ["long/narrow"](https://en.wikipedia.org/wiki/Wide_and_narrow_data#Narrow) format. -->
-<!-- #  -->
-<!-- # In the context of doing data science in R, long/narrow format is also known as "tidy" format. In order to use the **ggplot2** and **dplyr** packages for data visualization and data wrangling, your input data frames must be in "tidy" format. Thus, all non-"tidy" data must be converted to "tidy" format first. Before we convert non-"tidy" data frames like `drinks_smaller` to "tidy" data frames like `drinks_smaller_tidy`, let's define "tidy" data. -->
 
 ### Definition of "tidy" data 
 
@@ -1646,18 +1635,6 @@ drinks_smaller %>%
                cols = beer:wine)
 ```
 
-<!-- With our `drinks_smaller_tidy` "tidy" formatted data frame, we can now produce the barplot you saw previously using `geom_col()`. Recall from the previous chapter that we use `geom_col()` and not `geom_bar()`, since we would like to map the "pre-counted" `servings` variable to the `y`-aesthetic of the bars. -->
-
-<!-- ```{r eval=FALSE} -->
-<!-- ggplot(drinks_smaller_tidy, aes(x = country, y = servings, fill = type)) + -->
-<!--   geom_col(position = "dodge") -->
-<!-- ``` -->
-
-<!-- (ref:drinks-col) Comparing alcohol consumption in 4 countries using geom_col(). -->
-
-<!-- ```{r, echo=FALSE, fig.cap='(ref:drinks-col)'} -->
-<!-- drinks_smaller_tidy_plot -->
-<!-- ``` -->
 
 Converting "wide" format data to "tidy" format often confuses new R users. The only way to learn to get comfortable with the `pivot_longer()` function is with practice, practice, and more practice using different datasets. For example, run `?pivot_longer` and look at the examples in the bottom of the help file.
 
@@ -1669,7 +1646,7 @@ You can also view examples of both `pivot_longer()` and `pivot_wider()` on the [
 
 ## Distributions {#distributions}
 
-<!-- Include math formulas (sort of?) in the margin. $C ~ binomial(n, p)$, where $C \subset (H,T)$  -->
+<!-- Include math formulas: $C ~ binomial(n, p)$, where $C \subset (H,T)$  -->
 
 What is a distribution? Think of the distribution of a variable as an urn from which we can pull out, at random, values for that variable. Drawing a thousand or so values from that urn, and then looking at a histogram or density plot, can show where the values are centered and how the values vary. 
 
@@ -1700,7 +1677,7 @@ sample(x = die,
        prob = c(0.5, 0.1, 0.1, 0.1, 0.1, 0.1))
 ```
 
-**Note:**`sample()` is just one of many functions for creating draws --- or, more colloquially, "drawing" --- from a distribution. Three of the most important functions are: `runif()`, `rbinom()`, and `rnorm()`.
+**Note:** `sample()` is just one of many functions for creating draws --- or, more colloquially, "drawing" --- from a distribution. Three of the most important functions are: `runif()`, `rbinom()`, and `rnorm()`.
 
 ### `runif()`
 
@@ -1731,10 +1708,10 @@ rbinom(n = 1 , size = 1, prob = 0.5)
 
 Do the same thing 100 times and look at the results:
 
-```{r}
+```{r, out.width =  "100%"}
 tibble(heads = rbinom(n = 100, size = 1, prob = 0.5)) %>% 
-ggplot(aes(x = heads)) +
-  geom_bar() +
+  ggplot(aes(x = heads)) +
+    geom_bar() +
     labs(title = "Flipping a Fair Coin 100 Times",
          x = "Result",
          y = "Count") +
@@ -1750,10 +1727,10 @@ In our graph above, we use the function `scale_x_continuous()` because our x-axi
 
 Suppose instead we wanted to simulate an unfair coin, where the probability of landing on Heads was 0.75 instead of 0.25. 
 
-```{r}
+```{r, out.width =  "100%"}
 tibble(heads = rbinom(n = 100, size = 1, prob = 0.75)) %>% 
-ggplot(aes(x = heads)) +
-  geom_bar() +
+  ggplot(aes(x = heads)) +
+    geom_bar() +
     labs(title = "Flipping a Fair Coin 100 Times",
          x = "Result",
          y = "Count") +
@@ -1791,7 +1768,7 @@ This bell-shaped distribution is defined by two parameters: (1) the *mean* $\mu$
 1. The dotted normal curve has mean $\mu = 5$ \& standard deviation $\sigma = 5$.
 1. The dashed normal curve has mean $\mu = 15$ \& standard deviation $\sigma = 2$.
 
-```{r, echo = FALSE, fig.cap="Three normal distributions."}
+```{r, echo = FALSE, fig.cap = "Three normal distributions.", out.width =  "100%"}
 library(ggrepel)
 all_points <- tibble(
   domain = seq(from = -10, to = 25, by = 0.01),
@@ -1902,29 +1879,29 @@ These 10 draws come from a distribution with the default `mean` of 0 and the def
 
 ```{r}
 tibble(value = rnorm(10)) %>% 
-ggplot(aes(x = value)) + 
-  geom_histogram(bins = 10)
+  ggplot(aes(x = value)) + 
+    geom_histogram(bins = 10)
 ```
 
 As you can see, it is not as symmetrical as the one displayed above. This is not surprising! If you just draw 10 beads from the urn, you can not possibly have a very good sense of what all the numbers on all the beads in the urn look like. What if we draw 100 values? What about 100,000?
 
 ```{r}
 tibble(value = rnorm(100)) %>% 
-ggplot(aes(x = value)) +
-  geom_histogram(bins = 10)
+  ggplot(aes(x = value)) +
+    geom_histogram(bins = 10)
 ```
 
 ```{r}
 tibble(value = rnorm(100000)) %>% 
-ggplot(aes(x = value)) +
-  geom_histogram(bins = 10)
+  ggplot(aes(x = value)) +
+    geom_histogram(bins = 1000)
 ```
 
 Now it's looking a lot more similar (although imperfect)! 
 
 Now, let's compare normal distributions with varying means and standard deviations, which can be set using the mean and sd arguments included with the function. 
 
-```{r}
+```{r, out.width =  "100%"}
 tibble(rnorm_5_1 = rnorm(n = 1000, mean = 5, sd = 1), 
        rnorm_0_3 = rnorm(n = 1000, mean = 0, sd = 3),
        rnorm_0_1 = rnorm(n = 1000, mean = 0, sd = 1)) %>%
@@ -1976,7 +1953,7 @@ By assumption, we analyze the draws to make inferences about the distribution.
 
 Although distributions (and the draws therefrom) are complex, we can often treat them in the same way that we treat simple numbers. For example, we can add two distributions together.
 
-```{r}
+```{r, out.width =  "100%"}
 n <- 100000
 tibble(Normal = rnorm(n, mean = 1),
        Uniform = runif(n, min = 2, max = 3),
@@ -2100,6 +2077,7 @@ There are many additional ways to manipulate missing values, but these three fun
 ## Summary
 
 This chapter covered many, many commands. You should have them all memorized by now.
+
 No! That is ridiculous. We don't have them all memorized. Why should you? The point of this chapter was to give you a tour of what you can do in R and how to do it. With that information, you have a base from which to try to solve the problems you will encounter in the future.
 
 
