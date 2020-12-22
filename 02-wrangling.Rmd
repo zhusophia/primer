@@ -1027,71 +1027,20 @@ bind_rows(data_1, data_2)
 
 Join (a.k.a. merge) two tables: dplyr join cheatsheet with comic characters and publishers.
 
-```{r, include = FALSE}
-# function to style the tables for display
-# used alongside CSS
-
-style_table <- function(data, table_title) {
-  data %>% 
-  gt() %>% 
-  tab_header(
-    title = table_title
-  ) %>% 
-  tab_options(
-    table.align = "left",
-    table.font.size = pct(80),
-    heading.title.font.size = pct(90),
-    column_labels.font.size = pct(90),
-    table.width = "100%",
-    row.striping.include_table_body = TRUE
-  )
-}
-
-get_col_widths <- function(super_first = TRUE) {
-  if (super_first == TRUE) {
-    col_left <- 38; col_mid <- 18; col_right <- (100 - col_left - col_mid)
-  } else {
-    col_left <- 18; col_mid <- 38; col_right <- (100 - col_left - col_mid)
-  }
-  gt_col_widths <- list(col_left_width = col_left, 
-                        col_mid_width = col_mid, 
-                        col_right_width = col_right)
-  return(gt_col_widths)
-}
-  
-make_three_gt <- function(gt_left, gt_mid, gt_right, ...) {
-  gt_col_widths <- get_col_widths(...)
-  htmltools::withTags(
-  table(style = "width: 100%; border: 0px;",
-    tr(
-      td(style = glue::glue("width: {gt_col_widths[[1]]}%; vertical-align: top;"),
-        gt:::as.tags.gt_tbl(gt_left)
-      ),
-      td(style = glue::glue("width: {gt_col_widths[[2]]}%; vertical-align: top;"),
-        gt:::as.tags.gt_tbl(gt_mid)
-      ),
-      td(style = glue::glue("width: {gt_col_widths[[3]]}%; vertical-align: top;"),
-        gt:::as.tags.gt_tbl(gt_right)
-      )
-    )
-  )
-)
-}
-```
   
 Working with two small data frames: `superheroes` and `publishers`.
 
 ```{r, message = FALSE, warning = FALSE}
 
 superheroes <- tibble::tribble(
-       ~name, ~alignment,  ~gender,          ~publisher,
-   "Magneto",      "bad",   "male",            "Marvel",
-     "Storm",     "good", "female",            "Marvel",
-  "Mystique",      "bad", "female",            "Marvel",
-    "Batman",     "good",   "male",                "DC",
-     "Joker",      "bad",   "male",                "DC",
-  "Catwoman",      "bad", "female",                "DC",
-   "Hellboy",     "good",   "male", "Dark Horse Comics"
+       ~name,   ~gender,     ~publisher,
+   "Magneto",   "male",       "Marvel",
+     "Storm",   "female",     "Marvel",
+  "Mystique",   "female",     "Marvel",
+    "Batman",   "male",       "DC",
+     "Joker",   "male",       "DC",
+  "Catwoman",   "female",     "DC",
+   "Hellboy",   "male",       "Dark Horse Comics"
   )
 
 publishers <- tibble::tribble(
@@ -1102,200 +1051,109 @@ publishers <- tibble::tribble(
   )
 ```
 
-Sorry, the cheat sheet does not illustrate "multiple match" situations terribly well.
-
-Sub-plot: watch the row and variable order of the join results for a healthy reminder of why it's dangerous to rely on any of that in an analysis.
-
-```{r style-gt-tables, include = FALSE}
-# superheroes will always be lilac
-super_gt <- style_table(superheroes, "superheroes") %>% 
-  tab_options(
-    table.background.color = "#edc7fc" # lilac
-  )
-
-# publishers will always be light blue
-pub_gt <- style_table(publishers, "publishers") %>% 
-  tab_options(
-    table.background.color = "#cce6f6" # light blue
-  )
-```
-
 #### `inner_join()`
 
-`inner_join(x, y)`: Return all rows from `x` where there are matching values in `y`, and all columns from `x` and `y`. If there are multiple matches between `x` and `y`, all combination of the matches are returned. This is a mutating join.
+`inner_join(x, y)`: Return all rows from `x` where there are matching values in `y`, and all columns from `x` and `y`. If there are multiple matches between `x` and `y`, all combination of the matches are returned. 
 
-```{r, echo= FALSE, out.width="100%", fig.cap="Inner join."}
+```{r, echo= FALSE, out.width="50%", fig.cap="Inner join."}
 knitr::include_graphics("02-wrangling/images/join-inner.png")
 ```
 
 ```{r}
-(ijsp <- inner_join(superheroes, publishers))
+inner_join(superheroes, publishers)
 ```
 
 We lose Hellboy in the join because, although he appears in `x = superheroes`, his publisher Dark Horse Comics does not appear in `y = publishers`. The join result has all variables from `x = superheroes` plus `yr_founded`, from `y`.
 
-```{r echo = FALSE}
-ijsp_gt <- style_table(ijsp, "inner_join(x = superheroes, y = publishers)") 
-```
-
-```{r echo = FALSE, out.width="33%"}
-make_three_gt(super_gt, pub_gt, ijsp_gt)
-```
-
 Now compare this result to that of using `inner_join()` with the two datasets in opposite positions. 
+
 ```{r}
-(ijps <- inner_join(publishers, superheroes))
+inner_join(publishers, superheroes)
 ```
 
 In a way, this does illustrate multiple matches, if you think about it from the `x = publishers` direction. Every publisher that has a match in `y = superheroes` appears multiple times in the result, once for each match. In fact, we're getting the same result as with `inner_join(superheroes, publishers)`, up to variable order (which you should also never rely on in an analysis).
 
-```{r echo = FALSE, out.width="100%"}
-ijps_gt <- style_table(ijps, "inner_join(x = publishers, y = superheroes)") 
-```
-
-```{r echo = FALSE}
-make_three_gt(pub_gt, super_gt, ijps_gt, super_first = FALSE)
-```
-
-The `inner_join()` will solve nearly all of the problems you'll encounter in this book.
-
 #### `full_join()`
 
-`full_join(x, y)`: Return all rows and all columns from both `x` and `y`. Where there are not matching values, returns `NA` for the one missing. This is a mutating join.
+`full_join(x, y)`: Return all rows and all columns from both `x` and `y`. Where there are not matching values, returns `NA` for the one missing. 
 
 ```{r}
-(fjsp <- full_join(superheroes, publishers))
+full_join(superheroes, publishers)
 ```
 
 We get all rows of `x = superheroes` plus a new row from `y = publishers`, containing the publisher Image. We get all variables from `x = superheroes` AND all variables from `y = publishers`. Any row that derives solely from one table or the other carries `NA`s in the variables found only in the other table.
 
-```{r echo = FALSE}
-fjsp_gt <- style_table(fjsp, "full_join(x = superheroes, y = publishers)") 
-```
-
-```{r echo = FALSE, out.width="100%"}
-make_three_gt(super_gt, pub_gt, fjsp_gt)
-```
 
 Because `full_join()` returns all rows and all columns from both `x` and `y` the result of `full_join(x = superheroes, y = publishers)` should match that of `full_join(x = publishers, y = superheroes)`.
 
 #### `left_join()`
 
-`left_join(x, y)`: Return all rows from `x`, and all columns from `x` and `y`. If there are multiple matches between `x` and `y`, all combination of the matches are returned. This is a mutating join.
+`left_join(x, y)`: Return all rows from `x`, and all columns from `x` and `y`. If there are multiple matches between `x` and `y`, all combination of the matches are returned. 
 
 ```{r}
-(ljsp <- left_join(superheroes, publishers))
+left_join(superheroes, publishers)
 ```
 
 We basically get `x = superheroes` back, but with the addition of variable `yr_founded`, which is unique to `y = publishers`. Hellboy, whose publisher does not appear in `y = publishers`, has an `NA` for `yr_founded`.
 
-```{r echo = FALSE}
-ljsp_gt <- style_table(ljsp, "left_join(x = superheroes, y = publishers)") 
-```
-
-```{r echo = FALSE, out.width="100%"}
-make_three_gt(super_gt, pub_gt, ljsp_gt)
-```
-
-Now compare this result to that of running `left_join(x = publishers, y = superheroes)`. Unlike `inner_join()` and `full_join()` the order of the arguments has a significant effect on the resulting dataframe. 
+Now compare this result to that of running `left_join(x = publishers, y = superheroes)`. Unlike `inner_join()` and `full_join()` the order of the arguments has a significant effect on the resulting tibble. 
 
 ```{r}
-(ljps <- left_join(publishers, superheroes))
+left_join(publishers, superheroes)
 ```
 
-We get a similar result as with `inner_join()` but the publisher Image survives in the join, even though no superheroes from Image appear in `y = superheroes`. As a result, Image has `NA`s for `name`, `alignment`, and `gender`.
+We get a similar result as with `inner_join()` but the publisher Image survives in the join, even though no superheroes from Image appear in `y = superheroes`. As a result, Image has `NA`s for `name` and `gender`.
 
-```{r echo = FALSE}
-ljps_gt <- style_table(ljps, "left_join(x = publishers, y = superheroes)") 
-```
-
-```{r echo = FALSE, out.width="100%"}
-make_three_gt(pub_gt, super_gt, ljps_gt, super_first = FALSE)
-```
-
-There is a similar function, `right_join(x, y)` that return all rows from `y`, and all columns from `x` and `y`. Like `left_join()`, this is a mutating join.
+There is a similar function, `right_join(x, y)` that return all rows from `y`, and all columns from `x` and `y`. 
 
 #### `semi_join()`
 
 `semi_join(x, y)`: Return all rows from `x` where there are matching values in `y`, keeping just columns from `x`. A semi join differs from an inner join because an inner join will return one row of `x` for each matching row of `y`, where a semi join will never duplicate rows of `x`. This is a filtering join.
 
 ```{r}
-(sjsp <- semi_join(superheroes, publishers))
+semi_join(superheroes, publishers)
 ```
 
-We get a similar result as with `inner_join()` but the join result contains only the variables originally found in `x = superheroes`.
-
-```{r echo = FALSE}
-sjsp_gt <- style_table(sjsp, "semi_join(x = superheroes, y = publishers)") 
-```
-
-```{r echo = FALSE, out.width="100%"}
-make_three_gt(super_gt, pub_gt, sjsp_gt)
-```
-
-Now compare the result of switching the values of the arguments. 
+Compare the result of switching the values of the arguments. 
 
 ```{r}
-(sjps <- semi_join(x = publishers, y = superheroes))
+semi_join(x = publishers, y = superheroes)
 ```
 
 Now the effects of switching the `x` and `y` roles is more clear. The result resembles `x = publishers`, but the publisher Image is lost, because there are no observations where `publisher == "Image"` in `y = superheroes`.
 
-```{r echo = FALSE}
-sjps_gt <- style_table(sjps, "semi_join(x = publishers, y = superheroes)") 
-```
+#### `anti_join()`
 
-```{r echo = FALSE, out.width="100%"}
-make_three_gt(pub_gt, super_gt, sjps_gt, super_first = FALSE)
-```
-
-#### `anti_join(superheroes, publishers)`
-
-`anti_join(x, y)`: Return all rows from `x` where there are not matching values in `y`, keeping just columns from `x`. This is a filtering join.
+`anti_join(x, y)`: Return all rows from `x` where there are no matching values in `y`, keeping just columns from `x`. 
 
 ```{r}
-(ajsp <- anti_join(superheroes, publishers))
+anti_join(superheroes, publishers)
 ```
 
 We keep only Hellboy now (and do not get `yr_founded`).
 
-```{r echo = FALSE}
-ajsp_gt <- style_table(ajsp, "anti_join(x = superheroes, y = publishers)") 
-```
-
-```{r echo = FALSE, out.width="100%"}
-make_three_gt(super_gt, pub_gt, ajsp_gt)
-```
-
 Now switch the arguments and compare the result.
 
 ```{r}
-(ajps <- anti_join(publishers, superheroes))
+anti_join(publishers, superheroes)
 ```
 
 We keep only publisher Image now (and the variables found in `x = publishers`).
 
-```{r echo = FALSE}
-ajps_gt <- style_table(ajps, "anti_join(x = publishers, y = superheroes)") 
-```
 
-```{r echo = FALSE, out.width="100%"}
-make_three_gt(pub_gt, super_gt, ajps_gt, super_first = FALSE)
-```
-
-### Join data frames with "key" variables
+### Using key variables
 
 "Joining" or "merging" two different datasets is tricky stuff. Let's go through some more examples while reviewing the basic concepts. In the `flights` data frame, the variable `carrier` lists the carrier code for the different flights. While the corresponding airline names for `"UA"` and `"AA"` might be somewhat easy to guess (United and American Airlines), what airlines have codes `"VX"`, `"HA"`, and `"B6"`? This information is provided in a separate data frame `airlines`.
 
-```{r eval=FALSE}
-View(airlines)
+```{r}
+airlines
 ```
 
-We see that in `airports`, `carrier` is the carrier code, while `name` is the full name of the airline company. Using this table, we can see that `"VX"`, `"HA"`, and `"B6"` correspond to Virgin America, Hawaiian Airlines, and JetBlue, respectively. However, wouldn't it be nice to have all this information in a single data frame instead of two separate data frames? We can do this by "joining" the `flights` and `airlines` data frames.
+We see that in `airports`, `carrier` is the carrier code, while `name` is the full name of the airline company. Using this table, we can see that `"VX"`, `"HA"`, and `"B6"` correspond to Virgin America, Hawaiian Airlines, and JetBlue, respectively. However, wouldn't it be nice to have all this information in a single data frame instead of two separate data frames? We can do this by joining the `flights` and `airlines` data frames.
 
 Note that the values in the variable `carrier` in the `flights` data frame match the values in the variable `carrier` in the `airlines` data frame. In this case, we can use the variable `carrier` as a *key variable* to match the rows of the two data frames. Key variables are almost always *identification variables* that uniquely identify the observational units. This ensures that rows in both data frames are appropriately matched during the join. @rds2016 created the following diagram to help us understand how the different data frames in the **nycflights13** package are linked by various key variables:
 
-```{r, echo=FALSE, fig.cap="Relationships among nycflights tables", out.width="70%", fig.align='center'}
+```{r, echo = FALSE, fig.cap = "Relationships among nycflights tables"}
 knitr::include_graphics("02-wrangling/images/relational-nycflights.png")
 ```
 
@@ -1303,11 +1161,9 @@ knitr::include_graphics("02-wrangling/images/relational-nycflights.png")
 
 In both the `flights` and `airlines` data frames, the key variable we want to join/merge/match the rows by has the same name: `carrier`. Let's use the `inner_join()`  function to join the two data frames, where the rows will be matched by the variable `carrier`, and then compare the resulting data frames:
 
-```{r eval=FALSE}
-flights_joined <- flights %>% 
+```{r}
+flights %>% 
   inner_join(airlines, by = "carrier")
-View(flights)
-View(flights_joined)
 ```
 
 Observe that the `flights` and `flights_joined` data frames are identical except that `flights_joined` has an additional variable `name`. The values of `name` correspond to the airline companies' names as indicated in the `airlines` data frame. 
@@ -1316,45 +1172,40 @@ Say instead you are interested in the destinations of all domestic flights depar
 
 The `airports` data frame contains the airport codes for each airport:
 
-```{r eval=FALSE}
-View(airports)
+```{r}
+airports
 ```
 
 However, if you look at both the `airports` and `flights` data frames, you'll find that the airport codes are in variables that have different names. In `airports` the airport code is in `faa`, whereas in `flights` the airport codes are in `origin` and `dest`. 
 
 In order to join these two data frames by airport code, our `inner_join()` operation will use the `by = c("dest" = "faa")` argument with modified code syntax allowing us to join two data frames where the key variable has a different name:
 
-```{r, eval=FALSE}
-flights_with_airport_names <- flights %>% 
+```{r}
+flights %>% 
   inner_join(airports, by = c("dest" = "faa"))
-View(flights_with_airport_names)
 ```
 
 Let's construct the chain of pipe operators `%>%` that computes the number of flights from NYC to each destination, but also includes information about each destination airport:
 
 ```{r}
-named_dests <- flights %>%
+flights %>%
   group_by(dest) %>%
   summarize(num_flights = n(),
             .groups = "drop") %>%
   arrange(desc(num_flights)) %>%
   inner_join(airports, by = c("dest" = "faa")) %>%
   rename(airport_name = name)
-named_dests
 ```
 
-In case you didn't know, `"ORD"` is the airport code of Chicago O'Hare airport and `"FLL"` is the main airport in Fort Lauderdale, Florida, which can be seen in the `airport_name` variable.
-
-#### Multiple "key" variables
+`"ORD"` is the airport code of Chicago O'Hare airport and `"FLL"` is the code for the main airport in Fort Lauderdale, Florida, which can be seen in the `airport_name` variable.
 
 Say instead we want to join two data frames by *multiple key variables*. For example, we see that in order to join the `flights` and `weather` data frames, we need more than one key variable: `year`, `month`, `day`, `hour`, and `origin`. This is because the combination of these 5 variables act to uniquely identify each observational unit in the `weather` data frame: hourly weather recordings at each of the 3 NYC airports.
 
 We achieve this by specifying a *vector* of key variables to join by using the `c()` function. Recall that `c()` is short for "combine" or "concatenate."
 
 ```{r, eval=FALSE}
-flights_weather_joined <- flights %>%
+flights %>%
   inner_join(weather, by = c("year", "month", "day", "hour", "origin"))
-View(flights_weather_joined)
 ```
 
 ## Tidy data
