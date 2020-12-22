@@ -45,16 +45,12 @@ The **tidyverse** package will be used in every chapter. **primer.data** is the 
 
 ## Data Gathering
 
-<!-- DK: Not sure I like this example. We should do our own thing. -->
-
 The `read_csv()` function turns flat files into data frames. More specifically, it turns files whose values are separated by commas (hence CSV). Let’s import a Comma Separated Values file that exists on the internet. 
-
 Its important to know that the `read_csv()` function included in the readr package is different than the `read.csv()` function that comes installed with R. 
 
+It tells us that each comma from the .csv file corresponds to a column, and the column names are taken from the first line of the file. Then, the function "guesses" an appropriate data type for each of the columns it creates. Sometimes .csv files are a lot dirtier and require significant wrangling before you can explore the data and create usable graphics. 
 
-The result of this code chunk is pretty tame. It tells us that each comma from the .csv file corresponds to a column, and the column names are taken from the first line of the file. Then, the function "guesses" an appropriate data type for each of the columns it creates. Sometimes .csv files are a lot dirtier and require significant wrangling before you can explore the data and create usable graphics. 
-
-This is a link to a file containing the faculty's gender data across departments at Harvard University. Note, the file argument of the `read_csv()` function can take the link to a dataset in a number of forms. In the previous example and the one below, the file argument takes a url. Other formats that this argument could take are full or partial file paths for .csv files saved locally on your computer. 
+This link below brings you to a file containing the faculty's gender data across departments at Harvard University. Note, the file argument of the `read_csv()` function can take the link to a dataset in a number of forms. Below, the file argument takes a url. Other formats that this argument could take are full or partial file paths for .csv files saved locally on your computer. 
 
 ```{r}
 url <- "https://raw.githubusercontent.com/PPBDS/primer/master/02-wrangling/data/faculty.csv"
@@ -64,7 +60,7 @@ fac <- read_csv(file = url,
 fac
 ```
 
-We need to "skip" the first row of the file because it does not contain actual data.
+We need to "skip" the first row of the file because there is a code comment at the top, which has nothing to do with the actual data.
 
 Run the `summary()` function on the `fac` dataframe.
 
@@ -270,14 +266,14 @@ Recall the `fac` tibble we created earlier in the Chapter.
 fac
 ```
 
-Let's look at the deparment with 644 make professors.
+Let's look at the department with 644 make professors.
 
 ```{r, error = TRUE, renv.ignore = TRUE}
 fac %>%
   filter(Professors M == 644)
 ```
 
-We can solve this problem by using backticks.
+Notice that there is a space in the column name `Professors M`. Recall that we can solve this problem by using backticks.
 
 ```{r, error = TRUE}
 fac %>%
@@ -285,6 +281,7 @@ fac %>%
 ```
 
 There is not a department called "total." And backticks are annoying. So we run the `clean_names()` function, from the **janitor** package.  
+
 ```{r, message = FALSE}
 library(janitor)
 fac %>%
@@ -294,20 +291,19 @@ fac %>%
 <!-- DK: Fix this. -->
 
 
+It seems that one row of the table takes the sum of each of the other rows. This is likely the last row of the dataframe. Use `tail()` to print the last rows of the dataframe to check the final row.
 
-<!-- It seems that one row of the table takes the sum of each of the other rows. This is likely the last row of the dataframe. Use `tail()` to print the last rows of the dataframe to check the final row. -->
+```{r}
+tail(fac)
+```
 
-<!-- ```{r} -->
-<!-- tail(fac) -->
-<!-- ``` -->
+We remove the "Total" row because it will affect any dplyr functions we try to run later. Check the `tail()` of the dataframe again to make sure that the proper row was removed.
 
-<!-- Now, remove the "Total" row because it will affect any dplyr functions we try to run on the dataframe. Check the `tail()` of the dataframe again to make sure that the proper row was removed.  -->
-
-<!-- ```{r} -->
-<!-- fac %>% -->
-<!--   filter(concentration != "Total") %>%  -->
-<!--   tail() -->
-<!-- ``` -->
+```{r}
+fac %>%
+  filter(Concentration != "Total") %>%
+  tail()
+```
 
 
 
@@ -316,7 +312,7 @@ fac %>%
 The `skim()` function from the **skimr** package is a useful summary function that offers an overview of a tibble  The function creates a report of the tibble, organized by variable type. Example:
 
 ```{r out.width="100%"}
-skim(trains)
+skim(fac)
 ```
 
 Take a quick look at the section containing numeric variables. This is of particular interest because the right-most column offers insight into the potential distribution of the data. 
@@ -324,120 +320,81 @@ Take a quick look at the section containing numeric variables. This is of partic
 
 ## Characters 
 
-We've spent a lot of time working with big, beautiful data frames that are clean and wholesome, like the `gapminder` and `trains` data. But real life datasets rwill be much nastier. You will bring data into R from the outside world and discover there are problems. You might think: how hard can it be to deal with character data? And the answer is: it can be very hard! Here we discuss common remedial tasks for cleaning and transforming character data, also known as "strings". Basically, a string is one or more characters that are enclosed inside a pair of matching 'single' or "double quotes" .
+So far, we have encountered tibbles that are clean and wholesome, like the `gapminder` and `trains` data. But real life datasets will be much nastier. You will bring data into R from the outside world and discover there are problems. We will now discuss common remedial tasks for cleaning and transforming character data, also known as strings. A *string* is one or more characters that are enclosed inside a pair of matching 'single' or "double quotes" .
 
-A data frame or tibble will consist of one or more *atomic vectors* of a certain class. An atomic vector is one of the two types of vectors. There are six types: logical, integer, double, character. This lesson deals with things you can do with vectors of class `character`.
+A tibble can consist of one or more atomic vectors of a certain class. An *atomic vector* is one of the two types of vectors. There are six types: logical, integer, double, character. 
 
-At the beginning of the chapter, we loaded the **tidyverse**, which includes `stringr`. This package allows users to manipulate strings with its functions that being with `str_`.
 
-<!-- DK: Is this long list useful?  Not that I can see, unless you tell us the commands which do it. -->
-
-There are some basic string manipulation tasks:
-
-1. Study a single character vector
-  - How long are the strings?
-  - Presence/absence of a literal string
-  
-1. Operate on a single character vector
-  - Keep/discard elements that contain a literal string
-  - Split into two or more character vectors using a fixed delimiter    
-  - Snip out pieces of the strings based on character position
-  - Collapse into a single string
-  
-1. Operate on two or more character vectors
-  - Glue them together element-wise to get a new character vector.
-
-`fruit`, `words`, and `sentences` are character vectors that ship with stringr for practicing.*
+This lesson deals with things you can do with vectors of class `character`.`fruit`, `words`, and `sentences` are character vectors we will manipulate.
 
 ### Studying a single character vector
 
-We can determine if a character vector matches a pattern using `str_detect()`. It returns a logical vector that is the same length as the input. Recall logicals are either `TRUE` or `FALSE`.
+`str_detect()` determines if a character vector matches a pattern.  It returns a logical vector that is the same length as the input. Recall logicals are either `TRUE` or `FALSE`.
 
-Let's consider the character vector `fruit`
-
-Let's use `str_detect()` to see which fruits actually use the word "fruit"?
+Which fruits actually use the word "fruit"?
 
 ```{r}
 str_detect(fruit, pattern = "fruit")
 ```
 
-What's the easiest way to get the actual fruits that match? Use `str_subset()` to keep only the matching elements. *Note:* we are storing this new vector `my_fruit` to use in later examples!
+To get the actual fruits that match, we  use `str_subset()` to keep only the matching elements. *Note:* we are storing this new vector `my_fruit` to use in later examples!
 
 ```{r}
 (my_fruit <- str_subset(fruit, pattern = "fruit"))
 ```
 
-Use `stringr::str_view()` to create a window in your viewer that highlights a specified pattern for any and all instances within the list. Below we look at a subset of fruit and highlight the pattern "berry" within items in that list. 
+Use `str_view()` to create a window in your viewer that highlights the specified pattern within the list. Consider the pattern "berry". 
 
 ```{r}
 str_view(fruit[5:10], pattern = "berry")
 ```
 
-This can be helpful when you want to check that you are highlighting the correct pattern (especially when using regex, which is short for "regular expression").
-
-```{r}
-str_view(fruit[1:5], pattern = "^a.*o")
-```
 
 ### Operating on a single character vector
 
-We can use `str_split()` to split a string up into pieces. Some of our fruits are compound words, like "grapefruit", but some have two words, like "ugli fruit". Here we split on a single space `" "`, but show use of a regular expression later. 
+`str_split()` splits a string up into pieces. 
+
+Some of our fruits are compound words, like "grapefruit", but some have two words, like "ugli fruit". Here we split on a single space `" "`. 
 
 ```{r}
 str_split(my_fruit, pattern = " ")
 ```
 
-Split strings must return *list*  because who knows how many pieces there will be? Lists will be explained later in this chapter. For now, just know that they tree-like structured vectors.
-
-You can specify the number of pieces the string is split into using `str_split_fixed()` . In return, you will get a character matrix. A matrix is a rectangular array of data that displays one type of data such as "character".
-
-```{r}
-str_split_fixed(my_fruit, pattern = " ", n = 2)
-```
-
-If the to-be-split variable lives in a data frame, `tidyr::separate()` will split it into 2 or more variables.
-
-```{r}
-my_fruit_df <- tibble(my_fruit)
-my_fruit_df %>% 
-  separate(my_fruit, into = c("pre", "post"), sep = " ")
-```
-
-You can count characters in your strings with `str_length()`. Note this is different from the `length()` of the character vector itself.
+`str_length()` counts characters in your strings. Note this is different from the `length()` of the character vector itself.
 
 ```{r}
 length(my_fruit)
 str_length(my_fruit)
 ```
 
-You can extract parts of a string using `str_sub()`.`str_sub()` takes start and end arguments which give the (inclusive) position of the substring.
+`str_sub()` extracts parts of a string.`The function takes start and end arguments which are vectorised.
+
+Here, we tell R to extract the first three letters of each character.
 
 ```{r}
 animals <- c("dog", "cat", "bird")
 str_sub(animals, 1, 3)
 ```
 
-The `start` and `end` arguments are vectorised. In the code above, you are telling R to extract the first letter (1) all the way through the third (3).
-
-You can combine a character vector of length `n > 1` to a single string with `str_c()`, which also has other uses (see the [next section](#catenate-vectors)).
+ `str_c()` combines a character vector of length to a single string.
 
 ```{r}
 str_c("x", "y")
 ```
 
-Use the `sep` argument to control how they’re separated:
+You can use the `sep` argument to control how they’re separated:
 
 ```{r}
 str_c("x", "y", sep = ", ")
 ```
 
-You can replace a pattern within a string with `str_replace()`. Here we use an explicit string-to-replace, but later we revisit with a regular expression.
+ `str_replace()` replaces a pattern within a string.
 
 ```{r}
 str_replace(my_fruit, pattern = "fruit", replacement = "THINGY")
 ```
 
-A special case that comes up a lot is replacing `NA`, for which there is `str_replace_na()`.
+ `str_replace_na()` replaces `NA` in your string.
 
 ```{r}
 melons <- str_subset(fruit, pattern = "melon")
@@ -446,68 +403,56 @@ melons
 str_replace_na(melons, "UNKNOWN MELON")
 ```
 
-If the `NA`-afflicted variable lives in a data frame, you can use `tidyr::replace_na()`.
+If the `NA`- afflicted variable lives in a data frame, you can use `replace_na()`.
 
 ```{r}
 tibble(melons) %>% 
   replace_na(replace = list(melons = "UNKNOWN MELON"))
 ```
 
-And that concludes our treatment of regex-free manipulations of character data!
 
 ### Operating on two or more character vectors 
 
-If you have two or more character vectors of the same length, you can glue them together element-wise, to get a new vector of that length. Here are some ... awful smoothie flavors?
+If you have two or more character vectors of the same length, you can glue them together element-wise, to get a new vector of that length. 
 
 ```{r}
-str_c(fruit[1:4], fruit[5:8], sep = " & ")
+str_c(fruit[1:2], fruit[3:4], sep = " & ")
 ```
 
-Element-wise catenation can be combined with `str_c()`.
+Element-wise you can combine two vectors with `str_c()`.
 
 ```{r}
-str_c(fruit[1:4], fruit[5:8], sep = " & ", collapse = ", ")
+str_c(fruit[1:2], fruit[3:4], sep = " & ", collapse = ", ")
 ```
 
-If the to-be-combined vectors are variables in a data frame, you can use `tidyr::unite()` to make a single new variable from them.
+If the to-be-combined vectors are variables in a data frame, you can use `unite()` to make a single new variable.
 
 ```{r}
-fruit_df <- tibble(
-  fruit1 = fruit[1:4],
-  fruit2 = fruit[5:8]
-)
+fruit_df <- tibble(fruit1 = fruit[1:2],
+                   fruit2 = fruit[3:4])
 
 fruit_df %>% 
   unite("flavor_combo", fruit1, fruit2, sep = " & ")
 ```
 
+
 ### Regular expressions with stringr
 
-```{r echo = FALSE, fig.cap = "From [\\@ThePracticalDev](https://twitter.com/ThePracticalDev/status/774309983467016193)", out.width = "70%", fig.align='center'}
-knitr::include_graphics("02-wrangling/images/regexp.jpg")
+Your string tasks cannot be expressed in terms of a fixed string, but can be described in terms of a pattern. Regular expressions, aka "regexes", are the standard way to specify these patterns. In regexes, specific characters and constructs take on special meaning in order to match multiple strings.
 
-```
-
-Frequently your string tasks cannot be expressed in terms of a fixed string, but can be described in terms of a pattern. Regular expressions, aka "regexes", are the standard way to specify these patterns. In regexes, specific characters and constructs take on special meaning in order to match multiple strings.
-
-The country names in the `gapminder` dataset are convenient for examples. Let's use it now and store the `r nlevels(gapminder::gapminder$country)` unique country names in the object `countries`.
+Let's store the `levels(gapminder$country)` country names in the object `countries`.
 
 ```{r}
 countries <- levels(gapminder$country)
-countries
 ```
 
-The first metacharacter is the period `.`, which stands for any single character, except a newline (which by the way, is represented by `\n`). The regex `i.a` will match all countries that have an `i`, followed by any single character, followed by `a`. Yes, regexes are case sensitive, i.e. "Italy" does not match.
+In the code below, the first metacharacter is the period `.` , which stands for any single character, except a newline (which by the way, is represented by `\n`). The regex `i.a` will match all countries that have an `i`, followed by any single character, followed by `a`. Regexes are case sensitive, i.e. "Italy" does not match.
 
 ```{r}
 str_subset(countries, pattern = "i.a")
 ```
 
-Notice that `i.a` matches "ina", "ica", "ita", and more.
-
-Anchors can be included to express where the expression must occur within the string. The `^` indicates the beginning of string and `$` indicates the end.
-
-Note how the regex `i.a$` matches many fewer countries than `i.a` alone. Likewise, more elements of `my_fruit` match `d` than `^d`, which requires "d" at string start.
+Anchors can be included to express where the expression must occur within the string. The `^` indicates the beginning of string and `$` indicates the end. Notice we observe fewer countries.
 
 ```{r}
 str_subset(countries, pattern = "i.a$")
@@ -515,7 +460,7 @@ str_subset(my_fruit, pattern = "d")
 str_subset(my_fruit, pattern = "^d")
 ```
 
-The metacharacter `\b` indicates a word boundary and `\B` indicates NOT a word boundary. This is our first encounter with something called "escaping" and right now I just want you at accept that we need to prepend a second backslash to use these sequences in regexes in R. We'll come back to this tedious point later.
+`\b` indicates a word boundary, such as a space.`\B` indicates NOT a word boundary.
 
 ```{r}
 str_subset(fruit, pattern = "melon")
@@ -523,36 +468,6 @@ str_subset(fruit, pattern = "\\bmelon")
 str_subset(fruit, pattern = "\\Bmelon")
 ```
 
-Characters can be specified via classes. You can make them explicitly "by hand" or use some pre-existing ones.  Character classes are usually given inside square brackets, `[]` but a few come up so often that we have a metacharacter for them, such as `\d` for a single digit.
-
-Here we match `ia` at the end of the country name, preceded by one of the characters in the class. Or, in the negated class, preceded by anything but one of those characters.
-
-```{r}
-# Make a class "by hand"
-
-str_subset(countries, pattern = "[nls]ia$")
-
-# Use ^ to negate the class
-
-str_subset(countries, pattern = "[^nls]ia$")
-```
-
-Here we revisit splitting `my_fruit` with two more general ways to match whitespace: the `\s` metacharacter and the POSIX class `[:space:]`. Notice that we must prepend an extra backslash `\` to escape `\s` and the POSIX class has to be surrounded by two sets of square brackets.
-
-```{r}
-# Remember this?
-# str_split_fixed(fruit, pattern = " ", n = 2)
-# Alternatives:
-
-str_split_fixed(my_fruit, pattern = "\\s", n = 2)
-str_split_fixed(my_fruit, pattern = "[[:space:]]", n = 2)
-```
-
-Let's see the country names that contain punctuation.
-
-```{r}
-str_subset(countries, "[[:punct:]]")
-```
 
 ### Quantifiers
 
@@ -565,7 +480,8 @@ You can decorate characters (and other constructs, like metacharacters and class
 | ?          | 0 or 1    | {,m}       | at most m                  |
 |            |           | {n,m}      | between n and m, inclusive |
 
-Explore these by inspecting matches for `l` followed by `e`, allowing for various numbers of characters in between.
+
+Let's now explore the quantifiers  above by inspecting matches for `l` followed by `e`, allowing for various numbers of characters in between.
 
 `l.*e` will match strings with 0 or more characters in between, i.e. any string with an `l` eventually followed by an `e`. This is the most inclusive regex for this example, so we store the result as `matches` to use as a baseline for comparison.
 
@@ -594,6 +510,7 @@ list(match = intersect(matches, str_subset(fruit, pattern = "le")),
      no_match = setdiff(matches, str_subset(fruit, pattern = "le")))
 ```
 
+
 ### Raw strings
 
 You’ve probably caught on by now that there are certain characters with special meaning in regexes, including `$ * + . ? [ ] ^ { } | ( ) \`. This makes things difficult when we want to use these characters within the strings instead of as regexes. Previously, we would have to do a lot of maneuvering to create strings containing special characters, but now we can use `r"()"`. 
@@ -616,9 +533,9 @@ As you can see, a backslash is used to escape the initial backslash.
 
 ## Factors
 
-Factors are categorical variables that may only take on a specified set of values. Thus, they are known as categorical variables, as they can be separated into categories. To manipulate factors we will use the [forcats][forcats-web] package, a core package in the tidyverse. Like the stringr package whose functions begin with `str_`, main functions of the forcats package start with `fct_`.
+Factors are categorical variables that may only take on a specified set of values. Thus, they are known as categorical variables, as they can be separated into categories. To manipulate factors we will use the [forcats][forcats-web] package, a core package in the tidyverse. 
 
-Get to know your factor before you start touching it! It's polite. Let's use `gapminder$continent` as our example.
+Let's use `gapminder$continent` as our example.
 
 ```{r}
 str(gapminder$continent)
@@ -627,7 +544,7 @@ nlevels(gapminder$continent)
 class(gapminder$continent)
 ```
 
-To get a frequency table as a tibble, from a tibble, use `dplyr::count()`. To get a similar result from a free-range factor, use `forcats::fct_count()`.
+To get a frequency table as a tibble, from a tibble, use `count()`. To get a similar result from a free-range factor, use `fct_count()`.
 
 ```{r}
 gapminder %>% 
@@ -653,14 +570,14 @@ nlevels(h_gap$country)
 
 Even though `h_gap` only has data for a handful of countries, we are still schlepping around all levels from the original `gapminder` tibble.
 
-How can you get rid of them? The base function `droplevels()` operates on all the factors in a data frame or on a single factor. The function `forcats::fct_drop()` operates on a factor.
+How can you get rid of them? The base function `droplevels()` operates on all the factors in a data frame or on a single factor. The function `fct_drop()` operates on a factor.
 
 ```{r}
 h_gap_dropped <- h_gap %>% 
   droplevels()
 nlevels(h_gap_dropped$country)
 
-# Use forcats::fct_drop() on a free-range factor
+# Use fct_drop() on a free-range factor
 
 h_gap$country %>%
   fct_drop() %>%
@@ -669,27 +586,29 @@ h_gap$country %>%
 
 ### Change order of the levels
 
-By default, factor levels are ordered alphabetically. When you think about it, this ordering might as well be random! It is preferable to order the levels according to some principle:
-
-* Frequency: Make the most common level the first and so on.
-* Another variable: Order factor levels according to a summary statistic for another variable.
-
-First, let's order continent by frequency, forwards and backwards. This is often a great idea for tables and figures, esp. frequency barplots.
+By default, factor levels are ordered alphabetically. 
 
 ```{r}
-# Default order is alphabetical
-
 gapminder$continent %>%
   levels()
+```
 
-# Order by frequency
+We can also order factors by:
 
+1. Frequency: Make the most common level the first and so on.
+1. Another variable: Order factor levels according to a summary statistic for another variable.
+
+Let's order continent by frequency using `fct_infreq()`.
+
+```{r}
 gapminder$continent %>% 
   fct_infreq() %>%
   levels()
+```
 
-# Backwards!
+We can also have the frequency print out backwards using `fct_rev()`.
 
+```{r}
 gapminder$continent %>% 
   fct_infreq() %>%
   fct_rev() %>% 
@@ -716,9 +635,7 @@ gapminder %>%
 ```
 
 
-
-
-Now we order `country` by another variable, forwards and backwards. This other variable is usually quantitative and you will order the factor according to a grouped summary. The factor is the grouping variable and the default summarizing function is `median()` but you can specify something else.
+Let's now order `country` by another variable, forwards and backwards. This other variable is usually quantitative and you will order the factor according to a grouped summary. The factor is the grouping variable and the default summarizing function is `median()` but you can specify something else.
 
 ```{r}
 # Order countries by median life expectancy
@@ -748,7 +665,7 @@ Why do we reorder factor levels? It often makes plots much better! When a factor
 
 Compare the interpretability of these two plots of life expectancy in Asian countries in 2007. The only difference is the order of the `country` factor. Which one do you find easier to learn from?
 
-```{r , echo = FALSE, alpha-order-silly, fig.show = 'hold', out.width = '49%', out.height="80%"}
+```{r , echo = FALSE, alpha-order-silly, fig.show = 'hold', out.width = '100%'}
 gap_asia_2007 <- gapminder %>% 
   filter(year == 2007, 
          continent == "Asia")
@@ -761,33 +678,33 @@ ggplot(gap_asia_2007, aes(x = lifeExp,
                                           lifeExp))) + geom_point()
 ```
 
-Use `fct_reorder2()` when you have a line chart of a quantitative x against another quantitative y and your factor provides the color. This way the legend appears in the same order as the data! Note, the order is taken by the right side of the plot (not the left). Contrast the legend on the left with the one on the right. 
+<!-- Use `fct_reorder2()` when you have a line chart of a quantitative x against another quantitative y and your factor provides the color. This way the legend appears in the same order as the data! Note, the order is taken by the right side of the plot (not the left). Contrast the legend on the left with the one on the right.  -->
 
-```{r legends-made-for-humans, fig.show = 'hold', out.width = '49%', out.height="80%", echo = FALSE}
-h_countries <- c("Egypt", "Haiti", "Romania", "Thailand", "Venezuela")
-h_gap <- gapminder %>%
-  filter(country %in% h_countries) %>% 
-  droplevels()
-ggplot(h_gap, aes(x = year, y = lifeExp, color = country)) +
-  geom_line()
-ggplot(h_gap, aes(x = year, y = lifeExp,
-                  color = fct_reorder2(country, year, lifeExp))) +
-  geom_line() +
-  labs(color = "country")
-```
+<!-- ```{r legends-made-for-humans, fig.show = 'hold', out.width = '49%', out.height="80%", echo = FALSE} -->
+<!-- h_countries <- c("Egypt", "Haiti", "Romania", "Thailand", "Venezuela") -->
+<!-- h_gap <- gapminder %>% -->
+<!--   filter(country %in% h_countries) %>%  -->
+<!--   droplevels() -->
+<!-- ggplot(h_gap, aes(x = year, y = lifeExp, color = country)) + -->
+<!--   geom_line() -->
+<!-- ggplot(h_gap, aes(x = year, y = lifeExp, -->
+<!--                   color = fct_reorder2(country, year, lifeExp))) + -->
+<!--   geom_line() + -->
+<!--   labs(color = "country") -->
+<!-- ``` -->
 
-Sometimes you just want to hoist one or more levels to the front. Why? Because we said so. This resembles what we do when we move variables to the front with `dplyr::select(special_var, everything())`.
+<!-- Sometimes you just want to hoist one or more levels to the front. Why? Because we said so. This resembles what we do when we move variables to the front with `dplyr::select(special_var, everything())`. -->
 
-```{r}
-h_gap$country %>% 
-  levels()
+<!-- ```{r} -->
+<!-- h_gap$country %>%  -->
+<!--   levels() -->
 
-h_gap$country %>% 
-  fct_relevel("Romania", "Haiti") %>% 
-  levels()
-```
+<!-- h_gap$country %>%  -->
+<!--   fct_relevel("Romania", "Haiti") %>%  -->
+<!--   levels() -->
+<!-- ``` -->
 
-This might be useful if you are preparing a report for, say, the Romanian government. The reason for always putting Romania first has nothing to do with the data, it is important for external reasons and you need a way to express this.
+<!-- This might be useful if you are preparing a report for, say, the Romanian government. The reason for always putting Romania first has nothing to do with the data, it is important for external reasons and you need a way to express this. -->
 
 ### Recode the levels
 
@@ -809,7 +726,7 @@ i_gap$country %>%
 
 ### Grow a factor
 
-Let's create two data frames, each with data from two countries, dropping unused factor levels.
+Let's create two tibbles, each with data from two countries and dropped unused factor levels.
 
 ```{r}
 df1 <- gapminder %>%
@@ -840,6 +757,10 @@ fct_c(df1$country, df2$country)
 ```
 
 ## Lists
+
+```{r lists-subsetting, echo = FALSE, out.width = "75%", fig.align='center', fig.cap = "Subsetting a list, visually."}
+knitr::include_graphics("02-wrangling/images/lists-subsetting.png")
+```
 
 Earlier, we briefly introduced lists. Lists are a type of vector that is a step up in complexity from atomic vectors, because lists can contain other lists. This makes them suitable for representing hierarchical or tree-like structures. You create a list with the function `list()`:
 
@@ -926,38 +847,6 @@ a[["a"]]
 ```
 
 The distinction between `[ ]` and `[[ ]]` is really important for lists, because `[[ ]]` drills down into the list while `[ ]` returns a new, smaller list. Compare the code and output above with the visual representation.
-
-```{r lists-subsetting, echo = FALSE, out.width = "75%", fig.align='center', fig.cap = "Subsetting a list, visually."}
-knitr::include_graphics("02-wrangling/images/lists-subsetting.png")
-```
-
-### Lists of condiments
-
-The difference between `[ ]` and `[[ ]]` is very important, but it's easy to get confused. To help you remember, let me show you an unusual pepper shaker.
-
-```{r, echo = FALSE, out.width = "40%", fig.align='center'} 
-knitr::include_graphics("02-wrangling/images/pepper.jpg")
-```
-
-If this pepper shaker is your list `x`, then, `x[1]` is a pepper shaker containing a single pepper packet:
-
-```{r, echo = FALSE, out.width = "40%", fig.align='center'}
-knitr::include_graphics("02-wrangling/images/pepper-1.jpg")
-```
-
-`x[2]` would look the same, but would contain the second packet. `x[1:2]` would be a pepper shaker containing two pepper packets. 
-
-`x[[1]]` is:
-
-```{r echo = FALSE, out.width = "40%", fig.align='center'} 
-knitr::include_graphics("02-wrangling/images/pepper-2.jpg")
-```
-
-If you wanted to get the content of the pepper package, you'd need `x[[1]][[1]]`:
-
-```{r, echo = FALSE, out.width = "40%", fig.align='center'}
-knitr::include_graphics("02-wrangling/images/pepper-3.jpg")
-```
 
 ## Date-Times 
 
@@ -1404,7 +1293,7 @@ View(airlines)
 
 We see that in `airports`, `carrier` is the carrier code, while `name` is the full name of the airline company. Using this table, we can see that `"VX"`, `"HA"`, and `"B6"` correspond to Virgin America, Hawaiian Airlines, and JetBlue, respectively. However, wouldn't it be nice to have all this information in a single data frame instead of two separate data frames? We can do this by "joining" the `flights` and `airlines` data frames.
 
-Note that the values in the variable `carrier` in the `flights` data frame match the values in the variable `carrier` in the `airlines` data frame. In this case, we can use the variable `carrier` as a *key variable* to match the rows of the two data frames. Key variables are almost always *identification variables* that uniquely identify the observational units. This ensures that rows in both data frames are appropriately matched during the join. @rds2016 created the following diagram to help us understand how the different data frames in the `nycflights13` package are linked by various key variables:
+Note that the values in the variable `carrier` in the `flights` data frame match the values in the variable `carrier` in the `airlines` data frame. In this case, we can use the variable `carrier` as a *key variable* to match the rows of the two data frames. Key variables are almost always *identification variables* that uniquely identify the observational units. This ensures that rows in both data frames are appropriately matched during the join. @rds2016 created the following diagram to help us understand how the different data frames in the **nycflights13** package are linked by various key variables:
 
 ```{r, echo=FALSE, fig.cap="Relationships among nycflights tables", out.width="70%", fig.align='center'}
 knitr::include_graphics("02-wrangling/images/relational-nycflights.png")
@@ -1495,8 +1384,6 @@ drinks_smaller <- drinks %>%
   rename(beer = beer_servings, spirit = spirit_servings, wine = wine_servings)
 drinks_smaller
 ```
-
-
 
 
 ### Definition of "tidy" data 
