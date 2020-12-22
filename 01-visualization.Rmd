@@ -461,19 +461,36 @@ Similarly to histograms, `geom_bar()` visualizes the distribution of a categoric
 Run the following code that manually creates a data frame representing a collection of fruit: 3 apples and 2 oranges. Notice how `fruits` lists the fruit individually.
 
 ```{r}
-fruits <- tibble(fruit = c("apple", "apple", "orange", 
+my_fruit <- tibble(fruit = c("apple", "apple", "orange", 
                            "apple", "orange"))
 
-fruits
+my_fruit
 ```
 
-Using the `fruits` data frame where all 5 fruits are listed individually in 5 rows, we map the `fruit` variable to the x-position aesthetic and add a `geom_bar()` layer:
+Using the `my_fruit` data frame where all 5 fruits are listed individually in 5 rows, we map the `fruit` variable to the x-position aesthetic and add a `geom_bar()` layer:
 
 ```{r}
-ggplot(data = fruits, 
+ggplot(data = my_fruit, 
        mapping = aes(x = fruit)) +
   geom_bar()
 ```
+
+
+### `geom_col()` 
+
+`geom_col()` is very similar to `geom_bar()`, except that `geom_col()` requires you to calculate the number of rows in each category ahead of time. `geom_bar()` does the calculation for you.
+
+
+```{r}
+my_fruit %>% 
+  group_by(fruit) %>% 
+  count() %>% 
+  ggplot(aes(x = fruit, y = n)) +
+    geom_col()
+```
+
+Note how we must supply both an `x` and `y` aesthetic for `geom_col()`. We need a variable for the category, as with `geom_bar()` and for the count of entries for each value.
+
 
 #### No pie charts!
 
@@ -949,6 +966,14 @@ Alternatively to `ifelse()`, use `dplyr::case_when()`. `case_when()` is particul
 
 
 ### `summarize()`
+
+A musical interlude inspired by the Tidyverse:
+
+```{r, echo=FALSE}
+knitr::include_app("https://www.youtube.com/watch?v=p8Py9C8iq2s")
+```
+
+
 
 The next common task when working with data frames is to compute *summary statistics*. Summary statistics are single numerical values that summarize a large number of values. Commonly known examples of summary statistics include the *mean* (also called the average) and the *median* (the middle value). Other examples of summary statistics that might not immediately come to mind include the *sum*, the smallest value also called the *minimum*, the largest value also called the *maximum*, and the *standard deviation*.
 
