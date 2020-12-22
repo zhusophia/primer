@@ -16,13 +16,15 @@
 
 <!-- Cut aggresively! Example: "The most recent release" -->
 
-<!-- Explain what (ijps <- inner_join(publishers, superheroes)) is doing. -->
+<!-- Explain what (ijps <- inner_join(publishers, superheroes)) is doing. DK: Done. -->
 
-<!-- Avoid eval = FALSE. If you are showing them the code, show them the results. (Example: tidy section.) How do you know the code works? -->
+<!-- Avoid eval = FALSE. If you are showing them the code, show them the results. (Example: tidy section.) How do you know the code works? DK: Done. -->
 
-<!-- Make out.width = "100%" the default? -->
+<!-- Replace flights with fec16. airlines are boring. Don't worry about that now. -->
 
-<!-- Maybe make a big set of FEC data from the 2016 election for use as the practice data? Ought to use something different from airlines . . . which are boring. Don't worry about that now. -->
+<!-- Add in other join diagrams, like the one used for for inner join. -->
+
+<!-- Start joins with left_join, since it is most popular. -->
 
 
 Start by loading the packages which we will need in this chapter.
@@ -83,7 +85,7 @@ url <- paste0("https://en.wikipedia.org/w/index.php?title=",
 
 You can see the data table when you visit the webpage:
 
-```{r, echo=FALSE, out.width="100%"}
+```{r, echo=FALSE}
 knitr::include_graphics("02-wrangling/images/murders-data-wiki-page.png")
 ```
 
@@ -91,7 +93,7 @@ To get this data, we need to do some web scraping.
 
 Web scraping, or web harvesting, is the term we use to describe the process of extracting data from a website. The reason we can do this is because the information used by a browser to render webpages is received as a text file from a server. The text is code written in hyper text markup language (HTML). Every browser has a way to show the html source code for a page, each one different. On Chrome, you can use Control-U on a PC and command+option+U on a Mac. You will see something like this:
 
-```{r, echo=FALSE, out.width="100%"}
+```{r, echo=FALSE}
 knitr::include_graphics("02-wrangling/images/html-code.png")
 ```
 
@@ -521,7 +523,7 @@ r"(Do you use "airquotes" much?)"
 
 The `\` preceding each quote is what is known as escaping. It signals to the computer that the quotations are part of the string. Now, what happens if we have a backslash within the string. 
 
-```{r echo=FALSE, fig.margin=TRUE, out.width="100%"}
+```{r echo=FALSE, fig.margin=TRUE}
 knitr::include_graphics("https://imgs.xkcd.com/comics/backslashes.png")
 ```
 
@@ -533,9 +535,20 @@ As you can see, a backslash is used to escape the initial backslash.
 
 ## Factors
 
-Factors are categorical variables that may only take on a specified set of values. Thus, they are known as categorical variables, as they can be separated into categories. To manipulate factors we will use the [forcats][forcats-web] package, a core package in the tidyverse. 
+Factors are categorical variables that may only take on a specified set of values. Thus, they are known as categorical variables, as they can be separated into categories. To manipulate factors we will use the **forcats** package, a core package in the tidyverse. 
 
-Let's use `gapminder$continent` as our example.
+It is easy to make factors with either `factor()`, `as.factor()` or `parse_factor()`.
+
+```{r}
+tibble(X = letters[1:3]) %>% 
+  mutate(fac_1 = factor(X)) %>% 
+  mutate(fac_2 = as.factor(X)) %>% 
+  mutate(fac_3 = parse_factor(X))
+```
+
+Which of those three options is best depends on the situation. `factor()` is useful when you are creating a factor from nothing. `as.factor()` is best for simple transformations, especially of character variables, as in this example. `parse_factor()` is the most modern and powerful of the three. 
+
+Let's use `gapminder$continent` as an example.
 
 ```{r}
 str(gapminder$continent)
@@ -1003,7 +1016,7 @@ In R, the time zone is an attribute of the date-time that only controls printing
 
 There are many ways to bring data together. 
 
-```{r, echo = FALSE, fig.cap = "Combining data is often tricky.", out.width="100%"}
+```{r, echo = FALSE, fig.cap = "Combining data is often tricky."}
 knitr::include_graphics("02-wrangling/images/wrangling.gif")
 ```
 
@@ -1022,23 +1035,18 @@ bind_rows(data_1, data_2)
 ```
 
 
-### joins
+### Joins
 
 
-Join (a.k.a. merge) two tables: dplyr join cheatsheet with comic characters and publishers.
+Consider two tibbles: `superheroes` and `publishers`.
 
-  
-Working with two small data frames: `superheroes` and `publishers`.
-
-```{r, message = FALSE, warning = FALSE}
+```{r}
 
 superheroes <- tibble::tribble(
        ~name,   ~gender,     ~publisher,
    "Magneto",   "male",       "Marvel",
      "Storm",   "female",     "Marvel",
-  "Mystique",   "female",     "Marvel",
     "Batman",   "male",       "DC",
-     "Joker",   "male",       "DC",
   "Catwoman",   "female",     "DC",
    "Hellboy",   "male",       "Dark Horse Comics"
   )
@@ -1051,11 +1059,13 @@ publishers <- tibble::tribble(
   )
 ```
 
+Note how easy it is to use `tribble()`, from the **tibble** package (part of the Tidyverse) to create a tibble on the fly using text which organized for easy entry and reading. Recall that a double colon --- `::` --- is how we indicate that a function comes from a specific package.
+
 #### `inner_join()`
 
 `inner_join(x, y)`: Return all rows from `x` where there are matching values in `y`, and all columns from `x` and `y`. If there are multiple matches between `x` and `y`, all combination of the matches are returned. 
 
-```{r, echo= FALSE, out.width="50%", fig.cap="Inner join."}
+```{r, echo= FALSE, fig.cap = "Inner join."}
 knitr::include_graphics("02-wrangling/images/join-inner.png")
 ```
 
@@ -1065,10 +1075,19 @@ inner_join(superheroes, publishers)
 
 We lose Hellboy in the join because, although he appears in `x = superheroes`, his publisher Dark Horse Comics does not appear in `y = publishers`. The join result has all variables from `x = superheroes` plus `yr_founded`, from `y`.
 
+Note the message that we are 'Joining, by = "publisher"'. Whenever joining, R checks to see if there are variables in common between the two tibbles and, if there are, uses them to join. However, it is concerned that you may not be aware that this is what it is doing, so R tells you. Such messages are both annoying and a signal that we have not made our code as robust as we should. Fortunately, we can specify precisely which variables we want to join by. Always do this.
+
+
+```{r, eval = FALSE}
+inner_join(superheroes, publishers, by = "publisher")
+```
+
+`by` also takes a vector of key variables if you want to merge by multiple variables.
+
 Now compare this result to that of using `inner_join()` with the two datasets in opposite positions. 
 
 ```{r}
-inner_join(publishers, superheroes)
+inner_join(publishers, superheroes, by = "publisher")
 ```
 
 In a way, this does illustrate multiple matches, if you think about it from the `x = publishers` direction. Every publisher that has a match in `y = superheroes` appears multiple times in the result, once for each match. In fact, we're getting the same result as with `inner_join(superheroes, publishers)`, up to variable order (which you should also never rely on in an analysis).
@@ -1078,7 +1097,7 @@ In a way, this does illustrate multiple matches, if you think about it from the 
 `full_join(x, y)`: Return all rows and all columns from both `x` and `y`. Where there are not matching values, returns `NA` for the one missing. 
 
 ```{r}
-full_join(superheroes, publishers)
+full_join(superheroes, publishers, by = "publisher")
 ```
 
 We get all rows of `x = superheroes` plus a new row from `y = publishers`, containing the publisher Image. We get all variables from `x = superheroes` AND all variables from `y = publishers`. Any row that derives solely from one table or the other carries `NA`s in the variables found only in the other table.
@@ -1091,7 +1110,7 @@ Because `full_join()` returns all rows and all columns from both `x` and `y` the
 `left_join(x, y)`: Return all rows from `x`, and all columns from `x` and `y`. If there are multiple matches between `x` and `y`, all combination of the matches are returned. 
 
 ```{r}
-left_join(superheroes, publishers)
+left_join(superheroes, publishers, by = "publisher")
 ```
 
 We basically get `x = superheroes` back, but with the addition of variable `yr_founded`, which is unique to `y = publishers`. Hellboy, whose publisher does not appear in `y = publishers`, has an `NA` for `yr_founded`.
@@ -1099,7 +1118,7 @@ We basically get `x = superheroes` back, but with the addition of variable `yr_f
 Now compare this result to that of running `left_join(x = publishers, y = superheroes)`. Unlike `inner_join()` and `full_join()` the order of the arguments has a significant effect on the resulting tibble. 
 
 ```{r}
-left_join(publishers, superheroes)
+left_join(publishers, superheroes, by = "publisher")
 ```
 
 We get a similar result as with `inner_join()` but the publisher Image survives in the join, even though no superheroes from Image appear in `y = superheroes`. As a result, Image has `NA`s for `name` and `gender`.
@@ -1111,13 +1130,13 @@ There is a similar function, `right_join(x, y)` that return all rows from `y`, a
 `semi_join(x, y)`: Return all rows from `x` where there are matching values in `y`, keeping just columns from `x`. A semi join differs from an inner join because an inner join will return one row of `x` for each matching row of `y`, where a semi join will never duplicate rows of `x`. This is a filtering join.
 
 ```{r}
-semi_join(superheroes, publishers)
+semi_join(superheroes, publishers, by = "publisher")
 ```
 
 Compare the result of switching the values of the arguments. 
 
 ```{r}
-semi_join(x = publishers, y = superheroes)
+semi_join(x = publishers, y = superheroes, by = "publisher")
 ```
 
 Now the effects of switching the `x` and `y` roles is more clear. The result resembles `x = publishers`, but the publisher Image is lost, because there are no observations where `publisher == "Image"` in `y = superheroes`.
@@ -1127,7 +1146,7 @@ Now the effects of switching the `x` and `y` roles is more clear. The result res
 `anti_join(x, y)`: Return all rows from `x` where there are no matching values in `y`, keeping just columns from `x`. 
 
 ```{r}
-anti_join(superheroes, publishers)
+anti_join(superheroes, publishers, by = "publisher")
 ```
 
 We keep only Hellboy now (and do not get `yr_founded`).
@@ -1135,40 +1154,34 @@ We keep only Hellboy now (and do not get `yr_founded`).
 Now switch the arguments and compare the result.
 
 ```{r}
-anti_join(publishers, superheroes)
+anti_join(publishers, superheroes, by = "publisher")
 ```
 
 We keep only publisher Image now (and the variables found in `x = publishers`).
 
 
-### Using key variables
+### Example
 
-"Joining" or "merging" two different datasets is tricky stuff. Let's go through some more examples while reviewing the basic concepts. In the `flights` data frame, the variable `carrier` lists the carrier code for the different flights. While the corresponding airline names for `"UA"` and `"AA"` might be somewhat easy to guess (United and American Airlines), what airlines have codes `"VX"`, `"HA"`, and `"B6"`? This information is provided in a separate data frame `airlines`.
+Consider the relationships among the tibbles in the **nycflights** package:
 
-```{r}
-airlines
-```
-
-We see that in `airports`, `carrier` is the carrier code, while `name` is the full name of the airline company. Using this table, we can see that `"VX"`, `"HA"`, and `"B6"` correspond to Virgin America, Hawaiian Airlines, and JetBlue, respectively. However, wouldn't it be nice to have all this information in a single data frame instead of two separate data frames? We can do this by joining the `flights` and `airlines` data frames.
-
-Note that the values in the variable `carrier` in the `flights` data frame match the values in the variable `carrier` in the `airlines` data frame. In this case, we can use the variable `carrier` as a *key variable* to match the rows of the two data frames. Key variables are almost always *identification variables* that uniquely identify the observational units. This ensures that rows in both data frames are appropriately matched during the join. @rds2016 created the following diagram to help us understand how the different data frames in the **nycflights13** package are linked by various key variables:
 
 ```{r, echo = FALSE, fig.cap = "Relationships among nycflights tables"}
 knitr::include_graphics("02-wrangling/images/relational-nycflights.png")
 ```
 
-#### Matching "key" variable names
 
-In both the `flights` and `airlines` data frames, the key variable we want to join/merge/match the rows by has the same name: `carrier`. Let's use the `inner_join()`  function to join the two data frames, where the rows will be matched by the variable `carrier`, and then compare the resulting data frames:
+In both the `flights` and `airlines` data frames, the key variable we want to join/merge/match the rows by has the same name: `carrier`. Let's use `inner_join()` to join the two data frames, where the rows will be matched by the variable `carrier`
 
 ```{r}
 flights %>% 
   inner_join(airlines, by = "carrier")
 ```
 
-Observe that the `flights` and `flights_joined` data frames are identical except that `flights_joined` has an additional variable `name`. The values of `name` correspond to the airline companies' names as indicated in the `airlines` data frame. 
+This is our first example of using a join function with a pipe. `flights` is fed as the first argument to `inner_join()`. That is what the pipe does. The above code is equivalent to:
 
-Say instead you are interested in the destinations of all domestic flights departing NYC in 2013, and you ask yourself questions like: "What cities are these airports in?", or "Is `"ORD"` Orlando?", or "Where is `"FLL"`?".
+```{r, eval = FALSE}
+inner_join(flights, airlines, by = "carrier")
+```
 
 The `airports` data frame contains the airport codes for each airport:
 
@@ -1178,7 +1191,7 @@ airports
 
 However, if you look at both the `airports` and `flights` data frames, you'll find that the airport codes are in variables that have different names. In `airports` the airport code is in `faa`, whereas in `flights` the airport codes are in `origin` and `dest`. 
 
-In order to join these two data frames by airport code, our `inner_join()` operation will use the `by = c("dest" = "faa")` argument with modified code syntax allowing us to join two data frames where the key variable has a different name:
+In order to join these two data frames by airport code, our `inner_join()` operation will use `by = c("dest" = "faa")` thereby allowing us to join two data frames where the key variable has a different name.
 
 ```{r}
 flights %>% 
@@ -1199,14 +1212,7 @@ flights %>%
 
 `"ORD"` is the airport code of Chicago O'Hare airport and `"FLL"` is the code for the main airport in Fort Lauderdale, Florida, which can be seen in the `airport_name` variable.
 
-Say instead we want to join two data frames by *multiple key variables*. For example, we see that in order to join the `flights` and `weather` data frames, we need more than one key variable: `year`, `month`, `day`, `hour`, and `origin`. This is because the combination of these 5 variables act to uniquely identify each observational unit in the `weather` data frame: hourly weather recordings at each of the 3 NYC airports.
 
-We achieve this by specifying a *vector* of key variables to join by using the `c()` function. Recall that `c()` is short for "combine" or "concatenate."
-
-```{r, eval=FALSE}
-flights %>%
-  inner_join(weather, by = c("year", "month", "day", "hour", "origin"))
-```
 
 ## Tidy data
 
@@ -1248,7 +1254,7 @@ What does it mean for your data to be "tidy"? While "tidy" has a clear English m
 3. Each type of observational unit forms a table.
 
 
-```{r, echo=FALSE, out.width="100%"}
+```{r, echo=FALSE}
 knitr::include_graphics("02-wrangling/images/tidy-1.png")
 ```
 
