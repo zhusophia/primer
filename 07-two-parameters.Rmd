@@ -6,18 +6,24 @@
 
 <!-- Show posterior_interval() -->
 
-In Chapter \@ref(one-parameter), we learned how to do inference. Given certain assumptions about the problem, we created a joint distribution of the models under consideration and the data which might be observed. Once we observe the data, we go from the joint distribution to the conditional distribution of possible models given the data which we did, in fact, observe. That conditional distribution, suitably normalized, is our posterior probability distribution over the space of possible models. With that distribution, we can answer any question we might (reasonably) ask.
+In Chapter \@ref(one-parameter), we learned how to do inference. We created a joint distribution of the models under consideration and the data which might be observed. Once we observed the data, we went from the joint distribution to the conditional distribution of possible models given the data which we did, in fact, observe. That conditional distribution, suitably normalized, was our posterior probability distribution over the space of possible models. With that distribution, we can answer any question we might (reasonably) ask.
 
-But what a pain in the ass that whole process was! Do professionals actually go through all those steps every time they work on a data science problem? No! Don't be absurd. Instead, professionals use standard tools which, in an automated fashion, take care of those steps, taking us directly from assumptions and data to the posterior:
+<!-- DK: Need a gif here. -->
 
-$$p(models | data = data\ we\ observed)$$.
+*But what a pain in the ass that whole process was!* Do professionals actually go through all those steps every time they work on a data science problem? No! Don't be absurd. Instead, professionals use standard tools which, in an automated fashion, take care of those steps, taking us directly from assumptions and data to the posterior:
 
-Even then, however, the relative likelihood of different models is not that important. Models are invisible, mental entities with no more fiscal presence than unicorns or leprechauns. In the world itself, we make and test predictions. How many red beads will come from the urn next time we use our shovel? People with better models make better predictions. That is what matters.
+$$p(models | data = data\ we\ observed)$$
+
+Even then, however, the relative likelihood of different models is not that important. Models are invisible, mental entities with no more physical presence than unicorns or leprechauns. In the world itself, we make and test predictions. How many red beads will come from the urn next time we use our shovel? People with better models make better predictions. That is what matters.
 
 
 In addition to a change in tools, there are two more key differences in this chapter. First, Chapter \@ref(one-parameter) dealt with a limited set of specific models: 2401 possible models. The procedure used is just what we saw in Chapter \@ref(probability).  In this chapter, on the other hand, have a continuous parameter.  Second, Chapter \@ref(one-parameter) used models with just one parameter: the number of red beads, which we can also transform into a parameter $p$, the number of red beads divided by 2,400.  The  model in Chapter \@ref(one-parameter) was binomial, and there is only one unknown parameter $p$ in such models. Here, we have two unknown parameters: the mean $\mu$ of height in the US and the standard deviation, $\sigma$, of the normally distributed error term. 
 
 The purpose of this chapter is to demonstrate, slowly and thoroughly, how professionals do data science.
+
+```{r, echo = FALSE}
+knitr::include_graphics("07-two-parameters/images/learn_the ways.gif")
+```
 
 Data science is ultimately a moral act, so we will use the four [Cardinal Virtues](https://en.wikipedia.org/wiki/Cardinal_virtues) --- Wisdom, Justice, Courage and Temperance --- to organize our approach.  
 
@@ -423,14 +429,14 @@ We have a model. What can we do with it? Let's answer the four questions with wh
 If we had the ideal Preceptor Table, one with a row for every man alive, and with their actual height, we could calculate this number easily. Just take the average of those 3 billion or so rows! Alas, in our actual Preceptor Table, the vast majority of heights are missing. Question marks make simple algebra impossible. So, as with any unknown number, we need estimate a posterior probability distribution. Objects created by `stan_glm()` make this easy to do.
 
 ```{r}
-newobs <- tibble(here = "hack")
+newobs <- tibble(constant = 1)
 
 pe <- posterior_epred(object = fit_obj,
                 newdata = newobs) %>% 
         as_tibble()
 ```
 
-The key function is `posterior_epred()`. The two arguments we provide are `object`, the fitted model object returned by `stan_glm()` and, newdata, which are the covariates associated with the unit for each we want to make a forecast. (In this case, `newdata` can be any tibble because an intercept-only model does not make use of covariates.) The `epred` in `posterior_epred()` stands for "**e**expected **pred**iction. In other words, if we pick a random adult male what do we "expect" his height to be. We also call this the "expected value."
+The key function is `posterior_epred()`. The two arguments we provide are `object`, the fitted model object returned by `stan_glm()` and, `newdata`, which are the covariates associated with the unit for each we want to make a forecast. (In this case, `newdata` can be any tibble because an intercept-only model does not make use of covariates. We don't really need a variable named `constant`, but including it does not harm.) The `epred` in `posterior_epred()` stands for "**e**expected **pred**iction. In other words, if we pick a random adult male what do we "expect" his height to be. We also call this the "expected value."
 
 <!-- DK: Tell the story about "mathematical hope." Maybe give more details on what the tibble is doing. Once new version comes out, replace with tibble(.rows = 1). -->
 
@@ -468,7 +474,7 @@ $$ y_i =  \mu + \epsilon_i $$
 With expected values or averages, we can ignore the $\epsilon_i$ term in this model. The expected value of $$\epsilon_i$$ is zero since, by assumption, $\epsilon_i \sim N(0, \sigma^2)$. However, we can't ignore $\epsilon_i$ when predicting the height for a single individual.
 
 ```{r}
-newobs <- tibble(here = "hack")
+newobs <- tibble(constant = 1)
 
 pp <- posterior_predict(object = fit_obj,
                   newdata = newobs) %>% 
@@ -516,7 +522,7 @@ Again, the key conceptual difficulty is the population. The problem we actually 
 Bayesian models are beautiful because, via the magic of simulation, we can answer (almost!) any question. With simulation, we just need to answer this step by step. Because the question is about four random individuals, we need `posterior_predict()` to give us four sets of draws from four identical posterior probability distributions, each one like the one from the previous question.
 
 ```{r}
-newobs <- tibble(here = rep("hack", 4))
+newobs <- tibble(constant = rep(1, 4))
 
 pp <- posterior_predict(object = fit_obj,
                   newdata = newobs) %>% 
@@ -556,7 +562,7 @@ There is about a 75% chance that, when meeting 4 random men, the tallest will be
 The same approach will work for almost any question.
 
 ```{r}
-newobs <- tibble(here = rep("hack", 100))
+newobs <- tibble(constant = rep(1, 100))
 
 pp <- posterior_predict(object = fit_obj,
                   newdata = newobs) %>% 
