@@ -1,10 +1,6 @@
 
 # Functions {#functions}
 
-<!-- MF: THIS IS A TEST. Let me know if this works! -->
-
-<!-- ? -->
-
 <!-- Start by reading the distribution section of Chapter 2: -->
 
 <!-- https://ppbds.github.io/primer/wrangling.html#distributions -->
@@ -17,24 +13,7 @@
 
 <!-- This is what we are preparing readers for. We want that to be easy for them, once they get there. We should also do a better job of connecting this code to the code in Chapter 5 but, right now, we don't show that to readers. -->
 
-<!-- * Need to focus more on functions which actually do something useful, something that teaches concepts which will be valuable later. One idea: A function which takes a tibble and a variable to sample from. It returns one value from that variable. Complexity is added because it removed all missing data first. Could use nhanes as the data set to play with. Further complexity could be added by adding a condition which filters the tibble in some way. my_sampler() -->
-
-
-<!-- ```{r} -->
-<!-- my_sampler <- function(x, var, n = 1){ -->
-<!--  x %>% -->
-<!--    select(var) %>% -->
-<!--    drop_na() %>% -->
-<!--    sample_n(n) %>% -->
-<!--    slice() -->
-<!-- } -->
-
-<!-- my_sampler(x = kenya, var = "poverty") -->
-<!-- my_sampler(nhanes, var = "height") -->
-<!-- ``` -->
-
-<!-- tibble(ID = 1:10) %>%  -->
-
+<!-- * Need to focus more on functions which actually do something useful, something that teaches concepts which will be valuable later. One idea: A function which takes a tibble and a variable to sample from. It returns one value from that variable. Complexity is added because it removed all missing data first. Could use nhanes as the data set to play with. Further complexity could be added by adding a condition which filters the tibble in some way. my_sampler() DONE. -->
 
 <!-- tibble(ID = 1:10) %>%  -->
 <!--   mutate(height = map_dbl(ID, ~ my_sampler(nhanes, "height"))) %>%  -->
@@ -47,7 +26,7 @@
 
 <!-- Perhaps there are three main parts to the chapter. The first is lists, list-columns, map functions and custom functions. We can cover all that with fairly simple examples. (Don't use N argument yet. Just solve the no NA problem.) Second, as discussed below, is explorations of measures of center and variability for distributions. (Means we need to extend my_sampler with n argument.) We can explore those things with our new tools. The third section plays the Guessing Game. -->
 
-<!-- Read, and then delete, the Crooked Casino section. -->
+<!-- Read, and then delete, the Crooked Casino section. DONE.-->
 
 <!-- Key concept to focus on is the idea of a distribution and draws therefrom. This connects to chapter 2, where we introduced distributions and to chapter 5, where we explain probability distributions. In particular, we should show various ways to measure center and variability. These are cool and important concepts. Is "center" the mean or the median or the trimmed mean or . . . Is "variability" the standard deviation, the mean absolute deviation, the standard deviation of the median absolute deviation or . . . There is nothing explicitly "statistical" here. We are just trying to connect English words to specific formulas. We might show the distributions for which these measures give the same answers and then some (mainly skewed) for which they don't. How to explore these concepts in the context of function writing? Perhaps by writing functions like my_mean() and my_median()? Or maybe focus on a function which calculates MAD SD? Then use list-columns to compare this function to other choices? -->
 
@@ -84,7 +63,6 @@
 
 <!-- https://aosmith.rbind.io/2018/08/29/getting-started-simulating-data/ -->
 <!-- https://aosmith.rbind.io/2018/06/05/a-closer-look-at-replicate-and-purrr/ -->
-
 
 
 The goal of this chapter is to reveal the __process__ a long-time useR employs for writing functions. We also want to illustrate why the process is the way it is. Merely looking at the finished product, e.g. source code for R packages, can be extremely deceiving. Reality is generally much uglier ... but more interesting! Powerful packages like **dplyr** and **purrr** are ready and waiting to apply your purpose-built functions to various bits of your data. If you can express your analytic wishes in a function, these tools will give you great power.
@@ -248,7 +226,6 @@ tibble(col_1 = list(range(x)))
 ```
 
 Notice this is a 1x1 tibble with one observation, which is a list of one element. The element is a vector of the integers 2 and 7. Voila! You have just created a *list-column**.
-
 
 Lesson: If a function returns multiple values as a vector, like `range()` does, you can't use it directly to obtain a list-column, but you can wrap `list()` around it in order to get the same behavior.
 
@@ -525,9 +502,7 @@ function(x) x <- 2
 x
 ```
 
-### Test your function
-
-#### Test on new inputs
+### Test on new inputs
 
 Pick some new artificial inputs where you know (at least approximately) what your function should return.
 
@@ -641,72 +616,101 @@ The tidyverse style guide has a very useful [chapter on how to construct error m
 
 In this section, we create a new function, generalize it, and learn more technical details about R functions.
 
-Our goal is to write a function that simulates throwing dice.
+Our goal is to write a function that draws samples from datasets found in `PPBDS/data`. 
 
-We will begin by creating a minimally viable function, `starter_die()`, which throws one die one time. 
+We will begin by creating a minimally viable function, `starter_sampler()`, which isolates a sample of variable `height` from the dataset `nhanes`. We start by selecting the variable we want, `height`, and then performing sample_n with a value of 1 to get one sample. Finally, we slice to isolate the result. 
 
 ```{r}
-starter_die <- function() {
-  sample(1:6, 1)
+start_sampler <- function() {
+  nhanes %>% 
+    select(height) %>% 
+    sample_n(1) %>% 
+    slice()
 }
 ```
 
-From here, we can add a formal argument `n`, which requires the number of dice to be specified. However, if more than one dice is thrown, we want to make sure that any number from `1-6` has the chance of being returned. To do so, make sure the `replace` argument in `sample()` is set to `TRUE`. Now we have generalized the function `starter_dice()`!
+```{r}
+start_sampler()
+```
+
+That's interesting! However, it isn't very adaptable, is it? Let's add a formal argument `n`, which allows us to sample any number of `height`s from `nhanes`. 
 
 ```{r}
-starter_die <- function(n) {
-  sample(1:6, n, replace = TRUE)
+multiple_sampler <- function(n) {
+  nhanes %>% 
+    select(height) %>% 
+    sample_n(n) %>% 
+    slice()
 }
 ```
 
-What if we wanted to add a formal argument, `n`, that would be passed into `sample()`'s n specification? Now let's create an intermediate function `add_dice()` which throws n dice and adds the results.
+Now, when we call our new function, `multiple_sampler`, we want to enter an argument for `n`. Let's try calling `n` = 10 to get 10 resulting heights.
 
 ```{r}
-add_dice <- function(n) {
-  sum(sample(1:6, n, replace = TRUE))
+multiple_sampler(n = 10)
+```
+Great! Though we have inserted some flexibility in our function, it still isn't as useful as possible. What if we want to sample a variable other than `height`? Like last time, we will write a new function which adds the formal argument `var` for variable. This way, we can look at other variables within our dataset. 
+
+```{r}
+flexible_sampler <- function(var, n){
+  nhanes %>% 
+    select(var) %>% 
+    sample_n(n) %>% 
+    slice()
 }
 ```
 
-Congratulations! We have just generalized our function to take in any number of dice. But wait... is it really *any* value? Let's add in a few checks that make sure no weird inputs break our function.
+Let's test the variable `weight` instead of height. Recall that when we want a character variable, we place the variable inside quotes:
 
 ```{r}
-add_dice <- function(n) {
-  stopifnot(is.numeric(n))
-  sum(sample(1:6, n, replace = TRUE))
+flexible_sampler(var = "weight", n = 10)
+```
+Let's take it one step further. We will now completely optimize our function by inserting one more formal argument, `x`, which will allow us to sample from any dataset, not just `nhanes`.
+
+```{r}
+my_sampler <- function(x, var, n){
+  x %>% 
+    select(var) %>% 
+    sample_n(n) %>% 
+    slice()
 }
 ```
 
-```{r error=TRUE}
-add_dice(-1)
-```
-
-Oops! As you can see, we tried to use a negative number of dice, which will not fly. Let's alter the informal checks to stop the function if `n` is negative.
+Test our new function using the `kenya` dataset as `x`, `mean_age` as `var`, and 10 as our `n`. Feel free to test any number of datasets, variables, and n values using this sampler!
 
 ```{r}
-add_dice <- function(n) {
-  stopifnot(is.numeric(n))
-  stopifnot(n >= 0)
-  sum(sample(1:6, n, replace = TRUE))
+my_sampler(x = kenya, var = "mean_age", n = 10)
+```
+ 
+Our function is nearly perfect! One issue we may run into, however, is an NA value in our results. How can we avoid this? Recall our very valuable friend `drop_na`, which removes any values of `NA` from our results. After selecting the variable we want to inspect, we should call `drop_NA`:
+
+```{r}
+my_sampler <- function(x, var, n){
+  x %>% 
+    select(var) %>% 
+    drop_na() %>% 
+    sample_n(n) %>% 
+    slice()
 }
 ```
 
-As you can see, we have a function that works and takes in sensible arguments. Next, let's talk about about argument specifications and conventions.
+We have now created our very first flexible, useful, customizable function! 
 
 ### Argument names: freedom and conventions
 
 Understand the importance of argument names. We can name my arguments almost anything we like. Proof:
 
 ```{r}
-add_dice <- function(bob_ross) {
-  stopifnot(is.numeric(bob_ross))
-  stopifnot(bob_ross >= 0)
-  sum(sample(1:6, bob_ross, replace = TRUE))
+multiple_sampler <- function(bob_ross) {
+  nhanes %>% 
+    select(height) %>% 
+    sample_n(bob_ross) %>% 
+    slice()
 }
-
-add_dice(bob_ross = 3)
+  
+multiple_sampler(bob_ross = 3)
 ```
-
-While we can name my argument after a famous painter, it's usually a bad idea. Take all opportunities to make things more self-explanatory via meaningful names.
+While we *can* name our argument after a famous painter, it's usually a bad idea. Take all opportunities to make things more self-explanatory via meaningful names.
 
 If you are going to pass the arguments of your function as arguments of a built-in function, consider copying the argument names. Unless you have a good reason to do your own thing (some argument names are bad!), be consistent with the existing function. Again, the reason is to reduce your cognitive load. 
 
@@ -717,29 +721,32 @@ We took this detour so you could see there is no *structural* relationship betwe
 What happens if we call our function but neglect to specify the probabilities?
 
 ```{r error=TRUE}
-add_dice()
+my_sampler()
 ```
 
 Oops! At the moment, this causes a fatal error. It can be nice to provide some reasonable default values for certain arguments. Setting `n = 1` is a reasonable default value.
 
 ```{r}
-add_dice <- function(n = 1) {
-  stopifnot(is.numeric(n))
-  stopifnot(n >= 0)
-  sum(sample(1:6, n, replace = TRUE))
+multiple_sampler <- function(n = 1) {
+  nhanes %>% 
+    select(height) %>% 
+    sample_n(n) %>% 
+    slice()
 }
 ```
 
 Again we check how the function works by specifying `n` and not specifying `n`.
 
 ```{r}
-add_dice()
-add_dice(10)
+multiple_sampler()
+multiple_sampler(10)
 ```
 
 Note that you do not necessarily need to supply the argument name. R tries its best to understand you based on the order you provide your argument values in. However, it is usually best practice to specify the argument name.
 
 ### Wrap-up and what's next?
+
+<!-- MF: Should I modify this section to work with the my_sampler function instead of add_dice? -->
 
 Here's the function we've written so far:
 
@@ -832,6 +839,8 @@ Note that to achieve the above, we took out `sum()` and swapped it with `list()`
 
 ### Handling `NA`s
 
+<!-- MF: We solved the problem of NAs differently in the my_sampler section (calling drop_na). Should I remove that solution from that function and defer to this solution? Keep both? -->
+
 The upside to creating our own dice-rolling function is that there have been no missing values. In real life, missing data will make your life a living hell. If you are lucky, it will be properly indicated by the special value `NA`, but don't hold your breath. Many built-in R functions have an `na.rm =` argument through which you can specify how you want to handle `NA`s. Typically the default value is `na.rm = FALSE` and typical default behavior is to either let `NA`s propagate or to raise an error. Let's see how `quantile()` handles `NA`s:
 
 ```{r error=TRUE}
@@ -871,171 +880,51 @@ quantile_diff(z)
 quantile_diff(z, na.rm = FALSE)
 ```
 
-## The Crooked Casino
+## Part Two: Distributions?
 
-### Restoring `add_dice()`
+Last chapter, we learned about distributions. The most important of these distributions is, of course, the normal distribution. 
 
-In this section, we will be bringing together `map_*` functions, list-columns, and function writing. We'll also be introducing some important conditional functions (`ifelse()`, `any()`, `all()`, and `case_when()`). 
+This bell-shaped distribution is defined by two parameters: (1) the *mean* $\mu$ (spoken as "mu") which locates the center of the distribution and (2) the *standard deviation* $\sigma$ (spoken as "sigma") which determines the variation of values around that center. 
 
-Let’s return to our dice-throwing function, `add_dice()`. 
+As we learned in Chapter 2, using `rbinom()`, a smaller sample does not tend to resemble the normal distribution. Larger samples, on the other hand, do tend to mirror the distinctive bell-shaped curve of normal distributions. 
 
-```{r}
-add_dice <- function(n = 1) {
-  stopifnot(is.numeric(n))
-  stopifnot(n >= 0)
-  sum(sample(1:6, n, replace = TRUE))
-}
-```
+<!-- Insert my_sampler examples using 10 samples, then 100, then 1000 -->
 
-Next, we will create `roll_dice()`, which calls `add_dice(n = 2)` as many times as the user specifies. To do so, we will be combining the `rep()` function with `map_int()`.
 
-```{r}
-roll_dice <- function(n = 1) {
-  stopifnot(is.numeric(n))
-  map_int(rep(2, n), add_dice)
-}
-roll_dice(1)
-roll_dice(5)
-```
+## Part Three: Guessing Game?
 
-`rep()` is a useful input to `map_*` when you want to call a function with the same input multiple times. `rep(2, n)` creates a vector of length n where every element is 2. We use that as the input to `map_int()` because we want the input to `add_dice()` to be 2 every time (we are always throwing a pair of dice) and we want to perform the operation n times, chosen by the user.
+<!-- MF: Does the median versus mean discussion belong here? -->
 
-Create a tibble named `x` with one variable: `throws`. `throws` is a list column, each element of which is three throws of the dice pair, i.e., the result of calling `roll_dice(n = 3)`.  Thus, our tibble will have ten rows and two columns.
+Another interesting consideration in our models is the fact that the mean (or average) of our data might not be the most useful metric. Consider if we were looking at 1000 observations of income for citizens in the United States. Now, imagine that Bill Gates is one of those 1000 observations. The mean of our samples would be *much* higher than the actual figure of average income because of the significant outlier. 
 
-```{r}
-x <- tibble(throws = map(rep(3, 10), roll_dice))
-x
-```
-
-Add a variable to `x` called `first_seven` which is TRUE if the first roll in `throws` is a 7.
-
-```{r message=FALSE}
-library(magrittr)
-
-# The magrittr package allows us to use %<>%, the compound assignment pipe
-# operator, which (as its name suggests) both assigns and pipes
-
-x %<>% 
-  mutate(first_seven = map_lgl(throws, ~ ifelse(.[[1]] == 7, TRUE, FALSE)))
-```
-
-We see here that `[[1]]` is how we extract the first element of a list, just like `[1]` extracts the first element of an atomic vector.  `ifelse()` takes as its first argument a condition; if it is TRUE it returns the second argument (here TRUE) and if not the third (here FALSE).
-
-Add a variable to `x` called `a_winner` which is TRUE if at least one of the three throws is a 7 or an 11 and is FALSE otherwise.
-
-```{r}
-x %<>% 
-  mutate(a_winner = map_lgl(throws, ~ ifelse(any(c(7, 11) %in% .), TRUE, FALSE)))
-```
-
-Here we use `any()`: `any()` checks if any element in its input is TRUE. So, let's say a particular throw was 4, 6, and 7: `c(7, 11) %in% c(4, 6, 7)` returns the vector `TRUE FALSE` (since 7 is in the vector but 11 isn't); then, `any(c(7, 11) %in% c(4, 6, 7))` returns TRUE because one of the conditions is TRUE.
-
-Run `str()` on `x` and show the results.
-
-```{r}
-str(x)
-```
-
-### Running Simulations
-
-Calculate how “surprised” you should be if someone rolls three winners in a row. First, create a tibble with 10,000 rows. Include a `throws` list column with three throws of our dice, just as in part a). Second, create a column called `perfection` which is TRUE if all three of the throws are either 7 or 11.
-
-```{r}
-surprised <- tibble(throws = map(rep(3, 10000), roll_dice)) %>% 
-  mutate(perfection = map_lgl(throws, ~ ifelse(all(. %in% c(7, 11)), TRUE, FALSE)))
-
-surprised %>%
-  pull(perfection) %>%
-  mean()
-```
-
-Here, we use `all()`, which has the same structure as `any()`, but checks whether *all* the elements in the input are TRUE.
-
-Approximately 1.1% of three rolls of a pair of fair dice are all equal to either 7 or 11.
-
-Your friend proposes the following bet. You will roll a pair of fair dice 10 times. Side A gets the second highest of the first 4 rolls. Side B gets 1 plus the the median of the remaining 6 rolls. Which side is more likely to win?  What's the chance of a tie?
-
-```{r}
-bet <- tibble(throws = map(rep(10, 10000), roll_dice)) %>% 
-  mutate(A = map_dbl(throws, ~ sort(.[1:4])[3]),
-         B = map_dbl(throws, ~ 1 + median(.[5:10])),
-         winner = case_when(A > B ~ "A",
-                            B > A ~ "B",
-                            TRUE ~ "tie"))
-
-case_when(sum(bet$winner == "A") > sum(bet$winner == "B") ~ "A",
-          sum(bet$winner == "B") > sum(bet$winner == "A") ~ "B",
-          TRUE ~ "Same # Victories")
-
-sum(bet$winner == "tie")/length(bet$winner)
-```
-
-You can think of `case_when()` as a generalized `ifelse()`.  The syntax is a little more complicated.  Each expression is followed by `~` and what should be returned if that expression is TRUE.  The final expression, TRUE, is always true, and thus is the residual category if none of the above expression are TRUE.  Thus, the second `case_when()` in our above code will print "A" if A is the winner in more replications than B, "B" if B is the winner more than A, and "Same # Victories" otherwise.
-
-Side B is more likely to win.
-
-The chance of a tie is approximately 11%.
-
-### Making a Crooked Function
-
-Say we are at an establishment known as the Crooked Casino. In a game of craps, you win if you roll 7 or 11 as the sum of a pair of dice. The Crooked Casino is infamous for rigging its games so that it is more difficult to obtain 7 or 11 as a sum. Our job is to write a function that mimics this behavior.
-
-First, let's use what we have. We will add a line of code in `add_dice()` that assigns `sum(sample(1:6, n, replace = TRUE))` to a variable, `roll`, and returns `roll`.
-
-```{r}
-crooked_dice <- function(n = 1) {
-  stopifnot(is.numeric(n))
-  stopifnot(n >= 0)
-  roll <- sum(sample(1:6, n, replace = TRUE))
-  return(roll)
-}
-
-crooked_dice(2)
-```
-
-How is this any different from `add_dice()`, you may ask? It is not. We are merely assigning the outcome of the roll of a pair of dice to a variable `roll`, which will be useful in a moment. Recall that functions only "remember" what takes place within themselves. This means that each call of `crooked_dice()` creates a new variable `roll` that takes place inside the function.
-
-Now, let's use `ifelse()` to check whether a 7 or 11 was rolled, and if so, to assign a roll of `2` instead.
-
-```{r}
-crooked_dice <- function(n = 1) {
-  stopifnot(is.numeric(n))
-  stopifnot(n >= 0)
-  roll <- sum(sample(1:6, n, replace = TRUE))
-  ifelse(roll == 7 | roll == 11, 2, roll)
-}
-```
-
-The Crooked Casino is a bit more sly, however. They know if they have an overtly crooked game of craps that never returned 7 or 11, that no one would play. They want to be a little more subtle about their crookedness, so they determine that only half of the time a 7 or 11 is rolled will the outcome be altered.
-
-We can simulate this decision by generating a random variable using `runif()` and checking whether the result is greater than or equal to 0.5.
-
-```{r}
-crooked_dice <- function(n = 1) {
-  stopifnot(is.numeric(n))
-  stopifnot(n >= 0)
-  roll <- sum(sample(1:6, n, replace = TRUE))
-  ifelse((roll == 7 | roll == 11) && runif(1) >= 0.5, 2, roll)
-}
-```
-
-Now we can create a function named `crooked_craps()` that calls `crooked_dice()` as many times as specified.
-
-```{r}
-crooked_craps <- function(n = 1) {
-  stopifnot(is.numeric(n))
-  map_dbl(rep(2, n), crooked_dice)
-}
-crooked_craps(1)
-crooked_craps(5)
-```
-
-It's hard to tell whether `crooked_craps()` is working properly by rolling just once, or even ten times. Let's follow the steps we took above to create a tibble of 10 observations each of 10 rolls named `crooked_x`.
-
-```{r}
-crooked_x <- tibble(throws = map(rep(10, 10), crooked_craps))
-crooked_x %>%
-  str()
-```
+What is the better metric, then? The median. The median, unlike the mean, is not skewed so greatly by outliers. Therefore, for the purposes of our data science observations, we want to look at the median value.
 
 ## Summary
+
+<!-- Add summaries for all major sections of the chapter. This is just for the function section and needs more clarification. -->
+
+<!-- MF: Should the summary include enough information that a student could get away with not reading the chapter? Or should it only be a tool of review for students who have read the chapter? -->
+
+### Lists and list-columns
+
+The introduction of the chapter was centered on a discussion of lists and list-columns. Key points from this section include:
+
+- A list is different from an atomic vector. Atomic vectors are familiar to us: each element of the vector has one value, and thus if an atomic vector is a column in your dataset, each observation gets a single value.  Lists, however, can contain vectors as elements.
+- There are various ways to create lists. We can directly input values inside `list()`, or wrap the values in `c()` first to create a vector element.
+- Any function that returns multiple values can be used to create a list output. To turn the output into a list, simply wrap the line of code with `list()`.
+- We can take a list column and, by applying an anonymous function to it with `map()`, create another list column. This is similar to taking a tibble and piping it into a `dplyr` function (such as `mutate()`) which gives you a new tibble that you can work with.
+- You can also use `map_*` functions to take a list column as an input and return an atomic vector -- a column with a single value per observation -- as an output. 
+
+### Functions
+
+This chapter, we focused on functions. 
+
+In particular, when building a function, you want to remember these key lessons:
+- Optimize usefulness by adding more formal arguments when needed. A function that only gives an option for `n` may not be as helpful as a function that allows us to enter options for a dataset, variable, and n value. 
+- As there is no *structural* relationship between our argument names (`n`) and that of `sample()` (which also includes `n`), ensure that argument names are sensible. This helps not only your readers, but also you. In short: using "bob_ross" to denote the number of samples you want... is a bad idea. 
+- Make sure we account for possible values of NA in our functions. This can be accomplished by placing something like `drop_na()` as another line of code within the function's body, or by adding an `na.rm =` argument to our function. We might even enforce our preferred default -- but at least we're giving the user a way to control the behavior around `NA`s.
+- By default, a function returns the result of the last line of the body.
+
+### Distributions
+
+
