@@ -2,25 +2,8 @@
 
 <!-- TODO: --> 
 
-<!-- Don't use small camel. -->
 
-<!-- Show fruit before working on fruit, or at least beginning of fruit, or random sample of fruit. Maybe put fruit in a tibble and work on it from there. Students are not used to, and rarely do, work on vectors directly . ..  Or not.  -->
-
-<!-- Showing all the countries is bad. No walls of text! -->
-
-<!-- Cut some character stuff. Look at all my cuts from tidy. -->
-
-<!-- Country plots too small. Put them in separate code chunks, one on top of the other. Show the code for at least one of them. -->
-
-<!-- Package names are bolded. -->
-
-<!-- Cut aggresively! Example: "The most recent release" -->
-
-<!-- Explain what (ijps <- inner_join(publishers, superheroes)) is doing. DK: Done. -->
-
-<!-- Avoid eval = FALSE. If you are showing them the code, show them the results. (Example: tidy section.) How do you know the code works? DK: Done. -->
-
-<!-- Replace flights with fec16. airlines are boring. Don't worry about that now. -->
+<!-- Later: Replace flights with fec16. airlines are boring. -->
 
 <!-- Add in other join diagrams, like the one used for for inner join. -->
 
@@ -331,24 +314,22 @@ This lesson deals with things you can do with vectors of class `character`.`frui
 
 ### Studying a single character vector
 
+We will use the `fruit` data, a vector with the names of different fruits, from the **stringr** package, which is automatically loaded when we issue `library(tidyverse)`.
+
+```{r}
+fruit %>% 
+  sample(size = 8)
+```
+
+Note that `sample()` selects a random sample from a vector.
+
+
 `str_detect()` determines if a character vector matches a pattern.  It returns a logical vector that is the same length as the input. Recall logicals are either `TRUE` or `FALSE`.
 
 Which fruits actually use the word "fruit"?
 
 ```{r}
 str_detect(fruit, pattern = "fruit")
-```
-
-To get the actual fruits that match, we  use `str_subset()` to keep only the matching elements. *Note:* we are storing this new vector `my_fruit` to use in later examples!
-
-```{r}
-(my_fruit <- str_subset(fruit, pattern = "fruit"))
-```
-
-Use `str_view()` to create a window in your viewer that highlights the specified pattern within the list. Consider the pattern "berry". 
-
-```{r}
-str_view(fruit[5:10], pattern = "berry")
 ```
 
 
@@ -449,6 +430,8 @@ countries <- levels(gapminder$country)
 ```
 
 In the code below, the first metacharacter is the period `.` , which stands for any single character, except a newline (which by the way, is represented by `\n`). The regex `i.a` will match all countries that have an `i`, followed by any single character, followed by `a`. Regexes are case sensitive, i.e. "Italy" does not match.
+
+To explore regular expressions, we will use the `str_subset()` function, which pulls out all the values in a vector which match a given pattern.
 
 ```{r}
 str_subset(countries, pattern = "i.a")
