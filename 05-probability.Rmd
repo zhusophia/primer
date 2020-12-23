@@ -10,7 +10,7 @@
 
 <!-- More animations. Create a movie which swoops into the joint distribution, takes a slice, remove the other slices, and then normalizes. Cool new package ggral (sp?) -->
 
-<!-- Maybe https://github.com/malcolmbarrett/ggdag. Or maybe straight dagitty? -->
+
 
 <!-- We need a single example of a continuous distribution after Electoral Votes. It will also have math. And empirical. And posterior. -->
 
@@ -41,7 +41,7 @@ The central tension, and opportunity, in data science is the interplay between t
 
 ## Probability distributions
 
-```{r, echo=FALSE, fig.margin=TRUE, out.width="100%", fig.align='center', fig.cap="Dice and Probability."}
+```{r, echo = FALSE, fig.cap = "Dice and Probability."}
 knitr::include_graphics("05-probability/images/probability_dice.jpeg")
 ```
 
@@ -152,7 +152,7 @@ ggplot(mydata, aes(x = results)) +
 
 Our *mathematical distribution* tells us that, with a fair dice, the probability of getting 1, 2, 3, 4, 5, and 6 are equal: there is a 1/6 chance of each. When we roll two dice at the same time and sum the values, the numbers closest to the middle (ex. 6, 7, 8) are more common sums than numbers at the very edge (ex. 2, 12) because there are more combinations of numbers that add up to the middle values.
 
-```{r, echo = FALSE, out.width = "100%"}
+```{r, echo = FALSE}
 
 set.seed(1)
 
@@ -181,7 +181,7 @@ ggplot(mydata, aes(x = sum)) +
 
 We get an *empirical distribution* by running a simulation and rolling two dice a hundred times. The result is not identical to the mathematical distribution because of the inherent randomness of the real world. We can observe that the $p_2$ and $p_12$, which are displayed on the left and right most ends of the distribution, are far lower than the $p_6$, for example.
 
-```{r, echo = FALSE, out.width = "100%"}
+```{r, echo = FALSE}
 
 # Two dice rolled 100 times
 
@@ -212,7 +212,7 @@ ggplot(mydata, aes(x = sum)) +
 
 The *posterior distribution* for rolling one dice a hundred depends on your expectations. If you take the dice from your Monopoly set, you have reason to believe that the assumptions underlying the mathematical distribution are true. However, if you walk into a crooked casino and a host asks you to play craps, you might be suspicious. In craps, a come-out roll of 7 and 11 is a "natural" and the you win. You might expect those numbers to occur less often than they would with fair dice. Meanwhile, a come-out roll of 2, 3 is bad for someone betting what's known as the "Pass line." You might also expect values like 2 and 3 to occur more frequently. Your posterior distribution might look like this:
 
-```{r, echo = FALSE, out.width = "100%"}
+```{r, echo = FALSE}
 
 # Flipping a dice 100 times
 
@@ -242,7 +242,7 @@ Now we let's say we are building probability distributions for political events,
 
 It would be incredibly naive to create the following *mathematical distribution*. We create a distribution by running a simulation 10,000 times, where the chances of the Democratic candidate winning any given electoral college vote is 0.5.
 
-```{r, echo = FALSE, out.width = "100%"}
+```{r, echo = FALSE}
 
 ev <- c(rep(3, 8), rep(4, 5), rep(5, 3), rep(6, 6), rep(7, 3), rep(8,2),
         rep(9, 3), rep(10, 4), rep(11, 4), 12, 13, 14, 15, rep(16, 2), 18, 20 , 20, 19, 29, 38, 55)
@@ -270,7 +270,7 @@ The *empirical distribution* in this case could involve looking into past electi
 
 However, this model is enough to suggest that the assumptions of the mathematical probability distribution above do not work for electoral votes. The model assumes that the Democrats have a 50% chance of receiving each of the 538 votes. Just looking at the mathematical probability distribution, we can observe that receiving 13 or 17 or 486 votes out of 538 would be extreme and almost impossible under this mathematical model. However, our empirical distribution tells us that those were real election results.
 
-```{r, echo = FALSE, out.width = "100%"}
+```{r, echo = FALSE}
 
 mydata <- tibble(electoral_votes = c(486,191,17,297,49,13,111,370,379,
                       271,286,365,332,304))
@@ -289,7 +289,7 @@ ggplot(mydata, aes(x = electoral_votes)) +
 
 The *posterior distribution* in the election case is something data scientists devote a lot of time to. The analysts develop algorithms that consider their expectations for each outcome. Consider this generated using data from *FiveThirtyEight*.
 
-```{r, echo = FALSE, out.width = "100%"}
+```{r, echo = FALSE}
 # DK: Some comments about this. Where did you get this data from? Why those
 # columns? 
 
@@ -311,7 +311,7 @@ read_csv("./05-probability/data/election-forecasts-2020/prez_1.csv") %>%
 
 Here is a posterior from the FiveThirtyEight website from August 13, 2020. This was created using the same data as the above distribution, but simply displayed differently. For each electoral result, the height of the bar represents the probability that a given event will occur. However, there is no numbered y-axis telling us what the specific probability of each outcome is.
 
-```{r, echo=FALSE, out.width="100%", caption = "FiveThirtyEight Posterior from August 13, 2020"}
+```{r, echo = FALSE, caption = "FiveThirtyEight Posterior from August 13, 2020"}
 
 knitr::include_graphics("05-probability/images/fivethirtyeight.png")
 
@@ -319,7 +319,7 @@ knitr::include_graphics("05-probability/images/fivethirtyeight.png")
 
 Here is the posterior from *The Economist*, also from August 13, 2020. This looks confusing at first because the data analysts have chosen to merge the axes for Republican and Democratic electoral votes. We can tell that the Economist is more optimistic about Biden's odds in the election compared to Trump's, relative to *FiveThirtyEight*.
 
-```{r, echo=FALSE, out.width="100%", caption = "Economist Posterior from August 13, 2020"}
+```{r, echo = FALSE, caption = "Economist Posterior from August 13, 2020"}
 
 knitr::include_graphics("05-probability/images/economist_aug13.png")
 
@@ -327,7 +327,7 @@ knitr::include_graphics("05-probability/images/economist_aug13.png")
 
 These two models, built by smart people using the similar data sources, have reached fairly different conclusions. Data science is difficult! There is not one "right" answer. Real life is not a problem set. 
 
-```{r, echo=FALSE,  out.width="100%", fig.cap="Watch the makers of these two models throw shade at each other on Twitter! Eliot Morris is one of the primary authors of the Economist model. Nate Silver is in charge of 538. They don't seem to be too impressed with each other's work! More smack talk [here](https://statmodeling.stat.columbia.edu/2020/08/31/more-on-that-fivethirtyeight-prediction-that-biden-might-only-get-42-of-the-vote-in-florida/) and [here](https://statmodeling.stat.columbia.edu/2020/08/31/problem-of-the-between-state-correlations-in-the-fivethirtyeight-election-forecast/)."}
+```{r, echo = FALSE,  out.width="100%", fig.cap = "Watch the makers of these two models throw shade at each other on Twitter! Eliot Morris is one of the primary authors of the Economist model. Nate Silver is in charge of 538. They don't seem to be too impressed with each other's work! More smack talk [here](https://statmodeling.stat.columbia.edu/2020/08/31/more-on-that-fivethirtyeight-prediction-that-biden-might-only-get-42-of-the-vote-in-florida/) and [here](https://statmodeling.stat.columbia.edu/2020/08/31/problem-of-the-between-state-correlations-in-the-fivethirtyeight-election-forecast/)."}
 knitr::include_graphics("05-probability/images/538_versus_Economist.png")
 ```
 
@@ -394,7 +394,7 @@ Remember that probability distributions are mathematical objects that cover a se
 
 For instance, we can generate the following unnormalized distribution for the sum of rolling two dice (empirical distribution from running this simulation 100 times). You may notice that the shape of the distribution is the same as the empirical probability distribution we generated earlier, only the y-axis is labeled differently.
 
-```{r, echo = FALSE, out.width = "100%"}
+```{r, echo = FALSE}
 
 set.seed(1)
 
@@ -432,7 +432,7 @@ Now we understand that $p_A$ can represent the probability distribution of outco
 
 Let's say that you are rolling two six-sided dice simultaneously. One is weighted so that there is a 50% chance of rolling a 6 and a 10% chance of each of the other values. The other is weighted so there is a 50% chance of rolling a 5 and a 10% chance of rolling each of the other values. Let's roll both dice 1000 times. In previous examples involving two dice, we cared about the sum of results and not the outcomes of the first versus the second rolls of each simulation. With a joint distributions, the order matters so instead of 11 possible outcomes on the x-axis of our distribution graph (ranging from 2 to 12), we have 36. Furthermore, a 2D probability distribution is not sufficient to represent all of the variables involved, so the joint distribution for this example is displayed using a 3D plot.
 
-```{r, echo = FALSE, out.width = "100%"}
+```{r, echo = FALSE}
 knitr::include_graphics("05-probability/images/joint.png")
 ```
 
@@ -449,7 +449,10 @@ What if you flipped 2 coins? You know that the probability of getting heads once
 
 Notice how regardless of what we get the first time we flip the coin, the probability of getting heads is 0.5 throughout. This suggests that the coin flips are **independent**. The result of one coin flip does not impact the likelihood of getting the same result next time. Take a look at the tree diagram. $p_{H given H}$ represents the probability of getting heads *given* that we got heads the first time. $p_{H given T}$ represents the probability of getting heads *given* that we got tails the first time. $p_{H given H}$ = $p_{H given T}$.
 
-```{r, echo = FALSE, out.width = "100%"}
+
+<!-- DK: Should we create these decision trees on the fly, perhaps using https://github.com/malcolmbarrett/ggdag  or maybe straight dagitty? For now, what we have is fine. -->
+
+```{r, echo = FALSE}
 knitr::include_graphics("05-probability/images/tree-1.png")
 ```
 
@@ -469,7 +472,7 @@ We decide to go down the top branch *if* our random person has the disease. We g
 How would you express this in statistical notation? $p(A|B)$ is the same thing as the probability of A *given* B. $p(A|B)$ essentially means the probability of A *if* we know for sure the value of B. You should also remember that $p(A|B)$ is not the same thing as $p(B|A)$.
 
 
-```{r, echo = FALSE, out.width = "100%"}
+```{r, echo = FALSE}
 knitr::include_graphics("05-probability/images/tree-2.png")
 ```
 
@@ -487,20 +490,20 @@ In our histogram probability distribution, we didn’t care what combinations of
 
 To understand tree diagrams a little better, imagine you’re flipping 2 coins. Your tree diagram may look different depending what you’re interested in measuring. In the following figure, the order of your coin toss results does not matter. We can imagine that you are rolling two coins together, or that you only care about the sum of the two dice values.
 
-```{r out.width="100%", echo=FALSE}
+```{r out.width="100%", echo = FALSE}
 knitr::include_graphics("05-probability/images/tree-3.png")
 ```
 
 In the next figure figure below, the order of your coin toss results does matter. Depending on your first result, you go down a different branch.
 
-```{r out.width="100%", echo=FALSE}
+```{r out.width="100%", echo = FALSE}
 knitr::include_graphics("05-probability/images/tree-4.png")
 ```
 
 -->
 
 
-<!-- 2 b) Another coding session, but this time with list-columns and map_functions. These do not have to be long. We just want to re-iterate the points we made in words. Maybe we don't need list-columns. Maybe just show map functions here. Again, the point of this section is ONLY to understand the key probabity concepts: joint, total, conditional and marginal. -->
+<!-- 2 b) Another coding session, but this time with list-columns and map_functions. These do not have to be long. We just want to re-iterate the points we made in words. Maybe we don't need list-columns. Maybe just show map functions here. Again, the point of this section is ONLY to understand the key probability concepts: joint, total, conditional and marginal. -->
 
 
 ## Two models
@@ -513,7 +516,7 @@ So, of the 1,000 people who truly do have the disease --- where 1,000 is 1% of t
 
 Here is the joint empirical distribution of the test result and disease status. Note that this is an unnormalized distribution because each dot represents a person in this city.
 
-```{r, echo = FALSE, out.width = "100%"}
+```{r, echo = FALSE}
 
 pop <- tibble(patient_id = 1:100000, 
               positive_test = c(rep(1, 990),
@@ -541,7 +544,7 @@ ggplot(pop, aes(x = as.factor(positive_test), y = as.factor(have_disease))) +
 
 Here is a joint distribution displayed in 3D. Instead of using the "jitter" feature in R to unstack the dots, we are using a 3D plot to visualize the number of dots in each box. The number of people who correctly test negative in this city is 98,010, far outweighing any of the other categories. There are 990 false positives, 990 true positives, and only 10 false negatives. This is why we can barely see the 3D bar coming from those sections.
 
-```{r, echo = FALSE, out.width = "100%"}
+```{r, echo = FALSE}
 knitr::include_graphics("05-probability/images/rayshader_disease.png")
 ```
 
@@ -555,13 +558,13 @@ We want to analyze these plots by looking at different slices. For instance, let
 
 This is what looks like when we take the slice where the test result is positive and zoom in. Taking a slice is the same thing as creating the conditional probability distribution.
 
-```{r, echo = FALSE, out.width = "100%"}
+```{r, echo = FALSE}
 knitr::include_graphics("05-probability/images/rayshader_disease_zoom.png")
 ```
 
 We should rotate this slice and look at it from a 2D perspective. This looks very similar to what we saw at the beginning of the chapter when we flipped coins to create a probability distribution.
 
-```{r, echo = FALSE, out.width = "100%"}
+```{r, echo = FALSE}
 
 mydata <- tibble(results = c(rep(0, 5),
                              rep(1, 5)))
@@ -582,23 +585,23 @@ ggplot(mydata, aes(x = results)) +
 
 This Stat 110 Animations video does a really good job of explaining a similar concept.
 
-```{r, echo=FALSE}
+```{r, echo = FALSE}
 knitr::include_app("https://www.youtube.com/embed/by3_weGwnMg")
 ```
 
 ## Three models
 
-```{r, echo = FALSE, out.width = "100%"}
+```{r, echo = FALSE}
 knitr::include_graphics("05-probability/images/marble.jpg")
 ```
 
-Now, imagine that your friend gives you a bag with two marbles. There could either be two white marbles, two black marbles, or one of each color. Thus, the bag could contain 0% white marbles, 50% white marbles, or 100% white marbles. $p$ of white marbles could be 0, 0.5, or 1.
+Imagine that your friend gives you a bag with two marbles. There could either be two white marbles, two black marbles, or one of each color. Thus, the bag could contain 0% white marbles, 50% white marbles, or 100% white marbles. The proportion, $p$, of white marbles could be 0, 0.5, or 1.
 
 Let's say you take a marble out of the bag, record whether it's black or white, then return it to the bag. You repeat this three times, observing the number of white marbles you see out of three trials. You could get three whites, two whites, one white, or zero whites as a result of this trial. Let's make what we call a Bayes scatterplot out of this. We have three models (three different proportions of white marbles in the bag) and four possible experimental results.
 
 Here is the scatterplot visualization of the scenario:
 
-```{r, echo = FALSE, out.width = "100%"}
+```{r, echo = FALSE}
 
 x <- tibble(p = rep(seq(0, 1, 0.5), 1000)) %>%
   mutate(white_marbles = map_int(p, ~ rbinom(n = 1, size = 3, p = .)))
@@ -615,7 +618,7 @@ x %>%
 
 Here is the 3D visualization:
 
-```{r, echo = FALSE, out.width = "100%"}
+```{r, echo = FALSE}
 knitr::include_graphics("05-probability/images/three_models.png")
 ```
 
@@ -625,7 +628,7 @@ The y-axes of both the scatterplot and the 3D visualization are labeled "Number 
 
 Let's say you've got zero white marbles. We would isolate the slice where the result of the simulation involves three black marbles and zero white ones. Here is the unnormalized probability distribution.
 
-```{r, echo = FALSE, out.width = "100%"}
+```{r, echo = FALSE}
 
 x <- tibble(results = c(rep(0, 1000), rep(0.5, 130), rep(1, 0.1)))
 
@@ -642,7 +645,7 @@ ggplot(x, aes(results)) +
 
 Next, let's normalize the distribution.
 
-```{r, echo = FALSE, out.width = "100%"}
+```{r, echo = FALSE}
 
 ggplot(x, aes(results)) +
   geom_histogram(aes(y = after_stat(count/sum(count))), 
@@ -671,7 +674,7 @@ This plot makes sense because when all three marbles you draw out of the bag are
 
 <!-- DK: Should we cut out p = 0 and p = 1 as too annoying to deal with? -->
 
-```{r, echo = FALSE, out.width = "100%"}
+```{r, echo = FALSE}
 knitr::include_graphics("05-probability/images/heads.jpg")
 ```
 
@@ -681,7 +684,7 @@ We are going to run an experiment in which you flip the coin 20 times and record
 
 To start, it is useful to consider all the things which might happen if, for example, $p_h = 0.4$. Fortunately, the R functions for simulating random variables makes this easy.
 
-```{r, echo = FALSE, out.width = "100%"}
+```{r, echo = FALSE}
 
 set.seed(9)
 
@@ -703,7 +706,7 @@ x %>%
 
 First, notice that many different things can happen! Even if we *know*, for certain, that $p_h = 0.4$, many outcomes are possible. Life is remarkably random. Second, the most likely result of the experiment is 8 heads, as we would expect. Third, we have transformed the raw counts of how many times each total appeared into a probability distribution. Sometimes, however, it is convenient to just keep track of the raw counts. The shape of the figure is the same in both cases.
 
-```{r, echo = FALSE, out.width = "100%"}
+```{r, echo = FALSE}
 
 x %>%
   group_by(heads) %>%
@@ -722,7 +725,7 @@ Either way, the figures show what would have happened if that model --- that $p_
 
 We can do the same thing for all 11 possible models, calculating what would happen if each of them were true. This is somewhat counterfactual since only one of them can be true. Yet this assumption does allow us to create the *joint distribution* of *models which might be true* and of *data which our experiment might generate*. Let's simplify this is p(models, data), although you should keep the precise meaning in mind.
 
-```{r, echo = FALSE, out.width = "100%"}
+```{r, echo = FALSE}
 
 set.seed(10)
 
@@ -742,7 +745,7 @@ x %>%
 
 Here is the 3D version of the same plot.
 
-```{r, echo = FALSE, out.width = "100%"}
+```{r, echo = FALSE}
 knitr::include_graphics("05-probability/images/n_models.png")
 ```
 
@@ -761,7 +764,7 @@ This is the only part of the joint distribution that we care about. We aren't in
 
 As we would expect, most of the time when 8 coin tosses came up heads, the value of $p$ was 0.4. But, on numerous occasions, it was not. It is quite common for a value of $p$ like 0.3 or 0.5 to generate 8 heads. Consider:
 
-```{r, echo = FALSE, out.width = "100%"}
+```{r, echo = FALSE}
 
 x %>% 
   filter(heads == 8) %>% 
@@ -776,7 +779,7 @@ x %>%
 
 Yet this is a distribution of raw counts. It is an unnormalized density. To turn it into a proper probability density (i.e., one in which the sum of the probabilities across possible outcomes sums to one) we just divide everything by the total number of observations.
 
-```{r, echo = FALSE, out.width = "100%"}
+```{r, echo = FALSE}
 
 p_posterior <- x %>% 
   filter(heads == 8) %>% 
@@ -868,7 +871,7 @@ As you may have noticed, if you calculated the value using the first method, you
 
 This *Primer* contains four important themes that are relevant in all chapters: Wisdom, Temperance, Courage, and Justice. As you move through the textbook, you will be building on and refining these concepts.
 
-```{r, echo=FALSE, fig.margin=TRUE, out.width="100%", fig.cap="Wisdom."}
+```{r, echo = FALSE, fig.cap = "Wisdom."}
 
 knitr::include_graphics("other/images/Wisdom.jpg")
 
@@ -884,7 +887,7 @@ We need to be aware that sometimes it is not possible to capture all the variabl
 
 ## Justice
 
-```{r, echo=FALSE, fig.margin=TRUE, out.width="100%", fig.cap="Justice."}
+```{r, echo = FALSE, fig.cap = "Justice."}
 
 knitr::include_graphics("other/images/Justice.jpg")
 
@@ -910,7 +913,7 @@ For the purposes of this chapter, everything we worked with was predictive. We d
 
 ## Courage
 
-```{r, echo=FALSE, fig.margin=TRUE, out.width="100%", fig.cap="Courage."}
+```{r, echo = FALSE, fig.cap = "Courage."}
 
 knitr::include_graphics("other/images/Courage.jpg")
 
@@ -923,7 +926,7 @@ $$outcome = model + what \ is \ not \ in \ the \ model$$
 
 A residual is the variation that is not contained in the model. This is explains why the result is equal to the fitted (also known as expected) value plus the residual (what is not in the model). However, no matter how nuanced our model becomes, we will not be able to make perfect predictions. Some randomness is intrinsic. For instance, the behavior of one individual can change and can't be perfectly predicted even if a model accounts for what a group does on average.
 
-```{r, echo=FALSE, fig.margin=TRUE, fig.align='center', fig.cap='Bruno de Finetti, an Italian statistician who wrote a famous treatise on the theory of probability that began with the statement "PROBABILITY DOES NOT EXIST." This is because probability only exists subjectively in our minds. It is a tool people made up and use for broad-stroke estimates.'}
+```{r, echo = FALSE, fig.cap = 'Bruno de Finetti, an Italian statistician who wrote a famous treatise on the theory of probability that began with the statement "PROBABILITY DOES NOT EXIST." This is because probability only exists subjectively in our minds. It is a tool people made up and use for broad-stroke estimates.'}
 
 knitr::include_graphics("05-probability/images/de_finetti.jpg")
 
@@ -935,7 +938,7 @@ knitr::include_graphics("05-probability/images/de_finetti.jpg")
 
 ## Temperance
 
-```{r, echo=FALSE, fig.margin=TRUE, out.width="100%", fig.align='center', fig.cap="Temperance."}
+```{r, echo = FALSE, fig.cap = "Temperance."}
 
 knitr::include_graphics("other/images/Temperance.jpg")
 
@@ -943,7 +946,7 @@ knitr::include_graphics("other/images/Temperance.jpg")
 
 Models are often not as good as they appear. It's important to be patient and understand the pitfalls of the data you have created.
 
-```{r, echo=FALSE, fig.margin=TRUE, out.width="50%", fig.align='center', fig.cap="Donald Rumsfeld."}
+```{r, echo = FALSE, fig.cap = "Donald Rumsfeld."}
 
 knitr::include_graphics("05-probability/images/donald_rumsfeld.jpg")
 
@@ -953,7 +956,7 @@ Donald Rumsfeld, the former US Secretary of Defense, once said the following ton
 
   "There are known knowns. There are things we know we know. We also know there are known unknowns. That is to say, we know there are some things we do not know. But there are also unknown unknowns, the ones we do not know we do not know."
   
-```{r, echo=FALSE, out.width="100%", fig.cap="Three Card Monte."}
+```{r, echo = FALSE, fig.cap = "Three Card Monte."}
 
 knitr::include_graphics("05-probability/images/Three_Card_Monte.jpg")
 
@@ -963,7 +966,7 @@ What does this mean? Well imagine a crowd playing Three Card Monte in the street
 
 We need patience in order to study and understand the unknown unknowns in our data. Patience is also important when we analyze the "realism" of our models. When we created the mathematical probability distribution for presidential elections, for instance, we assumed that the Democratic candidate would have a 50% chance of winning each vote in the electoral college. By comparing the mathematical model to our empirical cases, however, we recognize that the mathematical model is unlikely to be true. The mathematical model suggested that getting fewer than 100 votes is next to impossible, but many past Democratic candidates in the empirical distribution received less than 100 electoral votes.
 
-## Conclusion
+## Summary
 
 Throughout this chapter, we spent time going through examples of conditional distributions. However, it's worth noting that all probability distributions are conditional on something. Even in the most simple examples, when we were flipping a coin multiple times, we were assuming that the probability of getting heads versus tails did not change between tosses.
 
@@ -973,7 +976,7 @@ It is useful to understand the three types of distributions and the concept of c
 
 If you are keen to learn more about probability, here is a video featuring Professor Gary King. This is a great way to review some of the concepts we covered in this chapter.
 
-```{r, echo=FALSE}
+```{r, echo = FALSE}
 knitr::include_app("https://www.youtube.com/embed/6C7yRBfh2ok")
 ```
 
