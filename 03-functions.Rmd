@@ -1,7 +1,7 @@
 
 # Functions {#functions}
 
-<!-- add .groups, so no bad messages. -->
+<!-- add .groups, so no bad messages. DONE.-->
 
 <!-- https://ppbds.github.io/primer/wrangling.html#distributions -->
 
@@ -65,11 +65,9 @@
 <!-- https://aosmith.rbind.io/2018/06/05/a-closer-look-at-replicate-and-purrr/ -->
 
 
-The goal of this chapter is to reveal the __process__ a long-time useR employs for writing functions. We also want to illustrate why the process is the way it is. Merely looking at the finished product, e.g. source code for R packages, can be extremely deceiving. Reality is generally much uglier ... but more interesting! Powerful packages like **dplyr** and **purrr** are ready and waiting to apply your purpose-built functions to various bits of your data. If you can express your analytic wishes in a function, these tools will give you great power.
-
 ## Introduction
 
-First, let's introduce the concept of functions. A function is a piece of code that is packaged in a way that makes it easy to reuse. Functions make it easy for you to `filter()`, `arrange()`, `select()`, and create a `tibble()`, as you have seen in the last few chapters. Functions also allow you to transform variables and perform a bunch of useful mathematical calculations, such as finding the `min()`, `max()`, and `quantile()`s of a dataset. Functions are also important in generating data and values, such as using `rnorm()` to randomly generate a normal distribution.
+A function is a piece of code that is packaged in a way that makes it easy to reuse. Functions make it easy for you to `filter()`, `arrange()`, `select()`, and create a `tibble()`, as you have seen in the last few chapters. Functions also allow you to transform variables and perform a bunch of useful mathematical calculations, such as finding the `min()`, `max()`, and `quantile()`s of a dataset. Functions are also important in generating data and values, such as using `rnorm()` to randomly generate a normal distribution.
 
 Note that every time we discuss a function, we include the parentheses. This is because you call a function by including its parentheses and any necessary arguments in those parentheses. This is a correct call of `rnorm()`:
 
@@ -83,7 +81,7 @@ If you run the function name without its parentheses, R will return the code tha
 rnorm
 ```
 
-Functions can do all sorts of things. Below, `sample()` takes a vector of values and spits out a number of random values from that vector. You can specify the number of random values with the argument `size`. Let's take it for a spin. This is the equivalent of rolling a die!
+Functions can do all sorts of things. Below, `sample()` takes a vector of values and spits out a number of random values from that vector. You can specify the number of random values with the argument `size`. This is the equivalent of rolling a die!
 
 ```{r}
 sample(x = 1:6, size = 1)
@@ -138,7 +136,7 @@ We called these `map_*` *functions* (plural) before.  If you know the expected o
 
 So, since our example produces numeric output, we use `map_dbl()` instead of `map()`.
 
-Now, you may be wondering, what's the difference between using `mutate()` and `map_*` functions? The answer lies in iteration, which is the specialization of the **purrr** package. `map_*` functions are powerful because of their ability to apply functions to every single element of a list, which `mutate()` cannot handle.
+What's the difference between using `mutate()` and `map_*` functions? `map_*` functions are useful because of their ability to apply functions to every single element of a list, which `mutate()` cannot handle.
 
 Speaking of lists, `map_*` functions are known to take in list inputs, and sometimes even create list-columns depending on the specific `map_*` function.
 
@@ -160,7 +158,7 @@ Only... what exactly is a list-column? Our next section will give you a quick re
 
 ## Lists and list-columns
 
-Let's quickly refresh on what lists are and functions that commonly deal with lists. Recall that a list is different from an atomic vector. Atomic vectors are familiar to us: each element of the vector has one value, and thus if an atomic vector is a column in your dataset, each observation gets a single value.  Lists, however, can contain vectors as elements.
+Recall that a list is different from an atomic vector. Atomic vectors are familiar to us: each element of the vector has one value, and thus if an atomic vector is a column in your dataset, each observation gets a single value.  Lists, however, can contain vectors as elements.
 
 ```{r}
 x <- list(c(3, 7, 2))
@@ -186,7 +184,7 @@ list_2 %>% str()
 x %>% str()
 ```
 
-As you can see, the two objects defined above are lists. It also displays the data type of each element. `list_1` is a list of length 3, with a character, a numeric, and a character. `list_2` is also a list of length 3, with a numeric, a character, and a numeric. Note that the `[1:3]` denotes a numeric vector of length 3 for `x`.
+The two objects defined above are lists. They also display the data type of each element. `list_1` is a list of length 3, with a character, a numeric, and a character. `list_2` is also a list of length 3, with a numeric, a character, and a numeric. Note that the `[1:3]` denotes a numeric vector of length 3 for `x`.
 
 Now, let's extract the first element of each of the new lists.
 
@@ -199,7 +197,7 @@ You might be wondering, how is the list `x` different from the lists `list_1` an
 
 There are a number of built-in R functions that output lists. For example, the ***ggplot***s you have been making store all of the graph information in lists.
 
-Any function that returns multiple values can be used to create a list output.  For example, consider the following list `x` again:
+Any function that returns multiple values can be used to create a list output. Consider the following list `x` again:
 
 ```{r}
 x
@@ -272,7 +270,8 @@ kenya %>%
   select(treatment, block, distance) %>%
   filter(treatment == "control") %>%
   group_by(block) %>%
-  summarize(dist_summary = list(summary(distance)))
+  summarize(dist_summary = list(summary(distance)),
+            .groups = "drop")
 ```
 
 ### Using `map_*` functions to create list-columns
@@ -284,7 +283,8 @@ First, let's wrangle the data so each observation is grouped by age and gender. 
 ```{r}
 nhanes %>%
   group_by(age, gender) %>%
-  summarize(all_weights = list(weight))
+  summarize(all_weights = list(weight), 
+            .groups = "drop")
 ```
 
 Now that we have a list column, we can use it as the input to `map()`, outputting another list column.  Let's say we wanted a new list column, `log_weights`, which takes the logarithmic value of each weight observation.
@@ -292,7 +292,8 @@ Now that we have a list column, we can use it as the input to `map()`, outputtin
 ```{r}
 nhanes %>%
   group_by(age, gender) %>%
-  summarize(all_weights = list(weight)) %>%
+  summarize(all_weights = list(weight),
+            .groups = "drop") %>%
   mutate(log_weights = map(all_weights, log))
 ```
 
@@ -303,7 +304,8 @@ If we try to replace the `map()` function in the last line with a simple `mutate
 ```{r, error = TRUE}
 nhanes %>%
   group_by(age, gender) %>%
-  summarize(all_weights = list(weight)) %>%
+  summarize(all_weights = list(weight),
+            .groups = "drop") %>%
   mutate(log_weights = log(all_weights))
 ```
 
@@ -314,7 +316,8 @@ You can also use `map_*` functions to take a list column as an input and return 
 ```{r}
 nhanes %>%
   group_by(age, gender) %>%
-  summarize(all_weights = list(weight)) %>%
+  summarize(all_weights = list(weight),
+            .groups = "drop") %>%
   mutate(log_weights = map(all_weights, log),
          mean_log_weights = map_dbl(log_weights, mean, na.rm = TRUE))
 ```
@@ -325,7 +328,8 @@ What if we wanted to extract the top five log weights per row?
 ```{r}
 nhanes %>%
   group_by(age, gender) %>%
-  summarize(all_weights = list(weight)) %>%
+  summarize(all_weights = list(weight),
+            .groups = "drop") %>%
   mutate(log_weights = map(all_weights, log),
          sorted_log_weights = map(log_weights, 
                                   ~ sort(., decreasing = TRUE)),
@@ -382,7 +386,8 @@ Next, we'll create a list column `temps_F` that consists of all the temperatures
 weather %>%
   select(origin, year, month, day, temp) %>%
   group_by(origin, year, month, day) %>%
-  summarize(temps_F = list(c(temp)))
+  summarize(temps_F = list(c(temp)),
+            .groups = "drop")
 ```
 
 Now that we have a list-column, we can use it as the input to `map()`, outputting another list-column.  Let's say we wanted a new list-column, `temps_C`, which records the temperature in Celsius.
@@ -393,7 +398,8 @@ The formula to convert from Fahrenheit to Celsius is $\frac{(F-32)*5}{9}$. Let's
 weather %>%
   select(origin, year, month, day, temp) %>%
   group_by(origin, year, month, day) %>%
-  summarize(temps_F = list(c(temp))) %>%
+  summarize(temps_F = list(c(temp)),
+            .groups = "drop") %>%
   mutate(temps_C = map(temps_F, ~ (. - 32) * 5/9))
 ```
 
@@ -403,7 +409,8 @@ Let's "eyeball" the first few results using `str()`.
 weather %>%
   select(origin, year, month, day, temp) %>%
   group_by(origin, year, month, day) %>%
-  summarize(temps_F = list(c(temp))) %>%
+  summarize(temps_F = list(c(temp)), 
+            .groups = "drop") %>%
   mutate(temps_C = map(temps_F, ~ (. - 32) * 5/9)) %>%
   ungroup() %>%
   slice(1:5) %>%
@@ -425,7 +432,7 @@ add_one_and_one()
 
 You just created a function! This function will return `1+1` whenever called. 
 
-Now what if we wanted to leave some mystery in the function? That is to say, we want to add the number 6 to a value `x`, that the user provides for us. 
+What if we wanted to leave some mystery in the function? That is to say, we want to add the number 6 to a value `x`, that the user provides for us. 
 
 ```{r}
 add_six_to_something <- function(x){
@@ -484,7 +491,7 @@ max_minus_min <- function(x) max(x) - min(x)
 max_minus_min(kenya$poverty)
 ```
 
-Check that you're getting the same answer as you did with your interactive code. Test it eyeball-o-metrically at this point.
+Check that you're getting the same answer as you did with your interactive code. Test it eyeball-to-metrically at this point.
 
 One thing to note about functions is that functions have selective memory. In fact, functions only "remember" what happens within the function itself.
 
@@ -602,7 +609,6 @@ mmm2(kenya)
 
 Another good use of this pattern is to leave checks behind in data analytical scripts. If we were loading from file (vs. a stable data package), we might want to formalize our expectations about the number of rows and columns, the names and flavors of the variables, etc. This would alert us if the data suddenly changed, which can be a useful wake-up call in scripts that you re-run *ad nauseam* on auto-pilot or non-interactively.
 
-
 In addition to a gratuitous apology, the error also contains two more pieces of helpful info:
 
 * *Which* function threw the error.
@@ -649,6 +655,7 @@ Now, when we call our new function, `multiple_sampler`, we want to enter an argu
 ```{r}
 multiple_sampler(n = 10)
 ```
+
 Great! Though we have inserted some flexibility in our function, it still isn't as useful as possible. What if we want to sample a variable other than `height`? Like last time, we will write a new function which adds the formal argument `var` for variable. This way, we can look at other variables within our dataset. 
 
 ```{r}
@@ -710,6 +717,7 @@ multiple_sampler <- function(bob_ross) {
   
 multiple_sampler(bob_ross = 3)
 ```
+
 While we *can* name our argument after a famous painter, it's usually a bad idea. Take all opportunities to make things more self-explanatory via meaningful names.
 
 If you are going to pass the arguments of your function as arguments of a built-in function, consider copying the argument names. Unless you have a good reason to do your own thing (some argument names are bad!), be consistent with the existing function. Again, the reason is to reduce your cognitive load. 
@@ -801,7 +809,7 @@ add_dice <- function(n = 2) {
 show_failure(add_dice(-1))
 ```
 
-Similar to the advice to use assertions in data analytical scripts, I recommend you use unit tests to monitor the behavior of functions you (or others) will use often. If your tests cover the function's important behavior, then you can edit the internals freely. You'll rest easy in the knowledge that, if you broke anything important, the tests will fail and alert you to the problem. A function that is important enough for unit tests probably also belongs in a package, where there are obvious mechanisms for running the tests as part of overall package checks.
+We recommend you use unit tests to monitor the behavior of functions you (or others) will use often. If your tests cover the function's important behavior, then you can edit the internals freely. You'll rest easy in the knowledge that, if you broke anything important, the tests will fail and alert you to the problem. 
 
 ### What a function returns
 
@@ -841,7 +849,7 @@ Note that to achieve the above, we took out `sum()` and swapped it with `list()`
 
 <!-- MF: We solved the problem of NAs differently in the my_sampler section (calling drop_na). Should I remove that solution from that function and defer to this solution? Keep both? -->
 
-The upside to creating our own dice-rolling function is that there have been no missing values. In real life, missing data will make your life a living hell. If you are lucky, it will be properly indicated by the special value `NA`, but don't hold your breath. Many built-in R functions have an `na.rm =` argument through which you can specify how you want to handle `NA`s. Typically the default value is `na.rm = FALSE` and typical default behavior is to either let `NA`s propagate or to raise an error. Let's see how `quantile()` handles `NA`s:
+The upside to creating our own dice-rolling function is that there have been no missing values. In real life, missing data will make your life hell. If you are lucky, it will be properly indicated by the special value `NA`, but don't hold your breath. Many built-in R functions have an `na.rm =` argument through which you can specify how you want to handle `NA`s. Typically the default value is `na.rm = FALSE` and typical default behavior is to either let `NA`s propagate or to raise an error. Let's see how `quantile()` handles `NA`s:
 
 ```{r error=TRUE}
 z <- kenya$poverty
@@ -865,7 +873,7 @@ quantile_diff(kenya$poverty)
 quantile_diff(z)
 ```
 
-This works but it is dangerous to invert the default behavior of a well-known built-in function and to provide the user with no way to override this.
+This works, but it is dangerous to invert the default behavior of a built-in function and to provide the user with no way to override this.
 
 We could add an `na.rm =` argument to our own function. We might even enforce our preferred default -- but at least we're giving the user a way to control the behavior around `NA`s.
 
@@ -889,7 +897,6 @@ This bell-shaped distribution is defined by two parameters: (1) the *mean* $\mu$
 As we learned in Chapter 2, using `rbinom()`, a smaller sample does not tend to resemble the normal distribution. Larger samples, on the other hand, do tend to mirror the distinctive bell-shaped curve of normal distributions. 
 
 <!-- Insert my_sampler examples using 10 samples, then 100, then 1000 -->
-
 
 ## Part Three: Guessing Game?
 
@@ -926,5 +933,3 @@ In particular, when building a function, you want to remember these key lessons:
 - By default, a function returns the result of the last line of the body.
 
 ### Distributions
-
-
