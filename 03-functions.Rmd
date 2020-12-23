@@ -1,19 +1,7 @@
-
 # Functions {#functions}
 
-<!-- add .groups, so no bad messages. -->
 
-<!-- https://ppbds.github.io/primer/wrangling.html#distributions -->
 
-<!-- This is the knowledge which readers start with. Remind them of it. -->
-
-<!-- Then read the virtual sampling sectioon of Chapter 6: -->
-
-<!-- https://ppbds.github.io/primer/one-parameter.html#virtual-sampling -->
-
-<!-- This is what we are preparing readers for. We want that to be easy for them, once they get there. We should also do a better job of connecting this code to the code in Chapter 5 but, right now, we don't show that to readers. -->
-
-<!-- * Need to focus more on functions which actually do something useful, something that teaches concepts which will be valuable later. One idea: A function which takes a tibble and a variable to sample from. It returns one value from that variable. Complexity is added because it removed all missing data first. Could use nhanes as the data set to play with. Further complexity could be added by adding a condition which filters the tibble in some way. my_sampler() DONE. -->
 
 <!-- tibble(ID = 1:10) %>%  -->
 <!--   mutate(height = map_dbl(ID, ~ my_sampler(nhanes, "height"))) %>%  -->
@@ -24,9 +12,8 @@
 
 <!-- Lesson: Larger N means more stable estimates. -->
 
-<!-- Perhaps there are three main parts to the chapter. The first is lists, list-columns, map functions and custom functions. We can cover all that with fairly simple examples. (Don't use N argument yet. Just solve the no NA problem.) Second, as discussed below, is explorations of measures of center and variability for distributions. (Means we need to extend my_sampler with n argument.) We can explore those things with our new tools. The third section plays the Guessing Game. -->
+<!-- Perhaps there are three main parts to the chapter. The first is lists, list-columns, map functions and custom functions. We can cover all that with fairly simple examples. (Don't use N argument yet. Just solve the no NA problem.) Second, as discussed below, is explorations of measures of center and variability for distributions. (Means we need to extend my_sampler with n argument.) We can explore those things with our new tools. The third section plays the Guessing Game. Show them mean, median, sd, and mad.-->
 
-<!-- Read, and then delete, the Crooked Casino section. DONE.-->
 
 <!-- Key concept to focus on is the idea of a distribution and draws therefrom. This connects to chapter 2, where we introduced distributions and to chapter 5, where we explain probability distributions. In particular, we should show various ways to measure center and variability. These are cool and important concepts. Is "center" the mean or the median or the trimmed mean or . . . Is "variability" the standard deviation, the mean absolute deviation, the standard deviation of the median absolute deviation or . . . There is nothing explicitly "statistical" here. We are just trying to connect English words to specific formulas. We might show the distributions for which these measures give the same answers and then some (mainly skewed) for which they don't. How to explore these concepts in the context of function writing? Perhaps by writing functions like my_mean() and my_median()? Or maybe focus on a function which calculates MAD SD? Then use list-columns to compare this function to other choices? -->
 
@@ -243,6 +230,22 @@ data.frame(col_1 = list(range(x)))
 ```
 
 Note that the output is a 2 x 1 dataframe with double observations, not one singular list. 
+
+<!-- DK: Rest of stuff is garbage? Think of a plot, and then make it. Motivate with the guessing game. -->
+
+<!-- Start with: kenya %>% drop_na() %>% filter(rv13 != 0) %>% sample_n(10) %>% select(rv13) %>% as_vector() %>% mean() -->
+
+<!-- Create function which does this: my_sample(x, var). (Do not include mean() at end).  -->
+
+<!-- ID(tibble = 1) %>%  -->
+<!--   mutate(my_samp = map(ID, ~ my_sampler(kenya, 10))) %>%  -->
+<!--   mutate(center = map_dbl(my_samp, ~ mean())) -->
+  
+<!-- ID(tibble = 1:000) %>%  -->
+<!--   mutate(my_samp = map(ID, ~ my_sampler(kenya, 10))) %>%  -->
+<!--   mutate(center = map_dbl(my_samp, ~ mean()))   -->
+
+<!-- Do it for mean and for median, and the plot histogram of their overlapping densities, and show that the median is a much more stable measure. -->
 
 Wrapping a function with `list()` is often how we will go about creating list columns.  Let's practice with the `kenya` dataset. How could we add a column to the dataset that included the quantiles of the `poverty` variable?
 
@@ -614,6 +617,8 @@ The tidyverse style guide has a very useful [chapter on how to construct error m
   
 ## Argument Specifications and Default Values
 
+<!-- DK: Explain that slice() gets you a vector. -->
+
 In this section, we create a new function, generalize it, and learn more technical details about R functions.
 
 Our goal is to write a function that draws samples from datasets found in `PPBDS/data`. 
@@ -666,6 +671,8 @@ Let's test the variable `weight` instead of height. Recall that when we want a c
 flexible_sampler(var = "weight", n = 10)
 ```
 Let's take it one step further. We will now completely optimize our function by inserting one more formal argument, `x`, which will allow us to sample from any dataset, not just `nhanes`.
+
+<!-- DK: No slice(), I think. -->
 
 ```{r}
 my_sampler <- function(x, var, n){
@@ -744,20 +751,7 @@ multiple_sampler(10)
 
 Note that you do not necessarily need to supply the argument name. R tries its best to understand you based on the order you provide your argument values in. However, it is usually best practice to specify the argument name.
 
-### Wrap-up and what's next?
 
-<!-- MF: Should I modify this section to work with the my_sampler function instead of add_dice? -->
-
-Here's the function we've written so far:
-
-```{r}
-# add_dice
-```
-
-What we've accomplished:
-
-* We've generalized our dice throwing function to take in a custom value for `n`
-* We've specified a default value: `n=2`
   
 ## Formal testing
 
@@ -837,48 +831,7 @@ show_dice(5)
 
 Note that to achieve the above, we took out `sum()` and swapped it with `list()`. The new function, `show_dice()`, returns a list of `n` dice thrown.
 
-### Handling `NA`s
 
-<!-- MF: We solved the problem of NAs differently in the my_sampler section (calling drop_na). Should I remove that solution from that function and defer to this solution? Keep both? -->
-
-The upside to creating our own dice-rolling function is that there have been no missing values. In real life, missing data will make your life a living hell. If you are lucky, it will be properly indicated by the special value `NA`, but don't hold your breath. Many built-in R functions have an `na.rm =` argument through which you can specify how you want to handle `NA`s. Typically the default value is `na.rm = FALSE` and typical default behavior is to either let `NA`s propagate or to raise an error. Let's see how `quantile()` handles `NA`s:
-
-```{r error=TRUE}
-z <- kenya$poverty
-z[3] <- NA
-quantile(kenya$poverty)
-quantile(z)
-quantile(z, na.rm = TRUE)
-```
-
-So `quantile()` simply will not operate in the presence of `NA`s unless `na.rm = TRUE`. How shall we modify our function?
-
-If we wanted to hardwire `na.rm = TRUE`, we could. Focus on our call to `quantile()` inside our definition of a new function, `quantile_diff()`.
-
-```{r}
-quantile_diff <- function(x, probs = c(0, 1)) {
-  stopifnot(is.numeric(x))
-  the_quantiles <- quantile(x, probs, na.rm = TRUE)
-  max(the_quantiles) - min(the_quantiles)
-}
-quantile_diff(kenya$poverty)
-quantile_diff(z)
-```
-
-This works but it is dangerous to invert the default behavior of a well-known built-in function and to provide the user with no way to override this.
-
-We could add an `na.rm =` argument to our own function. We might even enforce our preferred default -- but at least we're giving the user a way to control the behavior around `NA`s.
-
-```{r error=TRUE}
-quantile_diff <- function(x, probs = c(0, 1), na.rm = TRUE) {
-  stopifnot(is.numeric(x))
-  the_quantiles <- quantile(x, probs, na.rm = na.rm)
-  max(the_quantiles) - min(the_quantiles)
-}
-quantile_diff(kenya$poverty)
-quantile_diff(z)
-quantile_diff(z, na.rm = FALSE)
-```
 
 ## Part Two: Distributions?
 
