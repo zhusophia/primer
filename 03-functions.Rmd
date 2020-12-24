@@ -46,20 +46,16 @@
 <!-- Might also show how to add lots of plots to a tibble and then pick out the ones that show cool stuff. If you run 1,000 experiments, show the plots of the 5 extreme ones. -->
 
 
-<!-- Useful reference, maybe -->
-
-<!-- https://aosmith.rbind.io/2018/08/29/getting-started-simulating-data/ -->
-<!-- https://aosmith.rbind.io/2018/06/05/a-closer-look-at-replicate-and-purrr/ -->
 
 
 ## Introduction
 
-A function is a piece of code that is packaged in a way that makes it easy to reuse. Functions make it easy for you to `filter()`, `arrange()`, `select()`, and create a `tibble()`, as you have seen in the last few chapters. Functions also allow you to transform variables and perform a bunch of useful mathematical calculations, such as finding the `min()`, `max()`, and `quantile()`s of a dataset. Functions are also important in generating data and values, such as using `rnorm()` to randomly generate a normal distribution.
+A function is a piece of code that is packaged in a way that makes it easy to reuse. Functions make it easy for you to `filter()`, `arrange()`, `select()`, and create a `tibble()`, as you have seen in Chapters \@ref(visualization) and \@ref(wrangling). Functions also allow you to transform variables and perform mathematical calculations. We use functions like `rnorm()` and `runif()` to generate random draws from a distribution.
 
-Note that every time we discuss a function, we include the parentheses. This is because you call a function by including its parentheses and any necessary arguments in those parentheses. This is a correct call of `rnorm()`:
+Note that every time we discuss a function, we include the parentheses. This is because you call a function by including its parentheses and any necessary arguments within those parentheses. This is a correct call of `rnorm()`:
 
 ```{r}
-rnorm(1)
+rnorm(n = 1)
 ```
 
 If you run the function name without its parentheses, R will return the code that makes up the function. 
@@ -68,7 +64,7 @@ If you run the function name without its parentheses, R will return the code tha
 rnorm
 ```
 
-Functions can do all sorts of things. Below, `sample()` takes a vector of values and spits out a number of random values from that vector. You can specify the number of random values with the argument `size`. This is the equivalent of rolling a die!
+Functions can do all sorts of things. `sample()` takes a vector of values and returns a number of values randonly selected from that vector. You can specify the number of random values with the argument `size`. This call is the equivalent of rolling a die.
 
 ```{r}
 sample(x = 1:6, size = 1)
@@ -80,19 +76,26 @@ Functions can also take in other functions as arguments. For example, `replicate
 replicate(10, sample(1:6, 1))
 ```
 
-An especially useful type of function is the family of `map_*` functions. `map_*` functions come from the **purrr** package, which you will have loaded if you have loaded **tidyverse**. These functions apply the same function to every row in a tibble.
+An especially useful type of function is the family of `map_*` functions. `map_*` functions come from the **purrr** package, which is automatically loaded with `library(tidyverse)`. These functions apply the same function to every row in a tibble.
 
-```{r, include = FALSE}
+```{r, message = FALSE}
 library(tidyverse)
 ```
 
-Let's create a tibble with 3 values: 3, 7, and 2.
+Let's create a tibble with one variable `x` which takes on three values: 3, 7, and 2.
 
 ```{r}
 tibble(x = c(3, 7, 2))
 ```
 
-What if we wanted to take the square root of each value?
+It is easy to use mutate to create a new variable, `sq_root`, which is the square root of each value of x.
+
+```{r}
+tibble(x = c(3, 7, 2)) %>% 
+  mutate(sq_root = sqrt((x)))
+```
+
+map_* functions provide another approach.
 
 ```{r}
 tibble(x = c(3, 7, 2)) %>% 
@@ -103,13 +106,10 @@ tibble(x = c(3, 7, 2)) %>%
 
 ```{r error=TRUE}
 tibble(x = c(3, 7, 2)) %>% 
-  mutate(new = map_dbl(x, sqrt()))
+  mutate(sq_root = map_dbl(x, sqrt()))
 ```
 
 `sqrt()` with the parentheses is a call to the function. So, the first thing R tries to do is to run the function. Doing so fails because `sqrt()` requires an argument `x`, which is empty. 
-
-
-*Lesson*: When passing a function in to `map_*` functions, pass just the name.
 
 
 We called these `map_*` *functions* (plural) before.  If you know the expected output of your function, you can specify that kind of vector:
@@ -125,27 +125,27 @@ So, since our example produces numeric output, we use `map_dbl()` instead of `ma
 
 What's the difference between using `mutate()` and `map_*` functions? `map_*` functions are useful because of their ability to apply functions to every single element of a list, which `mutate()` cannot handle.
 
-Speaking of lists, `map_*` functions are known to take in list inputs, and sometimes even create list-columns depending on the specific `map_*` function.
+Speaking of lists, `map_*` functions are known to take in list inputs, and can create list-columns depending on the specific `map_*` function employed.
 
 ```{r}
 tibble(x = c(3, 7, 2)) %>% 
-  mutate(new = map(x, sqrt))
+  mutate(sq_root = map(x, sqrt))
 ```
 
 Notice that we changed the `map_dbl()` to `map()`, which returns a list-column. You can use `str` to easily view the contents of a list-column.
 
 ```{r}
 tibble(x = c(3, 7, 2)) %>% 
-  mutate(new = map(x, sqrt)) %>%
+  mutate(sq_root = map(x, sqrt)) %>%
   str()
 ```
 
-Only... what exactly is a list-column? Our next section will give you a quick refresher on lists, then dive into how lists, list-columns, and `map_*` functions relate.
+Only... what exactly is a list-column? Our next section will give you a quick refresher on lists, then dive into how lists, list-columns, and `map_*` functions work with each other.
 
 
 ## Lists and list-columns
 
-Recall that a list is different from an atomic vector. Atomic vectors are familiar to us: each element of the vector has one value, and thus if an atomic vector is a column in your dataset, each observation gets a single value.  Lists, however, can contain vectors as elements.
+Recall that a list is different from an atomic vector. In atomic vectors, each element of the vector has one value.  Lists, however, can contain vectors, and even more complex objects, as elements.
 
 ```{r}
 x <- list(c(3, 7, 2))
@@ -158,61 +158,25 @@ The above object, x, contains a numeric vector as an element. How do we extract 
 x[[1]][1]
 ```
 
-Right! Recall the example from Chapter 2 in which lists are a pepper jar that contain more pepper packets. Don't forget the square brackets!
+Recall the example from Chapter \@ref(wrangling) that  lists are like a pepper jar which contains more pepper packets. Don't forget the square brackets!
 
-Let's index through more lists to make sure it works. Remember that lists can contain a multitude of data types. First, let's create a few new lists. Pay attention to the placement of `list()`.
 
-```{r}
-list_1 <- list("Three", 7, "Two")
-list_2 <- c(list(3), list("7"), list(2))
+There are a number of built-in R functions that output lists. For example, the ***ggplot***s you have been making store all of the plot information in lists.
 
-list_1 %>% str()
-list_2 %>% str()
-x %>% str()
-```
+Any function that returns multiple values can be used to create a list output by wrapping those values with `list()`.
 
-The two objects defined above are lists. They also display the data type of each element. `list_1` is a list of length 3, with a character, a numeric, and a character. `list_2` is also a list of length 3, with a numeric, a character, and a numeric. Note that the `[1:3]` denotes a numeric vector of length 3 for `x`.
-
-Now, let's extract the first element of each of the new lists.
 
 ```{r}
-list_1[[1]][1]
-list_2[[1]][1]
-```
+x <- rnorm(10)
 
-You might be wondering, how is the list `x` different from the lists `list_1` and `list_2`? Besides the contents of the lists, we wanted to demonstrate how there are various ways to create lists. You can directly input values inside `list()`, or wrap the values in `c()` first to create a vector element.
-
-There are a number of built-in R functions that output lists. For example, the ***ggplot***s you have been making store all of the graph information in lists.
-
-Any function that returns multiple values can be used to create a list output. Consider the following list `x` again:
-
-```{r}
-x
-```
-
-If we take the `range()` of `x`, we expect two values to be returned: the minimum value and the maximum value in the numeric vector.
-
-```{r}
 range(x)
-class(range(x))
+
+tibble(col_1 = list(range(x))) 
 ```
 
-The output of `range(x)` is a numeric vector with two values, 2 and 7. To turn the output into a list, simply wrap the line of code with `list()`. 
+Notice this is a 1x1 tibble with one observation, which is a list of one element. Voila! You have just created a *list-column**.
 
-```{r}
-list(range(x))
-class(list(range(x)))
-```
-
-What if we want to create a tibble with the values of `range(x)`?
-
-```{r}
-tibble(col_1 = list(range(x)))
-```
-
-Notice this is a 1x1 tibble with one observation, which is a list of one element. The element is a vector of the integers 2 and 7. Voila! You have just created a *list-column**.
-
-Lesson: If a function returns multiple values as a vector, like `range()` does, you can't use it directly to obtain a list-column, but you can wrap `list()` around it in order to get the same behavior.
+*If a function returns multiple values as a vector, like `range()` does, you must use `list()` as a wrapper if you want to create a list-column.*
 
 A list column is a column of your data which is a [list](https://adv-r.hadley.nz/vectors-chap.html#lists) rather than an atomic vector.  Like with lists, you can pipe in `str()` to read the column more easily.
 
@@ -221,61 +185,46 @@ tibble(col_1 = list(range(x))) %>%
   str()
 ```
 
-Note that this is a case where it is crucial to use `tibble()`, not `data.frame()`!  If we had used `data.frame()` in the last example, it wouldn't have worked how we wanted:
 
-```{r error=TRUE}
-data.frame(col_1 = list(range(x)))
-```
+Let's practice with the `nhanes` dataset. How could we add a column to the dataset that included the quantiles of the `height` variable for each `gender`?
 
-Note that the output is a 2 x 1 dataframe with double observations, not one singular list. 
-
-<!-- DK: Rest of stuff is garbage? Think of a plot, and then make it. Motivate with the guessing game. -->
-
-<!-- Start with: kenya %>% drop_na() %>% filter(rv13 != 0) %>% sample_n(10) %>% select(rv13) %>% as_vector() %>% mean() -->
-
-<!-- Create function which does this: my_sample(x, var). (Do not include mean() at end).  -->
-
-<!-- ID(tibble = 1) %>%  -->
-<!--   mutate(my_samp = map(ID, ~ my_sampler(kenya, 10))) %>%  -->
-<!--   mutate(center = map_dbl(my_samp, ~ mean())) -->
-  
-<!-- ID(tibble = 1:000) %>%  -->
-<!--   mutate(my_samp = map(ID, ~ my_sampler(kenya, 10))) %>%  -->
-<!--   mutate(center = map_dbl(my_samp, ~ mean()))   -->
-
-<!-- Do it for mean and for median, and the plot histogram of their overlapping densities, and show that the median is a much more stable measure. -->
-
-Wrapping a function with `list()` is often how we will go about creating list columns.  Let's practice with the `kenya` dataset. How could we add a column to the dataset that included the quantiles of the `poverty` variable?
-
-First, we load the necessary **primer.data** library, select the relevant variables, and group by `block`. We are grouping because we are curious as to how the poverty rates look when aggregated by block, rather than as individual observations.
+First, we load the necessary **primer.data** library.
 
 ```{r}
 library(primer.data)
-kenya %>%
-  select(block, poverty) %>%
-  group_by(block)
 ```
 
-Next, we will create a list-column by wrapping `quantile()` with `list()`. `quantile()` naturally produces a numeric vector of the quantiles of `poverty`, and wrapping with `list()` will capture this numeric vector as a list.
+Then, select the relevant variables, and group by `gender`. We are grouping because we are curious as to how `height` is distributed in between `gender`. We drop any rows with missing data.
 
 ```{r}
-library(primer.data)
-kenya %>%
-  select(block, poverty) %>%
-  group_by(block) %>%
-  mutate(poverty_quantile = list(quantile(poverty)))
+nhanes %>%
+  select(gender, height) %>%
+  drop_na() %>% 
+  group_by(gender)
 ```
 
-Or let's say that we wanted 1) to subset the dataset to the those with `treatment == "control"`, 2) group by `block`, and 3) get a `summary()` of the `distance` variable by continent:
+Next, we will create a list-column by wrapping `quantile()` with `list()`. `quantile()` naturally produces a numeric vector of the quantiles of `height`, and wrapping with `list()` will capture this numeric vector as a list.
 
-```{r, message=FALSE}
-kenya %>%
-  select(treatment, block, distance) %>%
-  filter(treatment == "control") %>%
-  group_by(block) %>%
-  summarize(dist_summary = list(summary(distance)),
+```{r}
+tmp <- nhanes %>%
+  select(gender, height) %>%
+  drop_na() %>% 
+  group_by(gender) %>% 
+  summarize(height_quintiles = list(quantile(height)),
             .groups = "drop")
+
+tmp
 ```
+
+Take a look at the values for `height_quintiles`:
+
+```{r}
+str(tmp)
+```
+
+Men are taller than women, except at the very bottom of the highet distribution, which includes children.
+
+
 
 ### Using `map_*` functions to create list-columns
 
