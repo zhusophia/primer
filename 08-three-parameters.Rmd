@@ -1,11 +1,13 @@
 
 <!-- DK: We should have 4 models, in addition to the two here already. One is continuous right hand side variable. Maybe income ~ age. Clearly predictive, but not quite significant.  Also need age ~ party with an intercept. Both these are also three parameter models. Covering them makes chapter 9 easier. -->
 
+<!-- We will need to update the ch8 tibble creation to use other variables. -->
+
 <!-- DK: Review dummy variables in the context of the intercept model with categorical predictor. -->
 
 <!-- DK: Also add a logistic model of liberal explained by income. (Need to put income in increments of 100,000.) Just barely significant! (Is this a three parameter model? I don't see an error term.) -->
 
-<!-- Need to add a plot of fittted values and raw data. This will look a bit weird since, for each model, there are only two fitted values. Best is a jittered scatter plot with two columns, and then the fitted values put in the middle in red. -->
+<!-- Need to add a plot of fitted values and raw data. This will look a bit weird since, for each model, there are only two fitted values. Best is a jittered scatter plot with two columns, and then the fitted values put in the middle in red. -->
 
 <!-- governors %>%  -->
 <!--   ggplot(aes(sex, alive_post)) +  -->
@@ -15,16 +17,34 @@
 
 # Three Parameters {#three-parameters}
 
-Models have parameters. In Chapter \@ref(one-parameter) we created models with a single parameter $p$, the proportion of red beads in an urn. In Chapter \@ref(two-parameters) , we used models with two parameters: $\mu$ (the average height in the population, generically known as a model "intercept") and $\sigma$ (the variation in height in the population). Here --- can you guess where this is going? --- we will build models with three parameters: $\sigma$ (which serves the same role throughout the book) and two coefficients which define the shape of a line. In some models, those two parameters will be labeled $\beta_0$ and $\beta_1$. In others, they will be $\beta_1$ and $\beta_2$. All this notation is confusing, not least because different academic fields use inconsistent schemes. The key is to just follow the cardinal virtues and tackle your problem step by step.
+Models have parameters. In Chapter \@ref(one-parameter) we created models with a single parameter $p$, the proportion of red beads in an urn. In Chapter \@ref(two-parameters), we used models with two parameters: $\mu$ (the average height in the population, generically known as a model "intercept") and $\sigma$ (the variation in height in the population). Here --- can you guess where this is going? --- we will build models with three parameters: $\sigma$ (which serves the same role throughout the book) and two coefficients. In models which relate a continuous predictor to the outcome, those two parameters will be labeled $\beta_0$ and $\beta_1$. In models which estimate two averages, the parameters will be $\beta_1$ and $\beta_2$. All this notation is confusing, not least because different academic fields use inconsistent schemes. The key is to just follow the Cardinal Virtues and tackle your problem step by step.
+
+<!-- DK: More detail? -->
 
 
-## EDA for `trains`
+## age ~ party
 
-<!-- DK: Still need to standardize the method we use for providing references. -->
 
-<!-- DK: Fix Enos reference. -->
+We want to build a model and then use that model to make claims about the world. 
 
-Always explore your data. To demonstrate modeling with three parameters, we will use the `trains` data set from the **primer.data** package. Recall the discussion from Chapter \@ref(rubin-causal-model). Enos (2014) randomly placed Spanish-speaking confederates on nine train platforms around Boston, Massachusetts. Exposure to Spanish-speakers -- the `treatment` -- influenced attitudes toward immigration. These reactions were measured through changes in answers to three survey questions. Let's load the libraries we will need in this chapter, all of which we have used before, and look at the data.
+*What is the expected age of a Democrat at the train station?*
+
+*In a group of three Democrats and three Republicans, what age difference should we expect between the oldest Democrat and the youngest Republican?* 
+
+We can answer these and similar questions by creating a model that uses party affiliation to predict age
+
+### Wisdom
+
+```{r echo=FALSE, out.width="100%", fig.cap="Wisdom"}
+knitr::include_graphics("other/images/Wisdom.jpg")
+```
+
+Wisdom begins with a look at your data.
+
+#### EDA for `trains`
+
+
+Always explore your data. To demonstrate modeling with three parameters, we will use the `trains` data set from the **primer.data** package. Recall the discussion from Chapter \@ref(rubin-causal-model). @enos2014 randomly placed Spanish-speaking confederates on nine train platforms around Boston, Massachusetts. Exposure to Spanish-speakers -- the `treatment` -- influenced attitudes toward immigration. These reactions were measured through changes in answers to three survey questions. Let's load the libraries we will need in this chapter, all of which we have used before, and look at the data.
 
 ```{r, message=FALSE}
 library(primer.data)
@@ -81,31 +101,7 @@ ch8 %>%
 
 There are more Democrats in this dataset than Republicans. Democrats also span a wider range of ages than Republicans. 
 
-```{r}
-ch8 %>%
-  ggplot(aes(x = treatment, y = att_end)) + 
-  geom_boxplot() + 
-  labs(title = "Attitude End by Treatment in Trains Dataset",
-       subtitle = "Did the treatment make people more conservative?",
-       x = "Treatment",
-       y = "Attitude After Experiment")
-```
 
-On a boxplot, the top and bottom borders of the box denotes the 75th and 25th percentiles, respectively. The line inside the box denotes the median of the data. Treated individuals have a higher mean `att_end` than the control group, and a higher distribution in general. 
-
-In this chapter, we will make two models. The first explains `age` as a function of `party`. The second uses `att_end` as the dependent variable and `treatment` as the independent variable.
-
-
-## age ~ party
-
-
-We want to build a model and then use that model to make claims about the world. What is the probability that, if a Democrat shows up at the train station, he will be over 50 years old? In a group of three Democrats and three Republicans, what age difference should we expect between the oldest Democrat and the youngest Republican? We can answer these and similar questions by creating a model that uses party affiliation to predict age
-
-### Wisdom
-
-```{r echo=FALSE, out.width="100%", fig.cap="Wisdom"}
-knitr::include_graphics("other/images/Wisdom.jpg")
-```
 
 <!-- DK: Could do more here. -->
 
@@ -477,10 +473,35 @@ pp %>%
 
 In words, we would expect the oldest Democrat to be about 22 years older than the youngest Republican, but we would not be surprised if the oldest Democrat was actually younger than the youngest Republican in a group of 6.
 
+### Addendum
+
+Instead of parameterizing this model without an intercept, we could have used one. In that case, the math would be:
+
+$$ y_i = \beta_0  + \beta_1 x_{d,i} + \epsilon_i$$
+The interpretations of the parameters is now different. $\beta_0$ is now the average age of Republicans. This is the same interpretation as $\beta_1$ in the original set up. $beta_1$ is now the difference between the the average age of Republicans and that of Democrats. 
+
+To fit this model, we use the exact same code as before, except without the `-1` in the `formula` argument.
+
+```{r}
+stan_glm(age ~ party, 
+         data = trains, 
+         refresh = 0)
+```
+
+The intercept, 42.6, is the same as the `partyDemocrat` estimate in the first model. The `partyRepublican` estimate, which was previously 41.0, is now -1.5, meaning it is the difference (allowing for rounding) between the average age of Democrats and Republicans.
+
+Little else about the models will be different. They will have the same fitted values and residuals. `posterior_predict()` will generate the same posterior predictive probabilty distributions. Which parameterization we use does not matter much. But you should be able to interpret the meaning of the coefficients in both.
+
 
 ## att_end ~ treatment
 
-Above, we created a predictive model: with someone's party affiliation, we can make a better guess as to what their age is then what we could have in the absence of information about their party. There was nothing causal about that model. Changing someone's party registration can not change their age. In this example, we build a causal model. What is the average treatment effect, of exposing people to Spanish-speakers, on their attitudes toward immigration? What is the largest causal effect which still has a 1 in 10 chance of occurring?
+Above, we created a predictive model: with someone's party affiliation, we can make a better guess as to what their age is then what we could have in the absence of information about their party. There was nothing causal about that model. Changing someone's party registration can not change their age. In this example, we build a causal model. Consider these two questions:
+
+*What is the average treatment effect, of exposing people to Spanish-speakers, on their attitudes toward immigration?* 
+
+*What is the largest causal effect which still has a 1 in 10 chance of occurring?*
+
+Models help us answer questions better than we could without those models, but only if we follow the Cardinal Virtues.
 
 
 ### Wisdom
@@ -489,7 +510,23 @@ Above, we created a predictive model: with someone's party affiliation, we can m
 knitr::include_graphics("other/images/Wisdom.jpg")
 ```
 
-We are still using the data from Enos (2014). Yet the world is a very different place today! Is data from 2012, four years before Donald Trump's election as president, still relevant? Can we generalize data from Boston commuters to other people in Massachusetts, to other people in the US? There are no obvious answers to these questions. *The data we have is never a perfect match to the problem we face because data is always old.* The world is constantly changing. To use old data, we need to make assumptions about the stability of our model of the world and of the parameters we are estimating. Whether those assumptions are reasonable is a difficult question, one that requires knowledge about the world as it was and the world as it now is. Math won't save us.
+Look at your data! Before making a model which seeks to explain `att_end`, we should plot `att_end` and the variable we think is connected to it.
+
+```{r}
+ch8 %>%
+  ggplot(aes(x = treatment, y = att_end)) + 
+  geom_jitter(width = 0.1) + 
+  labs(title = "Attitude End and Treatment in Enos (2014)",
+       subtitle = "Did the treatment make people more conservative?",
+       x = "Treatment",
+       y = "Attitude After Experiment")
+```
+
+Treated individuals seem to have a higher values for `att_end` than control individuals, although there is a great deal of variation in both. 
+
+<!-- DK: Could do more here. -->
+
+We are still using the data from @enos2014. Yet the world is a very different place today! Is data from 2012, four years before Donald Trump's election as president, still relevant? Can we generalize data from Boston commuters to other people in Massachusetts, to other people in the US? There are no obvious answers to these questions. *The data we have is never a perfect match to the problem we face because data is always old.* The world is constantly changing. To use old data, we need to make assumptions about the stability of our model of the world and of the parameters we are estimating. Whether those assumptions are reasonable is a difficult question, one that requires knowledge about the world as it was and the world as it now is. Math won't save us.
 
 The critical issue is always: Which population are we interested in and does our data come from that population? If there is no connection between the two, progress is impossible. But, in this case, if we are willing to consider the population of US residents over the last decade (including today), and if we are willing to assume that our data set of 115 individuals is representative of that population, then we can use our data to create a model to answer our question.
 
@@ -715,13 +752,11 @@ In this case, we are looking at the distribution of the treatment effect for a s
 The question, however, was interested in the value at the 90th percentile. For this model, that is `r quantile(te$te, prob = 0.9)`. We would not expect a treatment effect of this magnitude to be common, but, at the same time, effects this big and bigger will occur about 10% of the time.
  
 
-<!-- DK: Conclusion -->
+## Summary
 
-## Conclusion
+<!-- Need to highlight the key commands. -->
 
-<!-- BG: This is not great, but I wanted to get some initial ideas down  -->
-
-In this chapter, we explored relationships between different variables in the trains data set. We built a predictive model and a causal model using the following three parameters: $\beta_1$, $\beta_2$, and $\sigma$.
+In this chapter, we explored relationships between different variables in the `trains` data set. We built a predictive model and a causal model.
 
 Similar to previous chapters, our first task is to use _Wisdom_ . We judge how relevant our data is to the questions we ask, using ethics to guide our decision. Could income data from 2012 really be suitable for making predictions today? Probably?  _Justice_ is necessary to decide the best way to represent the models we make. We use  _Courage_ to translate our models into code. Our goal is to understand, generate posterior distributions, and interpret their meaning. Temperance leads us to the final stage. We remind ourselves that there are so many unknown factors that affect our data. Our models are never as good as we hope them to be. We always use caution in applying our models to the real world. 
 
