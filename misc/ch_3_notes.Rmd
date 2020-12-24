@@ -1,0 +1,73 @@
+---
+title: "Prediction Game"
+author: "David Kane"
+date: "12/23/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(primer.data)
+```
+
+
+### Prediction Game
+
+Let's play a prediction game. Consider the `kenya` tibble from **primer.datta**.
+
+```{r}
+kenya
+```
+
+The game is that we will pick a random value of `rv13`, which is the number of people who live in the vicinity of a polling station. You guess a number. I guess a number. The winner of the Prediction Game is the person whose guess is closest to the random value selected. Example:
+
+```{r}
+your_guess <- 500
+my_guess <- 600
+
+sampled_value <- kenya %>% 
+  sample_n(1) %>% 
+  select(rv13) %>% 
+  as_vector()
+
+your_error <- abs(your_guess - sampled_value)
+my_error <- abs(my_guess - sampled_value)
+
+if(your_error < my_error) cat("You win!")
+if(your_error > my_error) cat("I win!")
+```
+
+
+Run this code in your R Console to try it out. It works! It is also sloppy and disorganized. But the first step in writting good code is to write bad code.
+
+We don't want to play the Prediction Game just once. We want to do it thousands of times. Copy/pasting this code a thousand times would be stupid. Instead, we need a function. Just place the working code within a function definition, and Voila!
+
+```{r}
+prediction_game <- function(){
+your_guess <- 500
+my_guess <- 600
+
+sampled_value <- kenya %>% 
+  sample_n(1) %>% 
+  select(rv13) %>% 
+  as_vector()
+
+your_error <- abs(your_guess - sampled_value)
+my_error <- abs(my_guess - sampled_value)
+
+if(your_error < my_error) cat("You win!")
+if(your_error > my_error) cat("I win!")
+}
+```
+
+Other than the function definition itself, there are no changes. Yet, by creating a function, we can now easily run this multiple times.
+
+```{r}
+for(i in 1:10){
+  prediction_game()
+}
+```
+
+
+<!-- DK: Insert a detailed discussion about how we take this garbage and turn it into something much cleaner, pulling out the various lessons we want to teach readers. -->
