@@ -12,9 +12,111 @@ library(primer.data)
 ```
 
 
+
+
+### `no_NA_sampler()`
+
+Assume that we want to sample 10 observations for `height` from the `nhanes` tibble from the **primer.data** package. That is easy to do with the built in function `sample()`.
+
+```{r}
+sample(nhanes$height, size = 10)
+```
+
+One problem with this approach is that it will sample missing values of `height`. We can avoid that by manipulating the vector inside of the call to `sample()`.
+
+```{r}
+sample(nhanes$height[! is.na(nhanes$height)], size = 10)
+```
+
+That works, but, first, it is ugly code. And, second, it is hard to extend when we have more constraints. For example, assume we only want to sample from individuals who have no missing values for any variables, not just `height`. To do that, we really ought to make a custom function. Call that function `no_NA_sampler()`.
+
+The first step in function creation is to write code in a normal pipe which does what you want the function to do. In this case, that code would look like:
+
+```{r}
+nhanes %>% 
+  drop_na() %>%
+  sample_n(10) %>% 
+  pull(height)
+```
+
+We start with `nhanes`, remove any row with a missing value for any variable, sample 10 rows at random and then pull out `height`. To turn this into a function, we just need to copy/paste this pipe within the body of our function definition:
+
+```{r}
+no_NA_sampler <- function(){
+  nhanes %>% 
+    drop_na() %>%
+    sample_n(10) %>% 
+    pull(height)
+}
+
+no_NA_sampler()
+```
+
+Voila! A function just executes the code within its body. The first step in function creation is not to write the function. It is to write the code which you want the function to execute.
+
+The first version, however, "hard codes" a lot of options which we might want to change. What if we want to sample 5 values of height or 500? In that case, we could hard code a new number in place of "10". Better would be to add an argument so that we can pass in whatever value we want.
+
+
+```{r}
+no_NA_sampler <- function(n){
+  nhanes %>% 
+    drop_na() %>%
+    sample_n(n) %>% 
+    pull(height)
+}
+
+no_NA_sampler(n = 2)
+no_NA_sampler(n = 25)
+```
+
+What if we want to sample from a different variable than `height` or from a different tibble than `nhanes`? Again, the trick is to turn hard coded values into arguments.
+
+```{r}
+no_NA_sampler <- function(tbl, var, n){
+  tbl %>% 
+    drop_na() %>%
+    sample_n(n) %>% 
+    pull({{var}})
+}
+
+no_NA_sampler(nhanes, height, n = 2)
+no_NA_sampler(trains, age, n = 5)
+```
+
+The tricky part of using variable names as arguments is that R does not know how to interpret something like `age` when it is passed in as an argument. The double curly braces tell R, in essence, that `var` is a variable which is in the tibble which will be passed, in the pipe, to `pull()`. 
+
+<!-- DK: I realize that the above is a lousy explanation. Feel free to change it completely. -->
+
+Now that we have the function doing what we want, we should add some comments and some error checking.
+
+```{r}
+no_NA_sampler <- function(tbl, var, n){
+  
+  # Function for grabbing `n` samples from a variable `var` which lives in a
+  # tibble `tbl`. 
+  
+  # I could not figure out how to check to see if `var` actually lives in tibble
+  # in my error checking. Also, I don't like that I need to use is_double() as
+  # the check on `n` even though I want `n` to be an integer.
+  
+  stopifnot(is_tibble(tbl))
+  stopifnot(is_double(n))
+
+  tbl %>% 
+    drop_na() %>%
+    
+    # What happens if n is "too large"? That is, I need to think harder about a)
+    # whether or not I am sampling with or without replacement and b) which I
+    # should be doing.
+    
+    sample_n(size = n) %>% 
+    pull({{var}})
+}
+```
+
 ### Prediction Game
 
-Let's play a prediction game. Consider the `kenya` tibble from **primer.datta**.
+Let's play a prediction game. Consider the `kenya` tibble from **primer.data**.
 
 ```{r}
 kenya
@@ -26,10 +128,7 @@ The game is that we will pick a random value of `rv13`, which is the number of p
 your_guess <- 500
 my_guess <- 600
 
-sampled_value <- kenya %>% 
-  sample_n(1) %>% 
-  select(rv13) %>% 
-  as_vector()
+sampled_value <- no_NA_sampler(kenya, rv13, n = 1) 
 
 your_error <- abs(your_guess - sampled_value)
 my_error <- abs(my_guess - sampled_value)
@@ -39,86 +138,77 @@ if(your_error > my_error) cat("I win!")
 ```
 
 
-Run this code in your R Console to try it out. It works! It is also sloppy and disorganized. But the first step in writting good code is to write bad code.
+Run this code in your R Console to try it out. It works! It is also sloppy and disorganized. *But the first step in writing good code is to write bad code*.
 
 We don't want to play the Prediction Game just once. We want to do it thousands of times. Copy/pasting this code a thousand times would be stupid. Instead, we need a function. Just place the working code within a function definition, and Voila!
 
 ```{r}
 prediction_game <- function(){
-your_guess <- 500
-my_guess <- 600
-
-sampled_value <- kenya %>% 
-  sample_n(1) %>% 
-  select(rv13) %>% 
-  as_vector()
-
-your_error <- abs(your_guess - sampled_value)
-my_error <- abs(my_guess - sampled_value)
-
-if(your_error < my_error) cat("You win!")
-if(your_error > my_error) cat("I win!")
+  your_guess <- 500
+  my_guess <- 600
+  
+  sampled_value <- no_NA_sampler(kenya, rv13, n = 1) 
+  
+  your_error <- abs(your_guess - sampled_value)
+  my_error <- abs(my_guess - sampled_value)
+  
+  if(your_error < my_error) cat("You win!")
+  if(your_error > my_error) cat("I win!")
 }
 ```
 
 Other than the function definition itself, there are no changes. Yet, by creating a function, we can now easily run this multiple times.
 
+
 ```{r}
-for(i in 1:10){
-  prediction_game()
-}
+replicate(3, prediction_game())
 ```
 
-
-<!-- DK: Insert a detailed discussion about how we take this garbage and turn it into something much cleaner, pulling out the various lessons we want to teach readers. Final version, after several versions, each one a bit better, should look something like: -->
-
+The problem with this version is that we want `prediction_game()` to *return* a message about the winner. Right now, it returns nothing. It just prints the winner. Let's change that, and also allow for guesses to be passed in as an argument.
 
 ```{r}
-prediction_game <- function(guess_1, guess_2){
-
-  stopifnot(is.numeric(guess_1))
-  stopifnot(is.numeric(guess_2))
-
+prediction_game <- function(guesses){
+  stopifnot(all(is_double(guesses)))
+  stopifnot(length(guesses) == 2)
   
-sampled_value <- kenya %>% 
-  sample_n(1) %>% 
-  select(rv13) %>% 
-  as_vector()
-
-your_error <- abs(your_guess - sampled_value)
-my_error <- abs(my_guess - sampled_value)
-
-if(your_error < my_error){ 
-  return(paste("Guess", guess_1, "wins!"))
-}
-if(your_error > my_error){ 
-  return(paste("Guess", guess_2, "wins!"))
-}
-if(your_error == my_error){ 
-  return("A tie!")
-}
+  your_guess <- guesses[1]
+  my_guess <- guesses[2]
+  
+  sampled_value <- no_NA_sampler(kenya, rv13, n = 1) 
+  
+  your_error <- abs(your_guess - sampled_value)
+  my_error <- abs(my_guess - sampled_value)
+  
+  if(your_error < my_error){ 
+    return(paste("Guess", your_guess, "wins!"))
+  }
+  if(your_error > my_error){ 
+    return(paste("Guess", my_guess, "wins!"))
+  }
+  if(your_error == my_error){ 
+    return("A tie!")
+  }
 
 }
 ```
-
-Calling this function is easy. Having it `return()` a result is much more robust that `cat`ing something to the screen.
 
 ```{r}
-map_chr(1:10, ~ prediction_game(500, 600))
+replicate(5, prediction_game(guesses = c(500, 600)))
 ```
+
 
 In general, we will want to store the results in a tibble, which makes later analysis and plotting easier.
 
 ```{r}
-tibble(ID = 1:10) %>% 
-  mutate(result = map_chr(ID, ~ prediction_game(500, 600)))
+tibble(ID = 1:3) %>% 
+  mutate(result = map_chr(ID, ~ prediction_game(guesses = c(500, 600))))
 ```
 
 Who wins the game the most if we play 1,000 times?
 
 ```{r}
 tibble(ID = 1:1000) %>% 
-  mutate(result = map_chr(ID, ~ prediction_game(500, 600))) %>% 
+  mutate(result = map_chr(ID, ~ prediction_game(guesses = c(500, 600)))) %>% 
   ggplot(aes(result)) +
     geom_bar()
 ```
