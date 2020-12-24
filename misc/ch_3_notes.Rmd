@@ -70,4 +70,67 @@ for(i in 1:10){
 ```
 
 
-<!-- DK: Insert a detailed discussion about how we take this garbage and turn it into something much cleaner, pulling out the various lessons we want to teach readers. -->
+<!-- DK: Insert a detailed discussion about how we take this garbage and turn it into something much cleaner, pulling out the various lessons we want to teach readers. Final version, after several versions, each one a bit better, should look something like: -->
+
+
+```{r}
+prediction_game <- function(guess_1, guess_2){
+
+  stopifnot(is.numeric(guess_1))
+  stopifnot(is.numeric(guess_2))
+
+  
+sampled_value <- kenya %>% 
+  sample_n(1) %>% 
+  select(rv13) %>% 
+  as_vector()
+
+your_error <- abs(your_guess - sampled_value)
+my_error <- abs(my_guess - sampled_value)
+
+if(your_error < my_error){ 
+  return(paste("Guess", guess_1, "wins!"))
+}
+if(your_error > my_error){ 
+  return(paste("Guess", guess_2, "wins!"))
+}
+if(your_error == my_error){ 
+  return("A tie!")
+}
+
+}
+```
+
+Calling this function is easy. Having it `return()` a result is much more robust that `cat`ing something to the screen.
+
+```{r}
+map_chr(1:10, ~ prediction_game(500, 600))
+```
+
+In general, we will want to store the results in a tibble, which makes later analysis and plotting easier.
+
+```{r}
+tibble(ID = 1:10) %>% 
+  mutate(result = map_chr(ID, ~ prediction_game(500, 600)))
+```
+
+Who wins the game the most if we play 1,000 times?
+
+```{r}
+tibble(ID = 1:1000) %>% 
+  mutate(result = map_chr(ID, ~ prediction_game(500, 600))) %>% 
+  ggplot(aes(result)) +
+    geom_bar()
+```
+
+It is hardly surprising that 500 wins more often than 600 since the mean of `rv13` is `r mean(kenya$rv13)`. The mean seems like a pretty good guess. But it is not the best guess.
+
+```{r}
+tibble(ID = 1:1000) %>% 
+  mutate(result = map_chr(ID, ~ prediction_game(442, 539))) %>% 
+  ggplot(aes(result)) +
+    geom_bar()
+```
+
+The mean is not a bad prediction. But the best prediction is (surprisingly?) the median, which is `r median(kenya$rv13)`.
+
