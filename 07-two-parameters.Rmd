@@ -29,7 +29,7 @@ Data science is ultimately a moral act, so we will use the four [Cardinal Virtue
 
 ## Wisdom
 
-```{r echo=FALSE, out.width="100%"}
+```{r echo = FALSE}
 knitr::include_graphics("other/images/Wisdom.jpg")
 ```
 
@@ -94,7 +94,7 @@ Be on the lookout for anything suspicious. Are there any NA's in your data set? 
 
 In addition to `glimpse()`, we can run `skim()`, from the **skimr** package, to calculate some summary statistics. 
 
-```{r, out.width="100%"}
+```{r}
 nhanes %>% 
   select(age, gender, height, survey) %>% 
   skim()
@@ -157,7 +157,7 @@ The other aspect of Wisdom is ethics. Just because we *can* make a model does no
 
 ## Justice
 
-```{r, echo=FALSE, out.width="100%"}
+```{r, echo = FALSE}
 knitr::include_graphics("other/images/Justice.jpg")
 ```
 
@@ -225,7 +225,7 @@ Since this is not a causal model, there is only one potential outcome --- which 
 
 ## Courage
 
-```{r echo=FALSE, out.width="100%"}
+```{r echo = FALSE}
 knitr::include_graphics("other/images/Courage.jpg")
 ```
 
@@ -373,7 +373,7 @@ ch7 %>%
 The fitted value represents the model's best guess at to what the true value of the outcome should be for that individual, given information about any covariates. This is a tricky concept since, after all, *we already know what the actual value is.* We commonly use "hat" notation for fitted values. $y_i$ is the actual height for man $i$. $\hat{y_i}$ is the fitted (or predicted or modeled) height for man $i$. It is the height we would guess if we did not know his true height. The residual, $r_i$, is the difference between the outcome ($y_i$) and the fitted value $\hat{y_i}$. These definitions lead to a natural decomposition of the outcome data:
 
 
-```{r, echo = FALSE, out.width="100%"}
+```{r, echo = FALSE}
 # Seems like it would be nice to have similar axes across the first two plots at
 # least. Want to make this easier to do in later chapters and standardize the
 # approach/code.
@@ -413,7 +413,7 @@ outcome + fitted + res +
 
 ## Temperance
 
-```{r echo=FALSE, out.width="100%"}
+```{r echo = FALSE}
 knitr::include_graphics("other/images/Temperance.jpg")
 ```
 
@@ -442,7 +442,7 @@ The key function is `posterior_epred()`. The two arguments we provide are `objec
 
 We use `as_tibble()` to convert the matrix which is returned by `posterior_epred()`. Converting these 4,000 draws into a posterior probability distribution is straightforward.
 
-```{r, out.width="100%"}
+```{r}
 pe %>% 
   ggplot(aes(x = `1`)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
@@ -486,7 +486,7 @@ pp
 
 As before, it is straightforward to turn draws from the posterior probability distribution into a graphic:
 
-```{r, out.width="100%"}
+```{r}
 pp %>% 
   ggplot(aes(x = `1`)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
@@ -533,7 +533,7 @@ pp <- posterior_predict(object = fit_obj,
 Note we need to add `mutate_all(as.numeric)` to the end of the pipe. This is caused by a bug --- or at least an awkwardness --- whereby the variable type provided by posterior_predict(), at least in the case of more than one observation, is `ppd` rather than `dbl`. The new code changes each column to numeric. Doing so makes each column of type double.
 
 
-```{r, out.width="100%"}
+```{r}
 pp %>% 
   rowwise() %>% 
   mutate(tallest = max(c_across(everything()))) %>% 
@@ -570,7 +570,7 @@ pp <- posterior_predict(object = fit_obj,
         mutate_all(as.numeric)
 ```
 
-```{r, out.width="100%"}
+```{r}
 pp %>% 
   rowwise() %>% 
   mutate(third_tallest = sort(c_across(everything()), 

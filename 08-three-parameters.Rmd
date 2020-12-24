@@ -1,7 +1,9 @@
 
-<!-- DK: We should have 4 models, in addition to the two here already. One is continuous right hand side variable. Maybe income ~ age. Clearly predictive, but not quite significant.  Also need age ~ party with an intercept. Both these are also three parameter models. Covering them makes chapter 9 easier. -->
+
 
 <!-- We will need to update the ch8 tibble creation to use other variables. -->
+
+<!-- Stop using set.seed(). Maybe start using seed =  -->
 
 <!-- DK: Review dummy variables in the context of the intercept model with categorical predictor. -->
 
@@ -35,7 +37,7 @@ We can answer these and similar questions by creating a model that uses party af
 
 ### Wisdom
 
-```{r echo=FALSE, out.width="100%", fig.cap="Wisdom"}
+```{r echo = FALSE, fig.cap = "Wisdom"}
 knitr::include_graphics("other/images/Wisdom.jpg")
 ```
 
@@ -61,7 +63,7 @@ Here, we can see information about each respondent's gender, political affiliati
 
 ```{r}
 ch8 <- trains %>% 
-  select(age, att_end, party, treatment)
+  select(age, att_end, party, income, treatment)
 ```
 
 It is always smart to look at a some random samples of the data:
@@ -114,7 +116,7 @@ The ethical issues are, fortunately, not fraught. Estimating someone's age is (u
 
 ### Justice
 
-```{r echo=FALSE, out.width="100%", fig.cap="Justice"}
+```{r echo = FALSE, fig.cap = "Justice"}
 knitr::include_graphics("other/images/Justice.jpg")
 ```
 
@@ -194,7 +196,7 @@ Don't panic dear poets and philosophers, the whole thing is easier than it looks
 
 ### Courage
 
-```{r echo=FALSE, out.width="100%", fig.cap="Courage"}
+```{r echo = FALSE, fig.cap = "Courage"}
 knitr::include_graphics("other/images/Courage.jpg")
 ```
 
@@ -290,7 +292,7 @@ The following three histograms show the actual outcomes, fitted values, and resi
 
 <!-- DK: Clean up these plots to be similar across chapters! Also, we should ensure that the width of 10 units is the same in each plot. Or does that already happen? Want the intuition that, the more predictive the model, the smaller the remaining variation in the residuals. -->
 
-```{r, echo=FALSE, warning=FALSE, message=FALSE, out.width="100%", fig.align='center'}
+```{r, echo = FALSE, warning=FALSE, message=FALSE, fig.align='center'}
 
 trains_both <- trains %>% 
               select(party, age) %>% 
@@ -349,7 +351,7 @@ The three plots are structured like our equation and table above. A value in the
 
 ### Temperance
 
-```{r echo=FALSE, out.width="100%", fig.cap="Temperance"}
+```{r echo = FALSE, fig.cap = "Temperance"}
 knitr::include_graphics("other/images/Temperance.jpg")
 ```
 
@@ -506,7 +508,7 @@ Models help us answer questions better than we could without those models, but o
 
 ### Wisdom
 
-```{r echo=FALSE, out.width="100%", fig.cap="Wisdom"}
+```{r echo = FALSE, fig.cap = "Wisdom"}
 knitr::include_graphics("other/images/Wisdom.jpg")
 ```
 
@@ -515,7 +517,7 @@ Look at your data! Before making a model which seeks to explain `att_end`, we sh
 ```{r}
 ch8 %>%
   ggplot(aes(x = treatment, y = att_end)) + 
-  geom_jitter(width = 0.1) + 
+  geom_jitter() + 
   labs(title = "Attitude End and Treatment in Enos (2014)",
        subtitle = "Did the treatment make people more conservative?",
        x = "Treatment",
@@ -534,7 +536,7 @@ Ethical issues are tricky, or at least trickier than they were in the context of
 
 ### Justice
 
-```{r echo=FALSE, out.width="100%", fig.cap="Justice"}
+```{r echo = FALSE, fig.cap = "Justice"}
 knitr::include_graphics("other/images/Justice.jpg")
 ```
 
@@ -593,7 +595,7 @@ Nothing has changed, except for the meaning of the data items and the interpreta
 
 ### Courage
 
-```{r echo=FALSE, out.width="100%", fig.cap="Courage"}
+```{r echo = FALSE, fig.cap = "Courage"}
 knitr::include_graphics("other/images/Courage.jpg")
 ```
 
@@ -642,7 +644,7 @@ It appears that the affect of the treatment is to change people's attitudes to b
 
 We can decompose the the dependent variable, `att_end` into two parts: the fitted values and the residuals. There are only two possible fitted values, one for the Treated and one for the Control. The residuals, as always, are simply the difference between the outcomes and the fitted values. 
 
-```{r, echo=FALSE}
+```{r, echo = FALSE}
 outcome <- trains %>% 
   ggplot(aes(att_end)) +
     geom_histogram(bins = 10) +
@@ -674,7 +676,7 @@ The smaller the spread of the residuals, the better a job the model is doing of 
 
 ### Temperance
 
-```{r echo=FALSE, out.width="100%", fig.cap="Temperance"}
+```{r echo = FALSE, fig.cap = "Temperance"}
 knitr::include_graphics("other/images/Temperance.jpg")
 ```
 
@@ -750,7 +752,118 @@ te %>%
 In this case, we are looking at the distribution of the treatment effect for a single individual. This is very different than the *average* treatment effect. In particular, it is much more variable. We are looking at one row in the Preceptor Table. For a single individual, `att_end` can be anywhere from 3 to 15, both under treatment and under control. The causal effect --- the difference between the two potential outcomes can, in theory, be anywhere from -12 to +12. Such extreme values are rare, but not impossible.
 
 The question, however, was interested in the value at the 90th percentile. For this model, that is `r quantile(te$te, prob = 0.9)`. We would not expect a treatment effect of this magnitude to be common, but, at the same time, effects this big and bigger will occur about 10% of the time.
- 
+
+## income ~ age
+
+So far, we have only created models in which the predictor variable is discrete, with only two possible values. `party` is either "Democrat" or "Republican". `treatment` is either "Treated" or "Control". Often times, however, the predictor variable will be continuous. Fortunately, the exact same approach works in this case as well. 
+
+* What would you expect the income to be for a random 40 year old?
+
+### Wisdom
+
+```{r echo = FALSE, fig.cap = "Wisdom"}
+knitr::include_graphics("other/images/Wisdom.jpg")
+```
+
+Before making a model which seeks to explain `income`, we should plot it and the variable we think is connected to it.
+
+```{r}
+ch8 %>%
+  ggplot(aes(x = age, y = income)) + 
+  geom_point(width = 0.1) + 
+  labs(title = "Income and Age",
+       subtitle = "Older people make more money. Maybe?",
+       x = "Age",
+       y = "Income") +
+  scale_y_continuous(labels = scales::dollar_format(accuracy = 1))
+```
+
+Is that data believable? Maybe? One could imagine that income was not recorded exactly and that, therefore, it is not surprising that many people had exactly the same income. Rounding makes different numbers the same, after all. But what about the (almost) complete lack of people reporting income between \$150,000 and \$250,000. In a real data science project, this puzzle would require further investigation. For now, we ignore the issue and blithely press on.
+
+
+### Justice
+
+```{r echo = FALSE, fig.cap = "Justice"}
+knitr::include_graphics("other/images/Justice.jpg")
+```
+
+The mathematics with continuous predictor is unchanges from the intercept-including example we discussed above.
+
+$$ y_i = \beta_0  + \beta_1 age_i + \epsilon_i$$
+When comparing two people (persons 1 and 2), one aged one year older than the other, $\beta_1$ the expected difference in their incomes. The algebra is simple:
+
+$$ y_1 = \beta_0  + \beta_1 age_1$$
+$$ y_2 = \beta_0  + \beta_1 age_2$$
+$$ y_1 - y_2 = \beta_0  + \beta_1 age_1 - \beta_0 - \beta_1 age_2\\
+
+
+y_1 - y_2 = \beta_1 age_1 - \beta_1 age_2\\
+
+y_1 - y_2 = \beta_1 (age_1 - age_2)\\
+
+$$
+So, if person 1 is one year older than person 2, we have:
+
+
+$$y_1 - y_2 = \beta_1 (age_1 - age_2)\\
+y_1 - y_2 = \beta_1 (1)\\
+y_1 - y_2 = \beta_1 \\
+$$
+
+
+
+### Courage
+
+```{r echo = FALSE, fig.cap = "Courage"}
+knitr::include_graphics("other/images/Courage.jpg")
+``` 
+
+The use of `stan_glm()` is the same as above.
+
+```{r}
+fit_3 <- stan_glm(income ~ age, 
+                  data = trains, 
+                  refresh = 0)
+
+print(fit_3, details = FALSE)
+```
+
+<!-- DK: Some more discussion! And some plots. Explain what the residuals are. And predicted values! -->
+
+
+### Temperance
+
+```{r echo = FALSE, fig.cap = "Temperance"}
+knitr::include_graphics("other/images/Temperance.jpg")
+```
+
+Recall our question:
+
+*What would you expect the income to be for a random 40 year old?*
+
+Given that we are looking for an expected value, we use `posterior_epred()`.
+
+```{r}
+newobs <- tibble(age = 40)
+
+pe <- posterior_epred(fit_3, newdata = newobs) %>% 
+  as_tibble() %>% 
+  mutate_all(as.numeric)
+
+pe %>% 
+  ggplot(aes(x = `1`)) +
+    geom_histogram(aes(y = after_stat(count/sum(count))),
+                   bins = 100)  +
+    labs(title = "Posterior Probability Distribution",
+         subtitle = "Expected income for a 40 year-old commuter",
+         x = "Income",
+         y = "Probability") +
+    scale_x_continuous(labels = scales::dollar_format()) +
+    scale_y_continuous(labels = scales::percent_format()) +
+    theme_classic()
+```
+
+<!-- DK: Discussion. -->
 
 ## Summary
 
