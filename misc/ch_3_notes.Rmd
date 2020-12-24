@@ -134,3 +134,58 @@ tibble(ID = 1:1000) %>%
 
 The mean is not a bad prediction. But the best prediction is (surprisingly?) the median, which is `r median(kenya$rv13)`.
 
+#### Playing within a tibble
+
+In other cases, it is more convenient to play portions of the Prediction Game within a tibble. Imagine that we are trying to guess the biggest value out of 10 random samples. We can do this by having a helper function which returns that vector and then, within a tibble, determining who has won.
+
+```{r}
+grab_a_sample <- function(x, var, n){
+  
+  stopifnot(is_tibble(x))
+  stopifnot(is_double(n))
+  
+  x %>% 
+    sample_n(10) %>% 
+    pull({{var}}) 
+}
+```
+
+<!-- DK: Note the of pull(), which I think is better because it gets rid of the names. Maybe do that above as well. Also, you would think that is_integer() would be the better test, but it is not. (Try it!) And is_numeric() is deprecated. Maybe this checking is too confusing? -->
+
+
+```{r}
+tibble(ID = 1:3, guess_1 = 800, guess_2 = 900) %>% 
+  mutate(result = map(ID, ~ grab_a_sample(kenya, rv13, 10)))
+```
+
+We can now manipulate the `result` column and then see which prediction did better.
+
+```{r}
+tibble(ID = 1:3, guess_1 = 800, guess_2 = 900) %>% 
+  mutate(result = map(ID, ~ grab_a_sample(kenya, rv13, 10))) %>% 
+  mutate(biggest = map_dbl(result, ~ max(.))) %>% 
+  mutate(error_1 = abs(guess_1 - biggest)) %>% 
+  mutate(error_2 = abs(guess_2 - biggest)) %>% 
+  mutate(winner = case_when(error_1 < error_2 ~ "Guess one wins!",
+                            error_1 > error_2 ~ "Guess two wins!",
+                            TRUE ~ "A tie!"))
+```
+
+Run the test 1,000 times.
+
+```{r}
+tibble(ID = 1:1000, guess_1 = 800, guess_2 = 900) %>% 
+  mutate(result = map(ID, ~ grab_a_sample(kenya, rv13, 10))) %>% 
+  mutate(biggest = map_dbl(result, ~ max(.))) %>% 
+  mutate(error_1 = abs(guess_1 - biggest)) %>% 
+  mutate(error_2 = abs(guess_2 - biggest)) %>% 
+  mutate(winner = case_when(error_1 < error_2 ~ "Guess one wins!",
+                            error_1 > error_2 ~ "Guess two wins!",
+                            TRUE ~ "A tie!")) %>% 
+  ggplot(aes(winner)) +
+    geom_bar()
+```
+
+Empirically, we see than 900 is a much better guess than 800.
+
+
