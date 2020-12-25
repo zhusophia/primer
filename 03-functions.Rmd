@@ -174,7 +174,7 @@ tmp <- nhanes %>%
   select(gender, height) %>%
   drop_na() %>% 
   group_by(gender) %>% 
-  mutate(height_quantiles = map(height, ~ quantile))
+  mutate(height_quantiles = map(height, ~ quantile(.)))
 
 tmp
 ```
@@ -182,7 +182,9 @@ tmp
 Take a look at the values for `height_quantiles`:
 
 ```{r}
-str(tmp)
+tmp %>% 
+  slice(1:5) %>% 
+  str()
 ```
 
 Men are taller than women, except at the very bottom of the highet distribution, which includes children.
