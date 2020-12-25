@@ -3,23 +3,120 @@
 In our haste to make progress --- to get all the way through the process of building, interpreting and using models --- we have given shortshrift to some of the messy details of model building. This chapter fills in those lacunae.
 
 
-## Taking logs
+## Transforming predictor variables
 
-## Transforming variables
+It is often convenient to transform a predictor variable. 
 
-## Comparing models
+### Centering
+
+Recall our model of `income` as a function of `age`. We fit this using the `trains` data from **primer.data**.
+
+```{r, message = FALSE}
+library(tidyverse)
+library(primer.data)
+library(rstanarm)
+```
 
 
-<!-- This could have been chaper 10, but I like showing logistic earlier, since it can appear on the third exam.  -->
+```{r}
+fit_1 <- stan_glm(formula = income ~ age, 
+         data = trains, 
+         refresh = 0,
+         seed = 9)
 
-<!-- Topics include: -->
+print(fit_1, detail = FALSE)
+```
+
+There is nothing wrong with this model. Yet the interpretation of $\beta_0$, the intercept in the regression, is very awkward. It means the average income for people of age zero. Yet that is useless! There are no people of zero age in our data. And, even if there were, it would be weird to think about such people taking the commuter trade into Boston and filling our survey forms.
+
+It is easy, however, to *transform* `age` into a variable which makes the intercept more meaningful. Consider a new variable, `age_c`, which is `age` minus the average age in the sample. Using this **c**entered version of age does not change the predictions or residuals in the model, but it does make the intercept easier to interpret.
+
+
+```{r}
+trains_2 <- trains %>% 
+  mutate(age_c = age - mean(age))
+
+fit_1_c <- stan_glm(formula = income ~ age_c, 
+                    data = trains_2, 
+                    refresh = 0,
+                    seed = 9)
+
+print(fit_1_c, detail = FALSE)
+```
+
+The intercept, `r round(coef(fit_1_c)["(Intercept)"], 0)`, is the expected income for someone with `age_c = 0`, i.e., someone of an average age in the data, which is `r round(mean(trains$age), 0)`. 
+
+### Scaling
+
+Centering --- changing a vector via addition/subtraction --- often makes the intercept easier to interpret. Scaling --- changing a vector via multiplication/division --- often makes it easier to interpret coefficients. The most common scaling method is to divide the vector by its standard deviation.
+
+```{r}
+trains_3 <- trains %>% 
+  mutate(age_s = age / sd(age))
+
+fit_1_s <- stan_glm(formula = income ~ age_s, 
+                    data = trains_3, 
+                    refresh = 0,
+                    seed = 9)
+
+print(fit_1_s, detail = FALSE)
+```
+
+`age_s` is age **s**caled by its own standard deviation. A change in one unit of `age_s` is the same as a change in one standard deviation of the `age`, which is about `r round(sd(trains$age))`. The interpretation of $\beta_1$ is now:
+
+*When comparing two people, one about `r round(sd(trains$age))` years older than the other, we expect the older person to earn about `r scales::comma(round(coef(fit_1_s)["age_s"], -3))` more.*
+
+But, because we scaled without centering, the intercept is now back the (nonsensical) meaning of the expected income for people of age 0. 
+
+
+### *z*-scores
+
+The most common transformation applies both centering and scaling. The base R function `scale()` subtracts the mean and divides by the standard deviation. A variable so transformed is a "*z*-score, meaning a vector with a mean of zero and a standard deviation of one. Using *z*-scores makes interpretation easier, especially when we seek to compare the importance of different predictors.
+
+```{r}
+trains_4 <- trains %>% 
+  mutate(age_z = scale(age))
+
+fit_1_z <- stan_glm(formula = income ~ age_z, 
+                    data = trains_4, 
+                    refresh = 0,
+                    seed = 9)
+
+print(fit_1_z, detail = FALSE)
+```
+
+The two parameters are easy to interpret after this transformation.
+
+*The expected income of someone of average age, which is about `r round(mean(trains$age))` in this study, is about `r round(coef(fit_1_z)["(Intercept)"], 0)` dollars.*
+
+*When comparing two individuals who differ in age by one standard deviation, which is about `r round(sd(trains$age))` in this study, the older person is expected to earn about `r `scales::comma(round(coef(fit_1_z)["age_z"], -3))` more than the younger.*
+
+Note that, when using *z*-scores, we would often phrase this comparison in terms of "sigmas." One person is "one sigma" older than another person means that they are one standard deviation older. This is simple enough, once you get used to it, but also confusing since we already using the word "sigma" to mean $\sigma$, the standard deviation of $\epsilon_i$. Alas, language is something we deal with rather than control. You will hear the same word "sigma" applied to both concepts, even in the same sentence. Determine meaning by context.
+
+### Taking logs
 
 <!-- * taking logs. When? Why? Doing so on dependent variable is a much bigger deal than doing it on independent variables since the former changes he very essence of the model. You can't really (?) compare two different models if one has taken logs of Y and one has not. -->
 
+### If parameters are unicorns, why bother with transformations?
+
 <!-- * standardizing variables. Key advantage is to make the coefficients easier to interpret. Even though the "right" thing to do in looking at models is to use posterior_* to look at model predictions, this takes some time. It is very handy, first pass, to look at all the coefficients and get a sense of which ones are "interesting." Then, focus on those when making newobs tibbles. -->
+
+## Transforming the outcome variable
+
+Transforming predictor variables is generally uncontroversial. It does not matter much. Change things to $z$-scores and you won't go far wrong. Or keep them in their original form, and take care with your interpretations. It's all good.
+
+Transforming the outcome variable is a much more difficult question, to which there are few right answers.
+
+
+
+## Selecting variables
 
 <!-- * Keeping or throwing away variables. How do we decide? If something is big and significant, we always keep it. If it is small and insignificant, we don't, unless our audience really wants to see it. If a mix, reasonable people differ. No right answer! -->
 
 <!-- * Creating new variables, especially by combining different ones into one combined variable. -->
+
+
+## Comparing models
+
 
 <!-- Overfitting and model selection. loo() -->
