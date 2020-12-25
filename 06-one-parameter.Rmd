@@ -98,7 +98,7 @@ knitr::include_graphics("06-one-parameter/images/sampling_bowl_1.jpg")
 
 One way to answer this question would be to perform an exhaustive count: remove each bead individually, count the number of red beads and the number of white beads, and divide the number of red beads by the total number of beads. However, this would be a long and tedious process. Therefore, we will use sampling! Consider two questions:
 
-*If we get 16 red beads in a random sample of size 50 taken from an urn with 2,400 (white or red) beads, how many red beads are in the urn?*
+*If we get 17 red beads in a random sample of size 50 taken from an urn with 2,400 (white or red) beads, how many red beads are in the urn?*
 
 *What is the probability, using the same urn, that we will draw more than 8 red beads if we use a shovel of size 20?*
 
@@ -824,7 +824,7 @@ knitr::include_graphics("06-one-parameter/images/that_would_be_great.png")
 
 Recall the question we asked at the beginning of our chapter: 
 
-*If we get 16 red beads in a random sample of size 50 taken from an urn with 2,400 (white or red) beads, how many red beads are in the urn?*
+*If we get 17 red beads in a random sample of size 50 taken from an urn with 2,400 (white or red) beads, how many red beads are in the urn?*
 
 *What is the probability, using the same urn, that we will draw more than 8 red beads if we use a shovel of size 20?*
 
@@ -881,15 +881,15 @@ knitr::include_graphics("06-one-parameter/images/rayshader_full.png")
 
 ### Posterior distribution
 
-We follow the same steps now as we did in Chapter \@ref(probability). We run the experiment. When we look at our question -- we are asking for the posterior probability of a certain case. This case is where we find that, using the 50 slot shovel, we get a result of 16 red beads. What does that make our posterior probability? We want:
+We follow the same steps now as we did in Chapter \@ref(probability). We run the experiment. When we look at our question -- we are asking for the posterior probability of a certain case. This case is where we find that, using the 50 slot shovel, we get a result of 17 red beads. What does that make our posterior probability? We want:
 
-$$p(models | data = 16)$$ 
+$$p(models | data = 17)$$ 
 
-The same approach works again. We take a "slice" of the joint distribution where the number of red beads in the paddle is equal to 16. After normalization, that gives us this posterior probability for the number of red beads in the urn. Let's call the tibble with this data in it `post` and then use `post` to create a graphic of the posterior.
+The same approach works again. We take a "slice" of the joint distribution where the number of red beads in the paddle is equal to 17. After normalization, that gives us this posterior probability for the number of red beads in the urn. Let's call the tibble with this data in it `post` and then use `post` to create a graphic of the posterior.
 
 ```{r}
 post <- x %>% 
-  filter(red_paddle == 16) %>% 
+  filter(red_paddle == 17) %>% 
   group_by(red_urn) %>% 
   summarize(total = n(), .groups = "drop") %>%
   mutate(probs = total/sum(total)) %>% 
@@ -900,7 +900,7 @@ post %>%
   ggplot(aes(x = red_urn, y = probs)) +
     geom_col() +
     labs(title = "Posterior Probability Distribution",
-         subtitle = "Number of red beads is centered at 768",
+         subtitle = "Number of red beads is centered at 816",
          x = "Number of Beads in Urn which Are Red",
          y = "Probability") + 
     scale_x_continuous(labels = scales::number_format(accuracy = 1)) +
@@ -908,11 +908,11 @@ post %>%
     theme_classic()
 ```
 
-To visualize this in a 3D plot, see the slice in the figure below. There are a few things to note. First, the x-axis only extends to 1500 (rather than the total 2400) due to the fact that, when the paddle only draws 16/50 = .32 = 32% red beads, it is almost impossible for the total number red beads in the total urn to exceed 1500. The most likely number of red beads in the total urn, when the paddle draws 16/50 red beads, is somewhere in the 700-830 range. This is signified by the peak between these points. The probability is lower below 700 and above 830 because it is less likely that this is the number of red beads in the urn, conditional on the fact that the paddle drew 16/50 red beads. This is our posterior distribution. 
+To visualize this in a 3D plot, see the slice in the figure below. There are a few things to note. First, the x-axis only extends to 1500 (rather than the total 2400) due to the fact that, when the paddle only draws 17/50 = .34 = 34% red beads, it is almost impossible for the total number red beads in the total urn to exceed 1500. The most likely number of red beads in the total urn, when the paddle draws 17/50 red beads, is somewhere in the 780-850 range. This is signified by the peak between these points. The probability is lower below 780 and above 850 because it is less likely that this is the number of red beads in the urn, conditional on the fact that the paddle drew 17/50 red beads. This is our posterior distribution. 
 
 For any value of red beads found in the paddle (from 0 to 50), there is a posterior distribution of possible values of red beads in the total urn. This distribution is meant to illustrate that, though our sample gives an estimate of the total proportion of red beads in the entire urn, there is much variation in what the actual proportion might be. 
 
-Recall Question #1 from the start of the Chapter: "If we get 16 red beads in a random sample of size 50, how many red beads are in the entire urn?" The answer is not a single number. Our posterior distribution is just that: a distribution. From our sample, we have many different results for the total number of red beads in the entire urn. Certain totals of red beads, like the extremes close to 0 or 2,400, are essentially impossible due to our sample value being 32%. Some totals, like 800, occur far more frequently than other totals. 
+Recall Question #1 from the start of the Chapter: "If we get 17 red beads in a random sample of size 50, how many red beads are in the entire urn?" The answer is not a single number. Our posterior distribution is just that: a distribution. From our sample, we have many different results for the total number of red beads in the entire urn. Certain totals of red beads, like the extremes close to 0 or 2,400, are essentially impossible due to our sample value being 32%. Some totals, like 800, occur far more frequently than other totals. 
 
 This means that, while we can provide a range of possibilities (and we can estimate which of those possibilities occur most frequently), we can never say that we know the total number of red beads with certainty. 
 
@@ -952,10 +952,10 @@ But we can not simply take the mean values of these positive results because dif
 
 Instead of building the joint and conditional probability distributions "by hand" as above, we can just use `stan_glm()` from the **rstanarm* package. For now, we will just walk through the code for doing this very quickly. Chapter \@ref(two-parameters) will provide a step=by-step explanation.
 
-Assume that, as before, a shovel of size 50 drawn from the urn has returned 16 red beads and 34 white. Create an object which contains this data.
+Assume that, as before, a shovel of size 50 drawn from the urn has returned 17 red beads and 33 white. Create an object which contains this data.
 
 ```{r}
-shovel <- tibble(red = c(rep(1, 16), rep(0, 34))) %>% 
+shovel <- tibble(red = c(rep(1, 17), rep(0, 33))) %>% 
   
   # `sample_frac()` just re-arranges the rows of `shovel`. Doing so is
   # aesthetically please but does not matter since the order of the beads in the
