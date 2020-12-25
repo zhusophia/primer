@@ -676,32 +676,169 @@ Given randomness, coverage will only be precisely correct by luck. The key point
 
 ## 0/1 Outcomes
 
-Variables with well-behaved, continuous ranges are the easiest to handle. We started with `height` because it was simple. Sadly, however, many variables are not like `height`. Consider `diabetes`, a variable in `nhanes` which takes on two possible values: 0 (if you do not have diabetes) and 1 (if you do). In the same way that we would like to construct a model which explains or predicts `height`, we would like to build a model which explains or predicts `diabetes`. 
+Variables with well-behaved, continuous ranges are the easiest to handle. We started with `height` because it was simple. Sadly, however, many variables are not like `height`. Consider `gender`, a variable in `nhanes` which takes on two possible values: "Male" and "Female". In the same way that we would like to construct a model which explains or predicts `height`, we would like to build a model which explains or predicts `gender`. We want to answer questions like:
 
-<!-- DK: Discuss cardinal virtues? -->
+*What is the probability that a random person who is 180 cm tall is female?*
 
-
-
-Before we do that, however, let's revisit the urn example from Chapter \@ref(one-parameter). 
+*Wisdom* suggests we start by looking at the data. Because models use numbers, we need to create a new variable, `female`, which is 1 for Females and 0 for males.
 
 
+```{r}
+ch7_b <- nhanes %>% 
+  select(age, gender, height) %>%
+  mutate(female = ifelse(gender == "Female", 1, 0)) %>% 
+  filter(age >= 18) %>% 
+  select(female, height) %>% 
+  drop_na()
 
-### gender ~ height
+ch7_b
+```
 
-<!-- ```{r} -->
-<!-- z <- nhanes %>%  -->
-<!--   select(gender, height) %>%  -->
-<!--   drop_na() -->
+```{r}
+ch7_b %>% 
+  ggplot(aes(x = height, y = female)) +
+  geom_jitter(height = 0.1, alpha = 0.05) +
+  labs(title = "Gender and Height",
+       subtitle = "Men are taller than women",
+       x = "Height (cm)",
+       y = NULL,
+       caption = "Data from NHANES") +
+  scale_y_continuous(breaks = c(0, 1),
+                     labels = c("Male", "Female"))
+```
 
 
-<!-- fit_3 <- stan_glm(diabetes ~ age, -->
-<!--                   data = ch7_diabetes, -->
-<!--                   family = binomial, -->
-<!--                   refresh = 0) -->
-<!-- ``` -->
+*Justice* guides us in noting that this is a predictive model. The math is complex:
+
+$$  \operatorname{Pr}(\text{Female} = 1) = \frac{\text{exp}(\beta_0 + \beta_1 \text{height})}{1 + \text{exp}(\beta_0 + \beta_1 \text{height})} $$
+
+<!-- DK: Insert discussion about why we use logistic models. -->
+
+*Courage* suggests that we use the same tools for fitting this logistic regression as we did above in fitting linear models.
 
 
 
+```{r}
+fit_2 <- stan_glm(data = ch7_b,
+                  formula = female ~ height,
+                  family = binomial,
+                  refresh = 0,
+                  seed = 27)
+```
+
+```{r}
+print(fit_2, digits = 3)
+```
+
+One major difference between linear and logistic models is that parameters in the latter are much harder to interpret. What does it mean, substantively, that $\beta_1$ is `r round(coef(fit_2)["height"], 2)`?
+
+We could, of course, estimate a linear model by using `family = guassian`.
+
+```{r}
+fit_2_lm <- stan_glm(data = ch7_b,
+                     formula = female ~ height,
+                     family = gaussian,
+                     refresh = 0,
+                     seed = 27)
+
+print(fit_2_lm, digits = 3)
+```
+
+
+Although the parameters are easier to interpret, that ease is a Siren's call. Follow it, and you will crash on the rocks on nonsense. 
+
+If you use a linear model with a Gaussian error term, you will have a model which can produce predicted values outside of the 0 to 1 range allowed for probabilities, as in this case.
+
+```{r}
+ch7_b %>% 
+  ggplot(aes(x = height, y = female)) +
+    geom_jitter(height = 0.1, alpha = 0.05) +
+    geom_line(aes(x = height, 
+                  y = fitted(fit_2)), 
+              color = "red") +
+    geom_line(aes(x = height, 
+                  y = fitted(fit_2_lm)), 
+              color = "blue") +
+    labs(title = "Gender and Height",
+         subtitle = "A linear model cam produce probabilities outside 0 to 1",
+         x = "Height (cm)",
+         y = NULL,
+         caption = "Data from NHANES") +
+    scale_y_continuous(breaks = c(0, 1),
+                       labels = c("Male", "Female"))
+  
+```
+
+Imagine we have a person who is 190 cm tall. What is the probability that this person is female? If we just use that input in the linear model, we get: $6.2 -0.034 * 190$ = -0.26$. Since it is impossible for a probability to be less than zero, this result is nonsense. Indeed, the primary impetus behind the creation of logistic regression models was to avoid such results.
+
+
+Fortunately, parameters are not what we care about. They are epiphenomenon, unicorns of our imagination. Instead, we want answers to our questions, for which *Temperance* --- and the functions in **rstanarm** --- is our guide. Recall our question:
+
+*What is the probability that a random person who is 180 cm tall is female?*
+
+```{r}
+newobs <- tibble(height = 180)
+
+pe <- posterior_epred(fit_2, newdata = newobs) %>% 
+  as_tibble()
+
+pe %>% 
+  ggplot(aes(x = `1`)) +
+    geom_histogram(aes(y = after_stat(count/sum(count))),
+                   bins = 100) +
+    labs(title = "Posterior Probability Distribution",
+         subtitle = "For probability 180 cm tall person is female",
+         x = "Probability",
+         y = "Probability",
+         caption = "Data source: NHANES") + 
+    scale_x_continuous(labels = scales::percent_format()) +
+    scale_y_continuous(labels = scales::percent_format()) 
+
+```
+
+There is only about a 1 in 20 chance that a 180 centimeter tall person is female.
+
+<!-- DK: Discuss the meaning of ppd of a probability. -->
+
+Another major difference with logistic models is that `posterior_epred()` and `posterior_predict()` return different types of objects. `posterior_epred()` returns probabilities, as above. `posterior_predict()`, on the other hand, returns predictions, as its name suggests. In other words, it returns zeros and ones. Consider another question:
+
+*In a group of 100 people who are 180 centimeters tall, how many will be women?*
+
+```{r}
+newobs <- tibble(height = rep(180, 100))
+
+pp <- posterior_predict(fit_2, newdata = newobs) %>% 
+  as_tibble() %>% 
+  mutate_all(as.numeric)
+
+pp
+```
+
+
+<!-- DK: I am confused! Is this a posterior predictive distribution or a posterior preditive probability distribution? -->
+
+Each column is 4,000 draws from the posterior predictive distribution for the gender of a person who is 180 cm tall. (Since all 100 people have the same height, all the columns are draws from the same distribution.) We can treat this object on a row-by-row basis.
+
+<!-- DK: More detail! -->
+
+
+```{r}
+pp %>% 
+  rowwise() %>% 
+  mutate(total = sum(c_across(everything()))) %>% 
+  ggplot(aes(x = total)) +
+    geom_histogram(aes(y = after_stat(count/sum(count))),
+                   bins = 100) +
+    labs(title = "Posterior Probability Distribution",
+         subtitle = "Number of women among 100 people 180 cm tall",
+         x = "Number of Women",
+         y = "Probability",
+         caption = "Data source: NHANES") + 
+    scale_x_continuous(labels = scales::number_format(accuracy = 1)) +
+    scale_y_continuous(labels = scales::percent_format()) 
+```
+
+That 5 or 6 women is the most likely number is very consistent with the answer to the first question. There we found that a random person who is 180 cm tall has a 5% or 6% chance of being female. So, with 100 such people, 5 or 6 seems a reasonable total. But the *expect value* from `posterior_epred()`, although it does provide a sense of where the center of the predictive distribution will be, does not tell us much about the range of possible outcomes. For that, we need `posterior_predict()`.
 
 
 ## Summary
