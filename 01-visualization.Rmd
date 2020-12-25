@@ -396,7 +396,7 @@ ggplot(data = gapminder,
 
 Unlike scatterplots and linegraphs, there is now only one variable being mapped in `aes()`. Here, that variable is `lifeExp`. The y-aesthetic of a histogram, the count of the observations in each bin, gets computed for you automatically. Furthermore, the geometric object layer is now a `geom_histogram()`. After running the following code, you'll see the histogram as well as warning messages. 
 
-* The warning message is telling us that the histogram was constructed using `bins = 30` for 30 equally spaced bins. This is known in computer programming as a default value; unless you override this default number of bins with a number you specify, R will choose 30 by default. We'll see in the next section how to change the number of bins to another value than the default.
+* The message is telling us that the histogram was constructed using `bins = 30` for 30 equally spaced bins. This is the default value; unless you override this default number of bins with a number you specify, R will choose 30 by default. Because this is an important aspect of making a histogram, R insists on informing you with this message. You make this message go away by specifying the `bin` number yourself, as you should always do.
 
 It's hard to get a sense for which range of life expectancy is spanned by each bin; everything is one giant amorphous blob. So let's add white vertical borders demarcating the bins by adding a `color` argument to `geom_histogram()`. We set `color `to "white" in  `geom_histogram()` to create a white outline between bins.
 
@@ -411,7 +411,8 @@ We can also use the `fill` argument to change the color of the actual bins. Let'
 ```{r}
 ggplot(data = gapminder, 
        mapping = aes(x = lifeExp)) +
-  geom_histogram(color = "white", 
+  geom_histogram(bins = 20,
+                 color = "white", 
                  fill = "steelblue")
 ```
 
@@ -421,15 +422,6 @@ We can also adjust the number of bins in our histogram in one of two ways:
 
 2. By adjusting the width of the bins via the `binwidth` argument to `geom_histogram()`. 
 
-As mentioned in the previous section, the default number of bins is 30. We can override this default, to say 40 bins, as follows. Notice the warning message disappeared!
-
-```{r}
-ggplot(data = gapminder, 
-       mapping = aes(x = lifeExp)) +
-  geom_histogram(bins = 40, 
-                 color = "white",
-                 fill = "steelblue" )
-```
 
 Using the second method, instead of specifying the number of bins, we specify the width of the bins by using the `binwidth` argument in the `geom_histogram()` layer. For example, let's set the width of each bin to be 5.
 
@@ -439,18 +431,6 @@ ggplot(data = gapminder,
   geom_histogram(binwidth = 5, 
                  color = "white",
                  fill = "steelblue")
-```
-
-Let's compare both resulting histograms side-by-side. 
-
-```{r warning = FALSE, message = FALSE}
-x <- ggplot(data = gapminder, mapping = aes(x = lifeExp)) +
-  geom_histogram(bins = 40, color = "white",fill = "steelblue")
-
-y <- ggplot(data = gapminder, mapping = aes(x = lifeExp)) +
-  geom_histogram(binwidth = 5, color = "white",fill = "steelblue")
-
-x + y
 ```
 
 
@@ -611,7 +591,7 @@ Recall the histogram we plotted in the `geom_histogram()` section.
 
 ```{r}
 ggplot(data = gapminder, mapping = aes(x = lifeExp)) +
-  geom_histogram()
+  geom_histogram(bins = 20)
 ```
 
 We can change `geom_histogram()` to `geom_density()` to make a density plot, which is a smoothed version of the histogram. This is a useful alternative to the histogram that displays continuous data in a smooth distribution.
