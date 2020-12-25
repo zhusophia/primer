@@ -865,6 +865,34 @@ pe %>%
 
 <!-- DK: Discussion. -->
 
+
+## liberal ~ income
+
+So far in this chapter, we have only considered *continuous* outcome variables. `age`, `att_end` and `income` all take on a variety of values. None of them are, truly, continuous, of course. `age` is only reported as an integer value. `att_end` can only, by definition, take on 13 distinct values. However, from a modeling perspective, what matters is that they have more than 2 possible values.
+
+`liberal`, however, only takes on two values: TRUE and FALSE. In order to model it, we must use the `binomial` family. 
+
+
+But first, following wisdom, let's look at our data.
+
+
+```{r}
+ch8_lib_inc <- trains %>% 
+  select(liberal, income) %>% 
+  mutate(income = income / 1000)
+
+fit_4 <- stan_glm(data = ch8_lib_inc,
+                  formula = liberal ~ income,
+                  family = binomial,
+                  refresh = 0,
+                  seed = 365)
+
+print(fit_4, digits = 3)
+```
+
+
+
+
 ## Summary
 
 <!-- Need to highlight the key commands. -->
