@@ -65,27 +65,145 @@
 <span class="header-section-number">9</span> Building Models<a class="anchor" aria-label="anchor" href="#building-models"><i class="fas fa-link"></i></a>
 </h1>
 <p>In our haste to make progress — to get all the way through the process of building, interpreting and using models — we have given shortshrift to some of the messy details of model building. This chapter fills in those lacunae.</p>
-<div id="taking-logs" class="section level2" number="9.1">
+<div id="transforming-predictor-variables" class="section level2" number="9.1">
 <h2>
-<span class="header-section-number">9.1</span> Taking logs<a class="anchor" aria-label="anchor" href="#taking-logs"><i class="fas fa-link"></i></a>
+<span class="header-section-number">9.1</span> Transforming predictor variables<a class="anchor" aria-label="anchor" href="#transforming-predictor-variables"><i class="fas fa-link"></i></a>
 </h2>
+<p>It is often convenient to transform a predictor variable.</p>
+<div id="centering" class="section level3" number="9.1.1">
+<h3>
+<span class="header-section-number">9.1.1</span> Centering<a class="anchor" aria-label="anchor" href="#centering"><i class="fas fa-link"></i></a>
+</h3>
+<p>Recall our model of <code>income</code> as a function of <code>age</code>. We fit this using the <code>trains</code> data from <strong>primer.data</strong>.</p>
+<div class="sourceCode" id="cb684"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">primer.data</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://mc-stan.org/rstanarm/">rstanarm</a></span><span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb685"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">fit_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">income</span> <span class="op">~</span> <span class="va">age</span>, 
+         data <span class="op">=</span> <span class="va">trains</span>, 
+         refresh <span class="op">=</span> <span class="fl">0</span>,
+         seed <span class="op">=</span> <span class="fl">9</span><span class="op">)</span>
+
+<span class="fu"><a href="https://docs.ropensci.org/skimr/reference/print.html">print</a></span><span class="op">(</span><span class="va">fit_1</span>, detail <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<pre><code>##             Median   MAD_SD  
+## (Intercept) 103379.6  24657.3
+## age            904.7    561.4
+## 
+## Auxiliary parameter(s):
+##       Median  MAD_SD 
+## sigma 74166.4  5146.6</code></pre>
+<p>There is nothing wrong with this model. Yet the interpretation of <span class="math inline">\(\beta_0\)</span>, the intercept in the regression, is very awkward. It means the average income for people of age zero. Yet that is useless! There are no people of zero age in our data. And, even if there were, it would be weird to think about such people taking the commuter trade into Boston and filling our survey forms.</p>
+<p>It is easy, however, to <em>transform</em> <code>age</code> into a variable which makes the intercept more meaningful. Consider a new variable, <code>age_c</code>, which is <code>age</code> minus the average age in the sample. Using this <strong>c</strong>entered version of age does not change the predictions or residuals in the model, but it does make the intercept easier to interpret.</p>
+<div class="sourceCode" id="cb687"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">trains_2</span> <span class="op">&lt;-</span> <span class="va">trains</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>age_c <span class="op">=</span> <span class="va">age</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span><span class="op">)</span>
+
+<span class="va">fit_1_c</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">income</span> <span class="op">~</span> <span class="va">age_c</span>, 
+                    data <span class="op">=</span> <span class="va">trains_2</span>, 
+                    refresh <span class="op">=</span> <span class="fl">0</span>,
+                    seed <span class="op">=</span> <span class="fl">9</span><span class="op">)</span>
+
+<span class="fu"><a href="https://docs.ropensci.org/skimr/reference/print.html">print</a></span><span class="op">(</span><span class="va">fit_1_c</span>, detail <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<pre><code>##             Median   MAD_SD  
+## (Intercept) 141804.2   7188.0
+## age_c          906.7    572.9
+## 
+## Auxiliary parameter(s):
+##       Median  MAD_SD 
+## sigma 74273.6  4882.0</code></pre>
+<p>The intercept, 1.42^{5}, is the expected income for someone with <code>age_c = 0</code>, i.e., someone of an average age in the data, which is 42.</p>
 </div>
-<div id="transforming-variables" class="section level2" number="9.2">
-<h2>
-<span class="header-section-number">9.2</span> Transforming variables<a class="anchor" aria-label="anchor" href="#transforming-variables"><i class="fas fa-link"></i></a>
-</h2>
+<div id="scaling" class="section level3" number="9.1.2">
+<h3>
+<span class="header-section-number">9.1.2</span> Scaling<a class="anchor" aria-label="anchor" href="#scaling"><i class="fas fa-link"></i></a>
+</h3>
+<p>Centering — changing a vector via addition/subtraction — often makes the intercept easier to interpret. Scaling — changing a vector via multiplication/division — often makes it easier to interpret coefficients. The most common scaling method is to divide the vector by its standard deviation.</p>
+<div class="sourceCode" id="cb689"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">trains_3</span> <span class="op">&lt;-</span> <span class="va">trains</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>age_s <span class="op">=</span> <span class="va">age</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html">sd</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span><span class="op">)</span>
+
+<span class="va">fit_1_s</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">income</span> <span class="op">~</span> <span class="va">age_s</span>, 
+                    data <span class="op">=</span> <span class="va">trains_3</span>, 
+                    refresh <span class="op">=</span> <span class="fl">0</span>,
+                    seed <span class="op">=</span> <span class="fl">9</span><span class="op">)</span>
+
+<span class="fu"><a href="https://docs.ropensci.org/skimr/reference/print.html">print</a></span><span class="op">(</span><span class="va">fit_1_s</span>, detail <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<pre><code>##             Median   MAD_SD  
+## (Intercept) 103061.4  25235.6
+## age_s        11121.0   6921.6
+## 
+## Auxiliary parameter(s):
+##       Median  MAD_SD 
+## sigma 74124.8  4959.5</code></pre>
+<p><code>age_s</code> is age <strong>s</strong>caled by its own standard deviation. A change in one unit of <code>age_s</code> is the same as a change in one standard deviation of the <code>age</code>, which is about 12. The interpretation of <span class="math inline">\(\beta_1\)</span> is now:</p>
+<p><em>When comparing two people, one about 12 years older than the other, we expect the older person to earn about 11,000 more.</em></p>
+<p>But, because we scaled without centering, the intercept is now back the (nonsensical) meaning of the expected income for people of age 0.</p>
 </div>
-<div id="comparing-models" class="section level2" number="9.3">
-<h2>
-<span class="header-section-number">9.3</span> Comparing models<a class="anchor" aria-label="anchor" href="#comparing-models"><i class="fas fa-link"></i></a>
-</h2>
-<!-- This could have been chaper 10, but I like showing logistic earlier, since it can appear on the third exam.  -->
-<!-- Topics include: -->
+<div id="z-scores" class="section level3" number="9.1.3">
+<h3>
+<span class="header-section-number">9.1.3</span> <em>z</em>-scores<a class="anchor" aria-label="anchor" href="#z-scores"><i class="fas fa-link"></i></a>
+</h3>
+<p>The most common transformation applies both centering and scaling. The base R function <code><a href="https://rdrr.io/r/base/scale.html">scale()</a></code> subtracts the mean and divides by the standard deviation. A variable so transformed is a "<em>z</em>-score, meaning a vector with a mean of zero and a standard deviation of one. Using <em>z</em>-scores makes interpretation easier, especially when we seek to compare the importance of different predictors.</p>
+<div class="sourceCode" id="cb691"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">trains_4</span> <span class="op">&lt;-</span> <span class="va">trains</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>age_z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/scale.html">scale</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span><span class="op">)</span>
+
+<span class="va">fit_1_z</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">income</span> <span class="op">~</span> <span class="va">age_z</span>, 
+                    data <span class="op">=</span> <span class="va">trains_4</span>, 
+                    refresh <span class="op">=</span> <span class="fl">0</span>,
+                    seed <span class="op">=</span> <span class="fl">9</span><span class="op">)</span>
+
+<span class="fu"><a href="https://docs.ropensci.org/skimr/reference/print.html">print</a></span><span class="op">(</span><span class="va">fit_1_z</span>, detail <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<pre><code>##             Median   MAD_SD  
+## (Intercept) 141650.2   7101.3
+## age_z        10899.1   6712.0
+## 
+## Auxiliary parameter(s):
+##       Median  MAD_SD 
+## sigma 74300.4  5019.0</code></pre>
+<p>The two parameters are easy to interpret after this transformation.</p>
+<p><em>The expected income of someone of average age, which is about 42 in this study, is about 1.42^{5} dollars.</em></p>
+<p><em>When comparing two individuals who differ in age by one standard deviation, which is about 12 in this study, the older person is expected to earn about <code>r</code>scales::comma(round(coef(fit_1_z)[“age_z”], -3))` more than the younger.</em></p>
+<p>Note that, when using <em>z</em>-scores, we would often phrase this comparison in terms of “sigmas.” One person is “one sigma” older than another person means that they are one standard deviation older. This is simple enough, once you get used to it, but also confusing since we already using the word “sigma” to mean <span class="math inline">\(\sigma\)</span>, the standard deviation of <span class="math inline">\(\epsilon_i\)</span>. Alas, language is something we deal with rather than control. You will hear the same word “sigma” applied to both concepts, even in the same sentence. Determine meaning by context.</p>
+</div>
+<div id="taking-logs" class="section level3" number="9.1.4">
+<h3>
+<span class="header-section-number">9.1.4</span> Taking logs<a class="anchor" aria-label="anchor" href="#taking-logs"><i class="fas fa-link"></i></a>
+</h3>
 <!-- * taking logs. When? Why? Doing so on dependent variable is a much bigger deal than doing it on independent variables since the former changes he very essence of the model. You can't really (?) compare two different models if one has taken logs of Y and one has not. -->
+</div>
+<div id="if-parameters-are-unicorns-why-bother-with-transformations" class="section level3" number="9.1.5">
+<h3>
+<span class="header-section-number">9.1.5</span> If parameters are unicorns, why bother with transformations?<a class="anchor" aria-label="anchor" href="#if-parameters-are-unicorns-why-bother-with-transformations"><i class="fas fa-link"></i></a>
+</h3>
 <!-- * standardizing variables. Key advantage is to make the coefficients easier to interpret. Even though the "right" thing to do in looking at models is to use posterior_* to look at model predictions, this takes some time. It is very handy, first pass, to look at all the coefficients and get a sense of which ones are "interesting." Then, focus on those when making newobs tibbles. -->
+</div>
+</div>
+<div id="transforming-the-outcome-variable" class="section level2" number="9.2">
+<h2>
+<span class="header-section-number">9.2</span> Transforming the outcome variable<a class="anchor" aria-label="anchor" href="#transforming-the-outcome-variable"><i class="fas fa-link"></i></a>
+</h2>
+<p>Transforming predictor variables is generally uncontroversial. It does not matter much. Change things to <span class="math inline">\(z\)</span>-scores and you won’t go far wrong. Or keep them in their original form, and take care with your interpretations. It’s all good.</p>
+<p>Transforming the outcome variable is a much more difficult question, to which there are few right answers.</p>
+</div>
+<div id="selecting-variables" class="section level2" number="9.3">
+<h2>
+<span class="header-section-number">9.3</span> Selecting variables<a class="anchor" aria-label="anchor" href="#selecting-variables"><i class="fas fa-link"></i></a>
+</h2>
 <!-- * Keeping or throwing away variables. How do we decide? If something is big and significant, we always keep it. If it is small and insignificant, we don't, unless our audience really wants to see it. If a mix, reasonable people differ. No right answer! -->
 <!-- * Creating new variables, especially by combining different ones into one combined variable. -->
+</div>
+<div id="comparing-models" class="section level2" number="9.4">
+<h2>
+<span class="header-section-number">9.4</span> Comparing models<a class="anchor" aria-label="anchor" href="#comparing-models"><i class="fas fa-link"></i></a>
+</h2>
 <!-- Overfitting and model selection. loo() -->
+</div>
+<div id="testing-is-nonsense" class="section level2" number="9.5">
+<h2>
+<span class="header-section-number">9.5</span> Testing is nonsense<a class="anchor" aria-label="anchor" href="#testing-is-nonsense"><i class="fas fa-link"></i></a>
+</h2>
 
 </div>
 </div>
@@ -96,9 +214,19 @@
     <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
       <ul class="nav navbar-nav">
 <li><a class="nav-link" href="#building-models"><span class="header-section-number">9</span> Building Models</a></li>
-<li><a class="nav-link" href="#taking-logs"><span class="header-section-number">9.1</span> Taking logs</a></li>
-<li><a class="nav-link" href="#transforming-variables"><span class="header-section-number">9.2</span> Transforming variables</a></li>
-<li><a class="nav-link" href="#comparing-models"><span class="header-section-number">9.3</span> Comparing models</a></li>
+<li>
+<a class="nav-link" href="#transforming-predictor-variables"><span class="header-section-number">9.1</span> Transforming predictor variables</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#centering"><span class="header-section-number">9.1.1</span> Centering</a></li>
+<li><a class="nav-link" href="#scaling"><span class="header-section-number">9.1.2</span> Scaling</a></li>
+<li><a class="nav-link" href="#z-scores"><span class="header-section-number">9.1.3</span> z-scores</a></li>
+<li><a class="nav-link" href="#taking-logs"><span class="header-section-number">9.1.4</span> Taking logs</a></li>
+<li><a class="nav-link" href="#if-parameters-are-unicorns-why-bother-with-transformations"><span class="header-section-number">9.1.5</span> If parameters are unicorns, why bother with transformations?</a></li>
+</ul>
+</li>
+<li><a class="nav-link" href="#transforming-the-outcome-variable"><span class="header-section-number">9.2</span> Transforming the outcome variable</a></li>
+<li><a class="nav-link" href="#selecting-variables"><span class="header-section-number">9.3</span> Selecting variables</a></li>
+<li><a class="nav-link" href="#comparing-models"><span class="header-section-number">9.4</span> Comparing models</a></li>
+<li><a class="nav-link" href="#testing-is-nonsense"><span class="header-section-number">9.5</span> Testing is nonsense</a></li>
 </ul>
 
       <div class="book-extra">
