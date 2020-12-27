@@ -1,18 +1,16 @@
 # Probability {#probability}
 
-<!-- Delete the cardinal virtues? -->
+<!-- Delete the cardinal virtues? If we keep them, then introduce them properly, perhaps reviewing the iconography. At least we need to update them to represent our current thinking! -->
 
 <!-- Need more discussion about quintiles and area under the curve. -->
 
-<!-- Add a bunch more code? Show how everything is done? -->
 
 <!-- When discussing a parameter $p$ and a probability distribution p() in the absence of a specific context, then those simple terms are OK. But, whenever you are talking about specific parameters or specific probability distributions, you should have either subscripts or items in the parentheses, respectively.  -->
 
 <!-- More animations. Create a movie which swoops into the joint distribution, takes a slice, remove the other slices, and then normalizes. Cool new package ggral (sp?) -->
 
 
-
-<!-- We need a single example of a continuous distribution after Electoral Votes. It will also have math. And empirical. And posterior. -->
+<!-- We need a single example of a continuous distribution after Electoral Votes. It will also have math. And empirical. And posterior. Maybe $p$ as a continuous proportion?  -->
 
 <!-- Revisit these references and see if there is other stuff we should include:   -->
 
@@ -23,13 +21,10 @@
 
 
 ```{r include=FALSE}
-# ggthemes probably belongs in book_start.Rmd. Also, the plots here all use
-# theme_classic(). We should make that consistent, or not, across the book. Sort
-# of awkward that we need the tidyverse to run the code below but we don't
+# Sort of awkward that we need the tidyverse to run the code below but we don't
 # explicitly load it up where the students can see us do it.
 
 library(tidyverse)
-library(ggthemes)
 ```
 
 &nbsp;
@@ -312,17 +307,13 @@ read_csv("./05-probability/data/election-forecasts-2020/prez_1.csv") %>%
 Here is a posterior from the FiveThirtyEight website from August 13, 2020. This was created using the same data as the above distribution, but simply displayed differently. For each electoral result, the height of the bar represents the probability that a given event will occur. However, there is no numbered y-axis telling us what the specific probability of each outcome is.
 
 ```{r, echo = FALSE, caption = "FiveThirtyEight Posterior from August 13, 2020"}
-
 knitr::include_graphics("05-probability/images/fivethirtyeight.png")
-
 ```
 
 Here is the posterior from *The Economist*, also from August 13, 2020. This looks confusing at first because the data analysts have chosen to merge the axes for Republican and Democratic electoral votes. We can tell that the Economist is more optimistic about Biden's odds in the election compared to Trump's, relative to *FiveThirtyEight*.
 
 ```{r, echo = FALSE, caption = "Economist Posterior from August 13, 2020"}
-
 knitr::include_graphics("05-probability/images/economist_aug13.png")
-
 ```
 
 These two models, built by smart people using the similar data sources, have reached fairly different conclusions. Data science is difficult! There is not one "right" answer. Real life is not a problem set. 
@@ -364,9 +355,9 @@ draws <- tibble(ID = 1:1000000,
 draws
 ```
 
-Recall the discussion from Section \@ref(distributions). A distribution and a sample of draws from that distribution are different things. But, if you squint, there are sort of the same thing, at least for our purposes. For example, if you want to know the mean of the distribution, then the mean of the draws will be a fairly good estimate, especially if the number of draws is large enough.
+A distribution and a sample of draws from that distribution are different things. But, if you squint, they are sort of the same thing, at least for our purposes. For example, if you want to know the mean of the distribution, then the mean of the draws will be a fairly good estimate, especially if the number of draws is large enough.
 
-The second way to represent a probability distribution in the computer is as a "draws" object. Recall from Chapter \@ref(wrangling) how we can draw randomly from specified probability distributions as so:
+The second way to represent a probability distribution in the computer is as a vector of draws. Recall from Chapter \@ref(wrangling) how we can draw randomly from specified probability distributions as so:
 
 ```{r}
 rnorm(10)
@@ -376,15 +367,7 @@ rnorm(10)
 runif(10)
 ```
 
-These elements of these vectors are all "draws" from the specified probability distributions. In most appplied situations, our tools will produce draws rather than summary objects. We can translate a summary object into a draws object like this:
-
-
-```{r}
-
-```
-
-
-Again, in practice, we almost never have to perform this transformation. We will just be given the draws object automatically. Fortunately, draws objects are very easy to work with:
+These elements of these vectors are all "draws" from the specified probability distributions. In most appplied situations, our tools will produce draws rather than summary objects. Fortunately, a vector of draws is very easy to work with:
 
 
 
@@ -867,14 +850,15 @@ As you may have noticed, if you calculated the value using the first method, you
 
 <!-- Difference between 0.04 and 0.06 is rarely significant. And is hardly ever a good reason to decide X over Y. -->
 
-## Wisdom
+## Cardinal Virtues
 
 This *Primer* contains four important themes that are relevant in all chapters: Wisdom, Temperance, Courage, and Justice. As you move through the textbook, you will be building on and refining these concepts.
 
+### Wisdom
+
+
 ```{r, echo = FALSE, fig.cap = "Wisdom."}
-
 knitr::include_graphics("other/images/Wisdom.jpg")
-
 ```
 
 The first theme of Wisdom is about whether the numbers we have capture the concepts we care about. We should be concerned about whether our data and models are representative of the problem.
@@ -885,12 +869,10 @@ You have a sneaking suspicion that the coin isn't fair and you ask your friend t
 
 We need to be aware that sometimes it is not possible to capture all the variables we care about. However, as long as we are prudent, we can still interpret the data.
 
-## Justice
+### Justice
 
 ```{r, echo = FALSE, fig.cap = "Justice."}
-
 knitr::include_graphics("other/images/Justice.jpg")
-
 ```
 
 Justice in data science is all about making sure that are models are as "fair" and unbiased as possible. Model structure is one of the most important ideas under the theme of Justice.
@@ -911,18 +893,16 @@ Another question to consider is whether the models we generate while calculating
 
 For the purposes of this chapter, everything we worked with was predictive. We did not attempt to make causal claims. If we wanted to make a causal claim, we would need to feature at least two different ways of doing an experiment. For instance, we could look at how the way in which you flip a coin affects the outcome. We could compare the number of heads we get from catching a coin in the air versus letting it fall to the ground. An important part of Justice is understanding the distinction between predictive and causal models.
 
-## Courage
+### Courage
 
 ```{r, echo = FALSE, fig.cap = "Courage."}
-
 knitr::include_graphics("other/images/Courage.jpg")
-
 ```
 Data science involves words, math, and code. Code is the most important element. Turning an idea into code requires *Courage*.
 
 Courage helps us account for unmodeled variation. Recall the following equation.
 
-$$outcome = model + what \ is \ not \ in \ the \ model$$
+$$outcome = model + what\ is\ not\ in\ the\ model$$
 
 A residual is the variation that is not contained in the model. This is explains why the result is equal to the fitted (also known as expected) value plus the residual (what is not in the model). However, no matter how nuanced our model becomes, we will not be able to make perfect predictions. Some randomness is intrinsic. For instance, the behavior of one individual can change and can't be perfectly predicted even if a model accounts for what a group does on average.
 
@@ -936,20 +916,16 @@ knitr::include_graphics("05-probability/images/de_finetti.jpg")
 
 
 
-## Temperance
+### Temperance
 
 ```{r, echo = FALSE, fig.cap = "Temperance."}
-
 knitr::include_graphics("other/images/Temperance.jpg")
-
 ```
 
 Models are often not as good as they appear. It's important to be patient and understand the pitfalls of the data you have created.
 
 ```{r, echo = FALSE, fig.cap = "Donald Rumsfeld."}
-
 knitr::include_graphics("05-probability/images/donald_rumsfeld.jpg")
-
 ```
 
 Donald Rumsfeld, the former US Secretary of Defense, once said the following tongue-twisting quote:
@@ -957,9 +933,7 @@ Donald Rumsfeld, the former US Secretary of Defense, once said the following ton
   "There are known knowns. There are things we know we know. We also know there are known unknowns. That is to say, we know there are some things we do not know. But there are also unknown unknowns, the ones we do not know we do not know."
   
 ```{r, echo = FALSE, fig.cap = "Three Card Monte."}
-
 knitr::include_graphics("05-probability/images/Three_Card_Monte.jpg")
-
 ```
 
 What does this mean? Well imagine a crowd playing Three Card Monte in the streets of New York. The guy running the game runs a demo and shows you all the cards to make you confident. They earn money by making you overconfident and persuading you to bet. Your odds may seem good during the demo round, but that doesn't actually say anything about what will likely happen when the real, high stakes game begins. The person running the game does many simulations, making the "victim" forget that they cannot actually make any conclusions about the odds of winning. There are some variables that we simply do not know even if we put a lot of effort into making posterior probability distributions. People can be using slight of hand, for instance.

@@ -7,7 +7,8 @@
 # This is caused by the setting of "before_chapter_script" in _bookdown.yml.
 
 # Packages used by almost all chapters, and which we don't choose to show to
-# students since the code they see does not make use of them.
+# students since the code they see does not make use of them. Should ggthemes be
+# here?
 
 library(knitr)
 library(scales)
