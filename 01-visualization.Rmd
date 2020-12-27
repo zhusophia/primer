@@ -983,29 +983,15 @@ The `mean()` and `sd()` summary functions go inside the `summarize()`  function 
 
 
 
-### Statistics
+### Distributions
 
-<!-- DK: Maybe ntile()? Others? Discuss na.rm = TRUE; quantile; is.na(); acting on logical vectors -->
-
-<!-- DK: Clean up notation: $sd$ or *sd* or what? -->
+<!-- Need to discuss quantiles. -->
 
 A variable in a tibble is a column, a vector of values. We sometimes refer to this vector as a "distribution." This is somewhat sloppy in that a distribution can be many things, most commonly a mathematical formula. But, strictly speaking, a "frequency distribution" is a list of values, so this usage is not unreasonable.
 
 There are two distinct concepts: a distribution and a set values drawn from that distribution. But, in everyday use, we apply "distribution" to both.
 
-`mean()` and `sd()` are just two of the functions we can use within `summarize()`. Others include:
-
-* mean(): the average  
-* median(): the the average  
-* sd(): the standard deviation, which is a measure of spread  
-* mad(): the scaled median absolute deviation  
-* min() and max(): the minimum and maximum values, respectively  
-* mad(): the scaled median absolute deviation  
-* sum(): the total amount when adding multiple numbers   
-* n(): a count of the number of rows    
-* n_distinct(): the number of distinct values   
-
-
+We use `summarize()` to calculate statistics for a variable, a column, a vector of values or a distribution. Note the language sloppiness. For the purposes of this book, "variable," "column," "vector," and "distribution" all mean the same things. Popular statistical functions include: `mean()`, `median()`, `min()`, `max()`, `n()` and `sum()`. Functions which may be new to you include two measures of the "spread" of a distribution, `sd()` (the standard deviation) and `mad()` (the scaled median absolute deviation).
 
 **`mean()`**
 
@@ -1017,15 +1003,14 @@ $$\bar{x} = \frac{x_1 + x_2 + \cdots + x_N}{N}$$
 
 <!-- DK: Use math formula, like this one: https://math.stackexchange.com/questions/1097546/what-is-the-general-formula-for-calculating-the-median -->
 
-The median is another commonly reported measure of the center of vector of values, calculated by first sorting the vector from smallest to largest. The middle element in the sorted list is the *median*.  If the middle falls between two values, then the median is the mean of those two middle values. The median and the mean are the two most common measures of the center of a collection of numbers. The median is more stable, less affected by outliers. There is no widely accepted symbol for the median, although $\tilde{x}$ is not uncommon.
+The median is another commonly reported measure of the center of a distribution, calculated by first sorting the vector of values from smallest to largest. The middle element in the sorted list is the *median*.  If the middle falls between two values, then the median is the mean of those two middle values. The median and the mean are the two most common measures of the center of a distrubution. The median is more stable, less affected by outliers. There is no widely accepted symbol for the median, although $\tilde{x}$ is not uncommon.
 
 **`sd()`**
 
-The *standard deviation* (*sd*) of a distribution is a measure of variation around the mean.  
+The *standard deviation* (*sd*) of a distribution is a measure of its variation around the mean.  
 
 $$\text{sd} = \sqrt{\frac{(x_1 - \bar{x})^2 + (x_2 - \bar{x})^2 + \cdots + (x_n - \bar{x})^2}{n - 1}}$$
-<!-- DK: More detail. How much does it cover? Plot a weirdish distribution and show two sd's on it. -->
-
+<!-- DK: More detail. How much does it cover? Plot a not-too-weirdish distribution and show two sd's on it. -->
 
 
 **`mad()`**
@@ -1034,7 +1019,7 @@ The scaled median absolute deviation, *mad*, is another measure of variation, al
 
 
 $$\text{mad} = 1.4826 \times \text{median}(abs(x - \tilde{x}))$$
-The basic idea for both *sd* and *mad* is that we need a measure of variation around the center of the distribution. *sd* uses the mean, $\bar{x}$, as its estimate of the center while *mad* uses the median, $\tilde{x}$. Because *mad* uses the absolute difference, as opposed to the squared difference, it is more robust to outliers.
+The basic idea for both *sd* and *mad* is that we need a measure of variation around the center of the distribution. *sd* uses the mean, $\bar{x}$, as its estimate of the center while *mad* uses the median, $\tilde{x}$. Because *mad* uses the absolute difference, as opposed to the squared difference, it is more robust to outliers. The 1.4826 multiplier causes the *mad* and the *sd* to be identical in the (important) case of standard normal distributions, a topic we will cover in Chapter \@ref(wrangling).
 
 <!-- DK: Could have more conversation. -->
 
