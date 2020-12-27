@@ -1445,48 +1445,28 @@ FIGURE 1.3: Diagram of mutate() columns.
 ## 1   78     9.5</code></pre>
 <p>The <code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code> and <code><a href="https://rdrr.io/r/stats/sd.html">sd()</a></code> summary functions go inside the <code>summarize()</code> function from the <strong>dplyr</strong> package. Note you can also use the British English spelling of <code><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise()</a></code>. The <code>summarize()</code> function takes in a data frame and returns a data frame with only one row corresponding to the summary statistics.</p>
 </div>
-<div id="statistics" class="section level3" number="1.3.9">
+<div id="distributions" class="section level3" number="1.3.9">
 <h3>
-<span class="header-section-number">1.3.9</span> Statistics<a class="anchor" aria-label="anchor" href="#statistics"><i class="fas fa-link"></i></a>
+<span class="header-section-number">1.3.9</span> Distributions<a class="anchor" aria-label="anchor" href="#distributions"><i class="fas fa-link"></i></a>
 </h3>
-<!-- DK: Maybe ntile()? Others? Discuss na.rm = TRUE; quantile; is.na(); acting on logical vectors -->
-<!-- DK: Clean up notation: $sd$ or *sd* or what? -->
+<!-- Need to discuss quantiles. -->
 <p>A variable in a tibble is a column, a vector of values. We sometimes refer to this vector as a “distribution.” This is somewhat sloppy in that a distribution can be many things, most commonly a mathematical formula. But, strictly speaking, a “frequency distribution” is a list of values, so this usage is not unreasonable.</p>
 <p>There are two distinct concepts: a distribution and a set values drawn from that distribution. But, in everyday use, we apply “distribution” to both.</p>
-<p><code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code> and <code><a href="https://rdrr.io/r/stats/sd.html">sd()</a></code> are just two of the functions we can use within <code>summarize()</code>. Others include:</p>
-<ul>
-<li>mean(): the average<br>
-</li>
-<li>median(): the the average<br>
-</li>
-<li>sd(): the standard deviation, which is a measure of spread<br>
-</li>
-<li>mad(): the scaled median absolute deviation<br>
-</li>
-<li>min() and max(): the minimum and maximum values, respectively<br>
-</li>
-<li>mad(): the scaled median absolute deviation<br>
-</li>
-<li>sum(): the total amount when adding multiple numbers<br>
-</li>
-<li>n(): a count of the number of rows<br>
-</li>
-<li>n_distinct(): the number of distinct values</li>
-</ul>
+<p>We use <code>summarize()</code> to calculate statistics for a variable, a column, a vector of values or a distribution. Note the language sloppiness. For the purposes of this book, “variable,” “column,” “vector,” and “distribution” all mean the same things. Popular statistical functions include: <code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code>, <code><a href="https://rdrr.io/r/stats/median.html">median()</a></code>, <code><a href="https://rdrr.io/r/base/Extremes.html">min()</a></code>, <code><a href="https://rdrr.io/r/base/Extremes.html">max()</a></code>, <code>n()</code> and <code><a href="https://rdrr.io/r/base/sum.html">sum()</a></code>. Functions which may be new to you include two measures of the “spread” of a distribution, <code><a href="https://rdrr.io/r/stats/sd.html">sd()</a></code> (the standard deviation) and <code><a href="https://rdrr.io/r/stats/mad.html">mad()</a></code> (the scaled median absolute deviation).</p>
 <p><strong><code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code></strong></p>
 <p>The <em>mean</em>, or <em>average</em>, is the most commonly reported measure of the center of a distribution. The mean is the sum of all of the data elements divided by how many elements there are. If we have <span class="math inline">\(N\)</span> data points, the mean is given by:</p>
 <p><span class="math display">\[\bar{x} = \frac{x_1 + x_2 + \cdots + x_N}{N}\]</span></p>
 <p><strong><code><a href="https://rdrr.io/r/stats/median.html">median()</a></code></strong></p>
 <!-- DK: Use math formula, like this one: https://math.stackexchange.com/questions/1097546/what-is-the-general-formula-for-calculating-the-median -->
-<p>The median is another commonly reported measure of the center of vector of values, calculated by first sorting the vector from smallest to largest. The middle element in the sorted list is the <em>median</em>. If the middle falls between two values, then the median is the mean of those two middle values. The median and the mean are the two most common measures of the center of a collection of numbers. The median is more stable, less affected by outliers. There is no widely accepted symbol for the median, although <span class="math inline">\(\tilde{x}\)</span> is not uncommon.</p>
+<p>The median is another commonly reported measure of the center of a distribution, calculated by first sorting the vector of values from smallest to largest. The middle element in the sorted list is the <em>median</em>. If the middle falls between two values, then the median is the mean of those two middle values. The median and the mean are the two most common measures of the center of a distrubution. The median is more stable, less affected by outliers. There is no widely accepted symbol for the median, although <span class="math inline">\(\tilde{x}\)</span> is not uncommon.</p>
 <p><strong><code><a href="https://rdrr.io/r/stats/sd.html">sd()</a></code></strong></p>
-<p>The <em>standard deviation</em> (<em>sd</em>) of a distribution is a measure of variation around the mean.</p>
+<p>The <em>standard deviation</em> (<em>sd</em>) of a distribution is a measure of its variation around the mean.</p>
 <p><span class="math display">\[\text{sd} = \sqrt{\frac{(x_1 - \bar{x})^2 + (x_2 - \bar{x})^2 + \cdots + (x_n - \bar{x})^2}{n - 1}}\]</span>
-<!-- DK: More detail. How much does it cover? Plot a weirdish distribution and show two sd's on it. --></p>
+<!-- DK: More detail. How much does it cover? Plot a not-too-weirdish distribution and show two sd's on it. --></p>
 <p><strong><code><a href="https://rdrr.io/r/stats/mad.html">mad()</a></code></strong></p>
 <p>The scaled median absolute deviation, <em>mad</em>, is another measure of variation, although nowhere near as popular as the standard deviation. The formula for calculating <em>mad</em> is a bit mysterious.</p>
 <p><span class="math display">\[\text{mad} = 1.4826 \times \text{median}(abs(x - \tilde{x}))\]</span>
-The basic idea for both <em>sd</em> and <em>mad</em> is that we need a measure of variation around the center of the distribution. <em>sd</em> uses the mean, <span class="math inline">\(\bar{x}\)</span>, as its estimate of the center while <em>mad</em> uses the median, <span class="math inline">\(\tilde{x}\)</span>. Because <em>mad</em> uses the absolute difference, as opposed to the squared difference, it is more robust to outliers.</p>
+The basic idea for both <em>sd</em> and <em>mad</em> is that we need a measure of variation around the center of the distribution. <em>sd</em> uses the mean, <span class="math inline">\(\bar{x}\)</span>, as its estimate of the center while <em>mad</em> uses the median, <span class="math inline">\(\tilde{x}\)</span>. Because <em>mad</em> uses the absolute difference, as opposed to the squared difference, it is more robust to outliers. The 1.4826 multiplier causes the <em>mad</em> and the <em>sd</em> to be identical in the (important) case of standard normal distributions, a topic we will cover in Chapter <a href="wrangling.html#wrangling">2</a>.</p>
 <!-- DK: Could have more conversation. -->
 <!-- DK: These formulas are inconsistent, with one using vectors. Should make these consistent, perhaps even give formula for median. -->
 <!-- DK: Finish with example usage, including na.rm, maybe? Move some of that discussion from chapter 2. -->
@@ -2252,7 +2232,7 @@ We can also change labels inside the plots. Wouldn’t it be great if we knew wh
 <li><a class="nav-link" href="#arrange-rows"><span class="header-section-number">1.3.6</span> arrange() rows</a></li>
 <li><a class="nav-link" href="#mutate"><span class="header-section-number">1.3.7</span> mutate()</a></li>
 <li><a class="nav-link" href="#summarize"><span class="header-section-number">1.3.8</span> summarize()</a></li>
-<li><a class="nav-link" href="#statistics"><span class="header-section-number">1.3.9</span> Statistics</a></li>
+<li><a class="nav-link" href="#distributions"><span class="header-section-number">1.3.9</span> Distributions</a></li>
 <li><a class="nav-link" href="#group_by"><span class="header-section-number">1.3.10</span> group_by()</a></li>
 <li><a class="nav-link" href="#na-values"><span class="header-section-number">1.3.11</span> NA values</a></li>
 </ul>

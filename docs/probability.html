@@ -182,7 +182,7 @@ FIGURE 5.2: Watch the makers of these two models throw shade at each other on Tw
 <span class="header-section-number">5.1.4</span> Working with probability distributions<a class="anchor" aria-label="anchor" href="#working-with-probability-distributions"><i class="fas fa-link"></i></a>
 </h3>
 <p>A probability distribution is not always easy to work with. It is a complex object. And, in many contexts, we don’t really care about all that complexity. So, instead of providing the full probability distribution, we often just use a summary measure, a number or two or three which captures the aspect of the entire distribution which is relevant to the matter at hand. Let’s explore these issues using the 538 posterior probability distribution, as of August 13, 2020, for the number of electoral votes which will be won by Joe Biden. Here is a tibble with 1,000,000 draws from that distribution:</p>
-<div class="sourceCode" id="cb532"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb536"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">draws</span></code></pre></div>
 <pre><code>## # A tibble: 1,000,000 x 2
 ##       ID electoral_votes
@@ -198,12 +198,12 @@ FIGURE 5.2: Watch the makers of these two models throw shade at each other on Tw
 ##  9     9             376
 ## 10    10             155
 ## # … with 999,990 more rows</code></pre>
-<p>Recall the discussion from Section <a href="wrangling.html#distributions">2.9</a>. A distribution and a sample of draws from that distribution are different things. But, if you squint, there are sort of the same thing, at least for our purposes. For example, if you want to know the mean of the distribution, then the mean of the draws will be a fairly good estimate, especially if the number of draws is large enough.</p>
+<p>Recall the discussion from Section <a href="visualization.html#distributions">1.3.9</a>. A distribution and a sample of draws from that distribution are different things. But, if you squint, there are sort of the same thing, at least for our purposes. For example, if you want to know the mean of the distribution, then the mean of the draws will be a fairly good estimate, especially if the number of draws is large enough.</p>
 <p>The second way to represent a probability distribution in the computer is as a “draws” object. Recall from Chapter <a href="wrangling.html#wrangling">2</a> how we can draw randomly from specified probability distributions as so:</p>
-<div class="sourceCode" id="cb534"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb538"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></code></pre></div>
 <pre><code>##  [1] -1.090  1.324  1.336  0.039 -1.233  0.794  0.448 -1.081 -0.025 -0.663</code></pre>
-<div class="sourceCode" id="cb536"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb540"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></code></pre></div>
 <pre><code>##  [1] 0.45 0.04 0.34 0.89 0.38 0.88 0.52 0.91 0.81 0.61</code></pre>
 <p>These elements of these vectors are all “draws” from the specified probability distributions. In most appplied situations, our tools will produce draws rather than summary objects. We can translate a summary object into a draws object like this:</p>
@@ -360,7 +360,7 @@ In the next figure figure below, the order of your coin toss results does matter
 <p>You might be wondering: what is the use of a model? Well, let’s say we toss the coin 20 times and get 8 heads again. Given this result, what is the probability that future samples of 20 flips will result in 10 or more heads?</p>
 <p>There are three main ways you could go about solving this problem with simulations.</p>
 <p>The first <em>wrong</em> way to do this is assuming that <span class="math inline">\(p_h\)</span> is certain because we observed 8 heads after 20 tosses. We would conclude that 8/20 gives us 0.4. The big problem with this is that you are ignoring your uncertainty when estimating <span class="math inline">\(p_h\)</span>. This would lead us to the following code.</p>
-<div class="sourceCode" id="cb538"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb542"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">sims</span> <span class="op">&lt;-</span> <span class="fl">10000000</span>
 
 <span class="va">odds</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>sim_ID <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">sims</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -374,7 +374,7 @@ In the next figure figure below, the order of your coin toss results does matter
 ##     &lt;dbl&gt;
 ## 1   0.245</code></pre>
 <p>The second method involves sampling the whole posterior distribution vector we previously created. This would lead to the following correct code.</p>
-<div class="sourceCode" id="cb540"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb544"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">p_draws</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>p <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0.1</span><span class="op">)</span>, <span class="fl">1000</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>heads <span class="op">=</span> <span class="fu">map_int</span><span class="op">(</span><span class="va">p</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1</span>, size <span class="op">=</span> <span class="fl">20</span>, p <span class="op">=</span> <span class="va">.</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">heads</span> <span class="op">==</span> <span class="fl">8</span><span class="op">)</span>
@@ -390,7 +390,7 @@ In the next figure figure below, the order of your coin toss results does matter
 ##     &lt;dbl&gt;
 ## 1   0.328</code></pre>
 <p>Third way is to sample from the actual distribution, which is a small dataset with just a few rows, but it includes both <span class="math inline">\(p_h\)</span> and the probability of each <span class="math inline">\(p_h\)</span>. This also gives the correct answer.</p>
-<div class="sourceCode" id="cb542"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb546"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">p_posterior</span> <span class="op">&lt;-</span> <span class="va">x</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">heads</span> <span class="op">==</span> <span class="fl">8</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span> <span class="op">%&gt;%</span> 
