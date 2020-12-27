@@ -2,6 +2,10 @@
 
 Everyone loves visualizations. 
 
+<!-- DK: economist theme causes the subtitle (and other labels) to bleed into the title. Can we clean this up? Use a different theme? -->
+
+<!-- DK: Would be nice if the plot featured a statistical measure of some kind (maybe a 95% confidence interval) so that we have a motivation for learning about distributions. Probably need a very different plot. Maybe something political? Election 2020? -->
+
 
 ```{r out.width = "100%", message = FALSE, echo = FALSE}
 library(tidyverse)
@@ -985,13 +989,11 @@ The `mean()` and `sd()` summary functions go inside the `summarize()`  function 
 
 ### Distributions
 
-<!-- Need to discuss quantiles. -->
+A variable in a tibble is a column, a vector of values. We sometimes refer to this vector as a "distribution." This is somewhat sloppy in that a distribution can be many things, most commonly a mathematical formula. But, strictly speaking, a "frequency distribution" or an "empirical distribution" is a list of values, so this usage is not unreasonable.
 
-A variable in a tibble is a column, a vector of values. We sometimes refer to this vector as a "distribution." This is somewhat sloppy in that a distribution can be many things, most commonly a mathematical formula. But, strictly speaking, a "frequency distribution" is a list of values, so this usage is not unreasonable.
+There are two distinct concepts: a distribution and a set values drawn from that distribution.  But, in everyday use, we apply "distribution" to both.
 
-There are two distinct concepts: a distribution and a set values drawn from that distribution. But, in everyday use, we apply "distribution" to both.
-
-We use `summarize()` to calculate statistics for a variable, a column, a vector of values or a distribution. Note the language sloppiness. For the purposes of this book, "variable," "column," "vector," and "distribution" all mean the same things. Popular statistical functions include: `mean()`, `median()`, `min()`, `max()`, `n()` and `sum()`. Functions which may be new to you include two measures of the "spread" of a distribution, `sd()` (the standard deviation) and `mad()` (the scaled median absolute deviation).
+We use `summarize()` to calculate statistics for a variable, a column, a vector of values or a distribution. Note the language sloppiness. For the purposes of this book, "variable," "column," "vector," and "distribution" all mean the same thing. Popular statistical functions include: `mean()`, `median()`, `min()`, `max()`, `n()` and `sum()`. Functions which may be new to you include three measures of the "spread" of a distribution: `sd()` (the standard deviation), `mad()` (the scaled median absolute deviation) and `quantile()`. 
 
 **`mean()`**
 
@@ -1026,6 +1028,45 @@ The basic idea for both *sd* and *mad* is that we need a measure of variation ar
 <!-- DK: These formulas are inconsistent, with one using vectors. Should make these consistent, perhaps even give formula for median. -->
 
 <!-- DK: Finish with example usage, including na.rm, maybe? Move some of that discussion from chapter 2. -->
+
+**`quantile()`**
+
+The *quantile* of a distribution is the value of that distribution which occupies a specific percentile location in the sorted list of values. For example, the median occupies the 50th percentile. The minimum is at the 0th percentile. The maximum is at the 100th percentile.
+
+```{r}
+set.seed(9)
+z <- rnorm(10000)
+c(min(z), median(z), max(z))
+quantile(z, probs = c(0, 0.5, 1))
+```
+
+The `probs` argument allows us to specify the percentile(s) we want. Two of the most important percentiles are the 2.5th and 97.5th.
+
+```{r}
+quantile(z, probs = c(0.025, 0.975))
+```
+
+The interval between these two percentiles includes 95% of all the values in the distribution. Depending on the context, this interval is sometimes called a "confidence interval." Different percentile ranges create confidence intervals of different widths. 
+
+An interesting fact is that, most of the time, the 95% confidence interval is, roughly. the same as the center of the distribtion +/- two times the standard deviation.
+
+```{r}
+c(mean(z) - 2 * sd(z), mean(z) + 2 * sd(z))
+```
+
+Again, the match is only roughly true. But it is good enough for most applied work.
+
+
+<!-- 
+DK: Show how two standard deviations gets you out to the confidence interval. Make nice plot.
+
+```{r, echo = FALSE}
+tibble(z = z) %>%
+ ggplot(aes(z)) +
+   geom_histogram(bins = 100)
+```
+
+-->
 
 ### `group_by()`
 
@@ -1382,12 +1423,19 @@ Great. Now our graph is easier to visualize. In addition, note that the `theme()
 
 ## Summary
 
-In this chapter, we first looked at basic coding terminology and concepts that we deal with when programming with R. We then learned about the three basic components that make up each plot: data, mapping, and one or more geoms. The **ggplot2** package offers a wide range of geoms that we can use to create different types of plots. Next, we examined the "super package" **tidyverse**, which includes helpful tools for visualization. It also offers features for importing and manipulating data, which is the main topic of the next chapter. Lastly, we explored advanced plotting features such as axis scaling, faceting, and themes. When we put this all together, we were able to create the following visualization:
+In this chapter, we first looked at basic coding terminology and concepts that we deal with when programming with R. We then learned about the three basic components that make up each plot: data, mapping, and one or more geoms. The **ggplot2** package offers a wide range of geoms that we can use to create different types of plots. Next, we examined the "super package" **tidyverse**, which includes helpful tools for visualization. It also offers features for importing and manipulating data, which is the main topic of Chapter @\ref(wrangling). Lastly, we explored advanced plotting features such as axis scaling, faceting, and themes. 
+
+The main *statistical* concept we discussed was that of a "distribution," a collection of related numbers. In R, these numbers are usually stored as a variable inside of a tibble. "Frequency distribution" and "empirical distribution" are common phrases to describe such objects. We learned how to calculate statistics --- often referred to as "summary statistics" --- about these distributions. The most important involve two concepts: the center of the distribution and the variability of the distribution. The center is most often summarized with the *mean* (`mean()`) or the *median* (`median()`). Variability is measured with the standard deviation (`sd()`) or the scaled median absolute deviation (`mad()`) or the 95% confidence interval (`quantile(probs = c(0.025, 0.975))`).   
+
+
+Recall the plot we began the chapter with:
 
 
 ```{r, echo = FALSE}
 gap_p
 ```
+
+You now know enough to make plots like this by yourself.
 
 It is important to know that we have only seen a small part of what R offers. For example, we can use the **gganimate** package to bring a slightly modified version of our gapminder plot to life:
 
