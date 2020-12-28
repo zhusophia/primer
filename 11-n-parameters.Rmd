@@ -1,6 +1,10 @@
 # N Parameters {#n-parameters}
 
-<!-- * Should start with  single variable which actually requires lots of parameters. For example, lived_after as a function of state and come up with a different average lived_after for each state. This is cheating in that it is too many parameters. But it would allow us to explain a bunch of stuff! Including Bayesian shrinkage. Saving this till the end of the model causes us to miss stuff. -->
+<!-- * Should start with  single variable which actually requires lots of parameters. For example, death_age as a function of state and come up with a different average death_age for each state. This is cheating in that it is too many parameters, or rather than some of the parameters need to be estimated for too little data.  But it would allow us to explain a bunch of stuff! Including Bayesian shrinkage. Saving this till the end of the model causes us to miss stuff. But the rest of the analysis used lived_after. Which is better. Yes? Should we discuss? Use both? -->
+
+<!-- Do centering properly. Create a new variable and use it throughout. -->
+
+<!-- Put seed everywhere. -->
 
 Having created models with one parameter in Chapter \@ref(one-parameter), two parameters in Chapter \@ref(two-parameters), three parameters in Chapter \@ref(three-parameters), and five parameters in Chapter \@ref(five-parameters), you are now ready to make the jump to $N$ parameters. 
 
@@ -20,29 +24,25 @@ library(tidyverse)
 library(rstanarm)
 ```
 
-<!-- DK: Perhaps we need more detail in this EDA?  Explain how we only have data for people who are already dead. That is an interesting restriction, and effects the Preceptor Table in interesting ways. Or is such a discussion too advanced? -->
+<!-- Perhaps we need more detail in this EDA?  Explain how we only have data for people who are already dead. That is an interesting restriction, and effects the Preceptor Table in interesting ways. Or is such a discussion too advanced? -->
 
-<!-- DK: Don't keep around variables other than the ones we end up using. -->
-
-<!-- DK: Provide proper citation to Barfort et al. -->
-
-<!-- DK: Go and change governors data to use better variable names than the ones we have here. Maybe switch to years instead of days. Or maybe just clean them up here. -->
-
-We will use the `governors` data set from the **primer.data** package. This data set features the demographic information about the candidates for governor in the US. It comes from the paper "Longevity Returns to Political Office" by Barfort, Klemmensen and Larsen (2019), which concludes that winning a gubernatorial election increases a candidate's lifespan.
+We will use the `governors` data set from the **primer.data** package. This data set, from @barfort2020, features the demographic information about the candidates for governor in the United States. @barfort2020 conclude that winning a gubernatorial election increases a candidate's lifespan.
 
 
 ```{r}
 glimpse(governors)
 ```
 
+<!-- DK: Should restrict the data to one observation per person. A subtle issue. Think about the infinite Preceptor Table. -->
+
 There are `r ncol(governors)` variables and `r scales::comma(nrow(governors))` observations. In this Chapter, we will only be looking at the variables `last_name`, `year`, `state`, `sex`, `lived_after`, and `election_age`. 
 
 ```{r}
-ch9_gov <- governors %>% 
+ch9 <- governors %>% 
   select(last_name, year, state, sex, lived_after, election_age)
 ```
 
-`election_age` and `lived_after` are how many days a candidate lived before the election and how many days a candidate lived after the election, respectively. As a consequence, only politicians who are already deceased are included in this data set. This means that there are only a handful of observations from elections in the last 20 years. Most candidates from that time period are still alive and are, therefore, excluded.
+`election_age` and `lived_after` are how many years a candidate lived before the election and how many years a candidate lived after the election, respectively. As a consequence, only politicians who are already deceased are included in this data set. This means that there are only a handful of observations from elections in the last 20 years. Most candidates from that time period are still alive and are, therefore, excluded.
 
 ```{r, echo = FALSE}
 # Bit of a cheat to ensure that one of the sampled candidates is female.
@@ -51,51 +51,50 @@ set.seed(14)
 ```
 
 ```{r}
-sample_n(ch9_gov, 5)
+sample_n(ch9, 5)
 ```
 
 `sex` is most often "Male", as we might expect.
 
-<!-- DK: Weird that this automagically creates a "TABLE 9.1: Data summary" side margin note. -->
 
 ```{r}
-skim(ch9_gov)
+skim(ch9)
 ```
 
 `skim()` groups the variables together by type.  We are given histograms of the numeric data. In looking at the histogram for `year`, we see that it is skewed right --- meaning that most of the data is bunched to the left and that there is a smaller tail to the right --- with half of the observations from election years between 1945 and 1962. This makes sense logically, because we are only looking at deceased candidates, and candidates from more recent elections are more likely to still be alive.
 
-In using this data set, our left-side variable will be `lived_after`. We are trying to understand/predict how many days a candidate will live after the election. 
+In using this data set, our left-side variable will be `lived_after`. We are trying to understand/predict how many years a candidate will live after the election. 
 
 
 ```{r}
-ch9_gov %>%
+ch9 %>%
   ggplot(aes(x = year, y = lived_after)) +
   geom_point() +
-  labs(title = "US Gubernatorial Candidate Lifespans",
+  labs(title = "US Gubernatorial Candidate Years Lived Post-Election",
        subtitle = "Candidates who died more recently can't have lived for long post-election",
        caption = "Data: Barfort, Klemmensen and Larsen (2019)",
        x = "Year",
-       y = "Days Lived After Election") +
+       y = "Years Lived After Election") +
   scale_y_continuous(labels = scales::label_number()) +
   theme_classic() 
 ```
 
-Starting with the relationship between `lived_after` and `year`, we can see that there is a rough line above which there are no observations. There are no data points in the top right portion of the graph because it is not possible to have run in 2011 and then lived 20,000 days (about 55 years) after the election took place. This edge of the data represents, approximately, the most days a candidate could have possibly lived, and still have died, given the year of the election. The reason the data is slanted downward is because the maximum value for this scenario is greater in earlier years. That is, those candidates who ran for governor in earlier years could live a long time after the election and still have died prior to the data set creation, giving them higher `lived_after` values than those who ran for office in more recent years. 
+<!-- DK: Fix -->
 
-<!-- DK: Explain why the line isn't perfect? (Because not everyone had the decency to die on the day directly before data set creation.) -->
+Starting with the relationship between `lived_after` and `year`, we can see that there is a rough line above which there are no observations. There are no data points in the top right portion of the graph because it is not possible to have run in 2011 and then live 50 years after the election took place. This edge of the data represents, approximately, the most years a candidate could have possibly lived, and still have died, given the year of the election. The reason the data is slanted downward is because the maximum value for this scenario is greater in earlier years. That is, those candidates who ran for governor in earlier years could live a long time after the election and still have died prior to the data set creation, giving them higher `lived_after` values than those who ran for office in more recent years. The edge of the scatter plot is not perfectly straight because, for many election years, no candidate had the decency to die just before data collection.
 
-There are fewer observations in later years because fewer recent candidates have died. 
+There are fewer observations in later years because fewer recent candidates have died recently. 
 
 
 ```{r}
-ch9_gov %>%
+ch9 %>%
   ggplot(aes(x = sex, y = lived_after)) +
   geom_boxplot() +
-  labs(title = "US Gubernatorial Candidate Lifespans",
+  labs(title = "US Gubernatorial Candidate Years Lived Post-Election",
        subtitle = "Male candidates live much longer after the election",
        caption = "Data: Barfort, Klemmensen and Larsen (2019)",
        x = "Gender",
-       y = "Days Lived After Election") +
+       y = "Years Lived After Election") +
   scale_y_continuous(labels = scales::label_number()) +
   theme_classic() 
 ```
@@ -112,11 +111,9 @@ knitr::include_graphics("other/images/Wisdom.jpg")
 
 The concept of the "population" is subtle and important. *The population is not the set of candidates for which we have data.* That is the data set. The population is the larger --- potentially much larger --- set of individuals about whom we want to make inferences. *The parameters in our models refer to the population, not to the data set.*
 
-Consider a simple example. Define $\mu$ as the average number of days lived by candidates for governor after Election Day. Can we calculate $\mu$ from our data? No! There are many candidates for governor who are still alive, who are not included in our data even though they are part of the "population" we want to study. $\mu$ can not be *calculated.* It can only be *estimated.*
+Consider a simple example. Define $\mu$ as the average number of years lived by candidates for governor after Election Day. Can we calculate $\mu$ from our data? No! There are many candidates for governor who are still alive, who are not included in our data even though they are part of the "population" we want to study. $\mu$ can not be *calculated.* It can only be *estimated.*
 
 Note, also, that there are many different populations, each with its own $\mu$, in which we might be interested. 
-
-<!-- DK: Are these dates correct? -->
 
 * The population of all candidates for governor in the US from 1945 to 2012. This is the period covered in the paper. 
 
@@ -154,14 +151,14 @@ To begin, let's model candidate lifespan after the election as a function of can
 
 
 ```{r}
-ch9_gov %>% 
+ch9 %>% 
   ggplot(aes(x = election_age, y = lived_after)) +
     geom_point() +
     labs(title = "Longevity of Gubernatorial Candidates",
          subtitle = "Younger candidates live longer", 
          caption = "Data Source: Barfort, Klemmensen and Larsen (2019)",
-         x = "Age in Days",
-         y = "Days Lived After Election") +
+         x = "Age in Years on Election Day",
+         y = "Years Lived After Election") +
     scale_x_continuous(labels = scales::label_number()) +
     scale_y_continuous(labels = scales::label_number()) +
     theme_classic()
@@ -173,7 +170,7 @@ The math is fairly simple:
 $$ alive\_post_i =  \beta_0 + \beta_1 alive\_pre_i + \epsilon_i $$
 
 
-with $\epsilon_i \sim N(0, \sigma^2)$. $alive\_post_i$ is the number of days lived after the election for candidate $i$. $alive\_pre_i$ is the number of days lived before the election for candidate $i$. $\epsilon_i$ is the "error term," the difference between the actual days-lived for candidate $i$ and the modeled days-lived.  $\epsilon_i$ is normally distributed with a mean of 0 and a standard deviation of $\sigma$. The key distinction is between:
+with $\epsilon_i \sim N(0, \sigma^2)$. $alive\_post_i$ is the number of years lived after the election for candidate $i$. $alive\_pre_i$ is the number of years lived before the election for candidate $i$. $\epsilon_i$ is the "error term," the difference between the actual years-lived for candidate $i$ and the modeled years-lived.  $\epsilon_i$ is normally distributed with a mean of 0 and a standard deviation of $\sigma$. The key distinction is between:
 
 * *Variables*, always subscripted with $i$, whose values (potentially) vary across individuals.
 
@@ -191,21 +188,23 @@ You may recall from middle school algebra that the equation of a line is $y = m 
 We can use `geom_smooth()` to create the fitted regression line:
 
 ```{r}
-ch9_gov %>% 
+ch9 %>% 
   ggplot(aes(x = election_age, y = lived_after)) +
     geom_point() +
     geom_smooth(formula = y ~ x, method = "lm", se = FALSE) +
     labs(title = "Longevity of Gubernatorial Candidates",
          subtitle = "Younger candidates live longer", 
          caption = "Data Source: Barfort, Klemmensen and Larsen (2019)",
-         x = "Age in Days",
-         y = "Days Lived After Election") +
+         x = "Age in Years",
+         y = "Years Lived After Election") +
     scale_x_continuous(labels = scales::label_number()) +
     scale_y_continuous(labels = scales::label_number()) +
     theme_classic() 
 ```
 
-Consider someone who is about 15,000 days old on Election Day. We have a score or more data points for candidates around that age. Two died soon after the election. Some of them lived for about 5,000 days after the election. Others lived for around 20,000 days. Variation fills the world. But the fitted line tells us that, on average, we would expect a candidate that age to live for a little less than 15,000 days after the election. 
+<!-- DK: fix. -->
+
+Consider someone who is about 40 years old on Election Day. We have a score or more data points for candidates around that age. Two died soon after the election. Some of them lived for 50 or more years after the election. *Variation fills the world.* But the fitted line tells us that, on average, we would expect a candidate that age to live for a little less than 40 years after the election. 
 
 <!-- DK: Add a red circle to the graphic to show how we figured that out? -->
 
@@ -215,17 +214,12 @@ This model, with a continuous independent (or "predictor") variable, has an infi
 
 We can implement this model with `stan_glm()`. 
 
-```{r, echo = FALSE}
-# Set seed hack to ensure similar results for fit_gov_1.
-
-set.seed(9)
-```
-
 
 ```{r}
-fit_gov_1 <- stan_glm(data = ch9_gov,
+fit_gov_1 <- stan_glm(data = ch9,
                       formula = lived_after ~ election_age,
-                      refresh = 0)
+                      refresh = 0,
+                      seed = 9)
 ```
 
 As we discussed in Chapter \@ref(three-parameters), the most common term for a model like this is a "regression." We have "regressed" `lived_after`, our dependent variable, on `election_age`, our (only) independent variable.
@@ -243,15 +237,15 @@ The posterior distributions of $\beta_0$ (the intercept) and $\beta_1$ (the coef
 <!-- DK: Use this trick to create parallel and non-parallel line plots later. -->
 
 ```{r}
-ch9_gov %>% 
+ch9 %>% 
   ggplot(aes(x = election_age, y = lived_after)) +
     geom_point() +
     geom_line(aes(y = fitted(fit_gov_1)), color = "blue") +
     labs(title = "Longevity of Gubernatorial Candidates",
          subtitle = "Blue line shows fitted values", 
          caption = "Data Source: Barfort, Klemmensen and Larsen (2019)",
-         x = "Age in Days",
-         y = "Days Lived After Election") +
+         x = "Age in Years",
+         y = "Years Lived After Election") +
     scale_x_continuous(labels = scales::label_number()) +
     scale_y_continuous(labels = scales::label_number()) +
     theme_classic()
@@ -267,13 +261,13 @@ We can create a formula for the fitted values by placing the median values of th
 
 $$ alive\_post_i =  26,500 - 0.9 alive\_pre_i$$
 
-Consider the intercept. Since our independent variable is $alive\_pre_i$, the intercept is the $alive\_post_i$ value when $alive\_pre_i$ is zero. Here, we would interpret this intercept as the average lifespan of a gubernatorial candidate after the election, if the candidate was alive for zero days prior to the election. 
+Consider the intercept. Since our independent variable is $alive\_pre_i$, the intercept is the $alive\_post_i$ value when $alive\_pre_i$ is zero. Here, we would interpret this intercept as the average lifespan of a gubernatorial candidate after the election, if the candidate was alive for zero years prior to the election. 
 
 This is, of course, substantively nonsense. No one runs for office on the day they are born. In the next model, we will explore ways of making the intercept more interpretable. In the meantime, the math is the math. 
 
-Consider the coefficient for $alive\_pre_i$, $\beta_1$. The median of the posterior, -0.9, represents the slope of the model. For every unit increase in our independent variable, our dependent variable will change by this amount. For every additional day a candidate is alive before an election, their lifespan after the election will be 0.9 days lower, on average. If we are given the number of days a candidate lived before the election and want to estimate how long they will live for after, we will multiply the days they were alive prior by this beta of -0.9, and then combine that with the intercept. 
+Consider the coefficient for $alive\_pre_i$, $\beta_1$. The median of the posterior, -0.9, represents the slope of the model. For every unit increase in our independent variable, our dependent variable will change by this amount. For every additional day a candidate is alive before an election, their lifespan after the election will be 0.9 years lower, on average. If we are given the number of years a candidate lived before the election and want to estimate how long they will live for after, we will multiply the years they were alive prior by this beta of -0.9, and then combine that with the intercept. 
 
-This is a descriptive model, not a causal model. Remember our motto from Chapter \@ref(rubin-causal-model): *No causation without manipulation.* There is no way, for person $i$, to change the days that she has been alive on Election Day. On the day of this election, she is X days old. There is no way to change that. So, there are not two (or more) potential outcomes. Without more than one potential outcome, there can not be a causal effect.
+This is a descriptive model, not a causal model. Remember our motto from Chapter \@ref(rubin-causal-model): *No causation without manipulation.* There is no way, for person $i$, to change the years that she has been alive on Election Day. On the day of this election, she is X years old. There is no way to change that. So, there are not two (or more) potential outcomes. Without more than one potential outcome, there can not be a causal effect.
 
 Given that, it is important to monitor our language. We do not believe that that changes in `election_age` "cause" changes in `lived_after`. That is obvious. But there are some words and phrases --- like "associated with" and "change by" --- which are too close to causal. (And which we are guilty of using just a few paragraphs ago!) Be wary of their use. *Always think in terms of comparisons* when using a predictive model. We can't change `election_age` from X to Y for an individual candidate. We can only compare two candidates (or two groups of candidates), one with `election_age` equal to X and the other with `election_age` equal to Y. If our model is correct, such candidates will, on average, differ in `lived_after` by $\beta_1$ times the difference between X and Y.
 
@@ -304,38 +298,44 @@ fit_gov_1 %>%
 
 <!-- DK: Would using 50-year-old be better? -->
 
-We center variables when the model's intercept does not make substantive sense. To center a model, we pick a constant value, usually the mean of the independent variable, and subtract that constant from every value of the independent variable. Another option would be to pick a reasonable reference value, like 18,262 -- the number of days that a someone who is 50 years-old has lived. Either way, the meaning of `election_age` changes from the raw number of days a candidate has been alive to the number of days relative to that reference value. 
+<!-- DK: Fix. -->
 
-In this example, we want to center the value for `election_age`, the independent variable. First, we must pick the value that we will center by. Here, we will use the mean of `election_age`, which is about 52 years old.  Once we find this value, we will subtract it from every `election_age` value. We have, thereby, changed the meaning of `election_age`. It now means the number of days a candidate has been alive, as of Election Day, relative to the average days alive of all candidates on their respective election days.
+We center variables when the model's intercept does not make substantive sense. To center a model, we pick a constant value, usually the mean of the independent variable, and subtract that constant from every value of the independent variable. Another option would be to pick a reasonable reference value, like 50 years-old. Either way, the meaning of `election_age` changes from the raw number of years a candidate has been alive to the number of years relative to that reference value. 
+
+<!-- DK: Fix hard codes like 52 -->
+
+In this example, we want to center the value for `election_age`, the independent variable. First, we must pick the value that we will center by. Here, we will use the mean of `election_age`, which is about `r round(mean(ch9$election_age), 0)` years old.  Once we find this number, we will subtract it from every `election_age` value. We have, thereby, changed the meaning of `election_age`. It now means the number of years a candidate has been alive, as of Election Day, relative to the average years alive of all candidates on their respective election days.
 
 ```{r}
-ch9_gov$election_age <- ch9_gov$election_age - mean(ch9_gov$election_age)
+ch9$election_age <- ch9$election_age - mean(ch9$election_age)
 ```
 
 
 
 ```{r, cache = TRUE}
-fit_gov_1.centered <- stan_glm(data = ch9_gov,
+fit_gov_1_centered <- stan_glm(data = ch9,
                       formula = lived_after ~ election_age,
                       refresh = 0)
 
-print(fit_gov_1.centered, detail = FALSE)
+print(fit_gov_1_centered, detail = FALSE)
 ```
 
 <!-- DK: If we are doing centering, then we ought to do it correctly, by showing side-by-side scatterplots with fitted lines, the better to show that we have just slid things over. -->
 
-We can see that the intercept has decreased while the slope has stayed the same. When we interpret this model, we only have to change the definition of the intercept. Rather than the intercept representing the lifespan of a candidate who was alive for zero days before running for governor, it now represents the post-election lifespan of a gubernatorial candidate who was alive for the mean number of days (about 52 years) before running. If a candidate was alive for about 52 years before running for governor, they are expected to live about 10,300 days (about 28 years) after the election, on average. 
+<!-- DK: Fix -->
+
+We can see that the intercept has decreased while the slope has stayed the same. When we interpret this model, we only have to change the definition of the intercept. Rather than the intercept representing the remaining years of a candidate who was alive for zero years before running for governor, it now represents the post-election lifespan of a gubernatorial candidate who was alive for the mean number of years before running. If a candidate was alive for about `r round(mean(ch9$election_age), 0)` years before running for governor, they are expected to live for about `r round(coef(fit_gov_1_centered)["(Intercept)"], 0)` years after the election, on average. 
 
 <!-- DK: Really need the ideal and actual Preceptor Table for this example. And should probably present it earlier. -->
 
-Think hard about your parameters. What do they mean? Which population do they represent? What ideal Preceptor Table would make their calculation easy? In this case, $\beta_0$ is the average number of days which gubernatorial candidates live after election day, but just for the subset of candidates who are the average age on Election Day. If we had the ideal Preceptor Table, this would be trivial to calculate. Just take the average for that subset! No estimation required. But, our actual Preceptor Table has lots of missing values. In particular, many gubernatorial candidates have not . . . uh . . . died. (How inconsiderate!) So, we can't know how many days they will live. All we can do is, first, define  $\beta_0$ and, second, estimate a posterior probability distribution for it. 
+Think hard about your parameters. What do they mean? Which population do they represent? What ideal Preceptor Table would make their calculation easy? In this case, $\beta_0$ is the average number of years which gubernatorial candidates live after election day, but just for the subset of candidates who are the average age on Election Day. If we had the ideal Preceptor Table, this would be trivial to calculate. Just take the average for that subset! No estimation required. But, our actual Preceptor Table has lots of missing values. In particular, many gubernatorial candidates have not . . . uh . . . died. (How inconsiderate!) So, we can't know how many years they will live. All we can do is, first, define  $\beta_0$ and, second, estimate a posterior probability distribution for it. 
 
 ### sex
 
 Let's now regress `lived_after` on `sex` to see how candidates' post-election lifespans differ by sex. 
 
 ```{r, cache = TRUE}
-fit_gov_2 <- stan_glm(data = ch9_gov,
+fit_gov_2 <- stan_glm(data = ch9,
                       formula = lived_after ~ sex - 1,
                       refresh = 0)
 ```
@@ -361,12 +361,13 @@ $$\epsilon_i \sim N(0, \sigma^2)$$
 
 The meanings of $alive\_post_i$ and $\epsilon_i$ are the same as in the first model. Indeed, they are the same throughout these exercises.  $x_{f,i}$ and $x_{m,i}$ are 0/1 variables, just like last chapter. They are *variables* whose values vary across individuals.
 
-The important parameters are $\beta_1$ and $\beta_2$. They are the average days-lived post-election for, respectively, women and men. Again, this is not the "average" for the data we have. That is easy to calculate! No estimation required. $\beta_1$ and $\beta_2$ are averages for the entire "population," however we have chosen to define that term. Those averages can not be calculated directly. They can only be estimated, by creating a posterior probability distribution.
+The important parameters are $\beta_1$ and $\beta_2$. They are the average years-lived post-election for, respectively, women and men. Again, this is not the "average" for the data we have. That is easy to calculate! No estimation required. $\beta_1$ and $\beta_2$ are averages for the entire "population," however we have chosen to define that term. Those averages can not be calculated directly. They can only be estimated, by creating a posterior probability distribution.
 
+<!-- DK: Fix -->
 
-Looking back to the regression model we just created, we see that there is no intercept. Instead of having a $\beta_0$ value, we have $\beta_1$ and $\beta_2$ for female and male. This makes things easier to interpret. Without having to add or subtract anything from an intercept, this regression tells us that, on average, women are expected to live about 6,000 days after running for governor, and men are expected to live 10,000 days.
+Looking back to the regression model we just created, we see that there is no intercept. Instead of having a $\beta_0$ value, we have $\beta_1$ and $\beta_2$ for female and male. This makes things easier to interpret. Without having to add or subtract anything from an intercept, this regression tells us that, on average, women are expected to live about `r round(coef(fit_gov_2)["sexFemale"], 0)` years after running for governor, and men are expected to live about `r `round(coef(fit_gov_2)["sexMale"], 0)` years.
 
-This is a strange result. Why would men live twice as long as women after the election? One explanation for this might be that women don't run for governor until later in life, and therefore are not expected to live as long.
+This is a strange result. Why would men live almost twice as long as women after the election? One explanation for this might be that women don't run for governor until later in life, and therefore are not expected to live as long.
 
 <!-- DK: Weird result, huh? Men live twice as long as women! Useful to discuss why that might be the case in more detail. -->
 
@@ -378,7 +379,7 @@ set.seed(9)
 
 
 ```{r}
-fit_gov_2a <- stan_glm(data = ch9_gov,
+fit_gov_2a <- stan_glm(data = ch9,
                        formula = lived_after ~ sex,
                        refresh = 0)
 ```
@@ -391,7 +392,7 @@ We no longer have a value for female. However we do have an intercept. In this r
 
 $$ alive\_post_i = \beta_0  + \beta_1 x_{m,i} + \epsilon_i$$
 
-$\beta_0$ is our intercept, around 5,850. This result is very similar to the female value from before. In this type of model, our intercept represents the the variable which is not represented in the model.  $\beta_1$ only affects the outcome when the candidate is male. (If the candidate is female, then $x_{m,i} = 0$. Therefore, the intercept value represents those who are not male, i.e., females.)
+$\beta_0$ is our intercept, around `r round(coef(fit_gov_2a)["(Intercept)"], 0)` years. This result is very similar to the female value from before. In this type of model, our intercept represents the the variable which is not represented in the model.  $\beta_1$ only affects the outcome when the candidate is male. (If the candidate is female, then $x_{m,i} = 0$. Therefore, the intercept value represents those who are not male, i.e., females.)
 
 <!-- DK: This explanation should be better. -->
 
@@ -410,16 +411,18 @@ fit_gov_2a %>%
   ggplot(aes(male_intercept)) + 
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    bins = 100) +
-    labs(title = "Posterior Distribution of Average Male Candidate Days Left`",
+    labs(title = "Posterior Distribution of Average Male Candidate Years Left`",
          y = "Probability",
-         x = "Male Days To Live After the Election") + 
+         x = "Male Years To Live After the Election") + 
     scale_x_continuous(labels = scales::number_format()) +
     scale_y_continuous(labels = scales::percent_format()) +
     theme_classic()
 ```
 
 
-The interpretation of this parameter is the same as we have seen before. There is a true average, across the entire population, of the number of days that male candidates live after the election. We can never know what that true average is. But, it seems highly likely that the true average is somewhere between 10,000 and 10,750 days.
+<!-- DK: Fix -->
+
+The interpretation of this parameter is the same as we have seen before. There is a true average, across the entire population, of the number of years that male candidates live after the election. We can never know what that true average is. But, it seems very likely that the true average is somewhere between 27.5 and 29.5 years.
 
 
 ### election_age and sex
@@ -433,12 +436,12 @@ Here is the math we will be using:
 
 $$ alive\_post_i =  \beta_0 + \beta_1 male_i + \beta_2 alive\_pre_i + \epsilon_i $$
 
-* The outcome variable is $alive\_post_i$, the number of days a person is alive after the election. $male_i$ is one of our explanatory variables. If we are predicting the amount of days a male candidate lives after the election, this value will be 1. When we are making this prediction for female candidates, this value will be 0. $alive\_pre_i$ is our other explanatory variable. It is the number of days a candidate has lived before the election. 
+* The outcome variable is $alive\_post_i$, the number of years a person is alive after the election. $male_i$ is one of our explanatory variables. If we are predicting the number of years a male candidate lives after the election, this value will be 1. When we are making this prediction for female candidates, this value will be 0. $alive\_pre_i$ is our other explanatory variable. It is the number of years a candidate has lived before the election. 
 
 
-* $\beta_0$ is the average number of days lived after the election for women, who on the day of election, have been alive the average number of days of all candidates (i.e. both male and female). $\beta_0$ is also the intercept of the equation. In other words, $\beta_0$ is the expected value of $alive\_post_i$, if $male_i = 0$ and $alive\_pre_i = 0$. 
+* $\beta_0$ is the average number of years lived after the election for women, who on the day of election, have been alive the average number of years of all candidates (i.e. both male and female). $\beta_0$ is also the intercept of the equation. In other words, $\beta_0$ is the expected value of $alive\_post_i$, if $male_i = 0$ and $alive\_pre_i = 0$. 
 
-* $\beta_1$ is almost meaningless by itself. The only time it has meaning is when its value is connected to our intercept (i.e. $\beta_0 + \beta_1$). When the two are added together, you get the average number of days lived after the election for men, who on the day of election, have been alive the average number of days for all candidates.
+* $\beta_1$ is almost meaningless by itself. The only time it has meaning is when its value is connected to our intercept (i.e. $\beta_0 + \beta_1$). When the two are added together, you get the average number of years lived after the election for men, who on the day of election, have been alive the average number of years for all candidates.
 
 * $\beta_2$ is, for the entire population, the average difference in $alive\_post_i$ between two individuals, one of whom has an $alive\_pre_i$ value of 1 greater than the other. 
 
@@ -447,9 +450,10 @@ $$ alive\_post_i =  \beta_0 + \beta_1 male_i + \beta_2 alive\_pre_i + \epsilon_i
 Now that we understand our model, let's translate the following model into code. 
 
 ```{r, cache = TRUE}
-fit_gov_3 <- stan_glm(data = ch9_gov,
+fit_gov_3 <- stan_glm(data = ch9,
                       formula = lived_after ~ sex + election_age,
-                      refresh = 0)
+                      refresh = 0,
+                      seed = 12)
 ```
 
 ```{r}
@@ -457,13 +461,15 @@ print(fit_gov_3, detail = FALSE)
 ```
 
 
+<!-- DK: Fix -->
+
 Looking at our results, you can see that our intercept value is around 8,100. (The exact values for the median of the posterior will vary because of the random sampling inherent in fitting the model.) This means that the average female candidate, who had been alive the average number of days of all candidates, would live another 8,100 days or so after the election. 
 
 
 Note that `sexMale` is around 2,250. This is our coefficient, $\beta_1$. We need to connect this value to our intercept value to get something meaningful. Using the formula $\beta_0$ + $\beta_1$, we find out that the number of days the average male candidate ---  who, on the day of election, had been alive the average number of days of all candidate --- would live is around 10,300,.  
 
 
-Now take a look at the coefficient for $alive\_pre_i$, $\beta_2$. The median of the posterior, -0.8, represents the slope of the model. For every unit increase in our independent variable, our dependent variable will change by this coefficient. It makes sense that this value is negative. Think about it: the more days a candidate has lived, the fewer days the candidate has left to live. So, for every extra day a candidate is alive before an election, their lifespan after the election will be 0.8 days lower, on average.
+Now take a look at the coefficient for $alive\_pre_i$, $\beta_2$. The median of the posterior, -0.8, represents the slope of the model. For every unit increase in our independent variable, our dependent variable will change by this coefficient. It makes sense that this value is negative. Think about it: the more years a candidate has lived, the fewer years the candidate has left to live. So, for every extra day a candidate is alive before an election, their lifespan after the election will be 0.8 years lower, on average.
 
 
 Let’s now look at some posteriors.
@@ -471,20 +477,20 @@ Let’s now look at some posteriors.
 ```{r}
 fit_gov_3 %>% 
   as_tibble() %>% 
-  mutate(male_days = `(Intercept)` + sexMale) %>% 
-  rename(female_days = `(Intercept)`) %>% 
-  select(female_days, male_days) %>% 
-  pivot_longer(cols = female_days:male_days, 
+  mutate(male_years = `(Intercept)` + sexMale) %>% 
+  rename(female_years = `(Intercept)`) %>% 
+  select(female_years, male_years) %>% 
+  pivot_longer(cols = female_years:male_years, 
                names_to = "parameters",
-               values_to = "days") %>% 
-  ggplot(aes(days, fill = parameters)) +
+               values_to = "years") %>% 
+  ggplot(aes(years, fill = parameters)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    alpha = 0.5, 
                    bins = 100, 
                    position = "identity") +
      labs(title = "Posterior Probability Distribution",
          subtitle = "Men live longer",
-         x = "Average Days Lived Post Election",
+         x = "Average Years Lived Post Election",
          y = "Probability") + 
     scale_x_continuous(labels = scales::number_format()) +
     scale_y_continuous(labels = scales::percent_format()) +
@@ -538,13 +544,13 @@ Math:
 $$ alive\_post_i =  \beta_0 + \beta_1 male_i + \beta_2 alive\_pre_i + \\ \beta_3 male_i *  alive\_pre_i + \epsilon_i$$
 <!-- DK: Need to make these interpretations clearer and more consistent across the examples. -->
 
-* Our outcome variable is still $alive\_post_i$. We want to know how many days a candidate will live after an election. 
+* Our outcome variable is still $alive\_post_i$. We want to know how many years a candidate will live after an election. 
 
-* $male_i$ is still one of our explanatory variables. If we are predicting the amount of days a male candidate lives after the election, this will be 1. When we are making this prediction for female candidate, this will be 0. $alive\_pre_i$ is still our other explanatory variable, representing the number of days a candidate has lived before the election, relative to the average value for all candidates. 
+* $male_i$ is still one of our explanatory variables. If we are predicting the amount of years a male candidate lives after the election, this will be 1. When we are making this prediction for female candidate, this will be 0. $alive\_pre_i$ is still our other explanatory variable, representing the number of years a candidate has lived before the election, relative to the average value for all candidates. 
 
-* $\beta_0$ is the average number of days lived after the election for women, who on the day of election, have been alive the average number of days of all candidates. In a sense, this is the same meaning as in the previous model, without an interaction term. But, always remember that the meaning of a parameter is conditional on the model in which it is embedded. Even if a parameter is called $\beta_0$ in two different regressions does necessitate that it means the same thing in both regressions. Parameter names are arbitrary, or at least simply a matter of convention.
+* $\beta_0$ is the average number of years lived after the election for women, who on the day of election, have been alive the average number of years of all candidates. In a sense, this is the same meaning as in the previous model, without an interaction term. But, always remember that the meaning of a parameter is conditional on the model in which it is embedded. Even if a parameter is called $\beta_0$ in two different regressions does necessitate that it means the same thing in both regressions. Parameter names are arbitrary, or at least simply a matter of convention.
 
-* $\beta_1$ does not have a simple interpretation as a stand-alone parameter. It is a measure of how different women are from men. However, $\beta_0 + \beta_1$ has a straightforward meaning exactly analogous to the meaning of $\beta_0$. The sum  is the average number of days lived after the election for *men*, who on the day of election, have been alive the average number of days of all candidates.
+* $\beta_1$ does not have a simple interpretation as a stand-alone parameter. It is a measure of how different women are from men. However, $\beta_0 + \beta_1$ has a straightforward meaning exactly analogous to the meaning of $\beta_0$. The sum  is the average number of years lived after the election for *men*, who on the day of election, have been alive the average number of years of all candidates.
 
 * $\beta_2$ is the coefficient of $alive\_pre_i$. It it just the slope for women. It is the average difference in $alive\_post_i$ between two women, one of whom has an $alive\_pre_i$ value of 1 greater than the other. In our last example,  $\beta_2$ was the slope for the whole population. Now we are different slopes for different genders. 
 
@@ -553,7 +559,7 @@ $$ alive\_post_i =  \beta_0 + \beta_1 male_i + \beta_2 alive\_pre_i + \\ \beta_3
 Code:
 
 ```{r, cache = TRUE}
-fit_gov_4 <- stan_glm(data = ch9_gov,
+fit_gov_4 <- stan_glm(data = ch9,
                       formula = lived_after ~ sex*election_age,
                       refresh = 0)
 ```
@@ -564,11 +570,13 @@ print(fit_gov_4, detail = FALSE)
 
 <!-- DK: Take your time explaining what this means! It is not trivial. Note that this is a non-parallel slopes model. -->
 
+<!-- DK: Fix -->
+
 The intercept has increased. $\beta_0$ is around 6,000. This is the intercept for females. It still means the average number of days lived after the election for women is 6,000 or so. Our `sexMale` coefficient, $\beta_1$, refers to the value that must be added to the intercept in order to get the intercept for males. When calculated, the result is 10,000. Keep in mind, however, that these values only apply if $alive\_pre_i = 0$, if, that is, candidate $i$ is around 52 years old. 
 
-The coefficient for $alive\_pre_i$, $\beta_2$, is -0.1. What does this mean? It is the slope for females. So for every extra day a female candidate is alive before an election, their lifespan after the election will be 0.1 days lower, on average. Now direct your attention below at the coefficient of `sexMale:election_age`, $\beta_3$, which is -.8. This is the value that must be added to the coefficient of $alive\_pre_i$ (recall $\beta_2$ + $\beta_3$) in order to find the slope for males. When the two are added together, this value, or slope, is about -0.9. For every extra day a male candidate is alive before an election, their lifespan after the election will be 0.9 days lower, on average. 
+The coefficient for $alive\_pre_i$, $\beta_2$, is -0.1. What does this mean? It is the slope for females. So for every extra day a female candidate is alive before an election, their lifespan after the election will be 0.1 years lower, on average. Now direct your attention below at the coefficient of `sexMale:election_age`, $\beta_3$, which is -.8. This is the value that must be added to the coefficient of $alive\_pre_i$ (recall $\beta_2$ + $\beta_3$) in order to find the slope for males. When the two are added together, this value, or slope, is about -0.9. For every extra day a male candidate is alive before an election, their lifespan after the election will be 0.9 years lower, on average. 
 
-*Key point*: The interpretation of the intercepts only apply to candidates for whom $alive\_pre_i = 0$. Candidates who are not 52 years-old will have different expected number of days to live. The interpretation of the slope applies to everyone. In other words, the relationship between $alive\_post_i$ and $alive\_pre_i$ is the same, regardless of your gender or how old you are.
+*Key point*: The interpretation of the intercepts only apply to candidates for whom $alive\_pre_i = 0$. Candidates who are not 52 years-old will have different expected number of years to live. The interpretation of the slope applies to everyone. In other words, the relationship between $alive\_post_i$ and $alive\_pre_i$ is the same, regardless of your gender or how old you are.
 
 
 The posterior:
@@ -577,25 +585,27 @@ The posterior:
 ```{r}
 fit_gov_4 %>% 
   as_tibble() %>% 
-  mutate(male_days = `(Intercept)` + sexMale) %>% 
-  rename(female_days = `(Intercept)`) %>% 
-  select(female_days, male_days) %>% 
-  pivot_longer(cols = female_days:male_days, 
+  mutate(male_years = `(Intercept)` + sexMale) %>% 
+  rename(female_years = `(Intercept)`) %>% 
+  select(female_years, male_years) %>% 
+  pivot_longer(cols = female_years:male_years, 
                names_to = "parameters",
-               values_to = "days") %>% 
-  ggplot(aes(days, fill = parameters)) +
+               values_to = "years") %>% 
+  ggplot(aes(years, fill = parameters)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    alpha = 0.5, 
                    bins = 100, 
                    position = "identity") +
     labs(title = "Posterior Probability Distribution",
          subtitle = "Men live longer",
-         x = "Average Days Lived Post Election",
+         x = "Average Years Lived Post Election",
          y = "Probability") + 
     scale_x_continuous(labels = scales::number_format()) +
     scale_y_continuous(labels = scales::percent_format()) +
     theme_classic()
 ```
+
+<!-- DK: Fix -->
 
 Male candidates live longer on average than female candidates. Note, also, that the average days to live after the election for females is about 6,000 with this model. With the previous model, it was 8,000. Why the difference? The interpretation of "average" is different! In the previous model, it was the average for all women. In this model, it is the average for all 52 years-old women. Those are different things, so we should hardly be surprised by different posteriors.
 
@@ -626,7 +636,7 @@ fit_gov_4 %>%
     theme_classic() 
 ```
 
-This posterior distribution shows the average slope values for men and women. You can see that men have a steeper slope, while the slope for women is practically 0! *If you are trying to forecast the number of days that a women will live after the election, you may ignore the number of days that she has already lived.* This is definitely not true for men. Why the difference?
+This posterior distribution shows the average slope values for men and women. You can see that men have a steeper slope, while the slope for women is practically 0! *If you are trying to forecast the number of years that a women will live after the election, you may ignore the number of years that she has already lived.* This is definitely not true for men. Why the difference?
  
 <!-- DK: Answer this question!  -->
 
@@ -639,7 +649,7 @@ Recall the math:
 $$ alive\_post_i =  \beta_0 + \beta_1 male_i + \beta_2 alive\_pre_i + \epsilon_i $$
 
 $$ alive\_post_i =  \beta_0 + \beta_1 male_i + \beta_2 alive\_pre_i + \\ \beta_3 male_i *  alive\_pre_i + \epsilon_i$$
-In both cases, $\beta_0$ has the same meaning. It is the average number of days lived after the election for women, who on the day of election, have been alive the average number of days of all candidates. Plug in 0 for $male_i$ and 0 for $alive\_pre_i$ and both equations simplify to:
+In both cases, $\beta_0$ has the same meaning. It is the average number of years lived after the election for women, who on the day of election, have been alive the average number of years of all candidates. Plug in 0 for $male_i$ and 0 for $alive\_pre_i$ and both equations simplify to:
 
 $$ alive\_post_i =  \beta_0 + \epsilon_i $$
 So far, so good. But, despite the fact that we are using the same data, the posterior probability distributions for $\beta_0$ are meaningfully different between the two models:
@@ -659,15 +669,15 @@ bind_cols(m_3, m_4) %>%
   select(`No Interaction Term`, `With Interaction Term`) %>% 
   pivot_longer(cols = `No Interaction Term`:`With Interaction Term`, 
                names_to = "Model",
-               values_to = "days") %>% 
-  ggplot(aes(days, fill = Model)) +
+               values_to = "years") %>% 
+  ggplot(aes(years, fill = Model)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    alpha = 0.5, 
                    bins = 100, 
                    position = "identity") +
     labs(title = "Posterior Probability Distributions",
          subtitle = "For intercept in two different models",
-         x = "Additional Days Lived Post Election",
+         x = "Additional Years Lived Post Election",
          y = "Probability") + 
     scale_x_continuous(labels = scales::number_format()) +
     scale_y_continuous(labels = scales::percent_format()) +
@@ -686,7 +696,7 @@ Consider a different question: What is the expected value for male candidates wh
 
 * With an interaction term: $\beta_0 + \beta_1 + \beta_2 365 + \beta_3 365$. 
 
-We shouldn't be surprised that different models generate different formulas for this question. Yet note how $\beta_0$ appears in both. In other words, $\beta_0$ is not *only* the average number of days lived after the election for women, who on the day of election, have been alive the average number of days of all candidates. It is also part of a multitude of other estimates. 
+We shouldn't be surprised that different models generate different formulas for this question. Yet note how $\beta_0$ appears in both. In other words, $\beta_0$ is not *only* the average number of years lived after the election for women, who on the day of election, have been alive the average number of years of all candidates. It is also part of a multitude of other estimates. 
 
 *The only way to understand all of what is wrapped up in $\beta_0$ is to see it in the context of the full mathematical formula.* Since we have two different models, defined by two different formulas, it is hardly surprising that the posterior probability distributions for $beta_0$ will differ, even though one specific interpretation --- one out of many --- is the same.
 
@@ -713,7 +723,7 @@ $$ alive\_post_i =  \beta_0 +  \beta_1 x_{AK,i} + \beta_2 x_{AR,i} + ... \beta_{
  
 
 ```{r, cache = TRUE}
-fit_gov_5 <- stan_glm(data = ch9_gov,
+fit_gov_5 <- stan_glm(data = ch9,
                       formula = lived_after ~ state + sex*election_age,
                       refresh = 0,
                       iter = 10000)
@@ -725,7 +735,7 @@ Note it takes awhile to run. We are dealing with 55 parameters here.
 print(fit_gov_5, detail = FALSE)
 ```
 
-The (Intercept) refers to the average number of days lived after the election for women, who on the day of election, have been alive the average number of days of all female candidates in Alabama! That's a mouthful. It really is not different than what we have been doing all along, however. You can see here that (Intercept) value is around 4,900. 
+The (Intercept) refers to the average number of years lived after the election for women, who on the day of election, have been alive the average number of years of all female candidates in Alabama! That's a mouthful. It really is not different than what we have been doing all along, however. You can see here that (Intercept) value is around 4,900. 
 
 
 However, we have only talked about women. What about for the men? Well, if you look at the bottom of the list, you will see the `sexMale` value of around 4,400. When you wish to find lived_after for a specific state, you must add this value to the intercept, about 4,900, and then also add the intercept of the desired state. 
@@ -750,15 +760,15 @@ fit_gov_5 %>%
   select(Washington_females, SD_females) %>% 
   pivot_longer(cols = Washington_females:SD_females, 
                names_to = "parameters",
-               values_to = "days") %>% 
-  ggplot(aes(days, fill = parameters)) +
+               values_to = "years") %>% 
+  ggplot(aes(years, fill = parameters)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    alpha = 0.5, 
                    bins = 100, 
                    position = "identity") +
     labs(title = "Posterior Probability Distribution",
          subtitle = "for women that live in Washington and South Dakota",
-         x = "Average Days Lived Post Election",
+         x = "Average Years Lived Post Election",
          y = "Probability") + 
     scale_x_continuous(labels = scales::number_format()) +
     scale_y_continuous(labels = scales::percent_format()) +
@@ -804,15 +814,15 @@ fit_gov_5 %>%
   select(WA, SD) %>% 
   pivot_longer(cols = WA:SD, 
                names_to = "Parameter",
-               values_to = "days") %>% 
-  ggplot(aes(days, fill = Parameter)) +
+               values_to = "years") %>% 
+  ggplot(aes(years, fill = Parameter)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    alpha = 0.5, 
                    bins = 100, 
                    position = "identity") +
     labs(title = "Posterior Probability Distribution",
          subtitle = "For 62 years-old male candidates from South Dakota and Washington",
-         x = "Expected Days Lived Post Election",
+         x = "Expected Years Lived Post Election",
          y = "Probability") + 
     scale_x_continuous(labels = scales::number_format()) +
     scale_y_continuous(labels = scales::percent_format()) +
@@ -836,23 +846,25 @@ fit_gov_5 %>%
                    position = "identity") +
     labs(title = "Posterior Probability Distribution",
          subtitle = "Candidates from Washington live longer than those from South Dakota",
-         x = "Average Additional Days Lived Post Election",
+         x = "Average Additional Years Lived Post Election",
          y = "Probability") + 
     scale_x_continuous(labels = scales::number_format()) +
     scale_y_continuous(labels = scales::percent_format()) +
     theme_classic()
 ```
 
+<!-- DK: Fix -->
+
 The average value of the difference in days-to-live is almost certainly positive, with the most likely value being around 4,500. Notice that there is essentially zero chance that, on average, South Dakota candidates live longer.
 
 One annoyance of the above approach is that it requires us to do everything "by hand," to recall the mathematical structure of the model, and then to insert the relevant values of the data for the individuals we want to predict. What a bother! Fortunately, **rstanarm** provides the `posterior_epred()` function to make this process simpler.
 
-First, we create a tibble with the desired input for our model. In our case the tibble has a variable named `sex` which contains two observations both with the value "Male". There is a `state` variable with the desired states. There is an `election_age` variable set to 10 years worth of days.
+First, we create a tibble with the desired input for our model. In our case the tibble has a variable named `sex` which contains two observations both with the value "Male". There is a `state` variable with the desired states. There is an `election_age` variable set to 10 years.
 
 ```{r}
 new_obs <- tibble(sex = c("Male", "Male"),
                   state = c("South Dakota", "Washington"),
-                  election_age = 10 * 365)
+                  election_age = 10)
 ```
 
 Second, we pass the fitted model object and this tibble to `posterior_epred()`.
@@ -872,15 +884,15 @@ pe %>%
   mutate(Difference = WA - SD) %>% 
   pivot_longer(cols = SD:Difference, 
                names_to = "Parameter",
-               values_to = "days") %>% 
-  ggplot(aes(days, fill = Parameter)) +
+               values_to = "years") %>% 
+  ggplot(aes(years, fill = Parameter)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    alpha = 0.5, 
                    bins = 100, 
                    position = "identity") +
     labs(title = "Posterior Probability Distribution",
          subtitle = "For 62 years-old candidates from South Dakota and Washington",
-         x = "Expected Days Lived Post Election",
+         x = "Expected Years Lived Post Election",
          y = "Probability") + 
     scale_x_continuous(labels = scales::number_format()) +
     scale_y_continuous(labels = scales::percent_format()) +
@@ -923,15 +935,15 @@ pp %>%
          WA = `2`) %>% 
   pivot_longer(cols = SD:WA, 
                names_to = "State",
-               values_to = "days") %>% 
-  ggplot(aes(days, fill = State)) +
+               values_to = "years") %>% 
+  ggplot(aes(years, fill = State)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    alpha = 0.5, 
                    bins = 100, 
                    position = "identity") +
     labs(title = "Posterior Predictive Distribution",
          subtitle = "For 62 years-old male candidates from South Dakota and Washington",
-         x = "Days Lived Post Election",
+         x = "Years Lived Post Election",
          y = "Probability") + 
     scale_x_continuous(labels = scales::number_format()) +
     scale_y_continuous(labels = scales::percent_format()) +
@@ -954,12 +966,14 @@ pp %>%
                    position = "identity") +
     labs(title = "Posterior Predictive Distribution", 
          subtitle = "How much longer will an individual Washington candidate live?",
-         x = "Days",
+         x = "Years",
          y = "Probability") + 
     scale_x_continuous(labels = scales::number_format()) +
     scale_y_continuous(labels = scales::percent_format()) +
     theme_classic()
 ```
+
+<!-- DK: Fix -->
 
 In words, we would predict that the candidate from Washington would live longer than the South Dakota candidate. By how much? Well, that number is an unknown parameter. By looking at our posterior above, our best estimate is about 4,500 days, which is roughly 8 years. However, it is important to note that it is possible that the male from South Dakota could outlive the Washington male. In fact, there is a 1 in 5 chance that he does so.
 
@@ -990,22 +1004,22 @@ tibble(Expectation = pe$diff,
        Prediction = pp$diff) %>% 
   pivot_longer(cols = Expectation:Prediction, 
                names_to = "State",
-               values_to = "days") %>% 
-  ggplot(aes(days, fill = State)) +
+               values_to = "years") %>% 
+  ggplot(aes(years, fill = State)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    alpha = 0.5, 
                    bins = 100, 
                    position = "identity") +
     labs(title = "Posterior Probability Distributions",
          subtitle = "For 62 years-old male candidates from South Dakota and Washington",
-         x = "Additional Days Lived Post Election",
+         x = "Additional Years Lived Post Election",
          y = "Probability") + 
     scale_x_continuous(labels = scales::number_format()) +
     scale_y_continuous(labels = scales::percent_format()) +
     theme_classic()
 ```
 
-Expected values vary much less than predictions. The above chart makes that easy to see. We can be almost certain that the true underlying average for the numbers of days that Washington candidates live longer than South Dakota candidates is positive. But, for any two individual candidates, there is a good chance that that the South Dakota candidate will live longer. We can not ignore $\epsilon$ when predicting the outcome for individuals. When estimating expected values or long-run averages, the  $\epsilon$'s cancel out. 
+Expected values vary much less than predictions. The above chart makes that easy to see. We can be almost certain that the true underlying average for the numbers of years that Washington candidates live longer than South Dakota candidates is positive. But, for any two individual candidates, there is a good chance that that the South Dakota candidate will live longer. We can not ignore $\epsilon$ when predicting the outcome for individuals. When estimating expected values or long-run averages, the  $\epsilon$'s cancel out. 
 
 <!-- DK: Discuss the substantive issue? How can it be that Washington candidates live longer? Also, compare these estimates to what naive lm() would tell us. -->
 
