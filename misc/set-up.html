@@ -240,8 +240,8 @@ GitHub<br />
 <li>Install the <strong>renv</strong> package:</li>
 </ol>
 <p>install.packages(“renv”)</p>
-<p>You can read about the <strong>renv</strong> package here: <a href="https://rstudio.github.io/renv/articles/renv.html" class="uri">https://rstudio.github.io/renv/articles/renv.html</a></p>
-<p>It is not critical to understand all the details of how <strong>renv</strong> works. The big picture is that it creates a set of libraries which will be used just for this project and whose versions are kept in sync between you and me.</p>
+<p>You can read about the <strong>renv</strong> package <a href="https://rstudio.github.io/renv/articles/renv.html">here</a>.</p>
+<p>It is not critical to understand all the details of how <strong>renv</strong> works. The big picture is that it creates a set of libraries which will be used just for this project and whose versions are kept in sync between you and me. (In olden times, <code>renv::consent()</code> was a necessary first step. But no longer?)</p>
 <ol start="4" style="list-style-type: decimal">
 <li>At this point, you should have all the tools you need to contribute. If you have never done a pull request, however, you will need to learn more. Start by reading the <a href="https://usethis.r-lib.org/articles/articles/pr-functions.html">help page</a>. Read the whole thing! Don’t just skim it. These are important concepts for professional-level workflow. The <strong>usethis</strong> package is mostly providing wrappers around the underlying git commands. If you want to understand what is happening at a lower level, read <a href="https://git-scm.com/book/en/v2/GitHub-Contributing-to-a-Project">this</a>, but doing so is optional.</li>
 </ol>
@@ -269,10 +269,13 @@ create_from_github(&quot;PPBDS/primer&quot;,
 <pre class="r"><code>library(renv)
 renv::restore()</code></pre>
 <p>This will install all the packages you need in the directory of this project. (This has no effect on your main library of R packages.) Restart your R session. Again, this means that you now have two separate installations of, for example, <code>ggplot2</code>. One is in the default place which your R sessions is by default pointed to. (In a different project without a <code>renv</code> directory, you can run <code>.libPaths()</code> to see where that is.) The second place that <code>ggplot2</code> is installed is in the <code>renv</code> directory which lives in this project.</p>
-<p>Note that, for the most part, you won’t do anything with <strong>renv</strong> after this initial use. However, there are three other <strong>renv</strong> commands you might issue:</p>
+<p>Note that, for the most part, you won’t do anything with <strong>renv</strong> after this initial use. If you use error = TRUE in any code chunk, you will also need renv.ignore = TRUE in that code chunk, or you will get an annoying warning because renv can’t parse the code in that chunk.</p>
+<p>However, there are three other <strong>renv</strong> commands you might issue:</p>
 <p><code>renv::status()</code> just reports if anything is messed up. It won’t hurt anything.</p>
 <p><code>renv::restore()</code> looks at the <code>renv.lock</code> file and installs the packages it specifies. You will need to do this when I make a change to <code>renv.lock</code>, e.g., if I upgrade our version of <strong>ggplot2</strong> or add a new package.</p>
 <p><code>renv::snapshot()</code> should only be issued if you know what you are doing. This changes the <code>renv.lock</code> file, which is something that, usually, only I do. Most common case for use would be if you need to add a new package to the project.</p>
+<p>I am a little hazy about how renv ensure that we have the development versions of two key packages: rstudio/bslib and r-lib/downlit. You might need to install these by hand:</p>
+<pre class="r"><code>remotes::install_github(c(&quot;rstudio/bslib&quot;, &quot;r-lib/downlit&quot;))</code></pre>
 <ol start="3" style="list-style-type: decimal">
 <li>Create a branch to work from:</li>
 </ol>
