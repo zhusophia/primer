@@ -1226,9 +1226,10 @@ You can also view examples of both `pivot_longer()` and `pivot_wider()` on the [
 
 ## Distributions {#distributions}
 
-<!-- Include math formulas: $C ~ binomial(n, p)$, where $C \subset (H,T)$  -->
 
-What is a distribution? Think of the distribution of a variable as an urn from which we can pull out, at random, values for that variable. Drawing a thousand or so values from that urn, and then looking at a histogram or density plot, can show where the values are centered and how the values vary. Because we are sloppy, we will use the word distribution to refer to both the (imaginary!) urn from which we are drawing values and to the list of values we have drawn. The vector of 115 ages in the `trains` data is a distribution.
+What is a distribution? Think of the distribution of a variable as an urn from which we can pull out, at random, values for that variable. Drawing a thousand or so values from that urn, and then looking at a histogram or density plot, can show where the values are centered and how the values vary. Because we are sloppy, we will use the word distribution to refer to both the (imaginary!) urn from which we are drawing values and to the list of values we have drawn. *The vector of 115 ages in the `trains` data is a distribution.*
+
+The most common distributions you will work with are *empirical* or *frequency* distributions, the values of `age` in the `trains` tibble, the values of `poverty` in the `kenya` tibble, and so on. But we can also create our own data by making "draws" from a distribution which we have concocted. 
 
 Consider the distribution of the possible values from rolling a fair die. We can use the `sample()` function to create draws from this distribution, meaning it will change (or sometimes stay the same) for every subsequent draw.
 
@@ -1238,7 +1239,7 @@ die <- c(1, 2, 3, 4, 5, 6)
 sample(x = die, size = 1)
 ```
 
-This produces one "draw" from the distribution of the possible values of one roll of six-sided die.
+This produces one "draw" from the distribution of the possible values of one roll of fair six-sided die.
 
 Now, suppose we wanted to roll this die 10 times. One of the arguments of the `sample()` function is `replace`. We must specify it as `TRUE` if values can appear more than once. Since, when rolling a die 10 times, we expect that a value like 3 can appear more than once, we need to set `replace = TRUE`. 
 
@@ -1256,6 +1257,27 @@ sample(x = die,
        replace = TRUE, 
        prob = c(0.5, 0.1, 0.1, 0.1, 0.1, 0.1))
 ```
+
+**Remember: There is no real data here.** We have not actually rolled a die. We have just made some assumptions about what would happen if we were to roll a die. With those assumptions we have built an urn --- a *data generating mechanism* --- from which we can draw as many values as we like. Let's roll the unfair die 10,000 times.
+
+```{r}
+tibble(result = sample(x = die, 
+                       size = 10000, 
+                       replace = TRUE, 
+                       prob = c(0.5, rep(0.1, 5)))) %>% 
+  ggplot(aes(x = result)) +
+    geom_bar() +
+    labs(title = "Distribution of Results of an Unfair Die",
+         x = "Result of One Roll",
+         y = "Count") +
+    scale_x_continuous(breaks = 1:6,
+                       labels = as.character(1:6)) +
+    scale_y_continuous(labels = scales::comma_format())
+```
+
+This makes the *dual nature of distributions* more clear. A distribution is the "thing" you see in this plot. A mathematical object with several different parts, including a set of possible values (1 through 6, in this case) and a record of the number of times each appears. A distribution is *also* the simple vector of numbers we used to create this plot.
+
+In general, we travel back-and-forth between distribution as a thing and distribution as a vector of numbers depending on what we are trying to accomplish. The path back-and-force is via draws.
 
 `sample()` is just one of many functions for creating draws --- or, more colloquially, "drawing" --- from a distribution. Three of the most important functions are: `runif()`, `rbinom()`, and `rnorm()`.
 
@@ -1276,6 +1298,7 @@ This means that the each value for $y$ is drawn from a uniform distribution betw
 ### `rbinom()`
 
 Consider binomial distribution, the case in which the probability of some Boolean variable (for instance success or failure) is calculated for repeated, independent trials. One common example would be the probability of flipping a coin and landing on heads. The function `rbinom()` allows us to draw from a binomial distribution. This function takes three arguments, `n`, `size`, and `prob`. 
+
 *`n` is the number of values we seek to draw. 
 *`size` is the number of trials for each `n`. 
 *`prob` is the probability of success on each trial. 
@@ -1286,7 +1309,7 @@ Suppose we wanted to flip a fair coin one time, and let landing on heads represe
 rbinom(n = 1 , size = 1, prob = 0.5)
 ```
 
-Do the same thing 100 times and look at the results:
+Do the same thing 100 times:
 
 ```{r}
 tibble(heads = rbinom(n = 100, size = 1, prob = 0.5)) %>% 
@@ -1300,6 +1323,10 @@ tibble(heads = rbinom(n = 100, size = 1, prob = 0.5)) %>%
 ```
 
 In our graph above, we use the function `scale_x_continuous()` because our x-axis variable is continuous, meaning it can take on any real values. The `breaks` argument to `scale_x_continuous()` converts our x-axis to having two different "tick marks". There is a fairly even distribution of Tails and Heads. More draws would typically result in an even more equal split. 
+
+Randomness creates (inevitable) tension between distribution as a "thing" and distribution as a vector of draws from that thing. In this case, the vector of draws is not balanced between Tails and Heads. Yet, we "know" that it should be since the coin is, by definition, fair. In a sense, the mathematics require an even split. Yet, randomness means that the vector of draws will rarely match the mathematically "true" result. And that is OK! First, randomness is an intrinsic property of the real world. Second, we can make the effect of randomness be as small as we want by increasing the number of draws. 
+
+<!-- DK: Could do a little example of that, showing the convergence to 50% as n increaeses. -->
 
 
 Suppose instead we wanted to simulate an unfair coin, where the probability of landing on Heads was 0.75 instead of 0.25. 
@@ -1315,7 +1342,7 @@ tibble(heads = rbinom(n = 100, size = 1, prob = 0.75)) %>%
                        labels = c("Tails", "Heads"))
 ```
 
-The distribution --- the imaginary urn --- from which we draw the results of a coin flip for a fair coin is a different distribution --- a different imaginary urn --- from the distribution for a biased coin. In fact, there are an infinite number of distributions. Yet as long as we can draw values from a distribution, we can work with it. Mathematics:
+The distribution --- the imaginary urn --- from which we draw the results of a coin flip for a fair coin is a different distribution --- a different imaginary urn --- from the distribution for a biased coin. In fact, there are an infinite number of distributions. *Yet as long as we can draw values from a distribution, we can work with it.* Mathematics:
 
 $$y_i \sim B(n, p)$$. 
 
@@ -1338,7 +1365,7 @@ tibble(heads = rbinom(n = 10000, size = 10, prob = 0.5)) %>%
 
 ### `rnorm()` {#normal}
 
-<!-- DK: Given that we have a cool plot at the end, maybe we don't need these earlier plots.  -->
+<!-- DK: Given that we have a cool plot at the end, maybe we don't need these earlier plots.  Or maybe we need plots for each kind of distribution. -->
 
 <!-- DK: Need to discuss the fact that we use y_i each time. -->
 
@@ -1534,7 +1561,7 @@ mad(draws)
 
 In practice, we will not know the exact distribution which generates our data. (If we did know, then estimation would be unnecessary.) The inherent randomness of the world means that calculated statistics will not match the underlying truth perfectly. But the more data that we collect, the closer the match will be.
 
-In addition to the mean and standard deviation of the draws, we will often be interested in various quantiles of the distributio, nmost commonly because we want to create confidence intervals. Examples:
+In addition to the mean and standard deviation of the draws, we will often be interested in various quantiles of the distribution, most commonly because we want to create intervals which cover a specified portion of the draws. Examples:
 
 ```{r}
 quantile(draws, probs = c(0.25, 0.75))
@@ -1542,7 +1569,9 @@ quantile(draws, probs = c(0.05, 0.95))
 quantile(draws, probs = c(0.025, 0.975))
 ```
 
-Note that these draws come from a distribution which is centered around 2 rather than 0. There is nothing intrinsically special about any of these ranges. They are mere convention, especially the 95% confidence interval.
+Note that these draws come from a distribution which is centered around 2 rather than 0. There is nothing intrinsically special about any of these ranges. They are mere convention, especially the 95% interval.
+
+<!-- DK: Discuss confidence intervals. -->
 
 Note how cavalier we are in sometimes using the word "distribution" and sometimes the word "draws." These are two different things! The distribution is the underlying reality, which we will only know for certain when we create it ourselves, as in this example. The draws are a vector of numbers which, we assume, are "drawn" from some underlying distribution which, in general, we do not know. 
 
@@ -1640,7 +1669,7 @@ Because `m` does not have column names, `as_tibble()` creates its won variables 
 
 ### Missing Values 
 
-When importing datasets that have not already been extensively wrangled, there may be some observations in the tibble that are blank. These are called missing values, and they are often marked as `NA`.  
+Some observations in a tibble are blank. These are called missing values, and they are often marked as `NA`.  We can create such a tibble as follows:
 
 ```{r}
 tbl <- tribble(

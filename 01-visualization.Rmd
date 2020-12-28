@@ -6,6 +6,8 @@ Everyone loves visualizations.
 
 <!-- DK: Would be nice if the plot featured a statistical measure of some kind (maybe a 95% confidence interval) so that we have a motivation for learning about distributions. Probably need a very different plot. Maybe something political? Election 2020? -->
 
+<!-- DK: Replace airquality data set with one of our primer.data sets. -->
+
 
 ```{r out.width = "100%", message = FALSE, echo = FALSE}
 library(tidyverse)
@@ -1074,20 +1076,28 @@ kenya %>%
 
 These intervals are similar to each other and similar to the 95% interval calculated above. The match is only roughly true, but it is good enough for most applied work.
 
+If there is an `NA` value in the variable, any statistical function like `mean()` will return `NA`. You can fix this by using `na.rm = TRUE` with the statistical function.
+
 <!-- DK: Might make a nice looking plot. -->
 
 ### `group_by()`
 
-<!-- DK: Use a different data set. -->
-
-Let's begin by revisiting the code in the previous section. We used the `mean()` argument to `summarize()` to calculate the average `Temp` value of the entire year.
+We can the use `mean()` with `summarize()` to calculate the average `Temp` value of the entire year.
 
 ```{r}
 airquality %>% 
   summarize(mean = mean(Temp))
 ```
 
-However, let's say instead of a single mean temperature for the whole year, you would like 5 mean temperatures, one for each of the 5 months in which data was gathered. In other words, we would like to compute the mean temperature split by month. We can do this by "grouping" temperature observations by the values of `Month`.Run the following code:
+However, let's say instead of a single mean temperature for the whole year, you would like 5 mean temperatures, one for each of the 5 months in which data was gathered. In other words, we would like to compute the mean temperature split by month. We can do this by "grouping" temperature observations by the values of `Month`. Consider:
+
+
+```{r}
+airquality %>% 
+  group_by(Month)
+```
+
+The data is the same as before, but note the "Groups" message at the top. R is informing you that this tibble has been grouped at that any operation you perform now will be done for each `Month`. Example: 
 
 ```{r}
 airquality %>% 
@@ -1095,7 +1105,7 @@ airquality %>%
   summarize(mean = mean(Temp))
 ```
 
-Notice the warning R gives us. The warning means that the tibble which issues forth from the end of the pipe has been "ungrouped". This means the group attribute we applied with `group_by()` no longer exists. This behavior is default, but what if we want to keep the group attribute? (i.e., we want the resulting tibble to still be grouped by month) 
+Notice the message R sends us. The warning means that the tibble which issues forth from the end of the pipe has been "ungrouped". This means the group attribute we applied with `group_by()` has been removed. This behavior is the (sensible) default.
 
 The proper way to handle the situation, here and everywhere else that we use `group_by()` and `summarize()`, is to specify the `.groups` argument.
 
@@ -1108,57 +1118,10 @@ airquality %>%
 
 This code does the same thing as the first version, but does not issue a warning, since we have made an affirmative decision to drop any grouping variables.
 
+The `group_by()` function doesn't change data frames by itself. Rather it changes the *meta-data*, or data about the data, specifically the grouping structure. It is only after we apply the `summarize()` function that the tibble changes.
 
-**Note:** The `group_by()` function doesn't change data frames by itself. Rather it changes the *meta-data*, or data about the data, specifically the grouping structure. It is only after we apply the `summarize()` function that the data frame changes.
+If you have a tibble which has been grouped, you can remove the grouping variable by using `ungroup()`. When your R code is behaving in a weird way, especially when it is "losing" rows, the problem is often solved by using `ungroup()` in the pipe.
 
-
-
-### NA values 
-
-In some datasets, some values are returned as `NA`? `NA` is how R encodes *missing values*  where `NA` indicates "not available" or "not applicable." If a value for a particular row and a particular column does not exist, `NA` is stored instead. Values can be missing for many reasons. Perhaps the data was collected but someone forgot to enter it? Perhaps the data was not collected at all because it was too difficult to do so? Who knows! You'll often encounter issues with missing values when working with real data.
-
-
-Recall our dataset `airquality`. Notice the `NA` values in the `Ozone` variable.
-
-```{r}
-airquality %>% 
-  select(Ozone)
-```
-
-Any time you try to calculate a summary statistic of a variable that has one or more `NA` missing values in R, `NA` is returned like such:
-
-```{r}
-airquality %>% 
-  summarize(mean_ozone = mean(Ozone))
-```
-
-To work around this fact, you can set the `na.rm` argument to `TRUE`, where `rm` is short for "remove"; this will ignore any `NA` missing values and only return the summary value for all non-missing values. 
-
-```{r}
-airquality %>% 
-  summarize(ozone_avg = (mean(Ozone, na.rm = TRUE)))
-```
-
-**Note:** The `na.rm = TRUE` are used as arguments to the `mean()` and `sd()` summary functions individually, and not to the `summarize()` function.
-
-However, one needs to be cautious whenever ignoring missing values as we've just done. There are possible ramifications of blindly sweeping rows with missing values "under the rug." This is in fact why the `na.rm` argument to any summary statistic function in R is set to `FALSE` by default. In other words, R does not ignore rows with missing values by default. R is alerting you to the presence of missing data and that you should be mindful of its absence.
-
-
-Another alternative we can use is the `drop_na()` function. We can either drop all `NA` values for the entire data set or individual variables. 
-
-When no argument is placed inside `drop_na()`, the function applies to the entire dataset.
-
-```{r}
-airquality %>% 
-  drop_na()
-```
-
-When the variable of interest is placed inside `drop_na()`, the function only applies to that variable. 
-
-```{r}
-airquality %>% 
-  drop_na(Ozone)
-```
 
 
 ## Advanced Plots
