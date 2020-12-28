@@ -2,9 +2,11 @@
 
 <!-- * Should start with  single variable which actually requires lots of parameters. For example, death_age as a function of state and come up with a different average death_age for each state. This is cheating in that it is too many parameters, or rather than some of the parameters need to be estimated for too little data.  But it would allow us to explain a bunch of stuff! Including Bayesian shrinkage. Saving this till the end of the model causes us to miss stuff. But the rest of the analysis used lived_after. Which is better. Yes? Should we discuss? Use both? -->
 
-<!-- Do centering properly. Create a new variable and use it throughout. -->
+<!-- Do centering properly. Create a new variable and use it throughout. Then track down the random 52 years hard-coded. -->
 
 <!-- Put seed everywhere. -->
+
+<!-- Clean up all the plots, especially the legends. -->
 
 Having created models with one parameter in Chapter \@ref(one-parameter), two parameters in Chapter \@ref(two-parameters), three parameters in Chapter \@ref(three-parameters), and five parameters in Chapter \@ref(five-parameters), you are now ready to make the jump to $N$ parameters. 
 
@@ -202,7 +204,6 @@ ch9 %>%
     theme_classic() 
 ```
 
-<!-- DK: fix. -->
 
 Consider someone who is about 40 years old on Election Day. We have a score or more data points for candidates around that age. Two died soon after the election. Some of them lived for 50 or more years after the election. *Variation fills the world.* But the fitted line tells us that, on average, we would expect a candidate that age to live for a little less than 40 years after the election. 
 
@@ -461,15 +462,15 @@ print(fit_gov_3, detail = FALSE)
 ```
 
 
-<!-- DK: Fix -->
-
-Looking at our results, you can see that our intercept value is around 8,100. (The exact values for the median of the posterior will vary because of the random sampling inherent in fitting the model.) This means that the average female candidate, who had been alive the average number of days of all candidates, would live another 8,100 days or so after the election. 
 
 
-Note that `sexMale` is around 2,250. This is our coefficient, $\beta_1$. We need to connect this value to our intercept value to get something meaningful. Using the formula $\beta_0$ + $\beta_1$, we find out that the number of days the average male candidate ---  who, on the day of election, had been alive the average number of days of all candidate --- would live is around 10,300,.  
+Looking at our results, you can see that our intercept value is around `r round(coef(fit_gov_3)["(Intercept)"], 0)`. (The exact values for the median of the posterior will vary because of the random sampling inherent in fitting the model.) This means that the average female candidate, who had been alive the average number of years of all candidates, would live another `r round(coef(fit_gov_3)["(Intercept)"], 0)` years or so after the election. 
 
 
-Now take a look at the coefficient for $alive\_pre_i$, $\beta_2$. The median of the posterior, -0.8, represents the slope of the model. For every unit increase in our independent variable, our dependent variable will change by this coefficient. It makes sense that this value is negative. Think about it: the more years a candidate has lived, the fewer years the candidate has left to live. So, for every extra day a candidate is alive before an election, their lifespan after the election will be 0.8 years lower, on average.
+Note that `sexMale` is around `r round(coef(fit_gov_3)["sexMale"], 0)`. This is our coefficient, $\beta_1$. We need to connect this value to our intercept value to get something meaningful. Using the formula $\beta_0 + \beta_1$, we find out that the number of years the average male candidate ---  who, on the day of election, is the average age of all candidates --- would live is around `r round(coef(fit_gov_3)["(Intercept)"] + coef(fit_gov_3)["sexMale"], 0)` years.  
+
+
+Now take a look at the coefficient for $alive\_pre_i$, $\beta_2$. The median of the posterior, `r round(coef(fit_gov_3)["election_age"], 1)`, represents the slope of the model. When comparing two candates who differ by one year in `election_age`, we expect that they will differ by `r round(coef(fit_gov_3)["election_age"], 1)` years in `lived_after`. It makes sense that this value is negative. Think about it: the more years a candidate has lived, the fewer years the candidate has left to live. So, for every extra year a candidate is alive before an election, their lifespan after the election will be `r abs(round(coef(fit_gov_3)["election_age"], 1))` years lower, on average.
 
 
 Let’s now look at some posteriors.
@@ -492,8 +493,8 @@ fit_gov_3 %>%
          subtitle = "Men live longer",
          x = "Average Years Lived Post Election",
          y = "Probability") + 
-    scale_x_continuous(labels = scales::number_format()) +
-    scale_y_continuous(labels = scales::percent_format()) +
+    scale_x_continuous(labels = scales::number_format(accuracy = 1)) +
+    scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
     theme_classic()
 ```
 
@@ -572,9 +573,9 @@ print(fit_gov_4, detail = FALSE)
 
 <!-- DK: Fix -->
 
-The intercept has increased. $\beta_0$ is around 6,000. This is the intercept for females. It still means the average number of days lived after the election for women is 6,000 or so. Our `sexMale` coefficient, $\beta_1$, refers to the value that must be added to the intercept in order to get the intercept for males. When calculated, the result is 10,000. Keep in mind, however, that these values only apply if $alive\_pre_i = 0$, if, that is, candidate $i$ is around 52 years old. 
+The intercept has increased. $\beta_0$ is around `r round(coef(fit_gov_4)["(Intercept)"], 0)`. This is the intercept for females. It still means the average number of years lived after the election for women is `r round(coef(fit_gov_4)["(Intercept)"], 0)` or so. Our `sexMale` coefficient, $\beta_1$, refers to the value that must be added to the intercept in order to get the average for males. When calculated, the result is `r round(coef(fit_gov_4)["(Intercept)"] + coef(fit_gov_4)["sexMale"], 0)`. Keep in mind, however, that these values only apply if $alive\_pre_i = 0$, if, that is, candidate $i$ is around 52 years old. 
 
-The coefficient for $alive\_pre_i$, $\beta_2$, is -0.1. What does this mean? It is the slope for females. So for every extra day a female candidate is alive before an election, their lifespan after the election will be 0.1 years lower, on average. Now direct your attention below at the coefficient of `sexMale:election_age`, $\beta_3$, which is -.8. This is the value that must be added to the coefficient of $alive\_pre_i$ (recall $\beta_2$ + $\beta_3$) in order to find the slope for males. When the two are added together, this value, or slope, is about -0.9. For every extra day a male candidate is alive before an election, their lifespan after the election will be 0.9 years lower, on average. 
+The coefficient for $alive\_pre_i$, $\beta_2$, is `r round(coef(fit_gov_4)["election_age"], 1)`. What does this mean? It is the slope for females. So, when comparing two female candidates who differ by one year in age, we expect that the older candidate will live `r abs(round(coef(fit_gov_4)["election_age"], 1))` years less. Now direct your attention below at the coefficient of `sexMale:election_age`, $\beta_3$, which is `r round(coef(fit_gov_4)["sexMale:election_age"], 1)`. This is the value that must be added to the coefficient of $alive\_pre_i$ (recall $\beta_2 + \beta_3$) in order to find the slope for males. When the two are added together, this value, or slope, is about `r round(coef(fit_gov_4)["election_age"] + coef(fit_gov_4)["sexMale:election_age"], 1)`. When comparing two male candidates who differ in age by one year, we expect the older candidate to live about `r abs(round(coef(fit_gov_4)["election_age"] + coef(fit_gov_4)["sexMale:election_age"], 1))` years less. 
 
 *Key point*: The interpretation of the intercepts only apply to candidates for whom $alive\_pre_i = 0$. Candidates who are not 52 years-old will have different expected number of years to live. The interpretation of the slope applies to everyone. In other words, the relationship between $alive\_post_i$ and $alive\_pre_i$ is the same, regardless of your gender or how old you are.
 
@@ -605,9 +606,8 @@ fit_gov_4 %>%
     theme_classic()
 ```
 
-<!-- DK: Fix -->
 
-Male candidates live longer on average than female candidates. Note, also, that the average days to live after the election for females is about 6,000 with this model. With the previous model, it was 8,000. Why the difference? The interpretation of "average" is different! In the previous model, it was the average for all women. In this model, it is the average for all 52 years-old women. Those are different things, so we should hardly be surprised by different posteriors.
+Male candidates live longer on average than female candidates. Note, also, that the average years to live after the election for females is about `r round(coef(fit_gov_4)["(Intercept)"], 0)` with this model. With the previous model, it was `r round(coef(fit_gov_3)["(Intercept)"], 0)` years. Why the difference? The interpretation of "average" is different! In the previous model, it was the average for all women. In this model, it is the average for all 52 years-old women. Those are different things, so we should hardly be surprised by different posteriors.
 
 <!-- DK: Is the above right? -->
  
@@ -731,20 +731,22 @@ fit_gov_5 <- stan_glm(data = ch9,
 
 Note it takes awhile to run. We are dealing with 55 parameters here.
 
+<!-- DK: How do we not print out all the coefficients? -->
+
 ```{r}
 print(fit_gov_5, detail = FALSE)
 ```
 
-The (Intercept) refers to the average number of years lived after the election for women, who on the day of election, have been alive the average number of years of all female candidates in Alabama! That's a mouthful. It really is not different than what we have been doing all along, however. You can see here that (Intercept) value is around 4,900. 
+The (Intercept) refers to the average number of years lived after the election for women from Alabama, who on the day of election, have been alive the average number of years of all female candidates! That's a mouthful. It really is not different than what we have been doing all along, however. You can see here that (Intercept) value is around `r round(coef(fit_gov_5)["(Intercept)"], 0)` years. 
 
 
-However, we have only talked about women. What about for the men? Well, if you look at the bottom of the list, you will see the `sexMale` value of around 4,400. When you wish to find lived_after for a specific state, you must add this value to the intercept, about 4,900, and then also add the intercept of the desired state. 
+However, we have only talked about women. What about for the men? Well, if you look at the bottom of the list, you will see the `sexMale` value of around `r round(coef(fit_gov_5)["sexMale"], 0)`. When you wish to estimate `lived_after` for a specific state, you must add this value to the intercept, and then also add the intercept of the desired state. 
 
-$\beta_{51}$, our coefficient value for $alive\_pre_i$, is 0. This means women have a slope of 0.
+$\beta_{51}$, our coefficient value for $alive\_pre_i$, is `r round(coef(fit_gov_5)["election_age"], 2)`. When comparing female candidates who differ by one year in their current ages, there is not much of a difference in how many years we expect them to live after the election.
 
 <!-- DK: Conflict between $alive\_pre_i$ and `sexMale:election_age`. Which is better? Should be consistent. -->
 
-$\beta_{51}$ + $\beta_{52}$, our coefficients for $alive\_pre_i$ and `sexMale:election_age`, results in the value of around -0.8. This value is our slope for men.
+$\beta_{51} + \beta_{52}$, our coefficients for $alive\_pre_i$ and `sexMale:election_age`, results in the value of around `r round(coef(fit_gov_5)["election_age"] + coef(fit_gov_5)["sexMale:election_age"], 1)`. This value is our slope for men.
 
 
 
@@ -846,16 +848,16 @@ fit_gov_5 %>%
                    position = "identity") +
     labs(title = "Posterior Probability Distribution",
          subtitle = "Candidates from Washington live longer than those from South Dakota",
-         x = "Average Additional Years Lived Post Election",
+         x = "Average Additional Years Lived Post Election: WA - SD",
          y = "Probability") + 
-    scale_x_continuous(labels = scales::number_format()) +
-    scale_y_continuous(labels = scales::percent_format()) +
+    scale_x_continuous(labels = scales::number_format(accuracy = 1)) +
+    scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
     theme_classic()
 ```
 
 <!-- DK: Fix -->
 
-The average value of the difference in days-to-live is almost certainly positive, with the most likely value being around 4,500. Notice that there is essentially zero chance that, on average, South Dakota candidates live longer.
+The average value of the difference in years-to-live is almost certainly positive, with the most likely value being around `r round(coef(fit_gov_5)["stateWashington"] - coef(fit_gov_5)["stateSouth Dakota"], 0)` years. Notice that there is essentially zero chance that, on average, South Dakota candidates live longer.
 
 One annoyance of the above approach is that it requires us to do everything "by hand," to recall the mathematical structure of the model, and then to insert the relevant values of the data for the individuals we want to predict. What a bother! Fortunately, **rstanarm** provides the `posterior_epred()` function to make this process simpler.
 
@@ -975,9 +977,9 @@ pp %>%
 
 <!-- DK: Fix -->
 
-In words, we would predict that the candidate from Washington would live longer than the South Dakota candidate. By how much? Well, that number is an unknown parameter. By looking at our posterior above, our best estimate is about 4,500 days, which is roughly 8 years. However, it is important to note that it is possible that the male from South Dakota could outlive the Washington male. In fact, there is a 1 in 5 chance that he does so.
+In words, we would predict that the candidate from Washington would live longer than the South Dakota candidate. By how much? Well, that number is an unknown parameter. By looking at our posterior above, our best estimate is about `r round(mean(pp$`2` - pp$`1`), 0)` years. However, it is important to note that it is possible that the male from South Dakota could outlive the Washington male. In fact, there is a 1 in 5 chance that he does so.
 
-*Note what is the same and what is different when we move from a question about averages to a question about individuals.* In both cases, the most likely value is about the same, about 4,500 days. That is, the average behavior is the same as our expected value for any given individual. But the uncertainty is much greater for an individual prediction. The chance of the true average for Washington candidates being less than that for South Dakota candidates is essentially zero. Yet, for any individual pair of candidates, it would not even be slightly surprising for the South Dakota candidate to outlive the Washington candidate. Individuals vary. Averages never tell the whole story.
+*Note what is the same and what is different when we move from a question about averages to a question about individuals.* In both cases, the most likely value is about the same, about `round(mean(pp$`2` - pp$`1`), 0)` years. That is, the average behavior is the same as our expected value for any given individual. But the uncertainty is much greater for an individual prediction. The chance of the true average for Washington candidates being less than that for South Dakota candidates is essentially zero. Yet, for any individual pair of candidates, it would not even be slightly surprising for the South Dakota candidate to outlive the Washington candidate. Individuals vary. Averages never tell the whole story.
 
 ### Expectation versus individual variation
 
