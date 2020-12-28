@@ -991,13 +991,13 @@ The `mean()` and `sd()` summary functions go inside the `summarize()`  function 
 
 A variable in a tibble is a column, a vector of values. We sometimes refer to this vector as a "distribution." This is somewhat sloppy in that a distribution can be many things, most commonly a mathematical formula. But, strictly speaking, a "frequency distribution" or an "empirical distribution" is a list of values, so this usage is not unreasonable.
 
-There are two distinct concepts: a distribution and a set values drawn from that distribution.  But, in everyday use, we apply "distribution" to both.
+*There are two distinct concepts: a distribution and a set values drawn from that distribution.*  But, in everyday use, we apply "distribution" to both.
 
-We use `summarize()` to calculate statistics for a variable, a column, a vector of values or a distribution. Note the language sloppiness. For the purposes of this book, "variable," "column," "vector," and "distribution" all mean the same thing. Popular statistical functions include: `mean()`, `median()`, `min()`, `max()`, `n()` and `sum()`. Functions which may be new to you include three measures of the "spread" of a distribution: `sd()` (the standard deviation), `mad()` (the scaled median absolute deviation) and `quantile()`. 
+We use `summarize()` to calculate statistics for a variable, a column, a vector of values or a distribution. Note the language sloppiness. For the purposes of this book, "variable," "column," "vector," and "distribution" all mean the same thing. Popular statistical functions include: `mean()`, `median()`, `min()`, `max()`, `n()` and `sum()`. Functions which may be new to you include three measures of the "spread" of a distribution: `sd()` (the standard deviation), `mad()` (the scaled median absolute deviation) and `quantile()` (use to calculate an *interval* which includes a specified proportion of the values). 
 
 **`mean()`**
 
-The *mean*, or *average*, is the most commonly reported measure of the center of a distribution.  The mean is the sum of all of the data elements divided by how many elements there are. If we have $N$ data points, the mean is given by: 
+The mean, or average, is the most commonly reported measure of the center of a distribution.  The mean is the sum of all of the data elements divided by how many elements there are. If we have $N$ data points, the mean is given by: 
 
 $$\bar{x} = \frac{x_1 + x_2 + \cdots + x_N}{N}$$
 
@@ -1005,11 +1005,11 @@ $$\bar{x} = \frac{x_1 + x_2 + \cdots + x_N}{N}$$
 
 <!-- DK: Use math formula, like this one: https://math.stackexchange.com/questions/1097546/what-is-the-general-formula-for-calculating-the-median -->
 
-The median is another commonly reported measure of the center of a distribution, calculated by first sorting the vector of values from smallest to largest. The middle element in the sorted list is the *median*.  If the middle falls between two values, then the median is the mean of those two middle values. The median and the mean are the two most common measures of the center of a distrubution. The median is more stable, less affected by outliers. There is no widely accepted symbol for the median, although $\tilde{x}$ is not uncommon.
+The median is another commonly reported measure of the center of a distribution, calculated by first sorting the vector of values from smallest to largest. The middle element in the sorted list is the *median*.  If the middle falls between two values, then the median is the mean of those two middle values. The median and the mean are the two most common measures of the *center* of a distribution. The median is more stable, less affected by outliers. There is no widely accepted symbol for the median, although $\tilde{x}$ is not uncommon.
 
 **`sd()`**
 
-The *standard deviation* (*sd*) of a distribution is a measure of its variation around the mean.  
+The standard deviation* (*sd*) of a distribution is a measure of its variation around the mean.  
 
 $$\text{sd} = \sqrt{\frac{(x_1 - \bar{x})^2 + (x_2 - \bar{x})^2 + \cdots + (x_n - \bar{x})^2}{n - 1}}$$
 <!-- DK: More detail. How much does it cover? Plot a not-too-weirdish distribution and show two sd's on it. -->
@@ -1017,58 +1017,64 @@ $$\text{sd} = \sqrt{\frac{(x_1 - \bar{x})^2 + (x_2 - \bar{x})^2 + \cdots + (x_n 
 
 **`mad()`**
 
-The scaled median absolute deviation, *mad*, is another measure of variation, although nowhere near as popular as the standard deviation. The formula for calculating *mad* is a bit mysterious.
+The scaled median absolute deviation (*mad*) is a measure of variation around the median.  It is not as popular as the standard deviation. The formula for calculating *mad* is a bit mysterious.
 
 
 $$\text{mad} = 1.4826 \times \text{median}(abs(x - \tilde{x}))$$
+
 The basic idea for both *sd* and *mad* is that we need a measure of variation around the center of the distribution. *sd* uses the mean, $\bar{x}$, as its estimate of the center while *mad* uses the median, $\tilde{x}$. Because *mad* uses the absolute difference, as opposed to the squared difference, it is more robust to outliers. The 1.4826 multiplier causes the *mad* and the *sd* to be identical in the (important) case of standard normal distributions, a topic we will cover in Chapter \@ref(wrangling).
 
 <!-- DK: Could have more conversation. -->
 
 <!-- DK: These formulas are inconsistent, with one using vectors. Should make these consistent, perhaps even give formula for median. -->
 
-<!-- DK: Finish with example usage, including na.rm, maybe? Move some of that discussion from chapter 2. -->
 
 **`quantile()`**
 
 The *quantile* of a distribution is the value of that distribution which occupies a specific percentile location in the sorted list of values. 
 
-The 5th percentile distribution is the point below which 5% of the data falls. The 95th percentile is, similarly, the point below which 95% of the data falls. The 50th percentile, also referred to as the median, splits the data into two separate, and equal, parts. The minimum is at the 0th percentile. The maximum is at the 100th percentile.
+The 5th percentile distribution is the point below which 5% of the data falls. The 95th percentile is, similarly, the point below which 95% of the data falls. The 50th percentile, the median, splits the data into two separate, and equal, parts. The minimum is at the 0th percentile. The maximum is at the 100th percentile.
+
+Let's take a look at the `poverty` variable in the `kenya` tibble from the **primer.data** package. `poverty` is the percentage of residents in each community with incomes below the poverty line. Let's first confirm that connections between `quantile()` and simpler functions.
 
 ```{r}
-set.seed(9)
-z <- rnorm(10000)
-c(min(z), median(z), max(z))
-quantile(z, probs = c(0, 0.5, 1))
+c(min(kenya$poverty), median(kenya$poverty), max(kenya$poverty))
+quantile(kenya$poverty, probs = c(0, 0.5, 1))
 ```
 
-The `probs` argument allows us to specify the percentile(s) we want. Two of the most important percentiles are the 2.5th and 97.5th.
+The `probs` argument allows us to specify the percentile(s) we want. Two of the most important percentiles are the 2.5th and 97.5th because they define the *95% interval*, a central range which includes 95% of the values.
 
 ```{r}
-quantile(z, probs = c(0.025, 0.975))
+quantile(kenya$poverty, probs = c(0.025, 0.975))
 ```
 
-The interval between these two percentiles includes 95% of all the values in the distribution. Depending on the context, this interval is sometimes called a "confidence interval." Different percentile ranges create confidence intervals of different widths. 
+The interval between these two percentiles includes 95% of all the values in the distribution. Depending on the context, this interval is sometimes called a "confidence interval" or "uncertainty interval" or "compatibility interval." Different percentile ranges create intervals of different widths. 
 
-An interesting fact is that, most of the time, the 95% confidence interval is, roughly. the same as the center of the distribtion +/- two times the standard deviation.
+An interesting fact is that, most of the time, the 95% confidence interval is, roughly, the same as the center of the distribution $\pm$ two times the standard deviation.
+
+In distributions without major outliers, the mean/median and sd/mad will be very similar to each other.
 
 ```{r}
-c(mean(z) - 2 * sd(z), mean(z) + 2 * sd(z))
+kenya %>% 
+  summarise(mean = mean(poverty),
+            median = median(poverty),
+            sd = sd(poverty),
+            mad = mad(poverty))
 ```
 
-Again, the match is only roughly true. But it is good enough for most applied work.
+It follows that intervals defined with them will be similar.
 
-
-<!-- 
-DK: Show how two standard deviations gets you out to the confidence interval. Make nice plot.
-
-```{r, echo = FALSE}
-tibble(z = z) %>%
- ggplot(aes(z)) +
-   geom_histogram(bins = 100)
+```{r}
+kenya %>% 
+  summarise(interval_1_bottom = mean(poverty) - 2 * sd(poverty),
+            interval_1_top = mean(poverty) + 2 * sd(poverty),
+            interval_2_bottom = median(poverty) - 2 * mad(poverty),
+            interval_2_top = median(poverty) + 2 * mad(poverty))
 ```
 
--->
+These intervals are similar to each other and similar to the 95% interval calculated above. The match is only roughly true, but it is good enough for most applied work.
+
+<!-- DK: Might make a nice looking plot. -->
 
 ### `group_by()`
 
