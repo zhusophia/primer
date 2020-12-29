@@ -1,6 +1,112 @@
 # N Parameters {#n-parameters}
 
-The next step in our model building education is to learn about *interactions*. The effect of a treatment relative to a control is almost never uniform. The effect might be bigger in women than in men, smaller in the rich relative to the poor. The technical term for such effects is "heterogenous," which is just Ph.D.'ese for "different." With enough data, all effects are heterogenous. Causal effects, at least in the social science, always vary across units. To model this reality, we rely on "interactions," on allowing for the effect size to differ. To so so, we need at least 5 parameters. 
+
+<!-- * Should start with  single variable which actually requires lots of parameters. For example, death_age as a function of state and come up with a different average death_age for each state. This is cheating in that it is too many parameters, or rather than some of the parameters need to be estimated for too little data.  But it would allow us to explain a bunch of stuff! Including Bayesian shrinkage. Saving this till the end of the model causes us to miss stuff. But the rest of the analysis used lived_after. Which is better. Yes? Should we discuss? Use both? -->
+
+Having created models with one parameter in Chapter \@ref(one-parameter), two parameters in Chapter \@ref(two-parameters), three parameters in Chapter \@ref(three-parameters), and five parameters in Chapter \@ref(five-parameters), you are now ready to make the jump to $N$ parameters. 
+
+In this chapter, we will consider models with many parameters and the complexities that arise therefrom. 
+
+
+## More on candidate longevity
+
+Let's continue our examination of the longevity of gubernatorial candidates which we began in Chapter \@ref(five-parameters). Recall the packages we need and the tibble we created:
+
+```{r, message = FALSE}
+library(tidyverse)
+library(primer.data)
+library(rstanarm)
+
+ch11 <- governors %>% 
+  select(last_name, year, state, sex, lived_after, election_age) %>% 
+  mutate(election_age_c = election_age - mean(election_age))
+```
+
+### state
+
+DK: Start with a model with just state.
+
+### state, election_age, sex and election_age*sex
+
+Let's consider one more model, one which adds `state` to the model we used at the end of the previous chapter. 
+
+Math:
+
+
+$$ lived\_after_i =  \beta_0 +  \beta_1 x_{AK,i} + \beta_2 x_{AR,i} + ... \beta_{49} x_{WY,i} + \\
+\beta_{50} male_i + \beta_{51} election\_age_i+ \beta_{52} male_i *  election\_age_i + \epsilon_i$$
+
+<!-- DK: Clean this up. Explain meaning of intercept more clearly. -->
+
+*  $lived\_after_i$ is the outcome variable. $\beta_1$, $\beta_2$, $\beta_3$... all the way to $\beta_{49}$ correspond to different parameters. These values are specific to each state. In order to find the female intercept (i.e. lived_after for females) for a specific state, you must add that state's beta value to the value of $\beta_0$ to find intercept for the `lived_after` outcome for females candidates in that specific state. For example, if you look at the model above, $\beta_1$ is the intercept value for Arkansas (note the AK subscript). You would take the appropriate value, which appears next to Arkansas in the printed model, and add it to the value for $\beta_0$.
+
+* $\beta_0$ will be the intercept for one state alone. When the model is printed, you will see that (Intercept) takes on the lived_after value for female candidates in Alabama. 
+
+* $\beta_{50}$ is the coefficient for the explanatory variable $male_i$. When we are trying to find the intercepts for female candidates, the explanatory variable will take on the value of 0. However,  $male_i$ = 1 when we are trying to find intercept values for male candidates. Therefore, you add the $\beta_{50}$ value to the female intercept value to find the value of lived_after for male candidates. $\beta_{51}$ is the coefficient for the explanatory variable $election\_age_i$. It it just the slope for women. $\beta_{52}$ is difficult to interpret. However, it gains meaning when it is added to $\beta_{51}$, which results in the slope for men.
+ 
+
+```{r, cache = TRUE}
+fit_gov_1 <- stan_glm(data = ch11,
+                      formula = lived_after ~ state + sex*election_age,
+                      refresh = 0,
+                      iter = 10000,
+                      seed = 98)
+```
+
+Note it takes awhile to run. We are dealing with 55 parameters here.
+
+<!-- DK: How do we not print out all the coefficients? -->
+
+```{r}
+print(fit_gov_1, detail = FALSE)
+```
+
+The (Intercept) refers to the average number of years lived after the election for women from Alabama, who on the day of election, have been alive the average number of years of all female candidates! That's a mouthful. It really is not different than what we have been doing all along, however. You can see here that (Intercept) value is around `r round(coef(fit_gov_1)["(Intercept)"], 0)` years. 
+
+
+However, we have only talked about women. What about for the men? Well, if you look at the bottom of the list, you will see the `sexMale` value of around `r round(coef(fit_gov_1)["sexMale"], 0)`. When you wish to estimate `lived_after` for a specific state, you must add this value to the intercept, and then also add the intercept of the desired state. 
+
+$\beta_{51}$, our coefficient value for $election\_age_i$, is `r round(coef(fit_gov_1)["election_age"], 2)`. When comparing female candidates who differ by one year in their current ages, there is not much of a difference in how many years we expect them to live after the election.
+
+<!-- DK: Conflict between $election\_age_i$ and `sexMale:election_age`. Which is better? Should be consistent. -->
+
+$\beta_{51} + \beta_{52}$, our coefficients for $election\_age_i$ and `sexMale:election_age`, results in the value of around `r round(coef(fit_gov_1)["election_age"] + coef(fit_gov_1)["sexMale:election_age"], 1)`. This value is our slope for men.
+
+
+
+Posterior distribution for female candidates in Washington and South Dakota. 
+
+<!-- DK: Clean up math here. No hard coding numbers!-->
+
+```{r}
+fit_gov_1 %>% 
+  as_tibble() %>% 
+  mutate(Washington_females = `(Intercept)` + stateWashington) %>% 
+  mutate (SD_females = `(Intercept)` + `stateSouth Dakota`) %>% 
+  select(Washington_females, SD_females) %>% 
+  pivot_longer(cols = Washington_females:SD_females, 
+               names_to = "parameters",
+               values_to = "years") %>% 
+  ggplot(aes(years, fill = parameters)) +
+    geom_histogram(aes(y = after_stat(count/sum(count))),
+                   alpha = 0.5, 
+                   bins = 100, 
+                   position = "identity") +
+    labs(title = "Posterior Probability Distribution",
+         subtitle = "for women that live in Washington and South Dakota",
+         x = "Average Years Lived Post Election",
+         y = "Probability") + 
+    scale_x_continuous(labels = scales::number_format()) +
+    scale_y_continuous(labels = scales::percent_format()) +
+    theme_classic()
+```
+
+
+The posterior above shows that female candidates in Washington live longer after the election than female candidates in South Dakota. Interesting huh? Our knowledge about averages is always more precise than our knowledge about individuals. 
+
+
+
+<!-- DK: Need to modify this to only show one of the more interesting state coefficients. (Although we might show all the state pdfs in the graphic.) This a good place to discuss shrinkage, which is what is happening here. And that is probably enough models. -->
 
 
 ## Wisdom
