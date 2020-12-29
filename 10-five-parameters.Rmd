@@ -1,12 +1,12 @@
 # Five Parameters {#five-parameters}
 
-
-
 <!-- Do centering properly. Create a new variable and use it throughout. Then track down the random 52 years hard-coded. -->
 
 <!-- Should lived\_after_i be replaced with y_i everywhere? Somewhere? -->
 
 <!-- Clean up all the plots, especially the legends. -->
+
+<!-- Make a joke about skipping 4 parameters. -->
 
 The next step in our model building education is to learn about *interactions*. The effect of a treatment relative to a control is almost never uniform. The effect might be bigger in women than in men, smaller in the rich relative to the poor. The technical term for such effects is "heterogenous," which is just Ph.D.'ese for "different." With enough data, all effects are heterogenous. Causal effects, at least in the social science, always vary across units. To model this reality, we rely on "interactions," on allowing for the effect size to differ. To so so, we need at least 5 parameters. 
 
@@ -38,7 +38,7 @@ glimpse(governors)
 There are `r ncol(governors)` variables and `r scales::comma(nrow(governors))` observations. In this Chapter, we will only be looking at the variables `last_name`, `year`, `state`, `sex`, `lived_after`, and `election_age`. 
 
 ```{r}
-ch9 <- governors %>% 
+ch10 <- governors %>% 
   select(last_name, year, state, sex, lived_after, election_age)
 ```
 
@@ -51,14 +51,14 @@ set.seed(14)
 ```
 
 ```{r}
-sample_n(ch9, 5)
+sample_n(ch10, 5)
 ```
 
 `sex` is most often "Male", as we might expect.
 
 
 ```{r}
-skim(ch9)
+skim(ch10)
 ```
 
 `skim()` groups the variables together by type.  We are given histograms of the numeric data. In looking at the histogram for `year`, we see that it is skewed right --- meaning that most of the data is bunched to the left and that there is a smaller tail to the right --- with half of the observations from election years between 1945 and 1962. This makes sense logically, because we are only looking at deceased candidates, and candidates from more recent elections are more likely to still be alive.
@@ -67,7 +67,7 @@ In using this data set, our left-side variable will be `lived_after`. We are try
 
 
 ```{r}
-ch9 %>%
+ch10 %>%
   ggplot(aes(x = year, y = lived_after)) +
   geom_point() +
   labs(title = "US Gubernatorial Candidate Years Lived Post-Election",
@@ -87,7 +87,7 @@ There are fewer observations in later years because fewer recent candidates have
 
 
 ```{r}
-ch9 %>%
+ch10 %>%
   ggplot(aes(x = sex, y = lived_after)) +
   geom_boxplot() +
   labs(title = "US Gubernatorial Candidate Years Lived Post-Election",
@@ -151,7 +151,7 @@ To begin, let's model candidate lifespan after the election as a function of can
 
 
 ```{r}
-ch9 %>% 
+ch10 %>% 
   ggplot(aes(x = election_age, y = lived_after)) +
     geom_point() +
     labs(title = "Longevity of Gubernatorial Candidates",
@@ -188,7 +188,7 @@ You may recall from middle school algebra that the equation of a line is $y = m 
 We can use `geom_smooth()` to create the fitted regression line:
 
 ```{r}
-ch9 %>% 
+ch10 %>% 
   ggplot(aes(x = election_age, y = lived_after)) +
     geom_point() +
     geom_smooth(formula = y ~ x, method = "lm", se = FALSE) +
@@ -215,7 +215,7 @@ We can implement this model with `stan_glm()`.
 
 
 ```{r}
-fit_gov_1 <- stan_glm(data = ch9,
+fit_gov_1 <- stan_glm(data = ch10,
                       formula = lived_after ~ election_age,
                       refresh = 0,
                       seed = 9)
@@ -236,7 +236,7 @@ The posterior distributions of $\beta_0$ (the intercept) and $\beta_1$ (the coef
 <!-- DK: Use this trick to create parallel and non-parallel line plots later. -->
 
 ```{r}
-ch9 %>% 
+ch10 %>% 
   ggplot(aes(x = election_age, y = lived_after)) +
     geom_point() +
     geom_line(aes(y = fitted(fit_gov_1)), color = "blue") +
@@ -305,17 +305,17 @@ We center variables when the model's intercept does not make substantive sense. 
 
 <!-- DK: Fix hard codes like 52 -->
 
-In this example, we want to center the value for `election_age`, the independent variable. First, we must pick the value that we will center by. Here, we will use the mean of `election_age`, which is about `r round(mean(ch9$election_age), 0)` years old.  Once we find this number, we will subtract it from every `election_age` value, creating a new variable: `election_age_c`, where the "c" stand for **c**entered.  `election_age_c` is the number of years a candidate has been alive, as of Election Day, relative to the average years alive of all candidates on their respective election days.
+In this example, we want to center the value for `election_age`, the independent variable. First, we must pick the value that we will center by. Here, we will use the mean of `election_age`, which is about `r round(mean(ch10$election_age), 0)` years old.  Once we find this number, we will subtract it from every `election_age` value, creating a new variable: `election_age_c`, where the "c" stand for **c**entered.  `election_age_c` is the number of years a candidate has been alive, as of Election Day, relative to the average years alive of all candidates on their respective election days.
 
 ```{r}
-ch9 <- ch9 %>% 
+ch10 <- ch10 %>% 
   mutate(election_age_c = election_age - mean(election_age))
 ```
 
 
 
 ```{r, cache = TRUE}
-fit_gov_1_centered <- stan_glm(data = ch9,
+fit_gov_1_centered <- stan_glm(data = ch10,
                       formula = lived_after ~ election_age_c,
                       refresh = 0,
                       seed = 11)
@@ -326,7 +326,7 @@ print(fit_gov_1_centered, detail = FALSE)
 <!-- DK: If we are doing centering, then we ought to do it correctly, by showing side-by-side scatterplots with fitted lines, the better to show that we have just slid things over. -->
 
 
-We can see that the intercept has decreased while the slope has stayed the same. When we interpret this model, we only have to change the definition of the intercept. Rather than the intercept representing the remaining years of a candidate who was alive for zero years before running for governor, it now represents the post-election lifespan of a gubernatorial candidate who was alive for the mean number of years before running. If a candidate was alive for about `r round(mean(ch9$election_age), 0)` years before running for governor, they are expected to live for about `r round(coef(fit_gov_1_centered)["(Intercept)"], 0)` years after the election, on average. 
+We can see that the intercept has decreased while the slope has stayed the same. When we interpret this model, we only have to change the definition of the intercept. Rather than the intercept representing the remaining years of a candidate who was alive for zero years before running for governor, it now represents the post-election lifespan of a gubernatorial candidate who was alive for the mean number of years before running. If a candidate was alive for about `r round(mean(ch10$election_age), 0)` years before running for governor, they are expected to live for about `r round(coef(fit_gov_1_centered)["(Intercept)"], 0)` years after the election, on average. 
 
 <!-- DK: Really need the ideal and actual Preceptor Table for this example. And should probably present it earlier. -->
 
@@ -337,7 +337,7 @@ Think hard about your parameters. What do they mean? Which population do they re
 Let's now regress `lived_after` on `sex` to see how candidates' post-election lifespans differ by sex. 
 
 ```{r, cache = TRUE}
-fit_gov_2 <- stan_glm(data = ch9,
+fit_gov_2 <- stan_glm(data = ch10,
                       formula = lived_after ~ sex - 1,
                       refresh = 0,
                       seed = 16)
@@ -378,7 +378,7 @@ Now that we have interpreted the model using a -1 in the formula to estimate $\b
 
 
 ```{r}
-fit_gov_2a <- stan_glm(data = ch9,
+fit_gov_2a <- stan_glm(data = ch10,
                        formula = lived_after ~ sex,
                        refresh = 0,
                        seed = 76)
@@ -450,7 +450,7 @@ $$ lived\_after_i =  \beta_0 + \beta_1 male_i + \beta_2 election\_age\_c_i + \ep
 Now that we understand our model, let's translate the following model into code. 
 
 ```{r, cache = TRUE}
-fit_gov_3 <- stan_glm(data = ch9,
+fit_gov_3 <- stan_glm(data = ch10,
                       formula = lived_after ~ sex + election_age_c,
                       refresh = 0,
                       seed = 12)
@@ -559,7 +559,7 @@ $$ lived\_after_i =  \beta_0 + \beta_1 male_i + \beta_2 election\_age\_c_i + \\ 
 Code:
 
 ```{r, cache = TRUE}
-fit_gov_4 <- stan_glm(data = ch9,
+fit_gov_4 <- stan_glm(data = ch10,
                       formula = lived_after ~ sex*election_age_c,
                       refresh = 0,
                       seed = 13)
