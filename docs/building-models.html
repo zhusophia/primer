@@ -75,11 +75,11 @@
 <span class="header-section-number">9.1.1</span> Centering<a class="anchor" aria-label="anchor" href="#centering"><i class="fas fa-link"></i></a>
 </h3>
 <p>Recall our model of <code>income</code> as a function of <code>age</code>. We fit this using the <code>trains</code> data from <strong>primer.data</strong>.</p>
-<div class="sourceCode" id="cb703"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb696"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">primer.data</span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://mc-stan.org/rstanarm/">rstanarm</a></span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb704"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb697"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">income</span> <span class="op">~</span> <span class="va">age</span>, 
          data <span class="op">=</span> <span class="va">trains</span>, 
          refresh <span class="op">=</span> <span class="fl">0</span>,
@@ -95,7 +95,7 @@
 ## sigma 74166.4  5146.6</code></pre>
 <p>There is nothing wrong with this model. Yet the interpretation of <span class="math inline">\(\beta_0\)</span>, the intercept in the regression, is very awkward. It means the average income for people of age zero. Yet that is useless! There are no people of zero age in our data. And, even if there were, it would be weird to think about such people taking the commuter trade into Boston and filling our survey forms.</p>
 <p>It is easy, however, to <em>transform</em> <code>age</code> into a variable which makes the intercept more meaningful. Consider a new variable, <code>age_c</code>, which is <code>age</code> minus the average age in the sample. Using this <strong>c</strong>entered version of age does not change the predictions or residuals in the model, but it does make the intercept easier to interpret.</p>
-<div class="sourceCode" id="cb706"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb699"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains_2</span> <span class="op">&lt;-</span> <span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>age_c <span class="op">=</span> <span class="va">age</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span><span class="op">)</span>
 
@@ -119,7 +119,7 @@
 <span class="header-section-number">9.1.2</span> Scaling<a class="anchor" aria-label="anchor" href="#scaling"><i class="fas fa-link"></i></a>
 </h3>
 <p>Centering — changing a vector via addition/subtraction — often makes the intercept easier to interpret. Scaling — changing a vector via multiplication/division — often makes it easier to interpret coefficients. The most common scaling method is to divide the vector by its standard deviation.</p>
-<div class="sourceCode" id="cb708"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb701"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains_3</span> <span class="op">&lt;-</span> <span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>age_s <span class="op">=</span> <span class="va">age</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html">sd</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span><span class="op">)</span>
 
@@ -145,7 +145,7 @@
 <span class="header-section-number">9.1.3</span> <em>z</em>-scores<a class="anchor" aria-label="anchor" href="#z-scores"><i class="fas fa-link"></i></a>
 </h3>
 <p>The most common transformation applies both centering and scaling. The base R function <code><a href="https://rdrr.io/r/base/scale.html">scale()</a></code> subtracts the mean and divides by the standard deviation. A variable so transformed is a "<em>z</em>-score, meaning a vector with a mean of zero and a standard deviation of one. Using <em>z</em>-scores makes interpretation easier, especially when we seek to compare the importance of different predictors.</p>
-<div class="sourceCode" id="cb710"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb703"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains_4</span> <span class="op">&lt;-</span> <span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>age_z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/scale.html">scale</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span><span class="op">)</span>
 
