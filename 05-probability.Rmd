@@ -2,6 +2,12 @@
 
 <!-- Delete the cardinal virtues? If we keep them, then introduce them properly, perhaps reviewing the iconography. At least we need to update them to represent our current thinking! -->
 
+<!-- Here, or earlier, need to explain discrete versus continuous distributions. -->
+
+<!-- Also good to get into the *scaling* of distributions, and the arbitrariness thereof. For example, trains$age is a distribution. Fine. What about rep(trains$age, 2)? What about rep(trains$age, 100)? Well, if any vector is a distribution, then all three of these are distributions. In fact, they are the same distribution, just scaled differently.  -->
+
+We also have the issue of continuous distributions. 
+
 <!-- Need more discussion about quintiles and area under the curve. -->
 
 
@@ -329,6 +335,13 @@ There are many political science questions you could explore with posterior dist
 * Future: How many electoral votes will a presidential candidate win?
 
 ### Working with probability distributions
+
+
+```{r, echo = FALSE, fig.cap = 'Bruno de Finetti, an Italian statistician who wrote a famous treatise on the theory of probability that began with the statement "PROBABILITY DOES NOT EXIST." This is because probability only exists subjectively in our minds. It is a tool people made up and use for broad-stroke estimates.'}
+
+knitr::include_graphics("05-probability/images/de_finetti.jpg")
+
+```
 
 A probability distribution is not always easy to work with. It is a complex object. And, in many contexts, we don't really care about all that complexity. So, instead of providing the full probability distribution, we often just use a summary measure, a number or two or three which captures the aspect of the entire distribution which is relevant to the matter at hand. Let's explore these issues using the 538 posterior probability distribution, as of August 13, 2020, for the number of electoral votes which will be won by Joe Biden. Here is a tibble with 1,000,000 draws from that distribution:
 
@@ -829,9 +842,15 @@ p_posterior <- x %>%
   mutate(probs = total/sum(total))
 
 odds <- tibble(p = sample(p_posterior$p, 
-                  size = sims, prob = p_posterior$probs, replace = TRUE)) %>%
-  mutate(heads = map_int(p, ~ rbinom(n = 1, size = 20, p = .))) %>% 
-  mutate(result = ifelse(heads >= 10, TRUE, FALSE)) %>% 
+                          size = sims, 
+                          prob = p_posterior$probs, 
+                          replace = TRUE)) %>%
+  mutate(heads = map_int(p, ~ rbinom(n = 1, 
+                                     size = 20, 
+                                     p = .))) %>% 
+  mutate(result = ifelse(heads >= 10, 
+                         TRUE, 
+                         FALSE)) %>% 
   summarize(success = sum(result)/sims)
 
 odds
@@ -852,7 +871,7 @@ As you may have noticed, if you calculated the value using the first method, you
 
 ## Cardinal Virtues
 
-This *Primer* contains four important themes that are relevant in all chapters: Wisdom, Temperance, Courage, and Justice. As you move through the textbook, you will be building on and refining these concepts.
+The four [Cardinal Virtues](https://en.wikipedia.org/wiki/Cardinal_virtues) are Wisdom, Justice, Courage, and Temperance. Because data science is, ultimately, a moral act, we use these virtues to guide our work. 
 
 ### Wisdom
 
@@ -861,13 +880,7 @@ This *Primer* contains four important themes that are relevant in all chapters: 
 knitr::include_graphics("other/images/Wisdom.jpg")
 ```
 
-The first theme of Wisdom is about whether the numbers we have capture the concepts we care about. We should be concerned about whether our data and models are representative of the problem.
 
-Parameter uncertainty is a reason to exercise Wisdom. Suppose your friend sets up a pseudo-casino in the playground of the neighborhood school. She's offering everyone the opportunity to play probability games and bet money. The first game is simple: coin tosses. If the coin lands on heads, you get five dollars. If it lands on tails, you pay three dollars.
-
-You have a sneaking suspicion that the coin isn't fair and you ask your friend to flip it 10 times to test your theory. However, you must not be overconfident. 10 observations might be too few to judge the fairness of the coin. Perhaps your friend secretly switches coins when it comes time for the actual betting and your sample in the initial simulation is not representative. You might be nervous about losing your money and even miscount the number of heads and tails. These are all examples of *parameter uncertainty*. Sometimes, a model has the correct form, but it's not practical to run the simulation millions of times to be certain of the outcome. It's not possible to be absolutely certain that your friend isn't switching coins. A perfect world does not exist, so we must have reservations when drawing likely conclusions.
-
-We need to be aware that sometimes it is not possible to capture all the variables we care about. However, as long as we are prudent, we can still interpret the data.
 
 ### Justice
 
@@ -875,44 +888,16 @@ We need to be aware that sometimes it is not possible to capture all the variabl
 knitr::include_graphics("other/images/Justice.jpg")
 ```
 
-Justice in data science is all about making sure that are models are as "fair" and unbiased as possible. Model structure is one of the most important ideas under the theme of Justice.
 
-In the section about N models, we talked about the number of heads we would get from flipping a coin 20 times. One of the important parts of model structure is compressing ideas like the coin toss experiment into mathematical expressions.
-
-For instance, a Bernouli distribution is where $n = 1$. In the following expression, we are assuming the default value of n = 1, where we flip a coin one time. H represents the observation (i.e. is the result heads of tails). The tilda tells us we are making observations from an experiment. The B() represents a binomial distribution because the result of the experiment is either 0 or 1, tails or heads. $p$ in the expression represents the probability of heads.
-
-$$ H \sim B(p) $$
-The following is a slightly more comprehensive expression, which takes different values of n into account. We might flip the coin 1 time, 2 times, etc.
-
-$$ H \sim B(p, n)$$
-
-This is the experiment we simulated in the section about N models. We flipped a coin 20 times and observed the number of heads we got. We worked with different values of $p$ to create the scatterplot and 3D visualization earlier in this chapter.
-
-$$ H \sim B(p, n = 20)$$
-Another question to consider is whether the models we generate while calculating probabilities are predictive or causal. Knowing the difference helps us fairly interpret the data. Every model is predictive in the sense that, if you give me new data drawn from a stable distribution, I can give you a predictive forecast. But only a subset of those models are causal, meaning that, for a given individual, you can change the value of one input and figure out what the new output would be and then, from that, calculate the causal effect.
-
-For the purposes of this chapter, everything we worked with was predictive. We did not attempt to make causal claims. If we wanted to make a causal claim, we would need to feature at least two different ways of doing an experiment. For instance, we could look at how the way in which you flip a coin affects the outcome. We could compare the number of heads we get from catching a coin in the air versus letting it fall to the ground. An important part of Justice is understanding the distinction between predictive and causal models.
 
 ### Courage
 
 ```{r, echo = FALSE, fig.cap = "Courage."}
 knitr::include_graphics("other/images/Courage.jpg")
 ```
-Data science involves words, math, and code. Code is the most important element. Turning an idea into code requires *Courage*.
 
-Courage helps us account for unmodeled variation. Recall the following equation.
+Data science involves words, math, and code, but the most important of these is code. Turning an idea into code requires *Courage*.
 
-$$outcome = model + what\ is\ not\ in\ the\ model$$
-
-A residual is the variation that is not contained in the model. This is explains why the result is equal to the fitted (also known as expected) value plus the residual (what is not in the model). However, no matter how nuanced our model becomes, we will not be able to make perfect predictions. Some randomness is intrinsic. For instance, the behavior of one individual can change and can't be perfectly predicted even if a model accounts for what a group does on average.
-
-```{r, echo = FALSE, fig.cap = 'Bruno de Finetti, an Italian statistician who wrote a famous treatise on the theory of probability that began with the statement "PROBABILITY DOES NOT EXIST." This is because probability only exists subjectively in our minds. It is a tool people made up and use for broad-stroke estimates.'}
-
-knitr::include_graphics("05-probability/images/de_finetti.jpg")
-
-```
-
-*Prediction uncertainty* highlights our ability, or lack thereof, to predict the future. This can be conceptualized as either an attempt to forecast the literal future or as an attempt to model data points which have been left out of the original analysis in some way. Prediction uncertainty has two primary sources that we previously discussed: *parameter uncertainty* and *unmodeled variation*.
 
 
 
@@ -922,15 +907,16 @@ knitr::include_graphics("05-probability/images/de_finetti.jpg")
 knitr::include_graphics("other/images/Temperance.jpg")
 ```
 
-Models are often not as good as they appear. It's important to be patient and understand the pitfalls of the data you have created.
+
+
+Your models are never as good as your code would suggest.
 
 ```{r, echo = FALSE, fig.cap = "Donald Rumsfeld."}
 knitr::include_graphics("05-probability/images/donald_rumsfeld.jpg")
 ```
 
-Donald Rumsfeld, the former US Secretary of Defense, once said the following tongue-twisting quote:
 
-  "There are known knowns. There are things we know we know. We also know there are known unknowns. That is to say, we know there are some things we do not know. But there are also unknown unknowns, the ones we do not know we do not know."
+> There are known knowns. There are things we know we know. We also know there are known unknowns. That is to say, we know there are some things we do not know. But there are also unknown unknowns, the ones we do not know we do not know. -- Donald Rumsfeld
   
 ```{r, echo = FALSE, fig.cap = "Three Card Monte."}
 knitr::include_graphics("05-probability/images/Three_Card_Monte.jpg")
