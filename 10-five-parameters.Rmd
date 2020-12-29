@@ -325,7 +325,6 @@ print(fit_gov_1_centered, detail = FALSE)
 
 <!-- DK: If we are doing centering, then we ought to do it correctly, by showing side-by-side scatterplots with fitted lines, the better to show that we have just slid things over. -->
 
-<!-- DK: Fix -->
 
 We can see that the intercept has decreased while the slope has stayed the same. When we interpret this model, we only have to change the definition of the intercept. Rather than the intercept representing the remaining years of a candidate who was alive for zero years before running for governor, it now represents the post-election lifespan of a gubernatorial candidate who was alive for the mean number of years before running. If a candidate was alive for about `r round(mean(ch9$election_age), 0)` years before running for governor, they are expected to live for about `r round(coef(fit_gov_1_centered)["(Intercept)"], 0)` years after the election, on average. 
 
@@ -435,16 +434,16 @@ We are going to transition to working with a model that has more than one explan
 
 Here is the math we will be using: 
 
-$$ lived\_after_i =  \beta_0 + \beta_1 male_i + \beta_2 election\_age_i + \epsilon_i $$
+$$ lived\_after_i =  \beta_0 + \beta_1 male_i + \beta_2 election\_age\_c_i + \epsilon_i $$
 
-* The outcome variable is $lived\_after_i$, the number of years a person is alive after the election. $male_i$ is one of our explanatory variables. If we are predicting the number of years a male candidate lives after the election, this value will be 1. When we are making this prediction for female candidates, this value will be 0. $election\_age_i$ is our other explanatory variable. It is the number of years a candidate has lived before the election. 
+* The outcome variable is $lived\_after_i$, the number of years a person is alive after the election. $male_i$ is one of our explanatory variables. If we are predicting the number of years a male candidate lives after the election, this value will be 1. When we are making this prediction for female candidates, this value will be 0. $election\_age\_c_i$ is our other explanatory variable. It is the number of years a candidate has lived before the election. 
 
 
-* $\beta_0$ is the average number of years lived after the election for women, who on the day of election, have been alive the average number of years of all candidates (i.e. both male and female). $\beta_0$ is also the intercept of the equation. In other words, $\beta_0$ is the expected value of $lived\_after_i$, if $male_i = 0$ and $election\_age_i = 0$. 
+* $\beta_0$ is the average number of years lived after the election for women, who on the day of election, have been alive the average number of years of all candidates (i.e. both male and female). $\beta_0$ is also the intercept of the equation. In other words, $\beta_0$ is the expected value of $lived\_after_i$, if $male_i = 0$ and $election\_age\_c_i = 0$. 
 
 * $\beta_1$ is almost meaningless by itself. The only time it has meaning is when its value is connected to our intercept (i.e. $\beta_0 + \beta_1$). When the two are added together, you get the average number of years lived after the election for men, who on the day of election, have been alive the average number of years for all candidates.
 
-* $\beta_2$ is, for the entire population, the average difference in $lived\_after_i$ between two individuals, one of whom has an $election\_age_i$ value of 1 greater than the other. 
+* $\beta_2$ is, for the entire population, the average difference in $lived\_after_i$ between two individuals, one of whom has an $election\_age\_c_i$ value of 1 greater than the other. 
 
 
 
@@ -470,7 +469,7 @@ Looking at our results, you can see that our intercept value is around `r round(
 Note that `sexMale` is around `r round(coef(fit_gov_3)["sexMale"], 0)`. This is our coefficient, $\beta_1$. We need to connect this value to our intercept value to get something meaningful. Using the formula $\beta_0 + \beta_1$, we find out that the number of years the average male candidate ---  who, on the day of election, is the average age of all candidates --- would live is around `r round(coef(fit_gov_3)["(Intercept)"] + coef(fit_gov_3)["sexMale"], 0)` years.  
 
 
-Now take a look at the coefficient for $election\_age_i$, $\beta_2$. The median of the posterior, `r round(coef(fit_gov_3)["election_age_c"], 1)`, represents the slope of the model. When comparing two candates who differ by one year in `election_age_c`, we expect that they will differ by `r round(coef(fit_gov_3)["election_age_c"], 1)` years in `lived_after`. It makes sense that this value is negative. Think about it: the more years a candidate has lived, the fewer years the candidate has left to live. So, for every extra year a candidate is alive before an election, their lifespan after the election will be `r abs(round(coef(fit_gov_3)["election_age_c"], 1))` years lower, on average.
+Now take a look at the coefficient for $election\_age\_c_i$, $\beta_2$. The median of the posterior, `r round(coef(fit_gov_3)["election_age_c"], 1)`, represents the slope of the model. When comparing two candates who differ by one year in `election_age_c`, we expect that they will differ by `r round(coef(fit_gov_3)["election_age_c"], 1)` years in `lived_after`. It makes sense that this value is negative. Think about it: the more years a candidate has lived, the fewer years the candidate has left to live. So, for every extra year a candidate is alive before an election, their lifespan after the election will be `r abs(round(coef(fit_gov_3)["election_age_c"], 1))` years lower, on average.
 
 
 Let’s now look at some posteriors.
@@ -503,7 +502,7 @@ fit_gov_3 %>%
 The graph above displays the posterior probability distributions for $\beta_0$ and for $\beta_0 + \beta_1 $. The two distributions are fairly different; the distribution for females is more spread out than that for males. There were a greater number of men than women in the data. The more data we have, the more precise we can be.
 
 
-Let's now take a look at a posterior distribution for $\beta_2$, the coefficient of $election\_age_i$. 
+Let's now take a look at a posterior distribution for $\beta_2$, the coefficient of $election\_age\_c_i$. 
 
 ```{r fit_gov3-p1, exercise = TRUE}
 fit_gov_3 %>% 
@@ -542,18 +541,18 @@ Let's create another model. This time, however, the numeric outcome variable of 
 
 Math:
 
-$$ lived\_after_i =  \beta_0 + \beta_1 male_i + \beta_2 election\_age_i + \\ \beta_3 male_i *  election\_age_i + \epsilon_i$$
+$$ lived\_after_i =  \beta_0 + \beta_1 male_i + \beta_2 election\_age\_c_i + \\ \beta_3 male_i *  election\_age\_c_i + \epsilon_i$$
 <!-- DK: Need to make these interpretations clearer and more consistent across the examples. -->
 
 * Our outcome variable is still $lived\_after_i$. We want to know how many years a candidate will live after an election. 
 
-* $male_i$ is still one of our explanatory variables. If we are predicting the amount of years a male candidate lives after the election, this will be 1. When we are making this prediction for female candidate, this will be 0. $election\_age_i$ is still our other explanatory variable, representing the number of years a candidate has lived before the election, relative to the average value for all candidates. 
+* $male_i$ is still one of our explanatory variables. If we are predicting the amount of years a male candidate lives after the election, this will be 1. When we are making this prediction for female candidate, this will be 0. $election\_age\_c_i$ is still our other explanatory variable, representing the number of years a candidate has lived before the election, relative to the average value for all candidates. 
 
 * $\beta_0$ is the average number of years lived after the election for women, who on the day of election, have been alive the average number of years of all candidates. In a sense, this is the same meaning as in the previous model, without an interaction term. But, always remember that the meaning of a parameter is conditional on the model in which it is embedded. Even if a parameter is called $\beta_0$ in two different regressions does necessitate that it means the same thing in both regressions. Parameter names are arbitrary, or at least simply a matter of convention.
 
 * $\beta_1$ does not have a simple interpretation as a stand-alone parameter. It is a measure of how different women are from men. However, $\beta_0 + \beta_1$ has a straightforward meaning exactly analogous to the meaning of $\beta_0$. The sum  is the average number of years lived after the election for *men*, who on the day of election, have been alive the average number of years of all candidates.
 
-* $\beta_2$ is the coefficient of $election\_age_i$. It it just the slope for women. It is the average difference in $lived\_after_i$ between two women, one of whom has an $election\_age_i$ value of 1 greater than the other. In our last example,  $\beta_2$ was the slope for the whole population. Now we are different slopes for different genders. 
+* $\beta_2$ is the coefficient of $election\_age\_c_i$. It it just the slope for women. It is the average difference in $lived\_after_i$ between two women, one of whom has an $election\_age\_c_i$ value of 1 greater than the other. In our last example,  $\beta_2$ was the slope for the whole population. Now we are different slopes for different genders. 
 
 * $\beta_3$ alone is difficult to interpret. However, when it is added to $\beta_2$, the result in the slope for men.
 
@@ -574,11 +573,11 @@ print(fit_gov_4, detail = FALSE)
 
 <!-- DK: Fix -->
 
-The intercept has increased. $\beta_0$ is around `r round(coef(fit_gov_4)["(Intercept)"], 0)`. This is the intercept for females. It still means the average number of years lived after the election for women is `r round(coef(fit_gov_4)["(Intercept)"], 0)` or so. Our `sexMale` coefficient, $\beta_1$, refers to the value that must be added to the intercept in order to get the average for males. When calculated, the result is `r round(coef(fit_gov_4)["(Intercept)"] + coef(fit_gov_4)["sexMale"], 0)`. Keep in mind, however, that these values only apply if $election\_age_i = 0$, if, that is, candidate $i$ is around 52 years old. 
+The intercept has increased. $\beta_0$ is around `r round(coef(fit_gov_4)["(Intercept)"], 0)`. This is the intercept for females. It still means the average number of years lived after the election for women is `r round(coef(fit_gov_4)["(Intercept)"], 0)` or so. Our `sexMale` coefficient, $\beta_1$, refers to the value that must be added to the intercept in order to get the average for males. When calculated, the result is `r round(coef(fit_gov_4)["(Intercept)"] + coef(fit_gov_4)["sexMale"], 0)`. Keep in mind, however, that these values only apply if $election\_age\_c_i = 0$, if, that is, candidate $i$ is around 52 years old. 
 
-The coefficient for $election\_age_i$, $\beta_2$, is `r round(coef(fit_gov_4)["election_age_c"], 1)`. What does this mean? It is the slope for females. So, when comparing two female candidates who differ by one year in age, we expect that the older candidate will live `r abs(round(coef(fit_gov_4)["election_age_c"], 1))` years less. Now direct your attention below at the coefficient of `sexMale:election_age_c`, $\beta_3$, which is `r round(coef(fit_gov_4)["sexMale:election_age_c"], 1)`. This is the value that must be added to the coefficient of $election\_age_i$ (recall $\beta_2 + \beta_3$) in order to find the slope for males. When the two are added together, this value, or slope, is about `r round(coef(fit_gov_4)["election_age_c"] + coef(fit_gov_4)["sexMale:election_age_c"], 1)`. When comparing two male candidates who differ in age by one year, we expect the older candidate to live about `r abs(round(coef(fit_gov_4)["election_age_c"] + coef(fit_gov_4)["sexMale:election_age_c"], 1))` years less. 
+The coefficient for $election\_age\_c_i$, $\beta_2$, is `r round(coef(fit_gov_4)["election_age_c"], 1)`. What does this mean? It is the slope for females. So, when comparing two female candidates who differ by one year in age, we expect that the older candidate will live `r abs(round(coef(fit_gov_4)["election_age_c"], 1))` years less. Now direct your attention below at the coefficient of `sexMale:election_age_c`, $\beta_3$, which is `r round(coef(fit_gov_4)["sexMale:election_age_c"], 1)`. This is the value that must be added to the coefficient of $election\_age\_c_i$ (recall $\beta_2 + \beta_3$) in order to find the slope for males. When the two are added together, this value, or slope, is about `r round(coef(fit_gov_4)["election_age_c"] + coef(fit_gov_4)["sexMale:election_age_c"], 1)`. When comparing two male candidates who differ in age by one year, we expect the older candidate to live about `r abs(round(coef(fit_gov_4)["election_age_c"] + coef(fit_gov_4)["sexMale:election_age_c"], 1))` years less. 
 
-*Key point*: The interpretation of the intercepts only apply to candidates for whom $election\_age_i = 0$. Candidates who are not 52 years-old will have different expected number of years to live. The interpretation of the slope applies to everyone. In other words, the relationship between $lived\_after_i$ and $election\_age_i$ is the same, regardless of your gender or how old you are.
+*Key point*: The interpretation of the intercepts only apply to candidates for whom $election\_age\_c_i = 0$. Candidates who are not 52 years-old will have different expected number of years to live. The interpretation of the slope applies to everyone. In other words, the relationship between $lived\_after_i$ and $election\_age\_c_i$ is the same, regardless of your gender or how old you are.
 
 
 The posterior:
@@ -647,10 +646,10 @@ Attentive readers will have noticed that the meaning of $\beta_0$ is identical f
 
 Recall the math:
 
-$$ lived\_after_i =  \beta_0 + \beta_1 male_i + \beta_2 election\_age_i + \epsilon_i $$
+$$ lived\_after_i =  \beta_0 + \beta_1 male_i + \beta_2 election\_age\_c_i + \epsilon_i $$
 
-$$ lived\_after_i =  \beta_0 + \beta_1 male_i + \beta_2 election\_age_i + \\ \beta_3 male_i *  election\_age_i + \epsilon_i$$
-In both cases, $\beta_0$ has the same meaning. It is the average number of years lived after the election for women, who on the day of election, have been alive the average number of years of all candidates. Plug in 0 for $male_i$ and 0 for $election\_age_i$ and both equations simplify to:
+$$ lived\_after_i =  \beta_0 + \beta_1 male_i + \beta_2 election\_age\_c_i + \\ \beta_3 male_i *  election\_age\_c_i + \epsilon_i$$
+In both cases, $\beta_0$ has the same meaning. It is the average number of years lived after the election for women, who on the day of election, have been alive the average number of years of all candidates. Plug in 0 for $male_i$ and 0 for $election\_age\_c_i$ and both equations simplify to:
 
 $$ lived\_after_i =  \beta_0 + \epsilon_i $$
 So far, so good. But, despite the fact that we are using the same data, the posterior probability distributions for $\beta_0$ are meaningfully different between the two models:
