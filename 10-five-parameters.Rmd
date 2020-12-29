@@ -684,7 +684,7 @@ bind_cols(m_3, m_4) %>%
     theme_classic()
 ```
 
-There is enough overlap between the two distributions that they aren't completely incompatible. If, in truth, $\beta_0 = 7000$, neither posterior distribution is "wrong."
+There is enough overlap between the two distributions that they aren't completely incompatible. If, in truth, $\beta_0 = 20$, neither posterior distribution is "wrong."
 
 The meaning of any parameter, including $\beta_0$, is conditional on two assumptions: the population for which we seek to make inferences and the structure of the model. In this case, we assume that the population of interest is the same. But the models are different, albeit only by one interaction term. But that is enough of a difference to make $\beta_0$ in the first model a different "thing" that $\beta_0$ in the second model, even if one "interpretation" of what they mean is the same.
 
@@ -692,9 +692,9 @@ The trick is that an individual interpretation of the meaning of a parameter jus
 
 Consider a different question: What is the expected value for male candidates who are 1 year older than average:
 
-* Without an interaction term: $\beta_0 + \beta_1 + \beta_2 365$.
+* Without an interaction term: $\beta_0 + \beta_1 + \beta_2 1$.
 
-* With an interaction term: $\beta_0 + \beta_1 + \beta_2 365 + \beta_3 365$. 
+* With an interaction term: $\beta_0 + \beta_1 + \beta_2 1 + \beta_3 1$. 
 
 We shouldn't be surprised that different models generate different formulas for this question. Yet note how $\beta_0$ appears in both. In other words, $\beta_0$ is not *only* the average number of years lived after the election for women, who on the day of election, have been alive the average number of years of all candidates. It is also part of a multitude of other estimates. 
 
@@ -713,139 +713,112 @@ knitr::include_graphics("other/images/Temperance.jpg")
 
 Consider:
 
-* How long will two male political candidates --- one from South Dakota and one from Washington, both 10 years older than the average candidate --- live after the election? How different will their lifespans be?
+* How long will two political candidates --- one male and one female, both 10 years older than the average candidate --- live after the election? How different will their lifespans be?
 
 These questions are, purposely, less precise than the ones we tackled in Chapters \@ref(two-parameters) and \@ref(three-parameters), written more in a conversational style. This is how normal people talk.
 
 However, as data scientists, our job is to bring precision to these questions. There are two commonsense interpretations. First, we could be curious about the *expected values* for these questions. If we averaged the data for a thousand candidates like these, what would the answer be? Second, we could be curious about two specific individuals. How long will they live? *Averages involve questions about parameters. The fates of individuals require predictions.* Those are general claims, violated too often to be firm rules. Yet, they highlight a key point: *expected values are less variable than individual predictions*.
 
-To calculate expected values, use parameters and algebra. To forecast for individuals, use `posterior_predict()`.
+To calculate expected values, use `posterior_epred()`. To forecast for individuals, use `posterior_predict()`.
 
-### Expected Values
+### Expected values
 
-Consider the "on average" interpretation first. The answer begins with the posterior distributions of the parameters in `fit_gov_5`.
+Consider the "on average" interpretation first. The answer begins with the posterior distributions of the parameters in `fit_gov_4`.
 
 <!-- DK: We need to walk through the math. Start with the original formula. Replace the x's with the values for this person. Simplify. Plug in the parameters, which are distributions. This gives us the answer. It goes too fast to just go straight for the code. -->
 
 ```{r}
-fit_gov_5 %>% 
+newobs = tibble(sex = c("Male", "Female"), 
+                 election_age_c = 10)
+
+pe <- posterior_epred(object = fit_gov_4, 
+                      newdata = newobs) %>% 
   as_tibble() %>% 
-  mutate(WA = `(Intercept)` + stateWashington + sexMale + 
-           (`sexMale:election_age_c` + election_age_c) * 10 * 365) %>% 
-  mutate(SD = `(Intercept)` + `stateSouth Dakota` + sexMale + 
-           (`sexMale:election_age_c` + election_age_c) * 10 * 365) %>% 
-  select(WA, SD) %>% 
-  pivot_longer(cols = WA:SD, 
-               names_to = "Parameter",
+  rename("Male" = `1`,
+         "Female" = `2`)
+
+
+pe %>% 
+ pivot_longer(cols = Male:Female, 
+               names_to = "Gender",
                values_to = "years") %>% 
-  ggplot(aes(years, fill = Parameter)) +
+  ggplot(aes(years, fill = Gender)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    alpha = 0.5, 
                    bins = 100, 
                    position = "identity") +
     labs(title = "Posterior Probability Distribution",
-         subtitle = "For 62 years-old male candidates from South Dakota and Washington",
-         x = "Expected Years Lived Post Election",
+         subtitle = "Expected years lived post-election",
+         x = "Years",
          y = "Probability") + 
-    scale_x_continuous(labels = scales::number_format()) +
-    scale_y_continuous(labels = scales::percent_format()) +
+    scale_x_continuous(labels = 
+                         scales::number_format(accuracy = 1)) +
+    scale_y_continuous(labels = 
+                         scales::percent_format(accuracy = 1)) +
     theme_classic()
 ```
 
-Looking at our posterior probability distributions above, we can see that the candidates from Washington are expected to live longer. But how much longer? As in previous chapters, we can manipulate distributions in, more or less, the same way that we manipulate simple numbers. If we want to know the difference between two posterior distributions, we can simply subtract. But before we do, note that, in many ways, looking at the difference is much easier than considering the individual posteriors.
+<!-- DK: Do males live longer than females, even when both of 62? That is surprising! -->
 
-We don't really need to calculate `WA` using all those complex terms. We already know that we are going to subtract `SD` and that both `WA` and `SD` include the `(Intercept)`, `sexMale`, and so on. All those terms in common will cancel out when we subtract. So, we can go directly to `diff` being equal to the difference between `stateWashington` and `stateSouth Dakota`.
+<!-- DK: Need to discuss if we would get the same answer for candidates of ages other than 62. Not sure myself! -->
+
+Looking at our posterior probability distributions above, we can see that male candidates are expected to live longer. But how much longer? As in previous chapters, we can manipulate distributions in, more or less, the same way that we manipulate simple numbers. If we want to know the difference between two posterior distributions, we can simply subtract. 
 
 
 ```{r}
-fit_gov_5 %>% 
+pe <- posterior_epred(object = fit_gov_4, 
+                      newdata = newobs) %>% 
   as_tibble() %>% 
-  mutate(diff = stateWashington - `stateSouth Dakota`) %>% 
-  select(diff) %>% 
+  mutate(diff = `1` - `2`)
+
+
+pe %>% 
   ggplot(aes(diff)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    alpha = 0.5, 
                    bins = 100, 
                    position = "identity") +
     labs(title = "Posterior Probability Distribution",
-         subtitle = "Candidates from Washington live longer than those from South Dakota",
-         x = "Average Additional Years Lived Post Election: WA - SD",
+         subtitle = "Male candidates live longer",
+         x = "Expected Additional Years Lived Post Election",
          y = "Probability") + 
     scale_x_continuous(labels = scales::number_format(accuracy = 1)) +
     scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
     theme_classic()
 ```
 
-<!-- DK: Fix -->
 
-The average value of the difference in years-to-live is almost certainly positive, with the most likely value being around `r round(coef(fit_gov_5)["stateWashington"] - coef(fit_gov_5)["stateSouth Dakota"], 0)` years. Notice that there is essentially zero chance that, on average, South Dakota candidates live longer.
 
-One annoyance of the above approach is that it requires us to do everything "by hand," to recall the mathematical structure of the model, and then to insert the relevant values of the data for the individuals we want to predict. What a bother! Fortunately, **rstanarm** provides the `posterior_epred()` function to make this process simpler.
+The average value of the difference in years-to-live is probably positive, with the most likely value being around `r round(mean(pe$diff), 0)` years. But there still a `r round(sum(pe$diff < 0) / length(pe$diff), 2) * 100`% chance the true value is less than zero, i.e., that we should expect female candidates to live longer.
 
-First, we create a tibble with the desired input for our model. In our case the tibble has a variable named `sex` which contains two observations both with the value "Male". There is a `state` variable with the desired states. There is an `election_age_c` variable set to 10 years.
 
-```{r}
-new_obs <- tibble(sex = c("Male", "Male"),
-                  state = c("South Dakota", "Washington"),
-                  election_age_c = 10)
-```
-
-Second, we pass the fitted model object and this tibble to `posterior_epred()`.
-
-```{r}
-pe <- posterior_epred(fit_gov_5, 
-                      newdata = new_obs) %>%
-  as_tibble() 
-```
-
-The name `pe` stands for **p**osterior **e**xpectation. This is different from the **p**osterior **p**rediction which `posterior_predict()` produces. Transforming the resulting object into a tibble makes later graphing easier. With `pe`, we can now reproduce our last two plots much more easily.
-
-```{r}
-pe %>% 
-  rename(SD = `1`,
-         WA = `2`) %>% 
-  mutate(Difference = WA - SD) %>% 
-  pivot_longer(cols = SD:Difference, 
-               names_to = "Parameter",
-               values_to = "years") %>% 
-  ggplot(aes(years, fill = Parameter)) +
-    geom_histogram(aes(y = after_stat(count/sum(count))),
-                   alpha = 0.5, 
-                   bins = 100, 
-                   position = "identity") +
-    labs(title = "Posterior Probability Distribution",
-         subtitle = "For 62 years-old candidates from South Dakota and Washington",
-         x = "Expected Years Lived Post Election",
-         y = "Probability") + 
-    scale_x_continuous(labels = scales::number_format()) +
-    scale_y_continuous(labels = scales::percent_format()) +
-    theme_classic()
-```
+Instead of using `posterior_epred()`, we could have answered these questions by using the posterior probability distributions for the parameters in the model, along with some simple math. Don't do this! First, you are much more likely to make a mistake. Second, this approach does not generalize well to complex models with scores of parameters and their interactions.
 
 
 
-
-<!-- What an interesting plot! -->
-
-### Individual Predictions
+### Individual predictions
 
 If, instead, we interpret the question as asking for a prediction for a small number of individuals, then we need to use `posterior_predict()`.
 
 
 <!-- DK: Try again to explain what a posterior prediction is. -->
 
-Use `posterior_predict()` to create draws from the posterior probability distribution for our prediction for these cases. `posterior_predict()` takes two arguments: the model for which the simulations should be run, and a tibble indicating the covariate values for the individual(s) we want to predict. In this case, we are using the `fit_gov_5` model and the tibble is the one we just created above. In other words, the inputs for `posterior_predict()` and `posterior_epred()` are identical. 
+Use `posterior_predict()` to create draws from the posterior probability distribution for our prediction for these cases. `posterior_predict()` takes two arguments: the model for which the simulations should be run, and a tibble indicating the covariate values for the individual(s) we want to predict. In this case, we are using the `fit_gov_4` model and the tibble is the one we just created above. In other words, the inputs for `posterior_predict()` and `posterior_epred()` are identical. 
 
 ```{r}
-pp <- posterior_predict(fit_gov_5, 
-                        newdata = new_obs) %>%
+pp <- posterior_predict(object = fit_gov_4, 
+                        newdata = newobs) %>%
   as_tibble() %>% 
-  mutate_all(as.numeric)
-  
-head(pp)
+  mutate_all(as.numeric) %>% 
+  rename("Male" = `1`,
+         "Female" = `2`)
+
+pp  
 ```
 
-The resulting tibble has 2 columns, one for each person. The first column shows the posterior predictions for the candidate from South Dakota. The second column shows the posterior predictions for the candidate from Washington. In both cases, the forecasts depend on the values of all the covariates. That is, we would provide a different forecast if the candidates were female or if they were other ages. 
+The resulting tibble has 2 columns, the first for a male candidate and the second for female candidate. Both columns are draws from the posterior predictive distributions. In both cases, the forecasts depend on the values of all the covariates. That is, we would provide a different forecast if the candidates were younger or older. 
+
+<!-- DK: Already explained mutate_all(as.numeric) in previous chapters. -->
 
 Why do we need the weird `mutate_all(as.numeric)` incantation? The reason is that `posterior_epred()` returns a simple matrix, which is easy to transform into a tibble. `posterior_predict()`, on the other hand, returns a special sort of matrix which is much harder to work with. So, we need a little hackery to make the next steps easier.
 
@@ -854,53 +827,64 @@ Let's look at the posterior predictive distribution for each candidate.
 
 ```{r}
 pp %>% 
-  rename(SD = `1`,
-         WA = `2`) %>% 
-  pivot_longer(cols = SD:WA, 
-               names_to = "State",
+  pivot_longer(cols = Male:Female, 
+               names_to = "Gender",
                values_to = "years") %>% 
-  ggplot(aes(years, fill = State)) +
+  ggplot(aes(years, fill = Gender)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    alpha = 0.5, 
                    bins = 100, 
                    position = "identity") +
     labs(title = "Posterior Predictive Distribution",
-         subtitle = "For 62 years-old male candidates from South Dakota and Washington",
+         subtitle = "For a male and female candidate",
          x = "Years Lived Post Election",
          y = "Probability") + 
     scale_x_continuous(labels = scales::number_format()) +
-    scale_y_continuous(labels = scales::percent_format()) +
+    scale_y_continuous(labels = 
+                         scales::percent_format(accuracy = 1)) +
     theme_classic()
 ```
 
 
 
-There is a big overlap in the predictions for individuals, even though there is almost no overlap in the averages. Random stuff happens to an individual all the time. Random stuff cancels out when you take the average for many individuals. Consider the difference in the posterior predictive distributions for the two individuals.
+There is a big overlap in the predictions for individuals while, at the same time, there is much less overlap in the averages. Random stuff happens to an individual all the time. Random stuff cancels out when you take the average for many individuals. Consider the difference in the posterior predictive distributions for the two individuals.
 
 <!-- DK: Example "Posterior Predictive Distribution" -->
 
 ```{r}
 pp %>% 
-  mutate(diff = `2` - `1`) %>% 
+  mutate(diff = Male - Female) %>% 
   ggplot(aes(diff)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    alpha = 0.5, 
                    bins = 100, 
                    position = "identity") +
     labs(title = "Posterior Predictive Distribution", 
-         subtitle = "How much longer will an individual Washington candidate live?",
+         subtitle = "How much longer will the male candidate live?",
          x = "Years",
          y = "Probability") + 
     scale_x_continuous(labels = scales::number_format()) +
-    scale_y_continuous(labels = scales::percent_format()) +
+    scale_y_continuous(labels = 
+                         scales::percent_format(accuracy = 1)) +
     theme_classic()
 ```
 
 <!-- DK: Fix. Could not figure out how to calculate the 13 years on the fly. Code like this `r round(mean(pp[,2] - pp[,1]), 0)` did not work. Problem is that the pp tibble has variable names 1 and 2, but we can't grab those with pp$`1` because that expression is within the backticks of an inline R code chunk. -->
 
-In words, we would predict that the candidate from Washington would live longer than the South Dakota candidate. By how much? Well, that number is an unknown parameter. By looking at our posterior above, our best estimate is about 13 years. However, it is important to note that it is possible that the male from South Dakota could outlive the Washington male. In fact, there is a 1 in 5 chance that he does so.
+In words, we would predict that the male candidate would live longer than the female candidate. By how much? Well, that number is an unknown parameter. By looking at our posterior above, our best estimate is about `r round(pp %>% mutate(diff = Male - Female) %>% pull(diff) %>% mean(), 1)` years. However, it is quite possible that, for any given male/female candidates, the female will live longer.
 
-*Note what is the same and what is different when we move from a question about averages to a question about individuals.* In both cases, the most likely value is about the same. That is, the average behavior is the same as our expected value for any given individual. But the uncertainty is much greater for an individual prediction. The chance of the true average for Washington candidates being less than that for South Dakota candidates is essentially zero. Yet, for any individual pair of candidates, it would not even be slightly surprising for the South Dakota candidate to outlive the Washington candidate. Individuals vary. Averages never tell the whole story.
+
+```{r}
+pp %>% 
+  mutate(diff = Male - Female) %>% 
+  summarize(f_live_longer = sum(diff < 0),
+            total = n(),
+            f_live_longer / total)
+```
+In fact, there is a 4 in 10 chance that the female candidate lives longer.
+
+
+*Note what is the same and what is different when we move from a question about averages to a question about individuals.* In both cases, the most likely value is about the same. That is, the average behavior is the same as our expected value for any given individual. But the uncertainty is much greater for an individual prediction. The chance of the true average for male candidates being less than that for female candidates is low. Yet, for any individual pair of candidates, it would not even be slightly surprising for the female candidate to outlive the male candidate. Individuals vary. Averages never tell the whole story.
 
 ### Expectation versus individual variation
 
@@ -908,41 +892,41 @@ Let's compare the results from `posterior_epred()` and `posterior_predict()` for
 
 
 ```{r}
-new_obs <- tibble(sex = c("Male", "Male"),
-                  state = c("South Dakota", "Washington"),
-                  election_age_c = 10 * 365)
+newobs <- tibble(sex = c("Male", "Female"),
+                  election_age_c = 10)
 
-pe <- posterior_epred(fit_gov_5, 
-                      newdata = new_obs) %>%
+pe <- posterior_epred(fit_gov_4, 
+                      newdata = newobs) %>%
   as_tibble() %>% 
-  mutate(diff = `2` - `1`)
+  mutate(diff = `1` - `2`)
 
-pp <- posterior_predict(fit_gov_5, 
-                        newdata = new_obs) %>% 
+pp <- posterior_predict(fit_gov_4, 
+                        newdata = newobs) %>% 
   as_tibble() %>% 
   mutate_all(as.numeric) %>% 
-  mutate(diff = `2` - `1`)
+  mutate(diff = `1` - `2`)
 
 tibble(Expectation = pe$diff,
        Prediction = pp$diff) %>% 
   pivot_longer(cols = Expectation:Prediction, 
-               names_to = "State",
+               names_to = "Type",
                values_to = "years") %>% 
-  ggplot(aes(years, fill = State)) +
+  ggplot(aes(years, fill = Type)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    alpha = 0.5, 
                    bins = 100, 
                    position = "identity") +
     labs(title = "Posterior Probability Distributions",
-         subtitle = "For 62 years-old male candidates from South Dakota and Washington",
+         subtitle = "For 62 years-old male and female candidates",
          x = "Additional Years Lived Post Election",
          y = "Probability") + 
     scale_x_continuous(labels = scales::number_format()) +
-    scale_y_continuous(labels = scales::percent_format()) +
+    scale_y_continuous(labels = 
+                         scales::percent_format(accuracy = 1)) +
     theme_classic()
 ```
 
-Expected values vary much less than predictions. The above chart makes that easy to see. We can be almost certain that the true underlying average for the numbers of years that Washington candidates live longer than South Dakota candidates is positive. But, for any two individual candidates, there is a good chance that that the South Dakota candidate will live longer. We can not ignore $\epsilon$ when predicting the outcome for individuals. When estimating expected values or long-run averages, the  $\epsilon$'s cancel out. 
+Expected values vary much less than predictions. The above chart makes that easy to see. We are somewhat sure that the true underlying average for the numbers of years that male candidates live post-election is more than female candidates. But, for any two individual candidates, there is a good chance that that the female candidate will live longer. We can not ignore $\epsilon$ when predicting the outcome for individuals. When estimating expected values or long-run averages, the  $\epsilon$'s cancel out. 
 
 <!-- DK: Discuss the substantive issue? How can it be that Washington candidates live longer? Also, compare these estimates to what naive lm() would tell us. -->
 
