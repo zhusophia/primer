@@ -873,6 +873,8 @@ As you may have noticed, if you calculated the value using the first method, you
 
 The four [Cardinal Virtues](https://en.wikipedia.org/wiki/Cardinal_virtues) are Wisdom, Justice, Courage, and Temperance. Because data science is, ultimately, a moral act, we use these virtues to guide our work. 
 
+<!-- DK: Not bad, but should be rewritten and tightened up. Delete the themes.Rmd when you are done. If it is worth remembering, it is worth including here. -->
+
 ### Wisdom
 
 
@@ -880,7 +882,7 @@ The four [Cardinal Virtues](https://en.wikipedia.org/wiki/Cardinal_virtues) are 
 knitr::include_graphics("other/images/Wisdom.jpg")
 ```
 
-Wisdom encompasses four issues: data, the map from problem/concept to data (validity), the population and ethics.
+Wisdom encompasses four topics: data, validity, , the population and ethics.
 
 First, we look at the data and perform an exploratory data analysis, an EDA. You can never look at your data too much.
 
@@ -892,7 +894,9 @@ Second, confirm that the data we have accurately capturing the concepts we care 
 
 > A sample that is representative of all mothers and children may not be the most appropriate for making inferences about mothers and children who participate in the Temporary Assistance for Needy Families program. ... Similarly, results regarding diet and exercise obtained from a study performed on patients at risk for heart disease may not be generally applicable to generally healthy individuals. 
 
-Third, a key concept is the "population", which is largely equivalent to rows of the ideal Preceptor Table, as discussed in Chapter \@ref(rubin-causal-model). @roas writes:
+We want there to be a connection between the problem we face and the data we have. But desire is a poor replacement for substance. If the data we have is not relevant, then data science is useless.
+
+Third, a key concept is the "population," which is largely equivalent to the rows of the ideal Preceptor Table, as discussed in Chapter \@ref(rubin-causal-model). @roas writes:
 
 <!-- DK: This is not bad, but needs to be re-written. -->
 
@@ -902,6 +906,8 @@ Third, a key concept is the "population", which is largely equivalent to rows of
 
 > Representativeness is a concern even with data that would not conventionally be considered as a sample. For example, the forecasting model in Section 7.1 contains data from 16 consecutive elections, and these are not a sample from anything, but one purpose of the model is to predict future elections. Using the regression fit to past data to predict the next election is mathematically equivalent to considering the observed data and the new outcome as a random sample from a hypothetical superpopulation. Or, to be more precise, it is like treating the errors as a random sample from the normal error distribution. For another example, if a regression model is fit to data from the 50 states, we are not interested in making predictions for a hypothetical 51st state, but you may well be interested in the hypothetical outcome in the 50 states in a future year. As long as some generalization is involved, ideas of statistical sampling arise, and we need to think about representativeness of the sample to the implicit or explicit population about which inferences will be drawn. This is related to the idea of generative modeling, as discussed in Section 4.1.
 
+Validity is about the columns in our tibble. Representativeness is about the rows.
+
 Fourth, even if we can make a model, we should always ask ourselves: Should we? Ethics matter.
 
 
@@ -910,6 +916,67 @@ Fourth, even if we can make a model, we should always ask ourselves: Should we? 
 ```{r, echo = FALSE, fig.cap = "Justice."}
 knitr::include_graphics("other/images/Justice.jpg")
 ```
+
+There are three key aspects of *Justice*: the Preceptor Table, predictive versus causal models, and mathematical formula.
+
+
+#### Preceptor Table
+
+<!-- DK: Could have more here. -->
+
+Precision matters. What do you know and what do you want to know? Creating a Preceptor Table forces you to be clear about what you are trying to accomplish and the problems you will face along the way.
+
+**A Preceptor Table is a table with rows and columns for all the data that we have and would (reasonably) like to have.** If we had a Preceptor Table with no questions marks --- which we describe below as the ideal Preceptor Table --- we could calculate the number we want without the need for any inference.
+
+First, the infinite Preceptor Table is well described in Chapter \@ref(rubin-causal-model). We never use these, but it useful to understand them, and the assumptions we must make to work with something simpler. 
+
+Second, the ideal Preceptor Table is the Preceptor Table with no question marks, and with a reasonable number of rows and columns. Conceptually, this is the heart of the analysis. 
+
+Third, the actual Preceptor Table is the Preceptor Table with all the annoying question marks which the real world saddles us with. 
+
+The central problem in inference is to fill in the question marks on the actual Preceptor Table.
+
+Note that the concept of a Preceptor Table is more subtle than it at first appears. For example, consider a problem in which we are using `party` to predict `income` with the `trains` data. Naively, it might look like we don't have any question marks. For all 115 rows in the data, we have `party` and `income`. But the Preceptor Table we really need has more than 115 rows because we are trying to draw inferences about people not in the sample of 115. What if a new person shows up, tells us their party, and asks us to guess their income? The ideal Preceptor Table would include their row, with the data for `party` present but the data for `income` a question mark.
+
+#### Predictive versus causal models
+
+Are we are modeling (just) for prediction or are we (also) modeling for causation? Predictive models care nothing about causation. Causal models are often also concerned with prediction, if only as a means of measuring the quality of the model. 
+
+Every model is predictive, in the sense that, if we give you new data --- and it is drawn from a stable distribution --- then you can create a predictive forecast. But only a subset of those models are causal, meaning that, for a given individual, you can change the value of one input and figure out what the new output would be and then, from that, calculate the causal effect.
+
+With prediction, all we care about is forecasting Y given X on some as-yet-unseen data --- implying that the Preceptor Table has rows in which we know all the X but not the Y. But there is no notion of "manipulation" in such models. We don't pretend that, for Joe, we could turn variable X from a value of 5 to a value of 30 by just turning some knob and, by doing so, cause Joe's value of Y to change from 17 to 23. We can compare two people (or two groups of people), one with X equal to 5 and one with X equal to 30, and see how they differ in Y. The basic assumption of predictive models is that there is only one possible Y for Joe. There are not, by assumption, two possible values for Y, one if X equal 5 and another if X equals 30. The Preceptor Table has a single column under Y.
+
+With causal inference, however, we can consider the case of Joe with $X = 5$ and Joe with $X = 30$. The same mathematical model can be used. And both models can be used for prediction, for estimating what the value of Y will be for a yet-unseen observation with values X. But, in this case, instead of only a single column in the Preceptor Table for Y, we have at least two (and possibly many) such columns, one for each of the potential outcomes under consideration.
+
+*The difference between prediction models and causal models is that the former have one column for Y and the latter have more than one.* 
+
+A related issue is the different types of Preceptor Tables. All of these are Preceptor Tables, but it is useful, I think, to have a clear description of the different types. 
+
+#### Mathematical Model
+
+Second, we need to describe the math of the model, but in the simplest possible way, similar to how [ModernDive](https://davidkane9.github.io/PPBDS/regression.html#model1) does it. Here is the approach from the three parameter models in chapter 8. 
+
+$$ y_i = \beta_T x_{i, treated} + \beta_C x_{i, control} + \epsilon_i $$
+
+where $\epsilon_i \sim N(0, \sigma^2)$. $y_i$ is immigration attitude of person $i$. $x_{i, treated}$ is a 0/1 variable which is 1 if $i$ was treated and 0 otherwise. $x_{i, control}$ is a 0/1 variable which is 1 if $i$ was untreated and 0 otherwise. 
+
+$\beta_T$ is the average immigration attitude among the treated.  $\beta_C$ is the average immigration attitude among the control. And that is it! We aren't writing pages and pages of proofs and derivations. We write a single model, which clearly specifies the unknown parameters. Notes:
+
+1) This is a cheat and a simplification! We are Bayesians but we have not specified the full Bayesian machinery. We really need priors on the unknown parameters as well. But that is too complex for an intro class, so we wave our hands and point readers to more advanced books. (We may only do this once, in chapter 7.)
+
+2) Defining $\beta_T$ as the "average immigration attitude among the treated" is a bit of a fudge. If you calculate that by hand and then compare it to what stan_glm() produces, they won't be the same. Instead, the stan_glm() value will be closer to zero. Why? $\beta_T$ is really the "average immigration attitude among everyone who might be treated in the entire population you are considering." It is not just the average for the treated. It is also include the controls in the experiment, the values for immigration attitude which they would have had, had they been treated. In fact, it even includes the values for people in the population which you want to make inferences for but which were not in the experiment at all. Should we go into all those messy details? I don't know! Maybe one time? Maybe in the margin?
+
+3) In this simple case, we are fortunate that the parameter $\beta_T$ has such a (mostly!) simple analog to a real world quantity. Much of the time, parameters are not so easy to interpret. What is the meaning of $\sigma$ after all? In a more complex model, especially with one with interaction terms, we will have to rely on the more traditional this is the amount by which a one unit change in X is associated with a change in Y. We save that complexity for chapters 9 and 10.
+
+
+Recall the big idea. Every outcome is the sum of two parts: the model and what is not in the model:
+
+$$outcome = model + what\ is\ not\ in\ the\ model$$
+
+It doesn't matter what the outcome is. It could be the result of a coin flip, the weight of a person, the GDP of a country. Whatever *outcome* you are considering is always made up of two parts. The first is the model you are creating. The second is all the stuff --- all the blooming and buzzing complexity of the real world --- which is not a part of the model.
+
+This section should always end by noting that we can never know the "true" values of any of our parameters. The best we can do is to calculate a posterior distribution, for each we need some Courage.
+
 
 
 
@@ -950,13 +1017,15 @@ We need patience in order to study and understand the unknown unknowns in our da
 
 ## Summary
 
+<!-- DK: Not a bad summary, but should hit the key points more clearly.  -->
+
 Throughout this chapter, we spent time going through examples of conditional distributions. However, it's worth noting that all probability distributions are conditional on something. Even in the most simple examples, when we were flipping a coin multiple times, we were assuming that the probability of getting heads versus tails did not change between tosses.
 
-We also discussed the difference between empirical, mathematical, and posterior probability distributions. Even though we developed these heuristics to better understand distributions, every time we make a claim about the world, it is based on our beliefs - what we think about the world. We could be wrong. Our beliefs can differ. Two reasonable people can have conflicting beliefs about the fairness of a dice.
+We also discussed the difference between empirical, mathematical, and posterior probability distributions. Even though we developed these heuristics to better understand distributions, every time we make a claim about the world, it is based on our beliefs - what we think about the world. We could be wrong. Our beliefs can differ. Two reasonable people can have conflicting beliefs about the fairness of a die.
 
 It is useful to understand the three types of distributions and the concept of conditional distributions, but almost every probability distribution is conditional and posterior. We can leave out both words in future discussions, as we generally will in this book. They are implicit.
 
-If you are keen to learn more about probability, here is a video featuring Professor Gary King. This is a great way to review some of the concepts we covered in this chapter.
+If you are keen to learn more about probability, here is a video featuring Professor Gary King. This is a great way to review some of the concepts we covered in this chapter, albeit at a higher level of mathematics.
 
 ```{r, echo = FALSE}
 knitr::include_app("https://www.youtube.com/embed/6C7yRBfh2ok")
