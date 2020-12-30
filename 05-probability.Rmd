@@ -871,9 +871,10 @@ As you may have noticed, if you calculated the value using the first method, you
 
 ## Cardinal Virtues
 
-The four [Cardinal Virtues](https://en.wikipedia.org/wiki/Cardinal_virtues) are Wisdom, Justice, Courage, and Temperance. Because data science is, ultimately, a moral act, we use these virtues to guide our work. 
+The four [Cardinal Virtues](https://en.wikipedia.org/wiki/Cardinal_virtues) are Wisdom, Justice, Courage, and Temperance. Because data science is, ultimately, a moral act, we use these virtues to guide our work. *Wisdom* highlights the importance of exploring your data. Given the questions you seek to answer, is the data valid? Is it representative? Is it ethical to proceed? *Justice* focuses on the Preceptor Table and the mathematical structure of the model. The virtue of *Courage* allows us to go from words and math to code, the hardest step in the data science process. *Temperance* guides us in the use of the model we have created to answer the questions we began with. We should be modest in the claims we make, and wary of naive attempts to "test" them.
 
-<!-- DK: Not bad, but should be rewritten and tightened up. Delete the themes.Rmd when you are done. If it is worth remembering, it is worth including here. -->
+
+<!-- DK: THe below Not bad, but should be rewritten and tightened up. Delete the themes.Rmd when you are done. If it is worth remembering, it is worth including here. Highlight these two key connections: validity <==> columns and representativeness <==> rows. -->
 
 ### Wisdom
 
@@ -954,27 +955,23 @@ A related issue is the different types of Preceptor Tables. All of these are Pre
 
 #### Mathematical Model
 
-*Justice* requires (simple) math. Looking ahead, is a model from Chapter \@ref(three-parameters). 
+*Justice* requires (simple) math. Consider a model of coin-tossing:
 
-$$ y_i = \beta_T x_{i, treated} + \beta_C x_{i, control} + \epsilon_i $$
 
-where $\epsilon_i \sim N(0, \sigma^2)$. $y_i$ is immigration attitude of person $i$. $x_{i, treated}$ is a 0/1 variable which is 1 if $i$ was treated and 0 otherwise. $x_{i, control}$ is a 0/1 variable which is 1 if $i$ was untreated and 0 otherwise. 
+$$ T_i  \sim B(p_H, n = 20) $$
+The total number $T$ of Heads in experiment $i$ with 20 flips of a single coin, $T_i$, is distributed as a binomial with $n = 20$ and an unknown probability $p_H$ of the coin coming up Heads. 
+ 
+ Note:
 
-$\beta_T$ is the average immigration attitude among the treated.  $\beta_C$ is the average immigration attitude among the control. And that is it! We aren't writing pages and pages of proofs and derivations. We write a single model, which clearly specifies the unknown parameters. Note:
+* This is a cheat and a simplification! We are Bayesians but we have not specified the full Bayesian machinery. We really need priors on the unknown parameter $p_H$ as well. But that is too complex for an introductory class, so we wave our hands, accept the default sesinvle parameters built into the functions we use and point readers to more advanced books, like @roas. 
 
-* This is a cheat and a simplification! We are Bayesians but we have not specified the full Bayesian machinery. We really need priors on the unknown parameters as well. But that is too complex for an introductory class, so we wave our hands and point readers to more advanced books, like @roas. 
-
-* Defining $\beta_T$ as the "average immigration attitude among the treated" is a bit of a fudge. If you calculate that by hand and then compare it to what stan_glm() produces, they won't be the same. Instead, the stan_glm() value will be closer to zero. Why? $\beta_T$ is really the "average immigration attitude among everyone who might be treated in the entire population you are considering." It is not just the average for the treated. It is also include the controls in the experiment, the values for immigration attitude which they would have had, had they been treated. In fact, it even includes the values for people in the population which you want to make inferences for but which were not in the experiment at all. 
+* Defining $p_H$ as the "the probability that the coin comes up Heads" is a bit of a fudge. If you calculate that by hand and then compare it to what our tools produce, they won't be the same. Instead, the calcualted value will be closer to zero. Why? $p_H$ is really the "long-run percentage of the time the coin comes up Heads." It is not just the percentage from this experiment. 
 
 <!-- DK: too complex for this chapter? -->
 
-* In this simple case, we are fortunate that the parameter $\beta_T$ has such a (mostly!) simple analog to a real world quantity. Much of the time, parameters are not so easy to interpret. What is the meaning of $\sigma$ after all? In a more complex model, especially with one with interaction terms, we focus less on parameters and more on actual predictions.
+* In this simple case, we are fortunate that the parameter $p_H$ has such a (mostly!) simple analog to a real world quantity. Much of the time, parameters are not so easy to interpret. In a more complex model, especially with one with interaction terms, we focus less on parameters and more on actual predictions.
 
-Every outcome is the sum of two parts: the model and what is not in the model:
 
-$$outcome = model + what\ is\ not\ in\ the\ model$$
-
-It doesn't matter what the outcome is. It could be the result of a coin flip, the weight of a person, the GDP of a country. Whatever *outcome* we are considering is always made up of two parts. The first is the model we have created. The second is all the stuff --- all the blooming and buzzing complexity of the real world --- which is not a part of the model.
 
 
 ### Courage
@@ -986,6 +983,15 @@ knitr::include_graphics("other/images/Courage.jpg")
 
 The three languages of data science are words, math and code, and the most important of these is code. We need to explain the structure of our model using all three languages, but we need *Courage* to implement the model in code.
 
+Code allows us to "fit" a model by estimating the values of the unknown parameters, like $p_H$. Sadly, we can never know the true values of these parameters. But, like all good data scientists, we can express our uncertain knowledge in the form of posterior probability distributions. With those distributions, we can compare the actual values of the outcome variable with the  "fitted" or "predicted" results of the model. We can examine the "residuals," the difference between the fitted and actual values.  
+
+Every outcome is the sum of two parts: the model and what is not in the model:
+
+$$outcome = model + what\ is\ not\ in\ the\ model$$
+
+It doesn't matter what the outcome is. It could be the result of a coin flip, the weight of a person, the GDP of a country. Whatever *outcome* we are considering is always made up of two parts. The first is the model we have created. The second is all the stuff --- all the blooming and buzzing complexity of the real world --- which is not a part of the model. 
+
+Some of our uncertainty is driven by our ignorance about $p_H$. But some, often most, of the uncertainty comes from forces that are, by assumption, not in the model. For example, if the coin is fair, we expect $T_i$ to equal 10. But, often, it will be different, even if we are correct and $p_H$ equals exactly 0.5. *Some randomness is intrinsic in this fallen world.* 
 
 
 ### Temperance
@@ -993,6 +999,8 @@ The three languages of data science are words, math and code, and the most impor
 ```{r, echo = FALSE, fig.cap = "Temperance."}
 knitr::include_graphics("other/images/Temperance.jpg")
 ```
+
+There are few more important concepts in statistics and data science than the "Data Generating Mechanism." Our *data* --- the data that we collect and see --- has been *generated* by the complexity and confusion of the world. God's own *mechanism* has brought His data to us. Our job is to build a model of that process, to create, on the computer, a mechanism which generates fake data consistent with the data which we see. With that DGM, we can answer any question which we might have. In particular, with the DGM, we provide predictions of data we have not seen and estimates of the uncertainty associated with those predictions. *Courage* helped us to create the DGM. *Temperance* will guide us in its use.
 
 Having created (and checked) a model, we now use the model to answer questions. Models are made for use, not for beauty. The world confronts us. Make decisions we must. Our decisions will be better ones if we use high quality models to help make them.
 
@@ -1003,6 +1011,9 @@ knitr::include_graphics("05-probability/images/donald_rumsfeld.jpg")
 ```
 
 > There are known knowns. There are things we know we know. We also know there are known unknowns. That is to say, we know there are some things we do not know. But there are also unknown unknowns, the ones we do not know we do not know. -- Donald Rumsfeld
+
+
+What we really care about is data we haven't seen yet, mostly data from tomorrow. But what if the world changes, as it always does? If it doesn't change much, maybe we are OK. If it changes a lot, then what good will our model be? In general, the world changes some. That means that are forecasts are more uncertain that a naive use of our model might suggest. 
   
 ```{r, echo = FALSE, fig.cap = "Three Card Monte."}
 knitr::include_graphics("05-probability/images/Three_Card_Monte.jpg")
@@ -1011,6 +1022,11 @@ knitr::include_graphics("05-probability/images/Three_Card_Monte.jpg")
 What does this mean? Well imagine a crowd playing Three Card Monte in the streets of New York. The guy running the game runs a demo and shows you all the cards to make you confident. They earn money by making you overconfident and persuading you to bet. Your odds may seem good during the demo round, but that doesn't actually say anything about what will likely happen when the real, high stakes game begins. The person running the game does many simulations, making the "victim" forget that they cannot actually make any conclusions about the odds of winning. There are some variables that we simply do not know even if we put a lot of effort into making posterior probability distributions. People can be using slight of hand, for instance.
 
 We need patience in order to study and understand the unknown unknowns in our data. Patience is also important when we analyze the "realism" of our models. When we created the mathematical probability distribution for presidential elections, for instance, we assumed that the Democratic candidate would have a 50% chance of winning each vote in the electoral college. By comparing the mathematical model to our empirical cases, however, we recognize that the mathematical model is unlikely to be true. The mathematical model suggested that getting fewer than 100 votes is next to impossible, but many past Democratic candidates in the empirical distribution received less than 100 electoral votes.
+
+<!-- DK: Could do more here. Show the iterative process of model building, including posterior predictive checks. -->
+
+<!-- Null hypothesis testing is a mistake. There is only the data, the models and the summaries therefrom. Describe an hypothesis test each chapter, and then dismiss it. Play the prediction game. That, perhaps, provides a useful framework for why NHST is stupid. Or, rather, you play the prediction game to figure out which statistical procedures are best --- and or, how well procedure X works --- and then use that information to make a decision. Explain what a test is, and why we think it is a waste of time to do them, and why people do them anyway. Key issue: If p = 0.04 really makes you do something totally different than p = 0.06, then either you (or the system within which you are operating) is stupid. -->
+
 
 ## Summary
 
