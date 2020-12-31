@@ -1,6 +1,6 @@
 # Building Models {#building-models}
 
-In our haste to make progress --- to get all the way through the process of building, interpreting and using models --- we have given shortshrift to some of the messy details of model building. This chapter fills in those lacunae.
+In our haste to make progress --- to get all the way through the process of building, interpreting and using models --- we have given short shrift to some of the messy details of model building and evaluation. This chapter fills in those lacunae.
 
 
 ## Transforming predictor variables
@@ -9,7 +9,11 @@ It is often convenient to transform a predictor variable.
 
 ### Centering
 
-Recall our model of `income` as a function of `age`. We fit this using the `trains` data from **primer.data**.
+Recall our model of `income` as a function of `age`. Mathematics:
+
+$$ y_i = \beta_0  + \beta_1 age_i + \epsilon_i$$
+
+We fit this using the `trains` data from **primer.data**.
 
 ```{r, message = FALSE}
 library(tidyverse)
@@ -27,16 +31,16 @@ fit_1 <- stan_glm(formula = income ~ age,
 print(fit_1, detail = FALSE)
 ```
 
-There is nothing wrong with this model. Yet the interpretation of $\beta_0$, the intercept in the regression, is very awkward. It means the average income for people of age zero. Yet that is useless! There are no people of zero age in our data. And, even if there were, it would be weird to think about such people taking the commuter trade into Boston and filling our survey forms.
+There is nothing wrong with this model. Yet the interpretation of $\beta_0$, the intercept in the regression, is awkward. It means the average income for people of age zero. Yet that is useless! There are no people of zero age in our data. And, even if there were, it would be weird to think about such people taking the commuter trade into Boston and filling out our survey forms.
 
-It is easy, however, to *transform* `age` into a variable which makes the intercept more meaningful. Consider a new variable, `age_c`, which is `age` minus the average age in the sample. Using this **c**entered version of age does not change the predictions or residuals in the model, but it does make the intercept easier to interpret.
+It is easy, however, to *transform* `age` into a variable which makes the intercept more meaningful. Consider a new variable, `c_age`, which is `age` minus the average age in the sample. Using this **c**entered version of age does not change the predictions or residuals in the model, but it does make the intercept easier to interpret.
 
 
 ```{r}
 trains_2 <- trains %>% 
-  mutate(age_c = age - mean(age))
+  mutate(c_age = age - mean(age))
 
-fit_1_c <- stan_glm(formula = income ~ age_c, 
+fit_1_c <- stan_glm(formula = income ~ c_age, 
                     data = trains_2, 
                     refresh = 0,
                     seed = 9)
@@ -44,7 +48,7 @@ fit_1_c <- stan_glm(formula = income ~ age_c,
 print(fit_1_c, detail = FALSE)
 ```
 
-The intercept, `r round(coef(fit_1_c)["(Intercept)"], 0)`, is the expected income for someone with `age_c = 0`, i.e., someone of an average age in the data, which is `r round(mean(trains$age), 0)`. 
+The intercept, `r round(coef(fit_1_c)["(Intercept)"], 0)`, is the expected income for someone with `age_c = 0`, i.e., someone of an average age in the data, which is around `r round(mean(trains$age), 0)`. 
 
 ### Scaling
 
@@ -52,9 +56,9 @@ Centering --- changing a vector via addition/subtraction --- often makes the int
 
 ```{r}
 trains_3 <- trains %>% 
-  mutate(age_s = age / sd(age))
+  mutate(s_age = age / sd(age))
 
-fit_1_s <- stan_glm(formula = income ~ age_s, 
+fit_1_s <- stan_glm(formula = income ~ s_age, 
                     data = trains_3, 
                     refresh = 0,
                     seed = 9)
@@ -62,11 +66,11 @@ fit_1_s <- stan_glm(formula = income ~ age_s,
 print(fit_1_s, detail = FALSE)
 ```
 
-`age_s` is age **s**caled by its own standard deviation. A change in one unit of `age_s` is the same as a change in one standard deviation of the `age`, which is about `r round(sd(trains$age))`. The interpretation of $\beta_1$ is now:
+`s_age` is age **s**caled by its own standard deviation. A change in one unit of `s_age` is the same as a change in one standard deviation of the `age`, which is about `r round(sd(trains$age))`. The interpretation of $\beta_1$ is now:
 
-*When comparing two people, one about `r round(sd(trains$age))` years older than the other, we expect the older person to earn about `r scales::comma(round(coef(fit_1_s)["age_s"], -3))` more.*
+*When comparing two people, one about 1 standard deviation worth of years older than the other, we expect the older person to earn about `r scales::comma(round(coef(fit_1_s)["age_s"], -3))` more.*
 
-But, because we scaled without centering, the intercept is now back the (nonsensical) meaning of the expected income for people of age 0. 
+But, because we scaled without centering, the intercept is now back to the (nonsensical) meaning of the expected income for people of age 0. 
 
 
 ### *z*-scores
@@ -75,9 +79,9 @@ The most common transformation applies both centering and scaling. The base R fu
 
 ```{r}
 trains_4 <- trains %>% 
-  mutate(age_z = scale(age))
+  mutate(z_age = scale(age))
 
-fit_1_z <- stan_glm(formula = income ~ age_z, 
+fit_1_z <- stan_glm(formula = income ~ z_age, 
                     data = trains_4, 
                     refresh = 0,
                     seed = 9)
@@ -91,7 +95,7 @@ The two parameters are easy to interpret after this transformation.
 
 *When comparing two individuals who differ in age by one standard deviation, which is about `r round(sd(trains$age))` in this study, the older person is expected to earn about `r `scales::comma(round(coef(fit_1_z)["age_z"], -3))` more than the younger.*
 
-Note that, when using *z*-scores, we would often phrase this comparison in terms of "sigmas." One person is "one sigma" older than another person means that they are one standard deviation older. This is simple enough, once you get used to it, but also confusing since we already using the word "sigma" to mean $\sigma$, the standard deviation of $\epsilon_i$. Alas, language is something we deal with rather than control. You will hear the same word "sigma" applied to both concepts, even in the same sentence. Determine meaning by context.
+Note that, when using *z*-scores, we would often phrase this comparison in terms of "sigmas." One person is "one sigma" older than another person means that they are one standard deviation older. This is simple enough, once you get used to it, but also confusing since we already using the word "sigma" to mean $\sigma$, the standard deviation of $\epsilon_i$. Alas, *language is something we deal with rather than control.* You will hear the same word "sigma" applied to both concepts, even in the same sentence. Determine meaning by context.
 
 ### Taking logs
 
@@ -103,13 +107,97 @@ Note that, when using *z*-scores, we would often phrase this comparison in terms
 
 ## Transforming the outcome variable
 
-Transforming predictor variables is generally uncontroversial. It does not matter much. Change things to $z$-scores and you won't go far wrong. Or keep them in their original form, and take care with your interpretations. It's all good.
+Transforming predictor variables is generally uncontroversial. It does not matter much. Change most continuous predictor variables to $z$-scores and you won't go far wrong. Or keep them in their original form, and take care with your interpretations. It's all good.
 
 Transforming the outcome variable is a much more difficult question, to which there are few right answers.
 
 
+## Beware overfitting
+
+One of the biggest dangers in data science is *overfitting*, using a model with too many parameters which fits the data we have too well and, therefore, works poorly on data we have yet to see. Consider a simple example with 10 data points.
+
+```{r, echo = FALSE}
+ovrftng <- tibble(x = 1:10,
+                  y = c(1.9, 1.9, 4.9, 2.7, 2.6, 
+                        5.2, 6.8, 8.9, 9.0, 9.9))
+
+ovrftng %>% 
+  ggplot(aes(x, y)) +
+    geom_point() +
+    labs(title = "Create a Model which Predicts `y` Given `x`") +
+    scale_x_continuous(breaks = seq(2, 10, 2)) +
+    scale_y_continuous(breaks = seq(2, 10, 2)) 
+```
+
+What happens when we fit a model with one predictor?
+
+```{r, echo = FALSE}
+one_pred <- lm(y ~ x,
+               data = ovrftng)
+  
+newdata <- tibble(x = seq(1, 10, by = 0.01),
+                  y = predict(one_pred, 
+                              newdata = tibble(x = x)))
+
+ovrftng %>% 
+  ggplot(aes(x, y)) +
+    geom_point() +
+    geom_line(data = newdata, 
+              aes(x, y)) +
+    labs(title = "`y` as a Linear Function of `x`") +
+    scale_x_continuous(breaks = seq(2, 10, 2)) +
+    scale_y_continuous(breaks = seq(2, 10, 2)) 
+    
+
+```
+
+
+
+```{r, echo = FALSE}
+two_pred <- lm(y ~ poly(x, 2),
+               data = ovrftng)
+
+newdata <- tibble(x = seq(1, 10, by = 0.01),
+                  y = predict(two_pred, 
+                              newdata = tibble(x = x)))
+
+ovrftng %>% 
+  ggplot(aes(x, y)) +
+    geom_point() +
+    geom_line(data = newdata, 
+              aes(x, y)) +
+    labs(title = "`y` as a Quadratic Function of `x`") +
+    scale_x_continuous(breaks = seq(2, 10, 2)) +
+    scale_y_continuous(breaks = seq(2, 10, 2)) 
+```
+
+
+```{r}
+nine_pred <- lm(y ~ poly(x, 9),
+                       data = ovrftng)
+
+newdata <- tibble(x = seq(1, 10, by = 0.01),
+                  y = predict(nine_pred, 
+                              newdata = tibble(x = x)))
+
+ovrftng %>% 
+  ggplot(aes(x, y)) +
+    geom_point() +
+    geom_line(data = newdata, 
+              aes(x, y)) +
+    labs(title = "`y` as a 9-Degree Polynomial Function of `x`") +
+    scale_x_continuous(breaks = seq(2, 10, 2)) +
+    scale_y_continuous(breaks = seq(2, 10, 2)) 
+```
+
+
+
+
 
 ## Selecting variables
+
+
+How do we decide which variables to include in a model? There is not
 
 <!-- * Keeping or throwing away variables. How do we decide? If something is big and significant, we always keep it. If it is small and insignificant, we don't, unless our audience really wants to see it. If a mix, reasonable people differ. No right answer! -->
 
@@ -117,6 +205,8 @@ Transforming the outcome variable is a much more difficult question, to which th
 
 
 ## Comparing models
+
+Deciding which variables to include in a model is a subset of the larger question: How do we decide which model, out of the set of possible models, to choose?
 
 <!-- Having diligently followed the advice above, you create a model to explain immigration attitudes among Boston commuters. -->
 
