@@ -64,21 +64,11 @@
 <h1>
 <span class="header-section-number">3</span> Functions<a class="anchor" aria-label="anchor" href="#functions"><i class="fas fa-link"></i></a>
 </h1>
-<!-- Key concept to focus on is the idea of a distribution and draws therefrom. This connects to chapter 2, where we introduced distributions and to chapter 5, where we explain probability distributions. In particular, we should show various ways to measure center and variability. These are cool and important concepts. Is "center" the mean or the median or the trimmed mean or . . . Is "variability" the standard deviation, the mean absolute deviation, the standard deviation of the median absolute deviation or . . . There is nothing explicitly "statistical" here. We are just trying to connect English words to specific formulas. We might show the distributions for which these measures give the same answers and then some (mainly skewed) for which they don't. How to explore these concepts in the context of function writing? Perhaps by writing functions like my_mean() and my_median()? Or maybe focus on a function which calculates MAD SD? Then use list-columns to compare this function to other choices? -->
-<!-- Lesson: If you have a really skewed distribution, then median is a more stable measure than mean, and MAD (median absolute difference -- which means absolute difference from the median) is a more stable measure than standard deviation. Results depends too much on who ended up in the sample, like Bill Gates. -->
-<!-- Related: Teach random draws. We introduce random variables at the end of chapter 2. Do more with them here. For example, with a data set, calculated a mean and sd. Then do 1,000 draws from that. Then, plot the densities of the raw data and the simulated data on top of one another. -->
-<!-- Standard errors, qua standard errors, are a tricky thing to teach. But what if, instead of teaching them as standard errors, we just introduce the formula as a simple way to approximate something which, when multiplied by 2, and then added/subtracted from the mean, gives you a pretty useful 95% confidence interval. Then we could do the same for MAD SD, and show how that works better for skewed variables! Here, "works better" means that, if you do it 1,000 times, it works better on average. No! Too much! -->
-<!-- The main use case is the "Guessing Game." Imagine that you are I are using the kenya data set and the distance, pop_density or rv13 variables. (All of which are quite skewed. We might also experiment with the poverty variable, which is less skewed. But skewed variables make this more interesting.) -->
-<!-- In the Guessing Game, you guess a number and I guess a number. The goal is to get closest to a random draw from all the values of distance (or whatever). We do this 1,000 times. Whoever gets closer more often, wins the Guessing Game.  -->
-<!-- This is a useful exercise for several reasons. First, coding it up is a good practice for writing a function. Indeed, we might re-write the whole chapter to focus on this example. Second, once we have a function, which runs one iteration of the Game --- maybe it takes the data set (or maybe a vector of values?), my guess and your guess, and then returns the winner --- we can use list columns and map_functions to run it a thousand times. This is all more fun and more interesting that stupid max-minus-min functions. -->
-<!-- Third, the Guessing Game gets at key statistical issues. There is a lot of meat there, all things that we will revisit many times. Some things to highlight, many of which can be put into the Guessing Game. -->
-<!-- 1) Guess a formula rather than a number. Presumably, you and I get to see (all of?) the data before playing the game. In the simplest version, we look at the data and give you a number. (The mean and median both do well in this game, obviously.) But, in a more advanced form of the game, we might be allowed to provide a function. The goal of inference is to come up with a function which wins the prediction game.) -->
-<!-- 2) Change the objective function. The simplest form of the Guessing Game just counts each contest separately. A more advanced for would give you a penalty which varies depending on how wrong you are. (This, obviously, is one way to think about minimizing the squared residuals.) This is very fun because there are many different penalty functions, each of which may lead to a different function winning the Guessing Game. -->
-<!-- 3) The chapter climaxes with the following cool result: If you are minimizing the sum (or average) of the squared residuals, guessing the mean wins the Guessing Game. However, if you are minimizing the sum (or average) of the absolute values of the residuals, you should guess the median. -->
-<!-- 4) Another form of the Guessing Game is like a casino. One person (the Casino) gives a 50% confidence interval. The other person gets to pick either inside or outside. Then there is a draw. The Casino wins if the second person can't consistently win. -->
-<!-- Key question: Do we explain standard error here? Could be easy! Calculate the mean. Calculate the sd. Divide and scale by the square root of n. Voila! But, still, I think No. But we should explain everything short of standard error.  -->
-<!-- group_nest() might be a useful function.  -->
-<!-- Might also show how to add lots of plots to a tibble and then pick out the ones that show cool stuff. If you run 1,000 experiments, show the plots of the 5 extreme ones. -->
+<!-- Last exercise: Create a distribution with an very fat tail. Draw a sample 1,000 times. Calculate the mean and the median each time. Overlay a plot of the distribution and of the means and the medians. All the medians will be from the middle of the distribution. They are "informative." All the means will be from the tail, no where near the middle of the distribution. The means will be around the true mean and the medians will be around the true medians. It is just that the true mean is not informative. We could do this by having a distribution with 100,000 observations, from which we draw 4,000 observations, just like the default behavior of stan_glm(). -->
+<!-- Or: Take a real data set, calculated a mean and sd. Then do 1,000 draws from that. Then, plot the densities of the raw data and the simulated data on top of one another. -->
+<!-- Advanced form of the guessing game in which we are allowed to provide a function. The goal of inference is to come up with a function which wins the prediction game. -->
+<!-- This is currently in problem set #3: Change the objective function. The simplest form of the Guessing Game just counts each contest separately. A more advanced for would give you a penalty which varies depending on how wrong you are. (This, obviously, is one way to think about minimizing the squared residuals.) This is very fun because there are many different penalty functions, each of which may lead to a different function winning the Guessing Game. -->
+<!-- Another form of the Guessing Game is like a casino. One person (the Casino) gives a 50% confidence interval. The other person gets to pick either inside or outside. Then there is a draw. The Casino wins if the second person can't consistently win. -->
 <div id="introduction" class="section level2" number="3.1">
 <h2>
 <span class="header-section-number">3.1</span> Introduction<a class="anchor" aria-label="anchor" href="#introduction"><i class="fas fa-link"></i></a>
@@ -93,7 +83,7 @@
 <code class="sourceCode R"><span class="va">rnorm</span></code></pre></div>
 <pre><code>## function (n, mean = 0, sd = 1) 
 ## .Call(C_rnorm, n, mean, sd)
-## &lt;bytecode: 0x7fd3e166de60&gt;
+## &lt;bytecode: 0x7fe51077c228&gt;
 ## &lt;environment: namespace:stats&gt;</code></pre>
 <p>Functions can do all sorts of things. <code><a href="https://rdrr.io/r/base/sample.html">sample()</a></code> takes a vector of values and returns a number of values randonly selected from that vector. You can specify the number of random values with the argument <code>size</code>. This call is the equivalent of rolling a die.</p>
 <div class="sourceCode" id="cb466"><pre class="downlit sourceCode r">
@@ -169,11 +159,13 @@
 <div class="sourceCode" id="cb479"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">x</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></code></pre></div>
 <pre><code>## [1] 3</code></pre>
-<p>Recall the example from Chapter <a href="wrangling.html#wrangling">2</a> that lists are like a pepper jar which contains more pepper packets. Don’t forget the square brackets!</p>
+<!-- BG: I removed the "recall pepper packet analogy" because it no longer exists in Ch. 2 -->
 <p>There are a number of built-in R functions that output lists. For example, the <strong><em>ggplot</em></strong>s you have been making store all of the plot information in lists.</p>
 <p>Any function that returns multiple values can be used to create a list output by wrapping those values with <code><a href="https://rdrr.io/r/base/list.html">list()</a></code>.</p>
 <div class="sourceCode" id="cb481"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>
+
+<span class="co"># range() returns the min and max of the argument </span>
 
 <span class="fu"><a href="https://rdrr.io/r/base/range.html">range</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] -1.3  2.5</code></pre>
@@ -217,6 +209,7 @@
 ##  9 Female   167.
 ## 10 Female   167.
 ## # … with 9,637 more rows</code></pre>
+<!-- BG: Here it says we use list() to wrap quantile(), but map() does that in the code below. Is it supposed to use list() here? -->
 <p>Next, we will create a list-column by wrapping <code><a href="https://rdrr.io/r/stats/quantile.html">quantile()</a></code> with <code><a href="https://rdrr.io/r/base/list.html">list()</a></code>. <code><a href="https://rdrr.io/r/stats/quantile.html">quantile()</a></code> naturally produces a numeric vector of the quantiles of <code>height</code>, and wrapping with <code><a href="https://rdrr.io/r/base/list.html">list()</a></code> will capture this numeric vector as a list.</p>
 <div class="sourceCode" id="cb490"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">tmp</span> <span class="op">&lt;-</span> <span class="va">nhanes</span> <span class="op">%&gt;%</span>
@@ -650,43 +643,6 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-321-1.png" width="100%"></div>
 <p>Empirically, we see than 900 is a much better guess than 800.</p>
 </div>
-<div id="measures-of-the-center-of-a-distribution" class="section level4" number="3.5.0.2">
-<h4>
-<span class="header-section-number">3.5.0.2</span> Measures of the center of a distribution<a class="anchor" aria-label="anchor" href="#measures-of-the-center-of-a-distribution"><i class="fas fa-link"></i></a>
-</h4>
-<p>Let’s play a new game. Pretend that we don’t have access to the entire <code>kenya</code> data set. Instead, someone is going to draw 25 values of <code>rv13</code> at random. Our job is to calculate the <code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code> and <code><a href="https://rdrr.io/r/stats/median.html">median()</a></code> of each of those samples and explore which of the two measures is more “stable.”</p>
-<div class="sourceCode" id="cb545"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">tibble</span><span class="op">(</span>ID <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>samp <span class="op">=</span> <span class="fu">map</span><span class="op">(</span><span class="va">ID</span>, <span class="op">~</span> <span class="fu">no_NA_sampler</span><span class="op">(</span><span class="va">kenya</span>, <span class="va">rv13</span>, <span class="fl">25</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>median_rv13 <span class="op">=</span> <span class="fu">map_dbl</span><span class="op">(</span><span class="va">samp</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html">median</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>mean_rv13 <span class="op">=</span> <span class="fu">map_dbl</span><span class="op">(</span><span class="va">samp</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>         </code></pre></div>
-<pre><code>## # A tibble: 3 x 4
-##      ID samp       median_rv13 mean_rv13
-##   &lt;int&gt; &lt;list&gt;           &lt;dbl&gt;     &lt;dbl&gt;
-## 1     1 &lt;dbl [25]&gt;         626      665.
-## 2     2 &lt;dbl [25]&gt;         483      632.
-## 3     3 &lt;dbl [25]&gt;         438      525.</code></pre>
-<p>As usual with right-skewed distributions, the median is smaller than the mean. Let’s do this 1,000 times and look at the distribution of these estimates.</p>
-<div class="sourceCode" id="cb547"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">tibble</span><span class="op">(</span>ID <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">1000</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>samp <span class="op">=</span> <span class="fu">map</span><span class="op">(</span><span class="va">ID</span>, <span class="op">~</span> <span class="fu">no_NA_sampler</span><span class="op">(</span><span class="va">kenya</span>, <span class="va">rv13</span>, <span class="fl">25</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>median_rv13 <span class="op">=</span> <span class="fu">map_dbl</span><span class="op">(</span><span class="va">samp</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html">median</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>mean_rv13 <span class="op">=</span> <span class="fu">map_dbl</span><span class="op">(</span><span class="va">samp</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu">pivot_longer</span><span class="op">(</span>cols <span class="op">=</span> <span class="va">median_rv13</span><span class="op">:</span><span class="va">mean_rv13</span>,
-               names_to <span class="op">=</span> <span class="st">"measure"</span>,
-               values_to <span class="op">=</span> <span class="st">"estimate"</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span><span class="va">estimate</span>, fill <span class="op">=</span> <span class="va">measure</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu">geom_histogram</span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.5</span>, 
-                   bins <span class="op">=</span> <span class="fl">100</span>, 
-                   position <span class="op">=</span> <span class="st">"identity"</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Distribution of Measures of the Center"</span>,
-         subtitle <span class="op">=</span> <span class="st">"The median is a more stable measure than the mean"</span>,
-         x <span class="op">=</span> <span class="st">"Estimate"</span>,
-         y <span class="op">=</span> <span class="st">"Count"</span><span class="op">)</span> <span class="op">+</span> 
-    <span class="fu">scale_x_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org//reference/label_number.html">number_format</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-323-1.png" width="100%"></div>
-<!-- DK: Not even sure if this shows what we want! But finishing off with a chart like this is probably a good idea. -->
-</div>
 </div>
 <div id="summary-3" class="section level2" number="3.6">
 <h2>
@@ -729,7 +685,6 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
 <li>The median is often a more stable measure of the center than the mean. The mad (scaled median absolute deviation) is often a more stable measure of variation than the standard deviation.</li>
 <li>Outliers cause a lack a stability. In a distribution without outliers, the mean/median and mad/sd are so close in value that it does not matter much which ones you use.</li>
 </ul>
-<!-- DK: We have not (yet?) talked about the stability of mad. We have barely address the stability of the median. Is there room to get into this? Even if not, simply asserting these facts in the Summary is probably a good idea! -->
 </div>
 </div>
 </div>
