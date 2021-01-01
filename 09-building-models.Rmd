@@ -101,6 +101,83 @@ Note that, when using *z*-scores, we would often phrase this comparison in terms
 
 <!-- * taking logs. When? Why? Doing so on dependent variable is a much bigger deal than doing it on independent variables since the former changes he very essence of the model. You can't really (?) compare two different models if one has taken logs of Y and one has not. -->
 
+### Adding transformed terms
+
+Instead of simply transforming variables, we can add more terms which are transformed versions of a variable. Consider the relation of `height` to `age` in `nhanes`. Let's start by dropping the missing values.
+
+```{r}
+no_na_nhanes <- nhanes %>% 
+  select(height, age) %>% 
+  drop_na() 
+```
+
+Fit and plot a simple linear model:
+
+```{r}
+nhanes_1 <- stan_glm(height ~ age,
+                     data = no_na_nhanes,
+                     refresh = 0,
+                     seed = 47)
+
+no_na_nhanes %>% 
+  ggplot(aes(x = age, y = height)) +
+    geom_point(alpha = 0.1) +
+    geom_line(aes(y = predict(nhanes_1)), 
+              color = "red") +
+    labs(title = "Age and Height",
+         subtitle = "Children are shorter, but a linear fit is poor",
+         x = "Age",
+         y = "Height (cm)",
+         caption = "Data source: NHANES")
+```
+
+That is not a very good model, obviously.
+
+Adding a quadratic term makes it better. (Note the need for `I()` in creating the squared term within the `formula` argument.)
+
+
+```{r}
+nhanes_2 <- stan_glm(height ~ age + I(age^2),
+                     data = no_na_nhanes,
+                     refresh = 0,
+                     seed = 33)
+
+no_na_nhanes %>% 
+  ggplot(aes(x = age, y = height)) +
+    geom_point(alpha = 0.1) +
+    geom_line(aes(y = predict(nhanes_2)), 
+              color = "red") +
+    labs(title = "Age and Height",
+         subtitle = "Quadratic fit is much better, but still poor",
+         x = "Age",
+         y = "Height (cm)",
+         caption = "Data source: NHANES")
+```
+
+Still, we have not made use of our background knowledge in creating these variables. We know that people don't get any taller after age 18 or so. Let's create variables which capture that break.
+
+```{r}
+nhanes_3 <- stan_glm(height ~ I(ifelse(age > 18, 18, age)),
+                     data = no_na_nhanes,
+                     refresh = 0,
+                     seed = 23)
+
+no_na_nhanes %>% 
+  ggplot(aes(x = age, y = height)) +
+    geom_point(alpha = 0.1) +
+    geom_line(aes(y = predict(nhanes_2)), 
+              color = "red") +
+    labs(title = "Age and Height",
+         subtitle = "Domain knowledge makes for better models",
+         x = "Age",
+         y = "Height (cm)",
+         caption = "Data source: NHANES")
+```
+
+The point is that we should not take the variables we receive as *given*. We are the captains of our souls. We transform variables as needed.
+
+
+
 ### If parameters are unicorns, why bother with transformations?
 
 <!-- * standardizing variables. Key advantage is to make the coefficients easier to interpret. Even though the "right" thing to do in looking at models is to use posterior_* to look at model predictions, this takes some time. It is very handy, first pass, to look at all the coefficients and get a sense of which ones are "interesting." Then, focus on those when making newobs tibbles. -->
@@ -208,24 +285,106 @@ How do we decide which variables to include in a model? There is not
 
 Deciding which variables to include in a model is a subset of the larger question: How do we decide which model, out of the set of possible models, to choose?
 
-<!-- Having diligently followed the advice above, you create a model to explain immigration attitudes among Boston commuters. -->
+Consider two models which explain attitudes to immigration among Boston commuters.
+
+```{r}
+fit_liberal <- stan_glm(formula = att_end ~ liberal,
+                  data = trains,
+                  refresh = 0,
+                  seed = 42)
+
+print(fit_liberal, detail = FALSE)
+```
+
+
+```{r}
+fit_att_start <- stan_glm(formula = att_end ~ att_start,
+                  data = trains,
+                  refresh = 0,
+                  seed = 85)
+
+print(fit_att_start, detail = FALSE)
+```
+
+They both seem like good models! The results make sense. People who are liberal have more liberal attitudes about immigration, so we would expect their `att_end` scores to be lower. We would also expect people to provide similar answers in two surveys administered a week or two apart. It makes sense that those with higher (more conservative) values for `att_start` would also have higher values for `att_end`.
+
+How do we choose between these models?
+
+### Better models make better predictions
+
+The most obvious criteria for comparing models is the accuracy of the predictions. For example, consider the use of `liberal` to predict `att_end`.
+
+
+```{r}
+trains %>% 
+  mutate(pred_liberal = predict(fit_liberal)) %>% 
+  ggplot(aes(x = pred_liberal, y = att_end)) +
+    geom_jitter(width = 0.05, height = 0.2, alpha = 0.5) +
+    labs(title = "Modeling Attitude Toward Immigration",
+         subtitle = "Liberals are less conservative",
+         x = "Predicted Attitude",
+         y = "True Attitude")
+```
+
+<!-- DK: Could put this discussion in fig.cap. Could add some details to the plots to indicate the points that I am talking about. Should create an animation, which brings in new point, forecasts it, and then measures how wrong the model was. -->
+
+Because there are only two possible values for `liberal` --- TRUE and FALSE --- there are only two predictions which this model will make: about 10 for `liberal == FALSE` and about 8 for `liberal == TRUE`. (The points in the above plot are jittered.)  For some individuals, these are perfect predictions. For others, they are poor predictions. (Note the two individuals who are `liberal == TRUE`, and who the model thinks will have `att_end == 8`, but who have `att_end == 15`. The mode got them both very, very wrong.)
+
+Consider our second model, using `att_start` to forecast `att_end`.
+
+```{r}
+trains %>% 
+  mutate(pred_liberal = predict(fit_att_start)) %>% 
+  ggplot(aes(x = pred_liberal, y = att_end)) +
+    geom_jitter(width = 0.05, height = 0.2, alpha = 0.5) +
+    labs(title = "Modeling Attitude Toward Immigration",
+         subtitle = "Survey responses are somewhat consistent",
+         x = "Predicted Attitude",
+         y = "True Attitude")
+```
+
+
+Because `att_end` takes on `r length(unique(trains$att_end))` unique values, the model makes `r length(unique(trains$att_end))` unique predictions. Some of those predictions are perfect! But others are very wrong. Note the individual with a predicted `att_end` of around 9 but with an actual value of `15`. That is a big miss!
+
+
+Rather than looking at individual cases, we need to look at the errors for all the predictions. Fortunately, a prediction error is the same thing as a residual, which is easy enough to calculate.
+
+```{r}
+trains %>% 
+  select(att_end, att_start, liberal) %>% 
+  mutate(pred_lib = predict(fit_liberal)) %>% 
+  mutate(resid_lib = predict(fit_liberal) - att_end) %>% 
+  mutate(pred_as = predict(fit_att_start)) %>% 
+  mutate(resid_as = predict(fit_att_start) - att_end)
+```
+
+Let's look at the square root of the average squared error. 
+
+```{r}
+trains %>% 
+  select(att_end, att_start, liberal) %>% 
+  mutate(lib_err = (predict(fit_liberal) - att_end)^2) %>% 
+  mutate(as_err = (predict(fit_att_start) - att_end)^2) %>% 
+  summarize(lib_sigma = sqrt(mean(lib_err)),
+            as_sigma = sqrt(mean(as_err))) 
+```
 
 
 
-
-
-<!-- Overfitting is dangerous -->
 
 <!-- Prediction is what matters. How to measure accuracy? How far is model X from perfect accuracy? Only deviance out-of-sample matters. -->
 
 <!-- Models are often similar. -->
 
 
+### Better models make better predictions on new data
 
 
-
+<!-- Overfitting is dangerous -->
 
 <!-- Overfitting and model selection. loo() -->
+
+### Selecting the rows
 
 ## Testing is nonsense
 
