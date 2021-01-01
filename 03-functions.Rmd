@@ -1,34 +1,17 @@
 # Functions {#functions}
 
-<!-- Key concept to focus on is the idea of a distribution and draws therefrom. This connects to chapter 2, where we introduced distributions and to chapter 5, where we explain probability distributions. In particular, we should show various ways to measure center and variability. These are cool and important concepts. Is "center" the mean or the median or the trimmed mean or . . . Is "variability" the standard deviation, the mean absolute deviation, the standard deviation of the median absolute deviation or . . . There is nothing explicitly "statistical" here. We are just trying to connect English words to specific formulas. We might show the distributions for which these measures give the same answers and then some (mainly skewed) for which they don't. How to explore these concepts in the context of function writing? Perhaps by writing functions like my_mean() and my_median()? Or maybe focus on a function which calculates MAD SD? Then use list-columns to compare this function to other choices? -->
+<!-- Last exercise: Create a distribution with an very fat tail. Draw a sample 1,000 times. Calculate the mean and the median each time. Overlay a plot of the distribution and of the means and the medians. All the medians will be from the middle of the distribution. They are "informative." All the means will be from the tail, no where near the middle of the distribution. The means will be around the true mean and the medians will be around the true medians. It is just that the true mean is not informative. We could do this by having a distribution with 100,000 observations, from which we draw 4,000 observations, just like the default behavior of stan_glm(). -->
 
-<!-- Lesson: If you have a really skewed distribution, then median is a more stable measure than mean, and MAD (median absolute difference -- which means absolute difference from the median) is a more stable measure than standard deviation. Results depends too much on who ended up in the sample, like Bill Gates. -->
+<!-- Or: Take a real data set, calculated a mean and sd. Then do 1,000 draws from that. Then, plot the densities of the raw data and the simulated data on top of one another. -->
 
-<!-- Related: Teach random draws. We introduce random variables at the end of chapter 2. Do more with them here. For example, with a data set, calculated a mean and sd. Then do 1,000 draws from that. Then, plot the densities of the raw data and the simulated data on top of one another. -->
+<!-- Advanced form of the guessing game in which we are allowed to provide a function. The goal of inference is to come up with a function which wins the prediction game. -->
 
-<!-- Standard errors, qua standard errors, are a tricky thing to teach. But what if, instead of teaching them as standard errors, we just introduce the formula as a simple way to approximate something which, when multiplied by 2, and then added/subtracted from the mean, gives you a pretty useful 95% confidence interval. Then we could do the same for MAD SD, and show how that works better for skewed variables! Here, "works better" means that, if you do it 1,000 times, it works better on average. No! Too much! -->
+<!-- This is currently in problem set #3: Change the objective function. The simplest form of the Guessing Game just counts each contest separately. A more advanced for would give you a penalty which varies depending on how wrong you are. (This, obviously, is one way to think about minimizing the squared residuals.) This is very fun because there are many different penalty functions, each of which may lead to a different function winning the Guessing Game. -->
 
-<!-- The main use case is the "Guessing Game." Imagine that you are I are using the kenya data set and the distance, pop_density or rv13 variables. (All of which are quite skewed. We might also experiment with the poverty variable, which is less skewed. But skewed variables make this more interesting.) -->
 
-<!-- In the Guessing Game, you guess a number and I guess a number. The goal is to get closest to a random draw from all the values of distance (or whatever). We do this 1,000 times. Whoever gets closer more often, wins the Guessing Game.  -->
+<!-- Another form of the Guessing Game is like a casino. One person (the Casino) gives a 50% confidence interval. The other person gets to pick either inside or outside. Then there is a draw. The Casino wins if the second person can't consistently win. -->
 
-<!-- This is a useful exercise for several reasons. First, coding it up is a good practice for writing a function. Indeed, we might re-write the whole chapter to focus on this example. Second, once we have a function, which runs one iteration of the Game --- maybe it takes the data set (or maybe a vector of values?), my guess and your guess, and then returns the winner --- we can use list columns and map_functions to run it a thousand times. This is all more fun and more interesting that stupid max-minus-min functions. -->
 
-<!-- Third, the Guessing Game gets at key statistical issues. There is a lot of meat there, all things that we will revisit many times. Some things to highlight, many of which can be put into the Guessing Game. -->
-
-<!-- 1) Guess a formula rather than a number. Presumably, you and I get to see (all of?) the data before playing the game. In the simplest version, we look at the data and give you a number. (The mean and median both do well in this game, obviously.) But, in a more advanced form of the game, we might be allowed to provide a function. The goal of inference is to come up with a function which wins the prediction game.) -->
-
-<!-- 2) Change the objective function. The simplest form of the Guessing Game just counts each contest separately. A more advanced for would give you a penalty which varies depending on how wrong you are. (This, obviously, is one way to think about minimizing the squared residuals.) This is very fun because there are many different penalty functions, each of which may lead to a different function winning the Guessing Game. -->
-
-<!-- 3) The chapter climaxes with the following cool result: If you are minimizing the sum (or average) of the squared residuals, guessing the mean wins the Guessing Game. However, if you are minimizing the sum (or average) of the absolute values of the residuals, you should guess the median. -->
-
-<!-- 4) Another form of the Guessing Game is like a casino. One person (the Casino) gives a 50% confidence interval. The other person gets to pick either inside or outside. Then there is a draw. The Casino wins if the second person can't consistently win. -->
-
-<!-- Key question: Do we explain standard error here? Could be easy! Calculate the mean. Calculate the sd. Divide and scale by the square root of n. Voila! But, still, I think No. But we should explain everything short of standard error.  -->
-
-<!-- group_nest() might be a useful function.  -->
-
-<!-- Might also show how to add lots of plots to a tibble and then pick out the ones that show cool stuff. If you run 1,000 experiments, show the plots of the 5 extreme ones. -->
 
 
 ## Introduction
@@ -604,7 +587,7 @@ In particular, when building a function, you want to remember these key lessons:
 - Outliers cause a lack a stability. In a distribution without outliers, the mean/median and mad/sd are so close in value that it does not matter much which ones you use.
 
 
-<!-- DK: We have not (yet?) talked about the stability of mad. We have barely address the stability of the median. Is there room to get into this? Even if not, simply asserting these facts in the Summary is probably a good idea! -->
+
 
 
 
