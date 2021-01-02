@@ -1,12 +1,18 @@
 # Probability {#probability}
 
-<!-- Delete the cardinal virtues? If we keep them, then introduce them properly, perhaps reviewing the iconography. At least we need to update them to represent our current thinking! -->
-
 <!-- Here, or earlier, need to explain discrete versus continuous distributions. -->
+
+<!-- Use labels = scales::probability_trans() to make the after_stat nonsense unnecessary? -->
+
+<!-- Show more of the code in this chapter. Lot's of good stuff! Everything but the mathematical distributions? At the least, show one plot with the various tricks. -->
+
+<!-- Hard code dice sum results for mathematical distribution. -->
 
 <!-- Also good to get into the *scaling* of distributions, and the arbitrariness thereof. For example, trains$age is a distribution. Fine. What about rep(trains$age, 2)? What about rep(trains$age, 100)? Well, if any vector is a distribution, then all three of these are distributions. In fact, they are the same distribution, just scaled differently.  -->
 
-We also have the issue of continuous distributions. 
+<!-- We also have the issue of continuous distributions.  -->
+
+<!-- Use "Proportion" instead of "Probability" for y-axis label in empirical distributions? -->
 
 <!-- Need more discussion about quintiles and area under the curve. -->
 
@@ -86,6 +92,8 @@ ggplot(mydata, aes(x = results)) +
        y = "Probability") +
   scale_x_continuous(breaks = c(0, 1), 
                      labels = c("Heads", "Tails")) +
+  scale_y_continuous(labels = 
+                       scales::percent_format(accuracy = 1)) +
   theme_classic()
 
 ```
@@ -118,6 +126,8 @@ ggplot(mydata, aes(x = results)) +
        y = "Probability") +
   scale_x_continuous(breaks = c(0, 1), 
                      labels = c("Heads", "Tails")) +
+  scale_y_continuous(labels = 
+                       scales::percent_format(accuracy = 1)) +
   theme_classic()
 
 ```
@@ -145,15 +155,18 @@ ggplot(mydata, aes(x = results)) +
        y = "Probability") +
   scale_x_continuous(breaks = c(0, 1), 
                      labels = c("Heads", "Tails")) +
+  scale_y_continuous(labels = 
+                       scales::percent_format(accuracy = 1)) +
   theme_classic()
 
 ```
 
-### Rolling two dice
+### Rolling two die
 
-Our *mathematical distribution* tells us that, with a fair dice, the probability of getting 1, 2, 3, 4, 5, and 6 are equal: there is a 1/6 chance of each. When we roll two dice at the same time and sum the values, the numbers closest to the middle (ex. 6, 7, 8) are more common sums than numbers at the very edge (ex. 2, 12) because there are more combinations of numbers that add up to the middle values.
+Our *mathematical distribution* tells us that, with a fair dice, the probability of getting 1, 2, 3, 4, 5, and 6 are equal: there is a 1/6 chance of each. When we roll two die at the same time and sum the values, the numbers closest to the middle (ex. 6, 7, 8) are more common sums than numbers at the very edge (ex. 2, 12) because there are more combinations of numbers that add up to the middle values.
 
 ```{r, echo = FALSE}
+# DK: Hard code in the exact truth, please.
 
 set.seed(1)
 
@@ -172,15 +185,17 @@ ggplot(mydata, aes(x = sum)) +
                  binwidth = 1, 
                  color = "white") +
   labs(title = "Mathematical Probability Distribution",
-       subtitle = "Sum from Rolling Two Dice",
-       x = "Outcome\nSum of Two Dice",
+       subtitle = "Sum from Rolling Two Die",
+       x = "Outcome\nSum of Two Die",
        y = "Probability") +
   scale_x_continuous(breaks = seq(0, 12, 1), labels = 0:12) +
+  scale_y_continuous(labels = 
+                       scales::percent_format(accuracy = 1)) +
   theme_classic()
 
 ```
 
-We get an *empirical distribution* by running a simulation and rolling two dice a hundred times. The result is not identical to the mathematical distribution because of the inherent randomness of the real world. We can observe that the $p_2$ and $p_12$, which are displayed on the left and right most ends of the distribution, are far lower than the $p_6$, for example.
+We get an *empirical distribution* by running a simulation and rolling two die a hundred times. The result is not identical to the mathematical distribution because of the inherent randomness of the real world. We can observe that the $p_2$ and $p_12$, which are displayed on the left and right most ends of the distribution, are far lower than the $p_6$, for example.
 
 ```{r, echo = FALSE}
 
@@ -203,10 +218,12 @@ ggplot(mydata, aes(x = sum)) +
                  binwidth = 1, 
                  color = "white") +
   labs(title = "Empirical Probability Distribution",
-       subtitle = "Sum from Rolling Two Dice A Hundred Times",
-       x = "Outcome\nSum of Two Dice",
+       subtitle = "Sum from Rolling Two Die A Hundred Times",
+       x = "Outcome\nSum of Two Die",
        y = "Probability") +
   scale_x_continuous(breaks = seq(0, 12, 1), labels = 0:12) +
+  scale_y_continuous(labels = 
+                       scales::percent_format(accuracy = 1)) +
   theme_classic()
 
 ```
@@ -227,10 +244,12 @@ ggplot(mydata, aes(x = results)) +
                  binwidth = 1, 
                  color = "white") +
   labs(title = "Posterior Probability Distribution",
-       subtitle = "Your Belief About Rolling Two Dice at a Crooked Casino",
-       x = "Outcome\nSum of Two Dice",
+       subtitle = "Your belief about the sum of two die at a crooked casino",
+       x = "Outcome\nSum of Two Die",
        y = "Probability") +
   scale_x_continuous(breaks = seq(0, 12, 1), labels = 0:12) +
+  scale_y_continuous(labels = 
+                       scales::percent_format(accuracy = 1)) +
   theme_classic()
 
 ```
@@ -241,7 +260,7 @@ Someone less suspcious of the casina would have a posterior distribution which l
 
 Now we let's say we are building probability distributions for political events, like a presidential election. We want to know the probability that Democratic candidate wins x electoral votes, where x represents the range of possible outcomes from 0 to 538.
 
-It would be incredibly naive to create the following *mathematical distribution*. We create a distribution by running a simulation 10,000 times, where the chances of the Democratic candidate winning any given electoral college vote is 0.5.
+It would be incredibly naive to create the following *mathematical distribution*. We create a distribution by running a simulation 10,000 times, where the chances of the Democratic candidate winning any given state's electoral votes is 0.5.
 
 ```{r, echo = FALSE}
 
@@ -261,9 +280,12 @@ ggplot(data = result, aes(total)) +
        subtitle = "Presidential Elections",
        y = "Probability",
        x = "Outcome\nElectoral Vote Total for Democratic Candidate") +
+  scale_y_continuous(labels = 
+                       scales::percent_format()) +
   theme_classic()
 
 ```
+
 
 We know that campaign platforms, donations, charisma, and many other factors will contribute to a candidate's likeability. Elections are more complicated than coin tosses. 
 
@@ -284,6 +306,8 @@ ggplot(mydata, aes(x = electoral_votes)) +
        subtitle = "Electoral Votes from Previous Elections",
        x = "Outcome\nElectoral Vote Total for Democratic Candidate",
        y = "Probability") +
+  scale_y_continuous(labels = 
+                       scales::percent_format(accuracy = 1)) +
   theme_classic()
 
 ```
@@ -300,11 +324,13 @@ read_csv("./05-probability/data/election-forecasts-2020/prez_1.csv") %>%
   rename(prob = evprob_chal, electoral_votes = total_ev) %>% 
   ggplot(aes(electoral_votes, prob)) +
     geom_bar(stat = 'identity') +
-    labs(title = "Posterior Probability Distribution Based on FiveThirtyEight Forecast",
-         subtitle = "Presidential Elections",
+    labs(title = "Posterior Probability Distribution",
+         subtitle = "Democratic electoral votes according to 538 forecast",
          y = "Probability",
          x = "Outcome\nElectoral Vote Total for Democratic Candidate",
          caption = "Data from August 13, 2020") +
+  scale_y_continuous(labels = 
+                       scales::percent_format()) +
   theme_classic()
 
 ```
@@ -388,7 +414,7 @@ These elements of these vectors are all "draws" from the specified probability d
 
 Remember that probability distributions are mathematical objects that cover a set of outcomes, where each outcome in the domain is mapped to a probability value between 0 and 1 inclusive and the sum of all mappings is 1. Sometimes, you may see distributions similar to probability distributions, only the y-axis displays raw counts instead of proportions. Unnormalized distributions are not probability distributions, but it is easy to convert between the two. You simply divide all the outcome counts on the y-axis by the sum of all outcome counts to "normalize" and unnormalized distribution. Unnormalized distributions are often an intermediary step; it is often handy to work with counts until the very end.
 
-For instance, we can generate the following unnormalized distribution for the sum of rolling two dice (empirical distribution from running this simulation 100 times). You may notice that the shape of the distribution is the same as the empirical probability distribution we generated earlier, only the y-axis is labeled differently.
+For instance, we can generate the following unnormalized distribution for the sum of rolling two die (empirical distribution from running this simulation 100 times). You may notice that the shape of the distribution is the same as the empirical probability distribution we generated earlier, only the y-axis is labeled differently.
 
 ```{r, echo = FALSE}
 
@@ -407,8 +433,8 @@ mydata <- mydata %>%
 ggplot(mydata, aes(x = sum)) +
   geom_histogram(binwidth = 1, color = "white") +
   labs(title = "Empirical Unnormalized Distribution",
-       subtitle = "Sum from Rolling Two Dice A Hundred Times",
-       x = "Outcome\nSum of Two Dice",
+       subtitle = "Sum from Rolling Two Die A Hundred Times",
+       x = "Outcome\nSum of Two Die",
        y = "Count") +
   scale_x_continuous(breaks = seq(0, 12, 1), labels = 0:12) +
   theme_classic()
@@ -426,7 +452,7 @@ ggplot(mydata, aes(x = sum)) +
 
 Now we understand that $p_A$ can represent the probability distribution of outcomes for event A. Let's talk about joint distributions, which can be represented by $p_{A, B}$. Joint distributions are also mathematical objects that cover a set of outcomes, where each distinct outcome has a chance of occurring between 0 and 1 and the sum of all chances equals to 1. The key to a joint distribution is it measures the chance that both events A and B will occur simultaneously.
 
-Let's say that you are rolling two six-sided dice simultaneously. One is weighted so that there is a 50% chance of rolling a 6 and a 10% chance of each of the other values. The other is weighted so there is a 50% chance of rolling a 5 and a 10% chance of rolling each of the other values. Let's roll both dice 1000 times. In previous examples involving two dice, we cared about the sum of results and not the outcomes of the first versus the second rolls of each simulation. With a joint distributions, the order matters so instead of 11 possible outcomes on the x-axis of our distribution graph (ranging from 2 to 12), we have 36. Furthermore, a 2D probability distribution is not sufficient to represent all of the variables involved, so the joint distribution for this example is displayed using a 3D plot.
+Let's say that you are rolling two six-sided dice simultaneously. One is weighted so that there is a 50% chance of rolling a 6 and a 10% chance of each of the other values. The other is weighted so there is a 50% chance of rolling a 5 and a 10% chance of rolling each of the other values. Let's roll both dice 1000 times. In previous examples involving two die, we cared about the sum of results and not the outcomes of the first versus the second rolls of each simulation. With a joint distributions, the order matters so instead of 11 possible outcomes on the x-axis of our distribution graph (ranging from 2 to 12), we have 36. Furthermore, a 2D probability distribution is not sufficient to represent all of the variables involved, so the joint distribution for this example is displayed using a 3D plot.
 
 ```{r, echo = FALSE}
 knitr::include_graphics("05-probability/images/joint.png")
@@ -484,7 +510,7 @@ This concept of conditional probability is relevant in our everyday lives. For e
 
 In our histogram probability distribution, we didn’t care what combinations of numbers made each sum. We only cared about the outcome. There are two ways of thinking about a coin toss as well. Your tree diagram should look different depending on whether the order of the results matters.
 
-To understand tree diagrams a little better, imagine you’re flipping 2 coins. Your tree diagram may look different depending what you’re interested in measuring. In the following figure, the order of your coin toss results does not matter. We can imagine that you are rolling two coins together, or that you only care about the sum of the two dice values.
+To understand tree diagrams a little better, imagine you’re flipping 2 coins. Your tree diagram may look different depending what you’re interested in measuring. In the following figure, the order of your coin toss results does not matter. We can imagine that you are rolling two coins together, or that you only care about the sum of the two die values.
 
 ```{r out.width="100%", echo = FALSE}
 knitr::include_graphics("05-probability/images/tree-3.png")
@@ -575,6 +601,8 @@ ggplot(mydata, aes(x = results)) +
        y = "Probability") +
   scale_x_continuous(breaks = c(0, 1), 
                      labels = c("Positive", "Negative")) +
+  scale_y_continuous(labels = 
+                       scales::percent_format(accuracy = 1)) +
   theme_classic()
 
 ```
@@ -653,6 +681,8 @@ ggplot(x, aes(results)) +
        y = "Count") +
   scale_x_continuous(breaks = seq(0,1,0.5), 
                      labels = c("0", "1", "2")) +
+  scale_y_continuous(labels = 
+                       scales::percent_format(accuracy = 1)) +
   theme_classic()
 
 ```
@@ -695,7 +725,9 @@ x %>%
     labs(title = "Empirical Distribution of Number of Heads",
          subtitle = "Based on 1,000 simulations with p = 0.4",
          x = "Number of Heads out of 20 Tosses",
-         y = "Probability of Heads") +
+         y = "Probability") +
+    scale_y_continuous(labels = 
+                         scales::percent_format(accuracy = 1)) +
   theme_classic()
 
 ```
@@ -735,6 +767,7 @@ x %>%
          subtitle = expression(paste("Based on simulations with various values of p"[h])),
          x = "Number of Heads out of 20 Tosses",
          y = expression(paste("p"[h]))) +
+  scale_y_continuous(breaks = seq(0, 1, 0.1)) +
   theme_classic()
 
 ```
@@ -789,6 +822,8 @@ p_posterior %>%
     labs(title = expression(paste("Posterior Probability Distribution of p"[h])),
          x = expression(paste("Possible values of p"[h])),
          y = "Probability") +
+    scale_y_continuous(labels = 
+                        scales::percent_format(accuracy = 1)) +
   theme_classic()
 
 ```
@@ -897,7 +932,7 @@ Second, confirm that the data we have accurately capturing the concepts we care 
 
 We want there to be a connection between the problem we face and the data we have. But desire is a poor replacement for substance. If the data we have is not relevant, then data science is useless.
 
-Third, a key concept is the "population," which is largely equivalent to the rows of the ideal Preceptor Table, as discussed in Chapter \@ref(rubin-causal-model). @roas writes:
+Third, a key concept is the "population," which is largely equivalent to the rows of the ideal Preceptor Table, as discussed in Chapter \@ref(rubin-causal-model). @roas write:
 
 <!-- DK: This is not bad, but needs to be re-written. -->
 
