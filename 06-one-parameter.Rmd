@@ -235,11 +235,6 @@ What we just demonstrated in this activity is the statistical concept of **sampl
 
 Moreover, because we mixed the beads before each use of the shovel, the samples were randomly drawn. Because each sample was drawn at random, the samples were different from each other. Because the samples were different from each other, we obtained the different proportions red observed in the previous histogram. This is known as the concept of *sampling variation*. 
 
-The purpose of this sampling activity is to develop an understanding of two key concepts relating to sampling: 
-
-1. Understanding the effect of sampling variation.
-1. Understanding the effect of sample size on sampling variation. 
-
 In Section \@ref(virtual-sampling), we'll mimic the hands-on sampling activity we just performed on a computer. This will allow us not only to repeat the sampling exercise much more than 33 times, but it will also allow us to use shovels with different numbers of slots than just 50. 
 
 Afterwards, we'll present you with definitions, terminology, and notation related to sampling in Section \@ref(standard-errors). As in many disciplines, such necessary background knowledge may seem confusing at first. However, as with many difficult topics, if you truly understand the underlying concepts and practice, you'll be able to master them.
@@ -271,7 +266,7 @@ Observe that `urn` has `r scales::comma(nrow(urn))` rows, meaning that the urn c
 `r scales::comma(nrow(urn))` equally-sized beads. The first variable `ID` is used as an *identification variable*; none of the beads in the actual urn are marked with numbers. The second variable `color` indicates whether a particular virtual bead is red or white. View the contents of the urn in RStudio's data viewer and scroll through the contents to convince yourself that `urn` is indeed a virtual analog of the actual urn.
 
 Note that, in this Chapter, we have used the variable `ID` in two different ways: first, to keep track of the samples drawn by the 33 individual teams and, second, to keep track of the 
-`r scales::comma(nrow(urn))` beads in our virtual urn. And that is OK! `ID` means the same concept in both cases. We will neeed to be careful, however, when working with more than one table which has an `ID` column. In that case, we will often rename one of the columns in order to avoid any conflicts.   
+`r scales::comma(nrow(urn))` beads in our virtual urn. And that is OK! `ID` means the same concept in both cases. We will need to be careful, however, when working with more than one table which has an `ID` column. In that case, we will often rename one of the columns in order to avoid any conflicts.   
 
 Now that we have a virtual analog of our urn, we need a virtual analog of the shovel seen in Figure 6.2 to generate virtual samples of 50 beads. We're going to use `sample_n()` and list-columns. 
 
@@ -354,8 +349,6 @@ ggplot(aes(x = prop_red)) +
        y = "Count",
        title = "Distribution of 33 proportions red") 
 ```
-
-
 
 Observe that we occasionally obtained proportions red that are less than 30%. On the other hand, we occasionally obtained proportions that are greater than 45%. However, the most frequently occurring proportions were between 35% and 40%. Why do we have these differences in proportions red? Because of *sampling variation*. 
 
@@ -645,13 +638,6 @@ This is the power of running many analyses at once using `map_*` functions and l
 
 <!-- When we sample, how close is our guess to the truth? How close is our guess if we do it 100 times? Lots of different ways to measure that! -->
 
-In both our tactile and our virtual sampling activities, we used sampling for the purpose of estimation. We extracted samples in order to *estimate* the proportion of the urn's beads that are red. Our virtual sampling activity built up to the results comparing 1,000 proportions red based on samples of size 25, 50, and 100, and finally expanding that to all the sizes between 1 and 100. This was our first attempt at understanding two key concepts relating to sampling for estimation:
-
-1. The effect of *sampling variation* on our estimates.
-1. The effect of sample size on *sampling variation*.
-
-Let's now introduce some terminology and notation as well as statistical definitions related to sampling. You will likely want to read this section a few times. Keep in mind, however, that all of the concepts underlying these terminology, notation, and definitions tie directly to the concepts underlying our tactile and virtual sampling activities. It will simply take time and practice to master them. 
-
 
 ### Terminology and notation {#terminology-and-notation}
 
@@ -659,7 +645,7 @@ Let's now introduce some terminology and notation as well as statistical definit
 knitr::include_graphics("06-one-parameter/images/yoda.png")
 ```
 
-Here is a list of terminology and mathematical notation relating to sampling.
+Let's now introduce some terminology and notation as well as statistical definitions related to sampling. You will likely want to read this section a few times. Keep in mind, however, that all of the concepts underlying these terminology, notation, and definitions tie directly to the concepts underlying our tactile and virtual sampling activities. It will simply take time and practice to master them. 
 
 First, a **population** is a collection of individuals or observations we are interested in. This is also commonly denoted as a **study population**. We mathematically denote the population's size using upper-case $N$.  In our sampling activities, the (study) population is the collection of $N$ = 2400 identically sized red and white beads contained in the urn.
 
@@ -728,9 +714,25 @@ shovels_100 %>%
        y = "Standard deviation of the proportion red")
 ```
 
-So as the sample size increases, the standard deviation of the proportion of red beads decreases. This type of standard deviation has another special name: **standard error**. Standard errors quantify the effect of sampling variation induced on our estimates. In other words, they quantify how much we can expect different proportions of a shovel's beads that are red *to vary* from one sample to another sample to another sample, and so on. As a general rule, as sample size increases, the standard error decreases.
+So as the sample size increases, the standard deviation of the proportion of red beads decreases. This type of standard deviation has another special name: **standard error**
 
-Unfortunately, these names confuse many people who are new to statistical inference. For example, it's common for people who are new to statistical inference to call the "sampling distribution" the "sample distribution." Another additional source of confusion is the name "standard deviation" and "standard error." Remember that a standard error is merely a *kind* of standard deviation: the standard deviation of any point estimate from sampling. In other words, all standard errors are standard deviations, but not every standard deviation is necessarily a standard error. 
+### What is a "standard error"?
+
+<!-- MF: I took from explanations online, but still feel SE isn't crystal clear. Need to revisit. -->
+
+<!-- Standard errors quantify the effect of sampling variation induced on our estimates. In other words, they quantify how much we can expect different proportions of a shovel's beads that are red *to vary* from one sample to another sample to another sample, and so on. As a general rule, as sample size increases, the standard error decreases.
+
+Unfortunately, these names confuse many people who are new to statistical inference. For example, it's common for people who are new to statistical inference to call the "sampling distribution" the "sample distribution." Another additional source of confusion is the name "standard deviation" and "standard error." Remember that a standard error is merely a *kind* of standard deviation: the standard deviation of any point estimate from sampling. In other words, all standard errors are standard deviations, but not every standard deviation is necessarily a standard error. -->
+
+The "standard error" (SE) is a term that measures the accuracy with which a sample distribution represents a population through the use of standard deviation. Specifically, SE is used to refer to the standard deviation of a sample statistic (aka point estimate), such as the mean or median. For example, the "standard error of the mean" refers to the standard deviation of the distribution of sample means taken from a population. 
+
+> In statistics, a sample mean deviates from the actual mean of a population; this deviation is the standard error of the mean. 
+
+Many students struggle to differentiate the standard error from the standard deviation.  The relationship between the standard error and the standard deviation is such that, for a given sample size, the standard error equals the standard deviation divided by the square root of the sample size. Accordingly, the standard error is inversely proportional to the sample size; the larger the sample size, the smaller the standard error because the statistic will approach the actual value. 
+
+<!-- Insert visual aid for students who are not mathematically inclined showing that larger sample sizes = closer to actual value -->
+
+The more data points involved in the calculations of the mean, the smaller the standard error tends to be. When the standard error is small, the data is said to be more representative of the true mean. In cases where the standard error is large, the data may have some notable irregularities.
 
 To help reinforce these concepts, let's re-display Figure 6.14 but using our new terminology, notation, and definitions relating to sampling in the figure below.
 
@@ -770,13 +772,9 @@ Remember the key message of this last table: that as the sample size $n$ goes up
 
 ### The moral of the story {#moral-of-the-story}
 
-Let's recap this section so far. We've seen that if a sample is generated at random, then the resulting point estimate is a "good guess" of the true unknown population parameter. In our sampling activities, since we made sure to mix the beads first before extracting a sample with the shovel, the resulting sample proportion $\hat{p}$ of the shovel's beads that were red was a "good guess" of the population proportion $p$ of the urn's beads that were red. 
+<!-- REWRITE THIS ENTIRE SECTION TO REFLECT FOCUS ON STANDARD ERROR. -->
 
-However, what do we mean by our point estimate being a "good guess"? Sometimes, we'll get an estimate that is less than the true value of the population parameter, while at other times we'll get an estimate that is greater. This is due to sampling variation. Despite this sampling variation, our estimates will "on average" be correct and thus will be centered at the true value. This is because our sampling was done at random and thus in an unbiased fashion. 
-
-In our sampling activities, sometimes our sample proportion $\hat{p}$ was less than the true population proportion $p$, while at other times it was greater. This was due to the sampling variability. However, despite this sampling variation, our sample proportions $\hat{p}$ were "on average" correct and thus were centered at the true value of the population proportion $p$. This is because we mixed our urn before taking samples and thus the sampling was done at random and thus in an unbiased fashion. This is also known as having an *accurate* estimate.
-
-What was the value of the population proportion $p$ of the $N$ = 2400 beads in the actual urn that were red? There were 900 red beads, for a proportion red of 900/2400 = 0.375 = 37.5%! How do we know this? Did the authors do an exhaustive count of all the beads? No! They were listed in the contents of the box that the urn came in! Hence we were able to make the contents of the virtual `urn` match the tactile urn:
+<!-- What was the value of the population proportion $p$ of the $N$ = 2400 beads in the actual urn that were red? There were 900 red beads, for a proportion red of 900/2400 = 0.375 = 37.5%! How do we know this? Did the authors do an exhaustive count of all the beads? No! They were listed in the contents of the box that the urn came in! Hence we were able to make the contents of the virtual `urn` match the tactile urn:
 
 ```{r}
 urn %>% 
@@ -784,9 +782,9 @@ urn %>%
             sum_not_red = sum(color != "red"), .groups = 'drop_last')
 ```
 
-Let's re-display our sampling distributions from earlier, but now with a vertical red line marking the true population proportion $p$ of beads that are red = 37.5% in Figure 6.19. We see that while there is a certain amount of error in the sample proportions $\hat{p}$ for all three sampling distributions, on average the $\hat{p}$ are centered at the true population proportion red $p$.
+Let's re-display our sampling distributions from earlier, but now with a vertical red line marking the true population proportion $p$ of beads that are red = 37.5% in Figure 6.19. We see that while there is a certain amount of error in the sample proportions $\hat{p}$ for all three sampling distributions, on average the $\hat{p}$ are centered at the true population proportion red $p$. -->
 
-<!-- DK: Clean up code. -->
+<!-- DK: Clean up code. 
 
 ```{r, echo = FALSE, fig.cap = "Three sampling distributions with population proportion $p$ marked by vertical line."}
 p <- urn %>% 
@@ -812,12 +810,9 @@ samp_distn_compare
 
 At this point, you might be asking yourself: "If we already knew the true proportion of the urn's beads that are red was 37.5%, then why did we do any sampling?" You might also be asking: "Why did we take 1,000 repeated samples of various sizes (n = 1 to n = 100)? Shouldn't we be taking only *one* sample that's as large as possible?". If you did ask yourself these questions, your suspicion is merited! 
 
-The sampling activity involving the urn is merely an *idealized version* of how sampling is done in real life. We performed this exercise only to study and understand:
+The sampling activity involving the urn is merely an *idealized version* of how sampling is done in real life. 
 
-1. The effect of sampling variation.
-1. The effect of sample size on sampling variation.
-
-This is not how sampling is done in real life. In a real life scenario, we won't know what the true value of the population parameter is. Furthermore, we wouldn't be able to take 1,000 replicated samples. Rather, we take a single sample that's as large as we can afford. In the next section, we'll study a real life example of sampling: polls.
+This is not how sampling is done in real life. In a real life scenario, we won't know what the true value of the population parameter is. Furthermore, we wouldn't be able to take 1,000 replicated samples. Rather, we take a single sample that's as large as we can afford. In the next section, we'll study a real life example of sampling: polls. -->
 
 ```{r, echo = FALSE, out.width="80%", fig.align='center', fig.cap = "Real life sampling is hard! In most scenarios, it's impossible to ask the entire population for their opinions."}
 knitr::include_graphics("06-one-parameter/images/that_would_be_great.png")
@@ -1256,6 +1251,8 @@ The first scenario provides a more accurate estimate, since the students outside
 ## Summary
 
 <!-- DK: What are truly the things we want students to remember! -->
+
+<!-- INSERT RECAP FOR EACH SECTION WITH 2-3 IMPORTANT PIECES OF INFORMATION -->
 
 In this chapter, we performed both tactile and virtual sampling exercises to infer about an unknown parameter We also presented a case study of sampling in real life with polls. In each case, we used the sample proportion $\hat{p}$ to estimate the population proportion $p$. However, we are not just limited to scenarios related to proportions. In other words, we can use sampling to estimate other population parameters using other point estimates as well.
 
