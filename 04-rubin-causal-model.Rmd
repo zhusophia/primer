@@ -6,7 +6,7 @@ library(tidyverse)
 
 <!-- Introduce the concept of the "population" throughout. It is important, especially in understanding the Preceptor Table. -->
 
-<!-- Remove Estimand column from Preceptor Tables? -->
+<!-- Remove Estimand column from Preceptor Tables almost everywhere? -->
 
 <!-- New defintion: A PT is a table with enough rows and columns such that we can include all our data and so that, if there is no missing value, we can answer our questions with arithmetic. -->
 
@@ -204,7 +204,7 @@ gt() %>%
 &nbsp;
 
 
-Recall that the "causal effect" is the difference between Yao's potential outcomes under treatment and under control. For convenience, let's add this to our ideal Preceptor Table:
+Recall that the "causal effect" is the difference between Yao's potential outcomes under treatment and under control. 
 
 ```{r, echo = FALSE}
 # First, we create a tibble with the values we want for the table
@@ -298,7 +298,7 @@ From this ideal Preceptor Table, there are many possible estimands we might be i
 
 
 
-All of the variables we calculated above are examples of estimands we might be interested in. One estimand is important enough that it has its own name: the **average treatment effect**, often abbreviated as **ATE**. The average treatment effect is the mean of all the causal effects. Here, the mean is $+0.6$.
+All of the variables we calculated above are examples of estimands we might be interested in. One estimand is important enough that it has its own name: the **average treatment effect**, often abbreviated as **ATE**. The average treatment effect is the mean of all the causal effects. Here, the mean is $+0.8$.
 
 Remember what an actual Preceptor Table riddled, as it always is, with question marks, looks like:
 
@@ -333,53 +333,7 @@ tibble(subject = c("Yao", "Emma", "Cassidy", "Tahmid", "Diego"),
 
 &nbsp;
 
-Calculating values from this table is no longer a simple math problem. 
-
-### Preceptor Table structure
-
-<!-- DK: Clean this up. Can an outcome be an estimand? Probably. But then estimands and outcomes can be separate categories of columns below. -->
-
-<!-- DK: Does it really make sense to include estimands in Preceptor Tables? Probably not. -->
-
-Remember a Preceptor Table has all of the rows and columns of data that we have and would reasonably like to know. The first column in a Preceptor Table is always the ID column. We can then have columns under the subheadings 'Outcomes', 'Estimands', and 'Covariates' in that order. The final structure of a Preceptor Table should look like this, and include only whatever columns and rows are necessary for the problem you are trying to solve:
-
-```{r, echo = FALSE}
-
-tibble(subject = c("1", "2", "3", "4", "5"),
-       age = c("?", "?", "?", "?", "?"), 
-       sex = c("?", "?", "?", "?", "?"),
-       ytreat = c("?", "?", "?", "?", "?"),
-       ycontrol = c("?", "?", "?", "?", "?"),
-       ydiff = c("?", "?", "?", "?", "?"),
-       yperc = c("?", "?", "?", "?", "?")) %>%
-  
-  # Then, we use the gt function to make it pretty
-  
-  gt() %>%
-  cols_label(subject = md("ID"),
-             age = md("$$\\text{Age}$$"),
-             sex = md("$$\\text{Sex}$$"),
-                ytreat = md("$$Y_t(u)$$"),
-                ycontrol = md("$$Y_c(u)$$"),
-                ydiff = md("$$Y_t(u) - Y_c(u)$$"),
-             yperc = md("$$((Y_t - Y_c) / Y_c) \\times 100$$")) %>%
-  cols_move(columns = vars(ytreat, ycontrol), after = vars(subject)) %>%
-  cols_move(columns = vars(age, sex), after = vars(yperc)) %>%
-  tab_style(cell_borders(sides = "right"),
-            location = cells_body(columns = vars(subject))) %>%
-  tab_style(style = cell_text(align = "left", v_align = "middle", size = "large"), 
-            locations = cells_column_labels(columns = vars(subject))) %>%
-  cols_align(align = "center", columns = TRUE) %>%
-  cols_align(align = "left", columns = vars(subject)) %>%
-  fmt_markdown(columns = TRUE) %>%
-  tab_spanner(label = "$$\\text{Covariates}$$", vars(age, sex)) %>%
-  tab_spanner(label = "$$\\text{Outcomes}$$", vars(ytreat, ycontrol)) %>%
-  tab_spanner(label = "$$\\text{Estimands}$$", vars(ydiff, yperc))
-```
-
-&nbsp;
-
-In this example, there is indeed a constant treatment effect for everyone: $+2$. Note that the *observed* values are all the same, but the unobserved values are such that our estimated ATE, $-1$, is pretty far from the actual ATE, $+2$. If we think we have a reasonable estimate of ATE, using that value as a constant for $\tau$ might be our *best guess* if we do want to estimate the counterfactual for an individual. See this discussion from Harvard Professor Matt Blackwell:
+Calculating values from this table is no longer a simple math problem. See this discussion from Harvard Professor Matt Blackwell:
 
 ```{r echo = FALSE}
 knitr::include_app("https://www.youtube.com/embed/gyRZSzCtU_o")
@@ -725,7 +679,7 @@ tibble(subject = c("Yao", "Emma", "Cassidy", "Tahmid", "Diego"),
 
 &nbsp;
 
-In this example, there is indeed a constant treatment effect for everyone: $+2$. Note that the *observed* values are all the same, but the unobserved values were such that our estimated ATE, $-1$, is pretty far from the actual ATE, $+2$. We'll consider in a little bit when it is reasonable to assume that our estimate of the ATE is a good one. If we think we have a reasonable estimate of ATE, using that value as a constant for $\tau$ might be our *best guess*. For more discussion, see more from Matt Blackwell:
+In this example, there is indeed a constant treatment effect for everyone: $+2$. Note that the *observed* values are all the same, but the unobserved values were such that our estimated ATE, $-1$, is pretty far from the actual ATE, $+2$. If we think we have a reasonable estimate of ATE, using that value as a constant for $\tau$ might be our *best guess*. For more discussion, see more from Matt Blackwell:
 
 ```{r echo = FALSE}
 knitr::include_app("https://www.youtube.com/embed/cBYUuD2aVkA")
@@ -814,7 +768,7 @@ tibble(subject = c("Respondent 1", "Respondent 2", "Respondent 3", "...", "Respo
 
 &nbsp;
 
-By surveying 1,000 people on their attitudes towards immigrants we now have some values to work with. This, however, does not solve the missing data problem. We are likely interested in the causal effect *in general*, not just for our 1,000 person sample. We'll need to think about whether our *sample* is representative of the full population. For the vast majority of US adults we still have no value. This is the second of the two most common sources of missing data: 
+By surveying 1,000 people on their attitudes towards immigrants we now have some values to work with. This, however, does not solve the missing data problem. We are likely interested in attitudes toward immigration *for the entire population*, not just for our 1,000 person sample. We'll need to think about whether our *sample* is representative of the full population. For the vast majority of US adults we still have no value. This is the second of the two most common sources of missing data: 
 
 1. For the units in our sample, we only see *one* potential outcome.
 2. For the units outside our sample, we see *no* potential outcomes.
@@ -826,7 +780,9 @@ There are in fact many other potential sources of missing data, like we saw in o
 knitr::include_graphics("04-rubin-causal-model/images/governors.png")
 ```
 
-Let's consider a new example experiment to highlight another type of data problem we might encounter. Say we want to know the causal effect of being elected governor on life length. In most states the minimum age requirement to be elected governor is 30. People under the age of 30 have no chance of being elected governor. That means for people less than 30 there is only one possible observable potential outcome. In our actual Preceptor Table, this means we have some rows with 2 columns (people old enough to be elected), and some rows with only 1 column (people too young to be elected).
+<!-- DK: Too minor a point to be mentioned? Also, I am not explaining it well. Children probably don't belong in the Preceptor Table in the first place! They are not in the data nor in the population. -->
+
+Let's consider a new example experiment to highlight another type of data problem we might encounter. Say we want to know the causal effect of being elected governor on longevity. In most states the minimum age requirement to be elected governor is 30. People under the age of 30 have no chance of being elected governor. That means for people less than 30 there is only one possible potential outcome. In our actual Preceptor Table, this means we have some rows with 2 columns (people old enough to be elected), and some rows with only 1 column (people too young to be elected).
 
 An actual Preceptor Table for this problem might look something like this: 
 
@@ -849,7 +805,6 @@ tibble(subject = c("Yao", "Dean Khurana", "Cassidy", "Preceptor", "Tahmid"),
             locations = cells_column_labels(columns = vars(subject))) %>%
   cols_align(align = "center", columns = TRUE) %>%
   cols_align(align = "left", columns = vars(subject)) %>%
-  tab_spanner(label = "$$\\text{Outcomes}$$", vars(ytreat, ycontrol)) %>%
   fmt_markdown(columns = TRUE)
 ```
 
@@ -1173,7 +1128,7 @@ In this example, the Hawthorne effect can impact attitudes expressed on surveys.
 
 <!-- DK: Replace with a shorter statement that causation is only easy to determine with random assignment. Otherwise, you can't be sure. Second semester course for those interested in learning those techniques. -->
 
-When considering the relationship between a treatment and an outcome, one of the most important assumptions is a lack of correlation between treatment assignment and the potential outcomes. Consider a version of the train experiment. Assume that, if a Republican is not on the platform with Spanish-speakers, they will have an attitude value of X. If they were on a platform where they could hear Spanish, their attitude would have been X + 2. A Democrat would have an attitude X regardless of whether or not they are on the platform with Spanish-speakers. In other words, the causal effect of being in the treatment group is +2 for Republicans, and 0 for Democrats. If we could run an experiment with random assignment, we would discover that the average causal effect is somewhere between 0 and 2, depending on the relative proportion of the Republicans and Democrats.
+When considering the relationship between a treatment and an outcome, one of the most important assumptions is a lack of correlation between treatment assignment and the potential outcomes. Consider a version of the train experiment. Assume that, if a Republican is not on the platform with Spanish-speakers, they will have an attitude value of 9. If they were on a platform where they could hear Spanish, their attitude would have been 11. A Democrat would have an attitude 9 regardless of whether or not they are on the platform with Spanish-speakers. In other words, the causal effect of being in the treatment group is +2 for Republicans, and 0 for Democrats. If we could run an experiment with random assignment, we would discover that the average causal effect is somewhere between 0 and 2, depending on the relative proportion of the Republicans and Democrats.
 
 ```{r, echo = FALSE}
 # First, we create a tibble with the values we want for the table
@@ -1198,14 +1153,12 @@ tibble(subject = 1:5,
             locations = cells_column_labels(columns = vars(subject))) %>%
   cols_align(align = "center", columns = TRUE) %>%
   cols_align(align = "left", columns = vars(subject)) %>%
-  tab_spanner(label = "$$\\text{Outcomes}$$", vars(ytreat, ycontrol)) %>%
-  tab_spanner(label = "$$\\text{Estimand}$$", vars(ydiff)) %>%
   fmt_markdown(columns = TRUE)
 ```
 
 &nbsp;
 
-Unfortunately (?), people do not choose to ride certain trains randomly. We might assume/hope that there is no correlation between which train you ride and potential outcomes. If this is true, then we would still be able to estimate the causal effect. Yet that is rarely true in general. What if, instead, all the Republicans are in the control group, and all the Democrats are in the treated? In that case, everyone has an attidue of X! And it appears that the presence of Spanish-speakers on the platform "does not matter". The correlation between treatment and potential outcomes invalidates the naive estimate of the average treatment effect.
+Unfortunately (?), people do not choose to ride certain trains randomly. We might assume/hope that there is no correlation between which train you ride and potential outcomes. If this is true, then we would still be able to estimate the causal effect. Yet that is rarely true in general. What if, instead, all the Republicans are in the control group, and all the Democrats are in the treated? In that case, everyone has an attitude of 9! And it appears that the presence of Spanish-speakers on the platform "does not matter". The correlation between treatment and potential outcomes invalidates the naive estimate of the average treatment effect.
 
 ```{r, echo = FALSE}
 # First, we create a tibble with the values we want for the table
@@ -1229,8 +1182,6 @@ tibble(subject = c("R", "R", "D", "R", "D"),
             locations = cells_column_labels(columns = vars(subject))) %>%
   cols_align(align = "center", columns = TRUE) %>%
   cols_align(align = "left", columns = vars(subject)) %>%
-  tab_spanner(label = "$$\\text{Outcomes}$$", vars(ytreat, ycontrol)) %>%
-  tab_spanner(label = "$$\\text{Estimand}$$", vars(ydiff)) %>%
   fmt_markdown(columns = TRUE)
 ```
 
@@ -1246,9 +1197,11 @@ The fundamental components of every problem in causal inference are units, treat
 
 A causal effect is the difference between one potential outcome and another. How different would your life be if you missed the train?
 
+
 ```{r, echo = FALSE}
-knitr::include_app("https://www.youtube.com/watch?v=BvUbv4iwbDs")
+knitr::include_app("https://www.youtube.com/embed/BvUbv4iwbDs")
 ```
+
 
 The causal effect of a treatment on a single unit at a point in time is the difference between the value of the outcome variable with the treatment and without the treatment. The fundamental problem of causal inference is that it is impossible to observe the causal effect on a single unit. We must make assumptions --- i.e, we must make models ---  in order to estimate causal effects.
 
