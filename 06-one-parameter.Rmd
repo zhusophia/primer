@@ -976,9 +976,7 @@ But we can not simply take the mean values of these positive results because dif
 
 ### stan_glm()
 
-<!-- Good reference: https://cran.r-project.org/web/packages/rstanarm/vignettes/binomial.html -->
-
-Instead of building the joint and conditional probability distributions "by hand" as above, we can just use `stan_glm()` from the **rstanarm* package. For now, we will just walk through the code for doing this very quickly. Chapter \@ref(two-parameters) will provide a step=by-step explanation.
+Instead of building the joint and conditional probability distributions "by hand" as above, we can just use `stan_glm()` from the **rstanarm* package. For now, we will just walk through the code for doing this very quickly. Chapter \@ref(two-parameters) will provide a step-by-step explanation.
 
 Assume that, as before, a shovel of size 50 drawn from the urn has returned 17 red beads and 33 white. Create an object which contains this data.
 
@@ -986,8 +984,11 @@ Assume that, as before, a shovel of size 50 drawn from the urn has returned 17 r
 shovel <- tibble(red = c(rep(1, 17), rep(0, 33))) %>% 
   
   # `sample_frac()` just re-arranges the rows of `shovel`. Doing so is
-  # aesthetically please but does not matter since the order of the beads in the
-  # shovel is irrelevant to estimating the proportion of red beads in the urn.
+  # aesthetically pleasing but does not matter since the order of the beads in
+  # the shovel is irrelevant to estimating the proportion of red beads in the
+  # urn, given that we assumed that sampling bead X has no impact on whether or
+  # not bead Y ends up in the sample. Such "independence" assumptions are almost
+  # universal.
   
   sample_frac() %>% 
   mutate(ID = 1:nrow(.)) %>% 
@@ -1008,20 +1009,19 @@ fit_1 <- stan_glm(formula = red ~ 1,
                   seed = 2020)
 ```
 
-This single function call has done all the work which we did on our own previously: created the joint distribution and then estimated the posterior probability distribution, conditional on the data which was passed in to the `data` argument. With the `fit_1` object, it is just a few lines of code to create the posterior probability distribution for $p$.
+This single function call has done all the work which we did on our own previously: created the joint distribution and then estimated the posterior probability distribution, conditional on the data which was passed in to the `data` argument. Once we have the `fit_1` object, it is just a few lines of code to create the posterior probability distribution for $p$.
 
 ```{r}
 fit_1 %>% 
   posterior_epred(newdata = tibble(constant = 1)) %>% 
   as_tibble() %>% 
-  ggplot(aes(x = `1` * 2400,
+  ggplot(aes(x = `1`,
              y = after_stat(count/sum(count)))) +
     geom_histogram(bins = 100) +
     labs(title = "Posterior Probability Distribution",
          subtitle = "Number of red beads is centered at 768",
-         x = "Number of Beads in Urn which Are Red",
+         x = "TThe Proportion of Red Beads: p",
          y = "Probability") + 
-    scale_x_continuous(labels = scales::number_format(accuracy = 1)) +
     scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
     theme_classic()
 ```
