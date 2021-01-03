@@ -2,6 +2,8 @@
 
 <!-- Here, or earlier, need to explain discrete versus continuous distributions. -->
 
+<!-- Clean up Three Models section. -->
+
 <!-- Greek letters or for parameters which we can never observe. Latin letters are for observables. -->
 
 <!-- \rho is an unknown probability. \rho and an underscore letter refers to the unknown probability of the event represented by that letter. \rho_h to refer to the unknown probability of heads. -->
@@ -316,8 +318,20 @@ The *posterior distribution* in the election case is something data scientists d
 # DK: Some comments about this. Where did you get this data from? Why those
 # columns? 
 
-
-read_csv("./05-probability/data/election-forecasts-2020/prez_1.csv") %>%
+read_csv("./05-probability/data/election-forecasts-2020/prez_1.csv",
+         col_types = cols(cycle = col_double(),
+                          branch = col_character(),
+                          model = col_character(),
+                          modeldate = col_character(),
+                          candidate_inc = col_character(),
+                          candidate_chal = col_character(),
+                          candidate_3rd = col_logical(),
+                          evprob_inc = col_double(),
+                          evprob_chal = col_double(),
+                          evprob_3rd = col_logical(),
+                          total_ev = col_double(),
+                          timestamp = col_character(),
+                          simulations = col_double())) %>%
   select(evprob_chal, total_ev)  %>% 
   rename(prob = evprob_chal, electoral_votes = total_ev) %>% 
   ggplot(aes(electoral_votes, prob)) +
@@ -462,9 +476,11 @@ knitr::include_graphics("05-probability/images/joint.png")
 
 ## Tree diagrams
 
+<!-- DK: Worth rewriting? -->
+
 ### Independence
 
-So far, you have learned how to calculate $\rho_A$, which is the fancy, statistical way of saying the probability of an event known as A. When flipping a coin, the probability of getting heads was 1/2. You have also learned how to compute the $\rho_{A or B}$. This means the probability of either A or B happening. When rolling a dice, $\rho_{1 or 2}$--the probability of getting a 1 or a 2--was 1/3.
+So far, you have learned how to calculate $\rho_A$, which is the fancy, statistical way of saying the probability of an event known as A. When flipping a coin, the probability of getting heads was 1/2. You have also learned how to compute the $\rho_{A or B}$. This means the probability of either A or B happening. When rolling a dice, $\rho_{1 or 2}$ --- the probability of getting a 1 or a 2 --- was 1/3.
 
 What if you flipped 2 coins? You know that the probability of getting heads once is 1/2, but what are the odds of getting heads 2 times in a row? Let's take a look at this tree diagram. We read this diagram from left to right. On the left, the probability of getting heads is 0.5. Now the tree branches out.
 
@@ -617,6 +633,8 @@ knitr::include_app("https://www.youtube.com/embed/by3_weGwnMg")
 
 ## Three models
 
+<!-- DK: Should this be in terms of p or number of white marbles or both? -->
+
 ```{r, echo = FALSE}
 knitr::include_graphics("05-probability/images/marble.jpg")
 ```
@@ -630,14 +648,21 @@ Here is the scatterplot visualization of the scenario:
 ```{r, echo = FALSE}
 
 x <- tibble(p = rep(seq(0, 1, 0.5), 1000)) %>%
-  mutate(white_marbles = map_int(p, ~ rbinom(n = 1, size = 3, p = .)))
+  mutate(white_marbles = 
+           map_int(p, ~ rbinom(n = 1, 
+                               size = 3, 
+                               p = .))) %>% 
+  mutate(n_white = as.integer(2 * p))
+  
 
 x %>%
-  ggplot(aes(x = white_marbles, y = p)) +
+  ggplot(aes(x = white_marbles, y = n_white)) +
     geom_jitter(alpha = 0.5) +
-    labs(title = "Number of White Marbles and Probability of White Marbles",
-         x = "Number of White Marbles Out of 3 Samples",
-         y = "Number of White Marbles in the Bag") +
+    labs(title = "Black and White Marbles",
+         subtitle = "More white marbles in bag mean more white marbles selected",
+         x = "White Marbles Selected",
+         y = "White Marbles in the Bag") +
+    scale_y_continuous(breaks = c(0, 1, 2)) +
   theme_classic()
 
 ```
@@ -656,7 +681,9 @@ Let's say you've got zero white marbles. We would isolate the slice where the re
 
 ```{r, echo = FALSE}
 
-x <- tibble(results = c(rep(0, 1000), rep(0.5, 130), rep(1, 0.1)))
+x <- tibble(results = c(rep(0, 1000), 
+                        rep(0.5, 130), 
+                        rep(1, 0.1)))
 
 ggplot(x, aes(results)) +
   geom_histogram(binwidth = 0.25, color = "white") +
@@ -664,7 +691,8 @@ ggplot(x, aes(results)) +
        subtitle = "Number of White Marbles Given a Three White Marbles Selected in the Sample",
        x = "Number of White Marbles in the Bag",
        y = "Count") +
-  scale_x_continuous(breaks = seq(0,1,0.5), labels = c("0", "1", "2")) +
+  scale_x_continuous(breaks = seq(0, 1, 0.5), 
+                     labels = c("0", "1", "2")) +
   theme_classic()
 
 ```
@@ -691,8 +719,6 @@ ggplot(x, aes(results)) +
 
 This plot makes sense because when all three marbles you draw out of the bag are NOT white, there is a pretty good chance that there are no white marbles in the bag. There is a smaller chance that the bag contains one black marble and one white marble. However, there is no chance that the bag only contains white marbles.
 
-<!-- # Section 5: 11 and the 1001 models. Same as coin example with unknown p as used in Albert example. First, p is 0, 0.1, 0.2, ... 0.9, 1.0. Make Bayes Scatterplot. Show marginals. Then, extend it so p takes on 1,001 values. This is how we go from discrete to continuous. All the same tricks apply. -->
-
 
 ## N models
 
@@ -706,7 +732,7 @@ This plot makes sense because when all three marbles you draw out of the bag are
 knitr::include_graphics("05-probability/images/heads.jpg")
 ```
 
-Assume that there is a coin with $\rho_h$. I guarantee that there are only 11 possible values of $\rho_h$: $0, 0.1, 0.2, ..., 0.9, 1$. In other words, there are 11 possible models, 11 things which might be true about the world. This is just like situations we have previously discussed, except that there are more models to consider.
+Assume that there is a coin with $\rho_h$. We guarantee that there are only 11 possible values of $\rho_h$: $0, 0.1, 0.2, ..., 0.9, 1$. In other words, there are 11 possible models, 11 things which might be true about the world. This is just like situations we have previously discussed, except that there are more models to consider.
 
 We are going to run an experiment in which you flip the coin 20 times and record the number of heads. What does this result tell you about the value of $\rho_h$? Ultimately, we will want to calculate a posterior distribution of $\rho_h$, which is written as p($\rho_h$). 
 
@@ -766,9 +792,9 @@ x %>%
   ggplot(aes(y = p, x = heads)) +
     geom_jitter(alpha = 0.1) +
     labs(title = "Empirical Distribution of Number of Heads",
-         subtitle = expression(paste("Based on simulations with various values of p"[h])),
+         subtitle = expression(paste("Based on simulations with various values of ", rho[h])),
          x = "Number of Heads out of 20 Tosses",
-         y = expression(paste("p"[h]))) +
+         y = expression(rho[h])) +
   scale_y_continuous(breaks = seq(0, 1, 0.1)) +
   theme_classic()
 
@@ -801,8 +827,8 @@ x %>%
   filter(heads == 8) %>% 
   ggplot(aes(p)) +
     geom_bar() +
-    labs(title = expression(paste("Values of p"[h]," Associated with 8 Heads")),
-         x = expression(paste("Assumed value of p"[h], " in simulation")),
+    labs(title = expression(paste("Values of ", rho[h], " Associated with 8 Heads")),
+         x = expression(paste("Assumed value of ", rho[h], " in simulation")),
          y = "Count") +
   theme_classic()
 
@@ -822,7 +848,6 @@ p_posterior %>%
   ggplot(aes(x = p, y = probs)) +
     geom_col() +
     labs(title = expression(paste("Posterior Probability Distribution of ", rho[h])),
-         # x = expression(paste("Possible values of p"[h])),
          x = expression(paste("Possible values for ", rho[h])),
          y = "Probability") +
     scale_x_continuous(breaks = seq(0.2, 0.7, by = 0.1)) +
