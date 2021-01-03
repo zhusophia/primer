@@ -59,7 +59,7 @@ knitr::include_graphics("05-probability/images/probability_dice.jpeg")
 ```
 
 
-What does it mean that Trump had a *30% chance* of winning re-election in the fall of 2020? That there is a *90% probability* of rain today? That the dice at the casino are *unfair*? If I roll that dice 10 times and five of those times I get a three, how likely is it that the dice are *unfair*?
+What does it mean that Trump had a *30% chance* of winning re-election in the fall of 2020? That there is a *90% probability* of rain today? That the dice at the casino are *unfair*? 
 
 Probability is about quantifying uncertainty. We can think of probability as a proportion. The probability of an event occurring is a number from 0 to 1, where 0 means that the event is impossible and 1 means that the event is 100% certain.
 
@@ -73,18 +73,18 @@ This allows us to make the following statements:
 
 <!-- DK: What is the difference between a distribution and a probability distribution? After all, we can define them both with draws. And the draws can look like anything. And you can turn any distribution into a probability distribution via normalization. -->
 
-For the purposes of this course, a *probability distribution* is a mathematical object that covers a set of outcomes, where each distinct outcome has a chance of occurring between 0 and 1 inclusive. The chances must sum to 1. The set of possible outcomes --- heads or tails for the coin, 1 through 6 for a single die, 2 through 12 for a pair of dice --- can be either discrete or continuous. This set of outcomes is the *domain* of the probability distribution. There are three types of probability distributions: mathematical, empirical, and posterior. Let's walk through some examples to better understand each type of probability distribution.
+For the purposes of this Primer, a *probability distribution* is a mathematical object that covers a set of outcomes, where each distinct outcome has a chance of occurring between 0 and 1 inclusive. The chances must sum to 1. The set of possible outcomes --- heads or tails for the coin, 1 through 6 for a single die, 2 through 12 for a pair of dice --- can be either discrete or continuous. This set of outcomes is the *domain* of the probability distribution. There are three types of probability distributions: mathematical, empirical, and posterior. Let's walk through some examples to better understand each type of probability distribution.
 
-The key difference between a distribution, as we have explored them in earlier chapters, and a *probability* distribution is the requirement that the sum of the probabilities of the individual outcomes must exactly 1. There is no such requirement in a distribution. But any distribution can be turned into a probability distribution by "normalizing" it, as we will explore.  In this context, we will often refer a distribution which is not (yet) a probability distribution as an "unnormalized" distribution.  
+The key difference between a distribution, as we have explored them in earlier chapters, and a *probability* distribution is the requirement that the sum of the probabilities of the individual outcomes must be exactly 1. There is no such requirement in a distribution. But any distribution can be turned into a probability distribution by "normalizing" it, as we will explore.  In this context, we will often refer to a distribution which is not (yet) a probability distribution as an "unnormalized" distribution.  
 
-Pay attention to notation. Whenever we are talking about a specific probability (represented by a single value), we will use $\rho$ (the Greek letter "rho" but spoken aloud as "p" by us) with a *subscript* which specifies the exact outcome of which it is the probability. For instance, $\rho_h = 0.5$ denotes the probability of getting heads on a coin toss when the coin is fair. $\rho_t$ --- spoken as "PT" or "P sub T" or "P tails" --- denotes the probability of getting tails on a coin toss. However, when we are referring to the entire probability distribution over a set of outcomes, we will use $\rho$ with *parentheses*. For example, the probability distribution of a coin toss is $\rho(\text{coin})$. That is, $\rho(\text{coin})$ is composed of the two specific probabilities (50% and 50%) mapped from the domain (Heads or Tails). 
+Pay attention to notation. Whenever we are talking about a specific probability (represented by a single value), we will use $\rho$ (the Greek letter "rho" but spoken aloud as "p" by us) with a *subscript* which specifies the exact outcome of which it is the probability. For instance, $\rho_h = 0.5$ denotes the probability of getting heads on a coin toss when the coin is fair. $\rho_t$ --- spoken as "PT" or "P sub T" or "P tails" --- denotes the probability of getting tails on a coin toss. However, when we are referring to the entire probability distribution over a set of outcomes, we will use $\text{Prob}()$. For example, the probability distribution of a coin toss is $\text{Prob}(coin)$. That is, $\text{Prob}(coin)$ is composed of the two specific probabilities (50% and 50%) mapped from the tow values in the domain: Heads and Tails. 
 
-<!-- DK: Above is not clear. Explain this better by showing that a distribution is just a vector. A probability distribution is a vector in which each element of the vector is mapped to a 0--1 probability, the sum of which is one. And, actually, do we ever use a term $\rho(\text{coin})$ later?  We do! Need to connect this more clearly to joint distribution discussion. -->
+<!-- DK: Above is not clear. Explain this better by showing that a distribution is just a vector. A probability distribution is a vector in which each element of the vector is mapped to a 0--1 probability, the sum of which is one. Need to connect this more clearly to joint distribution discussion. -->
 
 
 ### Flipping a coin
 
-A *mathematical distribution* is based on mathematical formulas. Assuming that the dice is perfectly fair, we should get heads as many times as we get tails.
+A *mathematical distribution* is based on mathematical formulas. Assuming that the coin is perfectly fair, we should, on average, get heads as often as we get tails.
 
 ```{r, echo = FALSE}
 
@@ -98,7 +98,7 @@ ggplot(mydata, aes(x = results)) +
                  binwidth = 0.5, 
                  color = "white") +
   labs(title = "Mathematical Probability Distribution",
-       subtitle = "Flipping One Coin",
+       subtitle = "Expectations for flipping a fair coin",
        x = "Outcome\nResult of Coin Flip",
        y = "Probability") +
   scale_x_continuous(breaks = c(0, 1), 
@@ -111,19 +111,19 @@ ggplot(mydata, aes(x = results)) +
 
 An *empirical distribution* is based on data. You can think of this as the probability distribution created by running a simulation. In theory, if we increase the number of coins we flip in our simulation, the empirical distribution will look more and more similar to the mathematical distribution. The probability distribution is the Platonic form. The empirical distribution will often look like the mathematical probability distribution, but it will rarely be exactly the same.
 
-In this simulation, there are 49 heads and 51 tails. The outcome will vary every time we run the simulation, but the proportion of heads to tails should not be too different if this coin is fair.
+In this simulation, there are 56 heads and 44 tails. The outcome will vary every time we run the simulation, but the proportion of heads to tails should not be too different if this coin is fair.
 
 ```{r, echo = FALSE}
 
 # Flipping one coin 100 times
 
-set.seed(2)
+set.seed(3)
 
 coin <- c(0, 1)
 
 sims <- 100
 
-results <- sample(coin, sims, replace=TRUE)
+results <- sample(coin, sims, replace = TRUE)
 
 mydata <- tibble(results)
 
@@ -132,7 +132,7 @@ ggplot(mydata, aes(x = results)) +
                  binwidth = 0.5, 
                  color = "white") +
   labs(title = "Empirical Probability Distribution",
-       subtitle = "Flipping One Coin A Hundred Times",
+       subtitle = "Flipping one coin a hundred times",
        x = "Outcome\nResult of Coin Flip",
        y = "Probability") +
   scale_x_continuous(breaks = c(0, 1), 
@@ -143,11 +143,12 @@ ggplot(mydata, aes(x = results)) +
 
 ```
 
+
 A *posterior distribution* is based on beliefs and expectations. It displays your belief about things you can't see right now. You may have posterior distributions for events in the past, present, or future.
 
 In the case of the coin toss, the posterior distribution changes depending on your beliefs. For instance, let's say your friend brought a coin to school and asked to bet you. If the result is heads, you have to pay them $5. 
 
-This makes you suspicious; your posterior distribution would reflect this. You might believe that $\rho_h$ is 0.95 while $\rho_t$ is 0.05.
+This makes you suspicious; your posterior distribution would reflect this. You might believe that $\rho_h$ is 0.95 and $\rho_t$ is 0.05.
 
 ```{r, echo = FALSE}
 
@@ -161,7 +162,7 @@ ggplot(mydata, aes(x = results)) +
                  binwidth = 0.5, 
                  color = "white") +
   labs(title = "Posterior Probability Distribution",
-       subtitle = "Your Beliefs About Flipping One Coin to Bet Your Friend",
+       subtitle = "Your beliefs about flipping one coin to bet your friend",
        x = "Outcome\nResult of Coin Flip",
        y = "Probability") +
   scale_x_continuous(breaks = c(0, 1), 
@@ -172,9 +173,9 @@ ggplot(mydata, aes(x = results)) +
 
 ```
 
-### Rolling two die
+### Rolling two dice
 
-Our *mathematical distribution* tells us that, with a fair dice, the probability of getting 1, 2, 3, 4, 5, and 6 are equal: there is a 1/6 chance of each. When we roll two die at the same time and sum the values, the numbers closest to the middle (ex. 6, 7, 8) are more common sums than numbers at the very edge (ex. 2, 12) because there are more combinations of numbers that add up to the middle values.
+Our *mathematical distribution* tells us that, with a fair dice, the probability of getting 1, 2, 3, 4, 5, and 6 are equal: there is a 1/6 chance of each. When we roll two dice at the same time and sum the numbers, the values closest to the middle are more common than values at the edge because there are more combinations of numbers that add up to the middle values.
 
 ```{r, echo = FALSE}
 tibble(sum = c(rep(c(2, 12), 1), 
@@ -188,7 +189,7 @@ tibble(sum = c(rep(c(2, 12), 1),
                    binwidth = 1, 
                    color = "white") +
     labs(title = "Mathematical Probability Distribution",
-         subtitle = "Sum from Rolling Two Die",
+         subtitle = "Expectation for the sum from rolling two dice",
          x = "Outcome\nSum of Two Die",
          y = "Probability") +
     scale_x_continuous(breaks = seq(2, 12, 1), labels = 2:12) +
@@ -197,7 +198,7 @@ tibble(sum = c(rep(c(2, 12), 1),
     theme_classic()
 ```
 
-We get an *empirical distribution* by running a simulation and rolling two die a hundred times. The result is not identical to the mathematical distribution because of the inherent randomness of the real world. We can observe that the $\rho_2$ and $\rho_12$, which are displayed on the left and right most ends of the distribution, are far lower than the $\rho_6$, for example.
+We get an *empirical distribution* by running a simulation and rolling two dice a hundred times. The result is not identical to the mathematical distribution because of the inherent randomness of the real world. 
 
 ```{r, echo = FALSE}
 
@@ -220,7 +221,7 @@ ggplot(mydata, aes(x = sum)) +
                  binwidth = 1, 
                  color = "white") +
   labs(title = "Empirical Probability Distribution",
-       subtitle = "Sum from Rolling Two Die A Hundred Times",
+       subtitle = "Sum from rolling two dice one hundred times",
        x = "Outcome\nSum of Two Die",
        y = "Probability") +
   scale_x_continuous(breaks = seq(2, 12, 1), labels = 2:12) +
@@ -230,7 +231,10 @@ ggplot(mydata, aes(x = sum)) +
 
 ```
 
-The *posterior distribution* for rolling one dice a hundred depends on your expectations. If you take the dice from your Monopoly set, you have reason to believe that the assumptions underlying the mathematical distribution are true. However, if you walk into a crooked casino and a host asks you to play craps, you might be suspicious. In craps, a come-out roll of 7 and 11 is a "natural" and the you win. You might expect those numbers to occur less often than they would with fair dice. Meanwhile, a come-out roll of 2, 3 is bad for someone betting what's known as the "Pass line." You might also expect values like 2 and 3 to occur more frequently. Your posterior distribution might look like this:
+We might consider labeling the y-axis in plots of empirical distributions as "Proportion" rather than "Probability" since it is an actual proportion, calculated from real (or simulated) data. We will keep it as "Probability" since we want to emphasize the parallels between mathematical, empirical and posterior distributions.
+
+
+The *posterior distribution* for rolling two dice a hundred times depends on your expectations. If you take the dice from your Monopoly set, you have reason to believe that the assumptions underlying the mathematical distribution are true. However, if you walk into a crooked casino and a host asks you to play craps, you might be suspicious. In craps, a come-out roll of 7 and 11 is a "natural" and the you win. You might expect those numbers to occur less often than they would with fair dice. Meanwhile, a come-out roll of 2, 3 is bad for someone betting what's known as the "Pass line." You might also expect values like 2 and 3 to occur more frequently. Your posterior distribution might look like this:
 
 ```{r, echo = FALSE}
 # Hard code our posterior about the crooked casino.
@@ -244,7 +248,7 @@ tibble(results = c(rep(2, 17), rep(3, 17), rep(4, 7),
                    binwidth = 1, 
                    color = "white") +
     labs(title = "Posterior Probability Distribution",
-         subtitle = "Your belief about the sum of two die at a crooked   casino",
+         subtitle = "Your belief about the sum of two dice at a crooked   casino",
          x = "Outcome\nSum of Two Die",
          y = "Probability") +
     scale_x_continuous(breaks = seq(2, 12, 1), labels = 2:12) +
@@ -258,9 +262,9 @@ Someone less suspicious of the casina would have a posterior distribution which 
 
 ### Presidential elections
 
-Now we let's say we are building probability distributions for political events, like a presidential election. We want to know the probability that Democratic candidate wins x electoral votes, where x represents the range of possible outcomes from 0 to 538.
+Now we let's say we are building probability distributions for political events, like a presidential election. We want to know the probability that Democratic candidate wins X electoral votes, where X represents the range of possible outcomes from 0 to 538.
 
-It would be incredibly naive to create the following *mathematical distribution*. We create a distribution by running a simulation 10,000 times, where the chances of the Democratic candidate winning any given state's electoral votes is 0.5.
+We can start with a *mathematical distribution* for X which assumes that the chances of the Democratic candidate winning any given state's electoral votes is 0.5 and the results from each state are independent.
 
 ```{r, echo = FALSE}
 
@@ -277,7 +281,7 @@ ggplot(data = result, aes(total)) +
   geom_histogram(aes(y= after_stat(count/sum(count))), 
                  binwidth = 1) +
   labs(title = "Mathematical Probability Distribution",
-       subtitle = "Presidential Elections",
+       subtitle = "Presidential elections with each state being 50/50 and independent",
        y = "Probability",
        x = "Outcome\nElectoral Vote Total for Democratic Candidate") +
   scale_y_continuous(labels = 
@@ -287,11 +291,13 @@ ggplot(data = result, aes(total)) +
 ```
 
 
-We know that campaign platforms, donations, charisma, and many other factors will contribute to a candidate's success Elections are more complicated than coin tosses. We also know that many presidential elections in history have resulted in much bigger victories or defeats than this distribution seems to allow for.
+We know that campaign platforms, donations, charisma, and many other factors will contribute to a candidate's success. Elections are more complicated than coin tosses. We also know that many presidential elections in history have resulted in much bigger victories or defeats than this distribution seems to allow for.
 
 The *empirical distribution* in this case could involve looking into past elections in the United States and counting the number of electoral votes that the Democrats won in each. For the empirical distribution, we create a tibble with electoral vote results from past elections. Looking at elections since 1964, we can observe that the number of electoral votes that the Democrats received in each one is different. Given that we only have 14 entries, it is difficult to draw conclusions or make predictions based off of this empirical distribution.
 
 However, this model is enough to suggest that the assumptions of the mathematical probability distribution above do not work for electoral votes. The model assumes that the Democrats have a 50% chance of receiving each of the 538 votes. Just looking at the mathematical probability distribution, we can observe that receiving 13 or 17 or 486 votes out of 538 would be extreme and almost impossible under this mathematical model. However, our empirical distribution tells us that those were real election results.
+
+<!-- DK: Need to add 2020 -->
 
 ```{r, echo = FALSE}
 
@@ -303,7 +309,7 @@ ggplot(mydata, aes(x = electoral_votes)) +
                  bins = 100, 
                  color = "white") +
   labs(title = "Empirical Probability Distribution",
-       subtitle = "Electoral Votes from Previous Elections",
+       subtitle = "Electoral votes from 16 previous elections",
        x = "Outcome\nElectoral Vote Total for Democratic Candidate",
        y = "Probability") +
   scale_y_continuous(labels = 
@@ -312,7 +318,7 @@ ggplot(mydata, aes(x = electoral_votes)) +
 
 ```
 
-The *posterior distribution* in the election case is something data scientists devote a lot of time to. The analysts develop algorithms that consider their expectations for each outcome. Consider this generated using data from *FiveThirtyEight*.
+The *posterior distribution* of electoral votes is popular topic, and an area of straong disagreement, among data scientists. Consider this posterior from *FiveThirtyEight*.
 
 ```{r, echo = FALSE}
 # DK: Some comments about this. Where did you get this data from? Why those
@@ -354,7 +360,7 @@ Here is a posterior from the FiveThirtyEight website from August 13, 2020. This 
 knitr::include_graphics("05-probability/images/fivethirtyeight.png")
 ```
 
-Here is the posterior from *The Economist*, also from August 13, 2020. This looks confusing at first because the data analysts have chosen to merge the axes for Republican and Democratic electoral votes. We can tell that *The Economist* was more optimistic about Biden's odds in the election compared to Trump's, relative to *FiveThirtyEight*.
+Here is the posterior from *The Economist*, also from August 13, 2020. This looks confusing at first because they chose to merge the axes for Republican and Democratic electoral votes. We can tell that *The Economist* was less optimistic, relative to *FiveThirtyEight*, about Trump's chances in the election.
 
 ```{r, echo = FALSE, caption = "Economist Posterior from August 13, 2020"}
 knitr::include_graphics("05-probability/images/economist_aug13.png")
@@ -369,13 +375,15 @@ knitr::include_graphics("05-probability/images/538_versus_Economist.png")
 There are many political science questions you could explore with posterior distributions and they can relate to the past, present, or future.
 
 * Past: How many electoral votes would Hilary Clinton have won if she had picked a different VP?
-* Present: What is the median height of Harvard students?
+* Present: What are the total campaign donations from Harvard faculty?
 * Future: How many electoral votes will the Democratic candidate for president win in 2024?
 
 ### Working with probability distributions
 
 
-```{r, echo = FALSE, fig.cap = 'Bruno de Finetti, an Italian statistician who wrote a famous treatise on the theory of probability that began with the statement "PROBABILITY DOES NOT EXIST." This is because probability only exists subjectively in our minds. It is a tool people made up and use for broad-stroke estimates.'}
+<!-- DK: Does this really belong here? Maybe at the end? -->
+
+```{r, echo = FALSE, fig.cap = 'Bruno de Finetti, an Italian statistician who wrote a famous treatise on the theory of probability that began with the statement "PROBABILITY DOES NOT EXIST." This is because probability only exists subjectively in our minds.'}
 
 knitr::include_graphics("05-probability/images/de_finetti.jpg")
 
@@ -428,7 +436,7 @@ Remember that *probability distributions are mathematical objects that cover a s
 
 <!-- DK: Do we really need this?  -->
 
-For instance, we can generate the following unnormalized distribution for the sum of rolling two die (empirical distribution from running this simulation 100 times). You may notice that the shape of the distribution is the same as the empirical probability distribution we generated earlier, only the y-axis is labeled differently.
+For instance, we can generate the following unnormalized distribution for the sum of rolling two dice (empirical distribution from running this simulation 100 times). You may notice that the shape of the distribution is the same as the empirical probability distribution we generated earlier, only the y-axis is labeled differently.
 
 ```{r, echo = FALSE}
 
@@ -447,7 +455,7 @@ mydata <- mydata %>%
 ggplot(mydata, aes(x = sum)) +
   geom_histogram(binwidth = 1, color = "white") +
   labs(title = "Empirical Unnormalized Distribution",
-       subtitle = "Sum from Rolling Two Die A Hundred Times",
+       subtitle = "Sum from rolling two dice one hundred times",
        x = "Outcome\nSum of Two Die",
        y = "Count") +
   scale_x_continuous(breaks = seq(0, 12, 1), labels = 0:12) +
@@ -464,11 +472,13 @@ ggplot(mydata, aes(x = sum)) +
 
 <!-- DK: Should be p(A). Discuss p(A, B) -->
 
-Recall that $\rho(\text{coin})$ is the probability distribution for the result of a coin toss. It includes two parts, the probability of heads ($\rho_h$) and the probability of ($\rho_t$). This is a *univariate* distribution because there is only one outcome, which can be heads or tails. If there is more than one outcome, then we have a *joint* distribution.
+Recall that $\text{Prob}(coin)$ is the probability distribution for the result of a coin toss. It includes two parts, the probability of heads ($\rho_h$) and the probability of tails ($\rho_t$). This is a *univariate* distribution because there is only one outcome, which can be heads or tails. If there is more than one outcome, then we have a *joint* distribution.
+
+<!-- DK: Use of "outcome" is sloppy. Does a single die roll have one outcome or 6? -->
 
 Joint distributions are also mathematical objects that cover a set of outcomes, where each distinct outcome has a chance of occurring between 0 and 1 and the sum of all chances equals to 1. The key to a joint distribution is it measures the chance that both events A and B will occur simultaneously. The notation is $\rho(\text{A}, \text{B})$.
 
-Let's say that you are rolling two six-sided dice simultaneously. One is weighted so that there is a 50% chance of rolling a 6 and a 10% chance of each of the other values. The other is weighted so there is a 50% chance of rolling a 5 and a 10% chance of rolling each of the other values. Let's roll both dice 1,000 times. In previous examples involving two die, we cared about the sum of results and not the outcomes of the first versus the second die of each simulation. With a joint distributions, the order matters; so instead of 11 possible outcomes on the x-axis of our distribution plot (ranging from 2 to 12), we have 36. Furthermore, a 2D probability distribution is not sufficient to represent all of the variables involved, so the joint distribution for this example is displayed using a 3D plot.
+Let's say that you are rolling two six-sided dice simultaneously. One is weighted so that there is a 50% chance of rolling a 6 and a 10% chance of each of the other values. The other is weighted so there is a 50% chance of rolling a 5 and a 10% chance of rolling each of the other values. Let's roll both dice 1,000 times. In previous examples involving two dice, we cared about the sum of results and not the outcomes of the first versus the second die of each simulation. With a joint distributions, the order matters; so instead of 11 possible outcomes on the x-axis of our distribution plot (ranging from 2 to 12), we have 36. Furthermore, a 2D probability distribution is not sufficient to represent all of the variables involved, so the joint distribution for this example is displayed using a 3D plot.
 
 ```{r, echo = FALSE}
 knitr::include_graphics("05-probability/images/joint.png")
@@ -528,7 +538,7 @@ This concept of conditional probability is relevant in our everyday lives. For e
 
 In our histogram probability distribution, we didn’t care what combinations of numbers made each sum. We only cared about the outcome. There are two ways of thinking about a coin toss as well. Your tree diagram should look different depending on whether the order of the results matters.
 
-To understand tree diagrams a little better, imagine you’re flipping 2 coins. Your tree diagram may look different depending what you’re interested in measuring. In the following figure, the order of your coin toss results does not matter. We can imagine that you are rolling two coins together, or that you only care about the sum of the two die values.
+To understand tree diagrams a little better, imagine you’re flipping 2 coins. Your tree diagram may look different depending what you’re interested in measuring. In the following figure, the order of your coin toss results does not matter. We can imagine that you are rolling two coins together, or that you only care about the sum of the two dice values.
 
 ```{r out.width="100%", echo = FALSE}
 knitr::include_graphics("05-probability/images/tree-3.png")
