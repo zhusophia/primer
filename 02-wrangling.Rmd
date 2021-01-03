@@ -1228,8 +1228,74 @@ You can also view examples of both `pivot_longer()` and `pivot_wider()` on the [
 
 ## Distributions {#distributions}
 
+<!-- DK: This could be re-organized. More discusion of discrete versus continuous. -->
 
-What is a distribution? Think of the distribution of a variable as an urn from which we can pull out, at random, values for that variable. Drawing a thousand or so values from that urn, and then looking at a histogram, can show where the values are centered and how the values vary. Because we are sloppy, we will use the word distribution to refer to both the (imaginary!) urn from which we are drawing values and to the list of values we have drawn. *The vector of `r length(trains$age)` ages in the `trains` data is a distribution.*
+What is a distribution? *Think of the distribution of a variable as an urn from which we can pull out, at random, values for that variable.* Drawing a thousand or so values from that urn, and then looking at a histogram, can show where the values are centered and how the values vary. Because we are sloppy, we will use the word distribution to refer to both the (imaginary!) urn from which we are drawing values and to the list of values we have drawn. *The vector of `r length(trains$age)` ages in the `trains` data is a distribution.*
+
+### Scaling a distribution
+
+Consider the vector which is the result of rolling one die 10 times.
+
+```{r}
+rolls <- c(5, 5, 1, 5, 4, 2, 6, 2, 1, 5)
+```
+
+There are other ways of storing the data in this vector. Instead of recording every draw, we could just record the number of times each value appears.
+
+```{r}
+table(rolls)
+```
+
+In this case, with only 10 vlaues, it is actually less efficient to store the data like this. But what happens when we have 10,000 rolls.
+
+```{r}
+more_rolls <- rep(rolls, 1000)
+table(more_rolls)
+```
+
+Instead of keeping around a vector of length 10,000, we can just keep 10 values, without losing any information.
+
+This example also highlights the fact that, graphically, two distributions can be identical even if they are of very different lengths.
+
+```{r, echo = FALSE}
+rolls_p <- tibble(value = rolls) %>% 
+  ggplot(aes(value)) +
+    geom_bar(aes(y = after_stat(count))) +
+    labs(title = "Distribution of 10 Rolls",
+         y = "Count")
+
+
+more_rolls_p <- tibble(value = more_rolls) %>% 
+  ggplot(aes(value)) +
+    geom_bar(aes(y = after_stat(count))) +
+    labs(title = "Distribution of 10,000 Rolls",
+         y = NULL)
+
+
+rolls_p + more_rolls_p
+```
+
+The two vectors --- `rolls` and `more_rolls` --- have the exact same shape because, even though their lengths differ, they are the same thing. *The total count for each value does not matter. What matters is the relative proportions.*
+
+Since shape is what matters, we will often "normalize" distributions so that the sum of the counts equals one, meaning that the y-axis is a percentage of the total. Example:
+
+```{r, echo = FALSE}
+rolls_p <- tibble(value = rolls) %>% 
+  ggplot(aes(x = value)) +
+    geom_bar(aes(y = after_stat(count/sum(count)))) +
+    labs(title = "Distribution of 10 Rolls",
+         y = "Percentage")
+
+more_rolls_p <- tibble(value = more_rolls) %>% 
+  ggplot(aes(value)) +
+    geom_bar(aes(y = after_stat(count/sum(count)))) +
+    labs(title = "Distribution of 10,000 Rolls",
+         y = NULL)
+
+rolls_p + more_rolls_p
+```
+
+### `sample()`
 
 The most common distributions you will work with are *empirical* or *frequency* distributions, the values of `age` in the `trains` tibble, the values of `poverty` in the `kenya` tibble, and so on. But we can also create our own data by making "draws" from a distribution which we have concocted. 
 
