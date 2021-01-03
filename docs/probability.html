@@ -44,7 +44,7 @@
 <li><a class="" href="one-parameter.html"><span class="header-section-number">6</span> One Parameter</a></li>
 <li><a class="" href="two-parameters.html"><span class="header-section-number">7</span> Two Parameters</a></li>
 <li><a class="" href="three-parameters.html"><span class="header-section-number">8</span> Three Parameters</a></li>
-<li><a class="" href="building-models.html"><span class="header-section-number">9</span> Building Models</a></li>
+<li><a class="" href="four-parameters.html"><span class="header-section-number">9</span> Four Parameters</a></li>
 <li><a class="" href="five-parameters.html"><span class="header-section-number">10</span> Five Parameters</a></li>
 <li><a class="" href="n-parameters.html"><span class="header-section-number">11</span> N Parameters</a></li>
 <li><a class="" href="case-studies.html"><span class="header-section-number">12</span> Case Studies</a></li>
@@ -65,7 +65,10 @@
 <span class="header-section-number">5</span> Probability<a class="anchor" aria-label="anchor" href="#probability"><i class="fas fa-link"></i></a>
 </h1>
 <!-- Here, or earlier, need to explain discrete versus continuous distributions. -->
-<!-- Use labels = scales::probability_trans() to make the after_stat nonsense unnecessary? -->
+<!-- Clean up Three Models section. -->
+<!-- Greek letters or for parameters which we can never observe. Latin letters are for observables. -->
+<!-- \rho is an unknown probability. \rho and an underscore letter refers to the unknown probability of the event represented by that letter. \rho_h to refer to the unknown probability of heads. -->
+<!-- Use $p$ to refer to an unknown proportion p. Use  -->
 <!-- Show more of the code in this chapter. Lot's of good stuff! Everything but the mathematical distributions? At the least, show one plot with the various tricks. -->
 <!-- Hard code dice sum results for mathematical distribution. -->
 <!-- Also good to get into the *scaling* of distributions, and the arbitrariness thereof. For example, trains$age is a distribution. Fine. What about rep(trains$age, 2)? What about rep(trains$age, 100)? Well, if any vector is a distribution, then all three of these are distributions. In fact, they are the same distribution, just scaled differently.  -->
@@ -94,20 +97,20 @@
 FIGURE 5.1: Dice and Probability.
 </p>
 </div>
-<p>What does it mean that Trump has a <em>30% chance</em> of winning re-election this fall? That there is a <em>90% probability</em> of rain today? That the dice at the casino is <em>unfair</em>? If I roll that dice 10 times and five of those times I get a three, how likely is it that the dice is <em>unfair</em>?</p>
-<p>Probability is about quantifying uncertainty. We can think of probability as a proportion. The probability of an event occurring is a number from 0 to 1, where 1 means that the event is 100% certain.</p>
-<p>Let’s begin with the simplest events: coin flips and dice rolls. If the dice and
-the coins are fair, we can operate under the assumption that all outcomes are
-equally likely.</p>
+<p>What does it mean that Trump had a <em>30% chance</em> of winning re-election in the fall of 2020? That there is a <em>90% probability</em> of rain today? That the dice at the casino are <em>unfair</em>? If I roll that dice 10 times and five of those times I get a three, how likely is it that the dice are <em>unfair</em>?</p>
+<p>Probability is about quantifying uncertainty. We can think of probability as a proportion. The probability of an event occurring is a number from 0 to 1, where 0 means that the event is impossible and 1 means that the event is 100% certain.</p>
+<p>Let’s begin with the simplest events: coin flips and dice rolls. If the dice and the coins are fair, we can operate under the assumption that all outcomes are equally likely.</p>
 <p>This allows us to make the following statements:</p>
 <ul>
-<li>The probability of rolling a 1 or 2 is 2/6, or 1/3.</li>
+<li>The probability of rolling a 1 or a 2 is 2/6, or 1/3.</li>
 <li>The probability of rolling a 1, 2, 3, 4, 5, or 6 is 1.<br>
 </li>
 <li>The probability of flipping a coin and getting tails is 1/2.</li>
 </ul>
-<p>For the purposes of this course, a <em>probability distribution</em> is a mathematical object that covers a set of outcomes, where each distinct outcome has a chance of occurring between 0 and 1 inclusive. The set of possible outcomes — heads or tails for the coin, 1 through 6 for the dice — can be either discrete or continuous. This set of outcomes is the <em>domain</em> of the probability distribution. There are three types of probability distributions: mathematical, empirical, and posterior. Let’s walk through some examples to better understand each type of probability distribution.</p>
-<p>Before we continue, we should be familiar with the notation used in this chapter. Whenever we are talking about a specific probability (represented by a single value), we will use <span class="math inline">\(p\)</span> with a <em>subscript</em>. For instance, <span class="math inline">\(p_h\)</span> = 0.5 denotes the probability of getting heads on a coin toss when the coin is fair. <span class="math inline">\(p_t\)</span> denotes the probability of getting tails on the coin toss. However, when we are referring to the entire probability distribution over a set of outcomes, we will use <span class="math inline">\(p\)</span> with <em>parentheses</em>. For example, the probability distribution of a coin toss is <span class="math inline">\(p(coin)\)</span>. That said, <span class="math inline">\(p(coin)\)</span> is composed of all the two specific probabilities mapped from the domain.</p>
+<!-- DK: What is the difference between a distribution and a probability distribution? After all, we can define them both with draws. And the draws can look like anything. And you can turn any distribution into a probability distribution via normalization. --><p>For the purposes of this course, a <em>probability distribution</em> is a mathematical object that covers a set of outcomes, where each distinct outcome has a chance of occurring between 0 and 1 inclusive. The chances must sum to 1. The set of possible outcomes — heads or tails for the coin, 1 through 6 for a single die, 2 through 12 for a pair of dice — can be either discrete or continuous. This set of outcomes is the <em>domain</em> of the probability distribution. There are three types of probability distributions: mathematical, empirical, and posterior. Let’s walk through some examples to better understand each type of probability distribution.</p>
+<p>The key difference between a distribution, as we have explored them in earlier chapters, and a <em>probability</em> distribution is the requirement that the sum of the probabilities of the individual outcomes must exactly 1. There is no such requirement in a distribution. But any distribution can be turned into a probability distribution by “normalizing” it, as we will explore. In this context, we will often refer a distribution which is not (yet) a probability distribution as an “unnormalized” distribution.</p>
+<p>Pay attention to notation. Whenever we are talking about a specific probability (represented by a single value), we will use <span class="math inline">\(\rho\)</span> (the Greek letter “rho” but spoken aloud as “p” by us) with a <em>subscript</em> which specifies the exact outcome of which it is the probability. For instance, <span class="math inline">\(\rho_h = 0.5\)</span> denotes the probability of getting heads on a coin toss when the coin is fair. <span class="math inline">\(\rho_t\)</span> — spoken as “PT” or “P sub T” or “P tails” — denotes the probability of getting tails on a coin toss. However, when we are referring to the entire probability distribution over a set of outcomes, we will use <span class="math inline">\(\rho\)</span> with <em>parentheses</em>. For example, the probability distribution of a coin toss is <span class="math inline">\(\rho(\text{coin})\)</span>. That is, <span class="math inline">\(\rho(\text{coin})\)</span> is composed of the two specific probabilities (50% and 50%) mapped from the domain (Heads or Tails).</p>
+<!-- DK: Above is not clear. Explain this better by showing that a distribution is just a vector. A probability distribution is a vector in which each element of the vector is mapped to a 0--1 probability, the sum of which is one. And, actually, do we ever use a term $\rho(\text{coin})$ later?  We do! Need to connect this more clearly to joint distribution discussion. -->
 <div id="flipping-a-coin" class="section level3" number="5.1.1">
 <h3>
 <span class="header-section-number">5.1.1</span> Flipping a coin<a class="anchor" aria-label="anchor" href="#flipping-a-coin"><i class="fas fa-link"></i></a>
@@ -117,9 +120,9 @@ equally likely.</p>
 <p>An <em>empirical distribution</em> is based on data. You can think of this as the probability distribution created by running a simulation. In theory, if we increase the number of coins we flip in our simulation, the empirical distribution will look more and more similar to the mathematical distribution. The probability distribution is the Platonic form. The empirical distribution will often look like the mathematical probability distribution, but it will rarely be exactly the same.</p>
 <p>In this simulation, there are 49 heads and 51 tails. The outcome will vary every time we run the simulation, but the proportion of heads to tails should not be too different if this coin is fair.</p>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-366-1.png" width="100%"></div>
-<p>An <em>posterior distribution</em> is based on beliefs and expectations. It displays your belief about things you can’t see right now. You may have posterior distributions for events in the past, present, or future.</p>
+<p>A <em>posterior distribution</em> is based on beliefs and expectations. It displays your belief about things you can’t see right now. You may have posterior distributions for events in the past, present, or future.</p>
 <p>In the case of the coin toss, the posterior distribution changes depending on your beliefs. For instance, let’s say your friend brought a coin to school and asked to bet you. If the result is heads, you have to pay them $5.</p>
-<p>This makes you suspicious; your posterior distribution would reflect this. You might believe that <span class="math inline">\(p_h\)</span> is 0.95 while <span class="math inline">\(p_t\)</span> is 0.05.</p>
+<p>This makes you suspicious; your posterior distribution would reflect this. You might believe that <span class="math inline">\(\rho_h\)</span> is 0.95 while <span class="math inline">\(\rho_t\)</span> is 0.05.</p>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-367-1.png" width="100%"></div>
 </div>
 <div id="rolling-two-die" class="section level3" number="5.1.2">
@@ -128,11 +131,11 @@ equally likely.</p>
 </h3>
 <p>Our <em>mathematical distribution</em> tells us that, with a fair dice, the probability of getting 1, 2, 3, 4, 5, and 6 are equal: there is a 1/6 chance of each. When we roll two die at the same time and sum the values, the numbers closest to the middle (ex. 6, 7, 8) are more common sums than numbers at the very edge (ex. 2, 12) because there are more combinations of numbers that add up to the middle values.</p>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-368-1.png" width="100%"></div>
-<p>We get an <em>empirical distribution</em> by running a simulation and rolling two die a hundred times. The result is not identical to the mathematical distribution because of the inherent randomness of the real world. We can observe that the <span class="math inline">\(p_2\)</span> and <span class="math inline">\(p_12\)</span>, which are displayed on the left and right most ends of the distribution, are far lower than the <span class="math inline">\(p_6\)</span>, for example.</p>
+<p>We get an <em>empirical distribution</em> by running a simulation and rolling two die a hundred times. The result is not identical to the mathematical distribution because of the inherent randomness of the real world. We can observe that the <span class="math inline">\(\rho_2\)</span> and <span class="math inline">\(\rho_12\)</span>, which are displayed on the left and right most ends of the distribution, are far lower than the <span class="math inline">\(\rho_6\)</span>, for example.</p>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-369-1.png" width="100%"></div>
 <p>The <em>posterior distribution</em> for rolling one dice a hundred depends on your expectations. If you take the dice from your Monopoly set, you have reason to believe that the assumptions underlying the mathematical distribution are true. However, if you walk into a crooked casino and a host asks you to play craps, you might be suspicious. In craps, a come-out roll of 7 and 11 is a “natural” and the you win. You might expect those numbers to occur less often than they would with fair dice. Meanwhile, a come-out roll of 2, 3 is bad for someone betting what’s known as the “Pass line.” You might also expect values like 2 and 3 to occur more frequently. Your posterior distribution might look like this:</p>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-370-1.png" width="100%"></div>
-<p>Someone less suspcious of the casina would have a posterior distribution which looks more like the mathematical distribution.</p>
+<p>Someone less suspicious of the casina would have a posterior distribution which looks more like the mathematical distribution.</p>
 </div>
 <div id="presidential-elections" class="section level3" number="5.1.3">
 <h3>
@@ -141,45 +144,28 @@ equally likely.</p>
 <p>Now we let’s say we are building probability distributions for political events, like a presidential election. We want to know the probability that Democratic candidate wins x electoral votes, where x represents the range of possible outcomes from 0 to 538.</p>
 <p>It would be incredibly naive to create the following <em>mathematical distribution</em>. We create a distribution by running a simulation 10,000 times, where the chances of the Democratic candidate winning any given state’s electoral votes is 0.5.</p>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-371-1.png" width="100%"></div>
-<p>We know that campaign platforms, donations, charisma, and many other factors will contribute to a candidate’s likeability. Elections are more complicated than coin tosses.</p>
+<p>We know that campaign platforms, donations, charisma, and many other factors will contribute to a candidate’s success Elections are more complicated than coin tosses. We also know that many presidential elections in history have resulted in much bigger victories or defeats than this distribution seems to allow for.</p>
 <p>The <em>empirical distribution</em> in this case could involve looking into past elections in the United States and counting the number of electoral votes that the Democrats won in each. For the empirical distribution, we create a tibble with electoral vote results from past elections. Looking at elections since 1964, we can observe that the number of electoral votes that the Democrats received in each one is different. Given that we only have 14 entries, it is difficult to draw conclusions or make predictions based off of this empirical distribution.</p>
 <p>However, this model is enough to suggest that the assumptions of the mathematical probability distribution above do not work for electoral votes. The model assumes that the Democrats have a 50% chance of receiving each of the 538 votes. Just looking at the mathematical probability distribution, we can observe that receiving 13 or 17 or 486 votes out of 538 would be extreme and almost impossible under this mathematical model. However, our empirical distribution tells us that those were real election results.</p>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-372-1.png" width="100%"></div>
 <p>The <em>posterior distribution</em> in the election case is something data scientists devote a lot of time to. The analysts develop algorithms that consider their expectations for each outcome. Consider this generated using data from <em>FiveThirtyEight</em>.</p>
-<pre><code>## 
-## ── Column specification ────────────────────────────────────────────────────────
-## cols(
-##   cycle = col_double(),
-##   branch = col_character(),
-##   model = col_character(),
-##   modeldate = col_character(),
-##   candidate_inc = col_character(),
-##   candidate_chal = col_character(),
-##   candidate_3rd = col_logical(),
-##   evprob_inc = col_double(),
-##   evprob_chal = col_double(),
-##   evprob_3rd = col_logical(),
-##   total_ev = col_double(),
-##   timestamp = col_character(),
-##   simulations = col_double()
-## )</code></pre>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-373-1.png" width="100%"></div>
 <p>Here is a posterior from the FiveThirtyEight website from August 13, 2020. This was created using the same data as the above distribution, but simply displayed differently. For each electoral result, the height of the bar represents the probability that a given event will occur. However, there is no numbered y-axis telling us what the specific probability of each outcome is.</p>
 <div class="inline-figure"><img src="05-probability/images/fivethirtyeight.png" width="100%"></div>
-<p>Here is the posterior from <em>The Economist</em>, also from August 13, 2020. This looks confusing at first because the data analysts have chosen to merge the axes for Republican and Democratic electoral votes. We can tell that the Economist is more optimistic about Biden’s odds in the election compared to Trump’s, relative to <em>FiveThirtyEight</em>.</p>
+<p>Here is the posterior from <em>The Economist</em>, also from August 13, 2020. This looks confusing at first because the data analysts have chosen to merge the axes for Republican and Democratic electoral votes. We can tell that <em>The Economist</em> was more optimistic about Biden’s odds in the election compared to Trump’s, relative to <em>FiveThirtyEight</em>.</p>
 <div class="inline-figure"><img src="05-probability/images/economist_aug13.png" width="100%"></div>
-<p>These two models, built by smart people using the similar data sources, have reached fairly different conclusions. Data science is difficult! There is not one “right” answer. Real life is not a problem set.</p>
+<p>These two models, built by smart people using similar data sources, have reached fairly different conclusions. Data science is difficult! There is not one “right” answer. Real life is not a problem set.</p>
 <div class="figure">
 <span id="fig:unnamed-chunk-376"></span>
 <img src="05-probability/images/538_versus_Economist.png" alt="Watch the makers of these two models throw shade at each other on Twitter! Eliot Morris is one of the primary authors of the Economist model. Nate Silver is in charge of 538. They don't seem to be too impressed with each other's work! More smack talk [here](https://statmodeling.stat.columbia.edu/2020/08/31/more-on-that-fivethirtyeight-prediction-that-biden-might-only-get-42-of-the-vote-in-florida/) and [here](https://statmodeling.stat.columbia.edu/2020/08/31/problem-of-the-between-state-correlations-in-the-fivethirtyeight-election-forecast/)." width="100%"><p class="caption">
 FIGURE 5.2: Watch the makers of these two models throw shade at each other on Twitter! Eliot Morris is one of the primary authors of the Economist model. Nate Silver is in charge of 538. They don’t seem to be too impressed with each other’s work! More smack talk <a href="https://statmodeling.stat.columbia.edu/2020/08/31/more-on-that-fivethirtyeight-prediction-that-biden-might-only-get-42-of-the-vote-in-florida/">here</a> and <a href="https://statmodeling.stat.columbia.edu/2020/08/31/problem-of-the-between-state-correlations-in-the-fivethirtyeight-election-forecast/">here</a>.
 </p>
 </div>
-<p>There are many political science questions you could explore with posterior distributions and they can relate to the past, present, and future.</p>
+<p>There are many political science questions you could explore with posterior distributions and they can relate to the past, present, or future.</p>
 <ul>
-<li>Past: How many electoral votes would Hilary Clinton have won if she picked a different VP?</li>
+<li>Past: How many electoral votes would Hilary Clinton have won if she had picked a different VP?</li>
 <li>Present: What is the median height of Harvard students?</li>
-<li>Future: How many electoral votes will a presidential candidate win?</li>
+<li>Future: How many electoral votes will the Democratic candidate for president win in 2024?</li>
 </ul>
 </div>
 <div id="working-with-probability-distributions" class="section level3" number="5.1.4">
@@ -192,50 +178,52 @@ FIGURE 5.2: Watch the makers of these two models throw shade at each other on Tw
 FIGURE 5.3: Bruno de Finetti, an Italian statistician who wrote a famous treatise on the theory of probability that began with the statement “PROBABILITY DOES NOT EXIST.” This is because probability only exists subjectively in our minds. It is a tool people made up and use for broad-stroke estimates.
 </p>
 </div>
-<p>A probability distribution is not always easy to work with. It is a complex object. And, in many contexts, we don’t really care about all that complexity. So, instead of providing the full probability distribution, we often just use a summary measure, a number or two or three which captures the aspect of the entire distribution which is relevant to the matter at hand. Let’s explore these issues using the 538 posterior probability distribution, as of August 13, 2020, for the number of electoral votes which will be won by Joe Biden. Here is a tibble with 1,000,000 draws from that distribution:</p>
-<div class="sourceCode" id="cb546"><pre class="downlit sourceCode r">
+<p>A probability distribution is not always easy to work with. It is a complex object. And, in many contexts, we don’t really care about all that complexity. So, instead of providing the full probability distribution, we often just use a summary measure, a number or two or three which captures those aspects of the entire distribution which are relevant to the matter at hand. Let’s explore these issues using the 538 posterior probability distribution, as of August 13, 2020, for the number of electoral votes which will be won by Joe Biden. Here is a tibble with 1,000,000 draws from that distribution:</p>
+<div class="sourceCode" id="cb545"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">draws</span></code></pre></div>
 <pre><code>## # A tibble: 1,000,000 x 2
 ##       ID electoral_votes
 ##    &lt;int&gt;           &lt;int&gt;
-##  1     1             491
-##  2     2             150
-##  3     3             369
-##  4     4             345
-##  5     5             185
-##  6     6             211
-##  7     7             203
-##  8     8             127
-##  9     9             376
-## 10    10             155
+##  1     1             197
+##  2     2             357
+##  3     3             406
+##  4     4             491
+##  5     5             150
+##  6     6             369
+##  7     7             345
+##  8     8             185
+##  9     9             211
+## 10    10             203
 ## # … with 999,990 more rows</code></pre>
 <p>A distribution and a sample of draws from that distribution are different things. But, if you squint, they are sort of the same thing, at least for our purposes. For example, if you want to know the mean of the distribution, then the mean of the draws will be a fairly good estimate, especially if the number of draws is large enough.</p>
-<p>The second way to represent a probability distribution in the computer is as a vector of draws. Recall from Chapter <a href="wrangling.html#wrangling">2</a> how we can draw randomly from specified probability distributions as so:</p>
-<div class="sourceCode" id="cb548"><pre class="downlit sourceCode r">
+<p>The most common method for representing a probability distribution in the computer is as a vector of draws. Recall from Chapter <a href="wrangling.html#wrangling">2</a> how we can draw randomly from specified probability distributions:</p>
+<div class="sourceCode" id="cb547"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></code></pre></div>
-<pre><code>##  [1] -1.090  1.324  1.336  0.039 -1.233  0.794  0.448 -1.081 -0.025 -0.663</code></pre>
-<div class="sourceCode" id="cb550"><pre class="downlit sourceCode r">
+<pre><code>##  [1] -0.061 -0.191  1.073  0.217  1.185 -0.742 -2.412  0.175 -0.152 -0.273</code></pre>
+<div class="sourceCode" id="cb549"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></code></pre></div>
-<pre><code>##  [1] 0.45 0.04 0.34 0.89 0.38 0.88 0.52 0.91 0.81 0.61</code></pre>
-<p>These elements of these vectors are all “draws” from the specified probability distributions. In most appplied situations, our tools will produce draws rather than summary objects. Fortunately, a vector of draws is very easy to work with:</p>
+<pre><code>##  [1] 0.178 0.038 0.911 0.860 0.206 0.330 0.041 0.138 0.853 0.907</code></pre>
+<p>These elements of these vectors are all “draws” from the specified probability distributions. In most applied situations, our tools will produce draws rather than summary objects. Fortunately, a vector of draws is very easy to work with:</p>
 </div>
 <div id="unnormalized-distributions" class="section level3" number="5.1.5">
 <h3>
 <span class="header-section-number">5.1.5</span> Unnormalized distributions<a class="anchor" aria-label="anchor" href="#unnormalized-distributions"><i class="fas fa-link"></i></a>
 </h3>
-<p>Remember that probability distributions are mathematical objects that cover a set of outcomes, where each outcome in the domain is mapped to a probability value between 0 and 1 inclusive and the sum of all mappings is 1. Sometimes, you may see distributions similar to probability distributions, only the y-axis displays raw counts instead of proportions. Unnormalized distributions are not probability distributions, but it is easy to convert between the two. You simply divide all the outcome counts on the y-axis by the sum of all outcome counts to “normalize” and unnormalized distribution. Unnormalized distributions are often an intermediary step; it is often handy to work with counts until the very end.</p>
+<p>Remember that <em>probability distributions are mathematical objects that cover a set of outcomes, where each outcome in the domain is mapped to a probability value between 0 and 1 inclusive and the sum of all mappings is 1.</em> Sometimes, you may see distributions similar to probability distributions, only the y-axis displays raw counts instead of proportions. Unnormalized distributions are not probability distributions, but it is easy to convert between the two. You simply divide all the outcome counts on the y-axis by the sum of all outcome counts to “normalize” the unnormalized distribution. Unnormalized distributions are often an intermediary step; it is sometimes handy to work with counts until the very end.</p>
+<!-- DK: Do we really need this?  -->
 <p>For instance, we can generate the following unnormalized distribution for the sum of rolling two die (empirical distribution from running this simulation 100 times). You may notice that the shape of the distribution is the same as the empirical probability distribution we generated earlier, only the y-axis is labeled differently.</p>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-382-1.png" width="100%"></div>
-<!-- DK: Add normalized density plot. Comment that they look identical, just scaled. -->
-<!-- after_stat("density") -->
+<!-- DK: Add normalized density plot. Comment that they look identical, just scaled. Talk about trains$ages and rep(trains$age, 3) being the same distributions with different scales. -->
+<!-- Explain: after_stat("density") -->
 </div>
 <div id="joint-distributions" class="section level3" number="5.1.6">
 <h3>
 <span class="header-section-number">5.1.6</span> Joint distributions<a class="anchor" aria-label="anchor" href="#joint-distributions"><i class="fas fa-link"></i></a>
 </h3>
 <!-- DK: Should be p(A). Discuss p(A, B) -->
-<p>Now we understand that <span class="math inline">\(p_A\)</span> can represent the probability distribution of outcomes for event A. Let’s talk about joint distributions, which can be represented by <span class="math inline">\(p_{A, B}\)</span>. Joint distributions are also mathematical objects that cover a set of outcomes, where each distinct outcome has a chance of occurring between 0 and 1 and the sum of all chances equals to 1. The key to a joint distribution is it measures the chance that both events A and B will occur simultaneously.</p>
-<p>Let’s say that you are rolling two six-sided dice simultaneously. One is weighted so that there is a 50% chance of rolling a 6 and a 10% chance of each of the other values. The other is weighted so there is a 50% chance of rolling a 5 and a 10% chance of rolling each of the other values. Let’s roll both dice 1000 times. In previous examples involving two die, we cared about the sum of results and not the outcomes of the first versus the second rolls of each simulation. With a joint distributions, the order matters so instead of 11 possible outcomes on the x-axis of our distribution graph (ranging from 2 to 12), we have 36. Furthermore, a 2D probability distribution is not sufficient to represent all of the variables involved, so the joint distribution for this example is displayed using a 3D plot.</p>
+<p>Recall that <span class="math inline">\(\rho(\text{coin})\)</span> is the probability distribution for the result of a coin toss. It includes two parts, the probability of heads (<span class="math inline">\(\rho_h\)</span>) and the probability of (<span class="math inline">\(\rho_t\)</span>). This is a <em>univariate</em> distribution because there is only one outcome, which can be heads or tails. If there is more than one outcome, then we have a <em>joint</em> distribution.</p>
+<p>Joint distributions are also mathematical objects that cover a set of outcomes, where each distinct outcome has a chance of occurring between 0 and 1 and the sum of all chances equals to 1. The key to a joint distribution is it measures the chance that both events A and B will occur simultaneously. The notation is <span class="math inline">\(\rho(\text{A}, \text{B})\)</span>.</p>
+<p>Let’s say that you are rolling two six-sided dice simultaneously. One is weighted so that there is a 50% chance of rolling a 6 and a 10% chance of each of the other values. The other is weighted so there is a 50% chance of rolling a 5 and a 10% chance of rolling each of the other values. Let’s roll both dice 1,000 times. In previous examples involving two die, we cared about the sum of results and not the outcomes of the first versus the second die of each simulation. With a joint distributions, the order matters; so instead of 11 possible outcomes on the x-axis of our distribution plot (ranging from 2 to 12), we have 36. Furthermore, a 2D probability distribution is not sufficient to represent all of the variables involved, so the joint distribution for this example is displayed using a 3D plot.</p>
 <div class="inline-figure"><img src="05-probability/images/joint.png" width="100%"></div>
 </div>
 </div>
@@ -243,11 +231,12 @@ FIGURE 5.3: Bruno de Finetti, an Italian statistician who wrote a famous treatis
 <h2>
 <span class="header-section-number">5.2</span> Tree diagrams<a class="anchor" aria-label="anchor" href="#tree-diagrams"><i class="fas fa-link"></i></a>
 </h2>
+<!-- DK: Worth rewriting? -->
 <div id="independence" class="section level3" number="5.2.1">
 <h3>
 <span class="header-section-number">5.2.1</span> Independence<a class="anchor" aria-label="anchor" href="#independence"><i class="fas fa-link"></i></a>
 </h3>
-<p>So far, you have learned how to calculate <span class="math inline">\(p_A\)</span>, which is the fancy, statistical way of saying the probability of an event known as A. When flipping a coin, the probability of getting heads was 1/2. You have also learned how to compute the <span class="math inline">\(p_{A or B}\)</span>. This means the probability of either A or B happening. When rolling a dice, <span class="math inline">\(p_{1 or 2}\)</span>–the probability of getting a 1 or a 2–was 1/3.</p>
+<p>So far, you have learned how to calculate <span class="math inline">\(\rho_A\)</span>, which is the fancy, statistical way of saying the probability of an event known as A. When flipping a coin, the probability of getting heads was 1/2. You have also learned how to compute the <span class="math inline">\(\rho_{A or B}\)</span>. This means the probability of either A or B happening. When rolling a dice, <span class="math inline">\(\rho_{1 or 2}\)</span> — the probability of getting a 1 or a 2 — was 1/3.</p>
 <p>What if you flipped 2 coins? You know that the probability of getting heads once is 1/2, but what are the odds of getting heads 2 times in a row? Let’s take a look at this tree diagram. We read this diagram from left to right. On the left, the probability of getting heads is 0.5. Now the tree branches out.</p>
 <ul>
 <li>
@@ -255,7 +244,7 @@ FIGURE 5.3: Bruno de Finetti, an Italian statistician who wrote a famous treatis
 <li>
 <em>If</em> we got tails the first time, then we go down the bottom branch. The probability of getting heads is 0.5.</li>
 </ul>
-<p>Notice how regardless of what we get the first time we flip the coin, the probability of getting heads is 0.5 throughout. This suggests that the coin flips are <strong>independent</strong>. The result of one coin flip does not impact the likelihood of getting the same result next time. Take a look at the tree diagram. <span class="math inline">\(p_{H given H}\)</span> represents the probability of getting heads <em>given</em> that we got heads the first time. <span class="math inline">\(p_{H given T}\)</span> represents the probability of getting heads <em>given</em> that we got tails the first time. <span class="math inline">\(p_{H given H}\)</span> = <span class="math inline">\(p_{H given T}\)</span>.</p>
+<p>Notice how regardless of what we get the first time we flip the coin, the probability of getting heads is 0.5 throughout. This suggests that the coin flips are <strong>independent</strong>. The result of one coin flip does not impact the likelihood of getting the same result next time. Take a look at the tree diagram. <span class="math inline">\(\rho_{H given H}\)</span> represents the probability of getting heads <em>given</em> that we got heads the first time. <span class="math inline">\(\rho_{H given T}\)</span> represents the probability of getting heads <em>given</em> that we got tails the first time. <span class="math inline">\(\rho_{H given H}\)</span> = <span class="math inline">\(\rho_{H given T}\)</span>.</p>
 <!-- DK: Should we create these decision trees on the fly, perhaps using https://github.com/malcolmbarrett/ggdag  or maybe straight dagitty? For now, what we have is fine. -->
 <div class="inline-figure"><img src="05-probability/images/tree-1.png" width="100%"></div>
 </div>
@@ -323,6 +312,7 @@ In the next figure figure below, the order of your coin toss results does matter
 <h2>
 <span class="header-section-number">5.4</span> Three models<a class="anchor" aria-label="anchor" href="#three-models"><i class="fas fa-link"></i></a>
 </h2>
+<!-- DK: Should this be in terms of p or number of white marbles or both? -->
 <div class="inline-figure"><img src="05-probability/images/marble.jpg" width="100%"></div>
 <p>Imagine that your friend gives you a bag with two marbles. There could either be two white marbles, two black marbles, or one of each color. Thus, the bag could contain 0% white marbles, 50% white marbles, or 100% white marbles. The proportion, <span class="math inline">\(p\)</span>, of white marbles could be 0, 0.5, or 1.</p>
 <p>Let’s say you take a marble out of the bag, record whether it’s black or white, then return it to the bag. You repeat this three times, observing the number of white marbles you see out of three trials. You could get three whites, two whites, one white, or zero whites as a result of this trial. Let’s make what we call a Bayes scatterplot out of this. We have three models (three different proportions of white marbles in the bag) and four possible experimental results.</p>
@@ -336,7 +326,6 @@ In the next figure figure below, the order of your coin toss results does matter
 <p>Next, let’s normalize the distribution.</p>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-397-1.png" width="100%"></div>
 <p>This plot makes sense because when all three marbles you draw out of the bag are NOT white, there is a pretty good chance that there are no white marbles in the bag. There is a smaller chance that the bag contains one black marble and one white marble. However, there is no chance that the bag only contains white marbles.</p>
-<!-- # Section 5: 11 and the 1001 models. Same as coin example with unknown p as used in Albert example. First, p is 0, 0.1, 0.2, ... 0.9, 1.0. Make Bayes Scatterplot. Show marginals. Then, extend it so p takes on 1,001 values. This is how we go from discrete to continuous. All the same tricks apply. -->
 </div>
 <div id="n-models" class="section level2" number="5.5">
 <h2>
@@ -346,13 +335,13 @@ In the next figure figure below, the order of your coin toss results does matter
 <!-- Note the connection between the marbles from Rethinking and the Bayesian scatterplot. In figure 2.2 in Rethinking represents the model where p = 0.25, where p is the proportion of blue marbles in the total collection. The y-axis models would be labeled with p = 0, 0.25, 0.5, 0.75, and 1. With the tree marble diagram in figure 2.2, we would be taking random samples with 3 marbles. The number of blue marbles we get each time would be plotted along p = 0.25. This is another example of model on the y-axis and data on the x-axis. -->
 <!-- DK: Should we cut out p = 0 and p = 1 as too annoying to deal with? -->
 <div class="inline-figure"><img src="05-probability/images/heads.jpg" width="100%"></div>
-<p>Assume that there is a coin with <span class="math inline">\(p_h\)</span>. I guarantee that there are only 11 possible values of <span class="math inline">\(p_h\)</span>: <span class="math inline">\(0, 0.1, 0.2, ..., 0.9, 1\)</span>. In other words, there are 11 possible models, 11 things which might be true about the world. This is just like situations we have previously discussed, except that there are more models to consider.</p>
-<p>We are going to run an experiment in which you flip the coin 20 times and record the number of heads. What does this result tell you about the value of <span class="math inline">\(p_h\)</span>? Ultimately, we will want to calculate a posterior distribution of <span class="math inline">\(p_h\)</span>, which is written as p(<span class="math inline">\(p_h\)</span>).</p>
-<p>To start, it is useful to consider all the things which might happen if, for example, <span class="math inline">\(p_h = 0.4\)</span>. Fortunately, the R functions for simulating random variables makes this easy.</p>
+<p>Assume that there is a coin with <span class="math inline">\(\rho_h\)</span>. We guarantee that there are only 11 possible values of <span class="math inline">\(\rho_h\)</span>: <span class="math inline">\(0, 0.1, 0.2, ..., 0.9, 1\)</span>. In other words, there are 11 possible models, 11 things which might be true about the world. This is just like situations we have previously discussed, except that there are more models to consider.</p>
+<p>We are going to run an experiment in which you flip the coin 20 times and record the number of heads. What does this result tell you about the value of <span class="math inline">\(\rho_h\)</span>? Ultimately, we will want to calculate a posterior distribution of <span class="math inline">\(\rho_h\)</span>, which is written as p(<span class="math inline">\(\rho_h\)</span>).</p>
+<p>To start, it is useful to consider all the things which might happen if, for example, <span class="math inline">\(\rho_h = 0.4\)</span>. Fortunately, the R functions for simulating random variables makes this easy.</p>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-399-1.png" width="100%"></div>
-<p>First, notice that many different things can happen! Even if we <em>know</em>, for certain, that <span class="math inline">\(p_h = 0.4\)</span>, many outcomes are possible. Life is remarkably random. Second, the most likely result of the experiment is 8 heads, as we would expect. Third, we have transformed the raw counts of how many times each total appeared into a probability distribution. Sometimes, however, it is convenient to just keep track of the raw counts. The shape of the figure is the same in both cases.</p>
+<p>First, notice that many different things can happen! Even if we <em>know</em>, for certain, that <span class="math inline">\(\rho_h = 0.4\)</span>, many outcomes are possible. Life is remarkably random. Second, the most likely result of the experiment is 8 heads, as we would expect. Third, we have transformed the raw counts of how many times each total appeared into a probability distribution. Sometimes, however, it is convenient to just keep track of the raw counts. The shape of the figure is the same in both cases.</p>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-400-1.png" width="100%"></div>
-<p>Either way, the figures show what would have happened if that model — that <span class="math inline">\(p_h = 0.4\)</span> — were true.</p>
+<p>Either way, the figures show what would have happened if that model — that <span class="math inline">\(\rho_h = 0.4\)</span> — were true.</p>
 <p>We can do the same thing for all 11 possible models, calculating what would happen if each of them were true. This is somewhat counterfactual since only one of them can be true. Yet this assumption does allow us to create the <em>joint distribution</em> of <em>models which might be true</em> and of <em>data which our experiment might generate</em>. Let’s simplify this is p(models, data), although you should keep the precise meaning in mind.</p>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-401-1.png" width="100%"></div>
 <p>Here is the 3D version of the same plot.</p>
@@ -366,11 +355,11 @@ In the next figure figure below, the order of your coin toss results does matter
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-403-1.png" width="100%"></div>
 <p>Yet this is a distribution of raw counts. It is an unnormalized density. To turn it into a proper probability density (i.e., one in which the sum of the probabilities across possible outcomes sums to one) we just divide everything by the total number of observations.</p>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-404-1.png" width="100%"></div>
-<p>The most likely value of <span class="math inline">\(p_h\)</span> is still 0.4, as before. But, it is much more likely that <span class="math inline">\(p\)</span> is either 0.3 or 0.5. And there is about an 8% chance that <span class="math inline">\(p_h \ge 0.6\)</span>.</p>
+<p>The most likely value of <span class="math inline">\(\rho_h\)</span> is still 0.4, as before. But, it is much more likely that <span class="math inline">\(p\)</span> is either 0.3 or 0.5. And there is about an 8% chance that <span class="math inline">\(\rho_h \ge 0.6\)</span>.</p>
 <p>You might be wondering: what is the use of a model? Well, let’s say we toss the coin 20 times and get 8 heads again. Given this result, what is the probability that future samples of 20 flips will result in 10 or more heads?</p>
 <p>There are three main ways you could go about solving this problem with simulations.</p>
-<p>The first <em>wrong</em> way to do this is assuming that <span class="math inline">\(p_h\)</span> is certain because we observed 8 heads after 20 tosses. We would conclude that 8/20 gives us 0.4. The big problem with this is that you are ignoring your uncertainty when estimating <span class="math inline">\(p_h\)</span>. This would lead us to the following code.</p>
-<div class="sourceCode" id="cb552"><pre class="downlit sourceCode r">
+<p>The first <em>wrong</em> way to do this is assuming that <span class="math inline">\(\rho_h\)</span> is certain because we observed 8 heads after 20 tosses. We would conclude that 8/20 gives us 0.4. The big problem with this is that you are ignoring your uncertainty when estimating <span class="math inline">\(\rho_h\)</span>. This would lead us to the following code.</p>
+<div class="sourceCode" id="cb551"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">sims</span> <span class="op">&lt;-</span> <span class="fl">10000000</span>
 
 <span class="va">odds</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>sim_ID <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">sims</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -384,7 +373,7 @@ In the next figure figure below, the order of your coin toss results does matter
 ##     &lt;dbl&gt;
 ## 1   0.245</code></pre>
 <p>The second method involves sampling the whole posterior distribution vector we previously created. This would lead to the following correct code.</p>
-<div class="sourceCode" id="cb554"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb553"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">p_draws</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>p <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0.1</span><span class="op">)</span>, <span class="fl">1000</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>heads <span class="op">=</span> <span class="fu">map_int</span><span class="op">(</span><span class="va">p</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1</span>, size <span class="op">=</span> <span class="fl">20</span>, p <span class="op">=</span> <span class="va">.</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">heads</span> <span class="op">==</span> <span class="fl">8</span><span class="op">)</span>
@@ -399,8 +388,8 @@ In the next figure figure below, the order of your coin toss results does matter
 ##   success
 ##     &lt;dbl&gt;
 ## 1   0.328</code></pre>
-<p>Third way is to sample from the actual distribution, which is a small dataset with just a few rows, but it includes both <span class="math inline">\(p_h\)</span> and the probability of each <span class="math inline">\(p_h\)</span>. This also gives the correct answer.</p>
-<div class="sourceCode" id="cb556"><pre class="downlit sourceCode r">
+<p>Third way is to sample from the actual distribution, which is a small dataset with just a few rows, but it includes both <span class="math inline">\(\rho_h\)</span> and the probability of each <span class="math inline">\(\rho_h\)</span>. This also gives the correct answer.</p>
+<div class="sourceCode" id="cb555"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">p_posterior</span> <span class="op">&lt;-</span> <span class="va">x</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">heads</span> <span class="op">==</span> <span class="fl">8</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -424,7 +413,7 @@ In the next figure figure below, the order of your coin toss results does matter
 ##   success
 ##     &lt;dbl&gt;
 ## 1   0.320</code></pre>
-<p>As you may have noticed, if you calculated the value using the first method, you would believe that getting 10 or more heads is less likely than it really is. If you were to run a casino based on these assumptions, you will lose all your money. It is very important to be careful about the assumptions you are making. We tossed a coin 20 times and got 8 heads. However, you would be wrong to assume that <span class="math inline">\(p_h\)</span> = 0.4 just based on this result.</p>
+<p>As you may have noticed, if you calculated the value using the first method, you would believe that getting 10 or more heads is less likely than it really is. If you were to run a casino based on these assumptions, you will lose all your money. It is very important to be careful about the assumptions you are making. We tossed a coin 20 times and got 8 heads. However, you would be wrong to assume that <span class="math inline">\(\rho_h\)</span> = 0.4 just based on this result.</p>
 <!-- ## Testing is evil -->
 <!-- Introduce concepts like the null model, testing, and p-values. Connect to permutation tests from chapter 3.  Side note quotation: "Amatuers test. Professionals summarize." Maybe we should pick an example in which the number of heads is low enough to provide some reasonable evidence against p = 0.5. -->
 <!-- In some fields, it is common to want to test a specific hypothesis. Consider the hypothesis that the coin is fair, i.e., that $p = 0.5$. Does the data we have support or reject that hypothesis? (Be wary that $p$ is both used for the probability of a head and the $p$-value of a hypothesis test.) -->
@@ -515,14 +504,14 @@ FIGURE 5.5: Justice.
 </h4>
 <p><em>Justice</em> requires (simple) math. Consider a model of coin-tossing:</p>
 <p><span class="math display">\[ T_i  \sim B(p_H, n = 20) \]</span>
-The total number <span class="math inline">\(T\)</span> of Heads in experiment <span class="math inline">\(i\)</span> with 20 flips of a single coin, <span class="math inline">\(T_i\)</span>, is distributed as a binomial with <span class="math inline">\(n = 20\)</span> and an unknown probability <span class="math inline">\(p_H\)</span> of the coin coming up Heads.</p>
+The total number <span class="math inline">\(T\)</span> of Heads in experiment <span class="math inline">\(i\)</span> with 20 flips of a single coin, <span class="math inline">\(T_i\)</span>, is distributed as a binomial with <span class="math inline">\(n = 20\)</span> and an unknown probability <span class="math inline">\(\rho_h\)</span> of the coin coming up Heads.</p>
 <p>Note:</p>
 <ul>
-<li><p>This is a cheat and a simplification! We are Bayesians but we have not specified the full Bayesian machinery. We really need priors on the unknown parameter <span class="math inline">\(p_H\)</span> as well. But that is too complex for an introductory class, so we wave our hands, accept the default sesinvle parameters built into the functions we use and point readers to more advanced books, like <span class="citation"><a href="references.html#ref-roas" role="doc-biblioref">Gelman, Hill, and Vehtari</a> (<a href="references.html#ref-roas" role="doc-biblioref">2020</a>)</span>.</p></li>
-<li><p>Defining <span class="math inline">\(p_H\)</span> as the “the probability that the coin comes up Heads” is a bit of a fudge. If you calculate that by hand and then compare it to what our tools produce, they won’t be the same. Instead, the calcualted value will be closer to zero. Why? <span class="math inline">\(p_H\)</span> is really the “long-run percentage of the time the coin comes up Heads.” It is not just the percentage from this experiment.</p></li>
+<li><p>This is a cheat and a simplification! We are Bayesians but we have not specified the full Bayesian machinery. We really need priors on the unknown parameter <span class="math inline">\(\rho_h\)</span> as well. But that is too complex for an introductory class, so we wave our hands, accept the default sesinvle parameters built into the functions we use and point readers to more advanced books, like <span class="citation"><a href="references.html#ref-roas" role="doc-biblioref">Gelman, Hill, and Vehtari</a> (<a href="references.html#ref-roas" role="doc-biblioref">2020</a>)</span>.</p></li>
+<li><p>Defining <span class="math inline">\(\rho_h\)</span> as the “the probability that the coin comes up Heads” is a bit of a fudge. If you calculate that by hand and then compare it to what our tools produce, they won’t be the same. Instead, the calcualted value will be closer to zero. Why? <span class="math inline">\(\rho_h\)</span> is really the “long-run percentage of the time the coin comes up Heads.” It is not just the percentage from this experiment.</p></li>
 </ul>
 <!-- DK: too complex for this chapter? --><ul>
-<li>In this simple case, we are fortunate that the parameter <span class="math inline">\(p_H\)</span> has such a (mostly!) simple analog to a real world quantity. Much of the time, parameters are not so easy to interpret. In a more complex model, especially with one with interaction terms, we focus less on parameters and more on actual predictions.</li>
+<li>In this simple case, we are fortunate that the parameter <span class="math inline">\(\rho_h\)</span> has such a (mostly!) simple analog to a real world quantity. Much of the time, parameters are not so easy to interpret. In a more complex model, especially with one with interaction terms, we focus less on parameters and more on actual predictions.</li>
 </ul>
 </div>
 </div>
@@ -537,13 +526,13 @@ FIGURE 5.6: Courage.
 </p>
 </div>
 <p>The three languages of data science are words, math and code, and the most important of these is code. We need to explain the structure of our model using all three languages, but we need <em>Courage</em> to implement the model in code.</p>
-<p>Code allows us to “fit” a model by estimating the values of the unknown parameters, like <span class="math inline">\(p_H\)</span>. Sadly, we can never know the true values of these parameters. But, like all good data scientists, we can express our uncertain knowledge in the form of posterior probability distributions. With those distributions, we can compare the actual values of the outcome variable with the “fitted” or “predicted” results of the model. We can examine the “residuals,” the difference between the fitted and actual values.</p>
+<p>Code allows us to “fit” a model by estimating the values of the unknown parameters, like <span class="math inline">\(\rho_h\)</span>. Sadly, we can never know the true values of these parameters. But, like all good data scientists, we can express our uncertain knowledge in the form of posterior probability distributions. With those distributions, we can compare the actual values of the outcome variable with the “fitted” or “predicted” results of the model. We can examine the “residuals,” the difference between the fitted and actual values.</p>
 <p>Every outcome is the sum of two parts: the model and what is not in the model:</p>
 <p><span class="math display">\[outcome = model + what\ is\ not\ in\ the\ model\]</span></p>
 <p>It doesn’t matter what the outcome is. It could be the result of a coin flip, the weight of a person, the GDP of a country. Whatever <em>outcome</em> we are considering is always made up of two parts. The first is the model we have created. The second is all the stuff — all the blooming and buzzing complexity of the real world — which is not a part of the model.</p>
-<p>Some of our uncertainty is driven by our ignorance about <span class="math inline">\(p_H\)</span>.</p>
+<p>Some of our uncertainty is driven by our ignorance about <span class="math inline">\(\rho_h\)</span>.</p>
 <p>A parameter is something which does not exist in the real world. (If it did, or could, then it would be data.) Instead, a parameter is a mental abstraction, a building block which we will use to to help us accomplish our true goal: To replace at least some of the questions marks in the Preceptor Table. Since parameters are mental abstractions, we will always be uncertain as to their value, however much data we might collect.</p>
-<p>But some, often most, of the uncertainty comes from forces that are, by assumption, not in the model. For example, if the coin is fair, we expect <span class="math inline">\(T_i\)</span> to equal 10. But, often, it will be different, even if we are correct and <span class="math inline">\(p_H\)</span> equals exactly 0.5. <em>Some randomness is intrinsic in this fallen world.</em></p>
+<p>But some, often most, of the uncertainty comes from forces that are, by assumption, not in the model. For example, if the coin is fair, we expect <span class="math inline">\(T_i\)</span> to equal 10. But, often, it will be different, even if we are correct and <span class="math inline">\(\rho_h\)</span> equals exactly 0.5. <em>Some randomness is intrinsic in this fallen world.</em></p>
 </div>
 <div id="temperance" class="section level3" number="5.6.4">
 <h3>

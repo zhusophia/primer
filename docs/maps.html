@@ -44,7 +44,7 @@
 <li><a class="" href="one-parameter.html"><span class="header-section-number">6</span> One Parameter</a></li>
 <li><a class="" href="two-parameters.html"><span class="header-section-number">7</span> Two Parameters</a></li>
 <li><a class="" href="three-parameters.html"><span class="header-section-number">8</span> Three Parameters</a></li>
-<li><a class="" href="building-models.html"><span class="header-section-number">9</span> Building Models</a></li>
+<li><a class="" href="four-parameters.html"><span class="header-section-number">9</span> Four Parameters</a></li>
 <li><a class="" href="five-parameters.html"><span class="header-section-number">10</span> Five Parameters</a></li>
 <li><a class="" href="n-parameters.html"><span class="header-section-number">11</span> N Parameters</a></li>
 <li><a class="" href="case-studies.html"><span class="header-section-number">12</span> Case Studies</a></li>
@@ -71,7 +71,7 @@
 <h2>Tidycensus<a class="anchor" aria-label="anchor" href="#tidycensus"><i class="fas fa-link"></i></a>
 </h2>
 <p>The <strong>tidycensus</strong> package is a great way to load interesting data for mapping. Note that to use this package, <strong>you’ll need a Census API key.</strong> You can request a key <a href="https://api.census.gov/data/key_signup.html">here</a>. Once you have a key, you’ll need the following two commands to use the package:</p>
-<div class="sourceCode" id="cb820"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb819"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/walkerke/tidycensus">tidycensus</a></span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/pkg/tidycensus/man/census_api_key.html">census_api_key</a></span><span class="op">(</span><span class="st">"API KEY"</span><span class="op">)</span></code></pre></div>
@@ -91,7 +91,7 @@
 <li>
 <code>year</code> is the year. <code><a href="https://rdrr.io/pkg/tidycensus/man/get_decennial.html">get_decennial()</a></code> can obtain data from the 1990, 2000, and 2010 Census.</li>
 </ul>
-<div class="sourceCode" id="cb821"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb820"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span>
 
 <span class="va">pop</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/tidycensus/man/get_decennial.html">get_decennial</a></span><span class="op">(</span>geography <span class="op">=</span> <span class="st">"state"</span>,
@@ -117,7 +117,7 @@
 <code>value</code> is the value of the variable you selected (here, population).</li>
 </ul>
 <p>What if you wanted to select more than one variable? By default, <code><a href="https://rdrr.io/pkg/tidycensus/man/get_decennial.html">get_decennial()</a></code> will stack all the variables on top of each other, identifying them with the <code>variable</code> column. So let’s say that you wanted to know the proportion of the population of each state that lives in rural areas. You would select two variables (total population and rural population) and would receive a tibble with 104 observations, with each state appearing once per variable. This may not be the most helpful way to receive the data, depending on your purposes. (When faceting, you may want the data in a long format like this, as we’ll see below.) You can request the data in wide format instead by using the option <code>output = "wide"</code>.</p>
-<div class="sourceCode" id="cb823"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb822"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">rural</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/tidycensus/man/get_decennial.html">get_decennial</a></span><span class="op">(</span>geography <span class="op">=</span> <span class="st">"state"</span>,
                        variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"P001001"</span>, <span class="st">"P002005"</span><span class="op">)</span>,
                        year <span class="op">=</span> <span class="fl">2010</span>,
@@ -130,13 +130,13 @@
 ## $ P001001 &lt;dbl&gt; 4.8e+06, 7.1e+05, 6.4e+06, 2.9e+06, 3.7e+07, 4.5e+06, 4.3e+06…
 ## $ P002005 &lt;dbl&gt; 1957932, 241338, 651358, 1278329, 1880350, 1215567, 1806024, …</code></pre>
 <p>Here, we created a tibble with states in the rows and total population (“P001001”) and rural population (“P002005”) in the columns. To plot the proportion of each state’s population is that lives in rural areas is now a simple application of <strong>tidyverse</strong> functions we know and love. First, let’s create a variable for rural population proportion and order the states by that variable:</p>
-<div class="sourceCode" id="cb825"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb824"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">rural</span> <span class="op">&lt;-</span> <span class="va">rural</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span><span class="op">(</span>state <span class="op">=</span> <span class="va">NAME</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>prop_rural <span class="op">=</span> <span class="va">P002005</span><span class="op">/</span><span class="va">P001001</span>,
          state <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/reorder.factor.html">reorder</a></span><span class="op">(</span><span class="va">state</span>, <span class="va">prop_rural</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>Next, let’s plot this using <code>ggplot()</code>:</p>
-<div class="sourceCode" id="cb826"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb825"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">rural</span> <span class="op">%&gt;%</span>
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">prop_rural</span>, y <span class="op">=</span> <span class="va">state</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
@@ -181,7 +181,7 @@
 <h2>Mapping with <strong>tidycensus</strong> and <code>geom_sf()</code><a class="anchor" aria-label="anchor" href="#mapping-with-tidycensus-and-geom_sf"><i class="fas fa-link"></i></a>
 </h2>
 <p>In order to start mapping in R, we need to get a little more data from the <strong>tidycensus</strong> package. We can use the same <code><a href="https://rdrr.io/pkg/tidycensus/man/get_decennial.html">get_decennial()</a></code> function as before, this time adding the argument <code>geometry = TRUE</code>.</p>
-<div class="sourceCode" id="cb827"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb826"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">rural</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/tidycensus/man/get_decennial.html">get_decennial</a></span><span class="op">(</span>geography <span class="op">=</span> <span class="st">"state"</span>,
                        variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"P001001"</span>, <span class="st">"P002005"</span><span class="op">)</span>,
                        year <span class="op">=</span> <span class="fl">2010</span>,
@@ -202,14 +202,14 @@
 ## $ prop_rural &lt;dbl&gt; 0.410, 0.340, 0.102, 0.438, 0.050, 0.268, 0.416, 0.138, 0.…</code></pre>
 <p>This is just like the tibble we had before, except now we have this funky “multipolygon” called <code>geometry</code>.<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content="&lt;p&gt;If you run &lt;code&gt;typeof(rural$geometry)&lt;/code&gt;, you’ll see that this is just a kind of list, and thus &lt;code&gt;geometry&lt;/code&gt; is a list column.&lt;/p&gt;"><sup>9</sup></a> The <code>geometry</code> column contains all the information <code>ggplot()</code> needs to create a map.</p>
 <p>In order to create a map using <code>ggplot()</code>, we need a new geom: <code>geom_sf()</code>. This works much like the geoms we have seen before, such as <code>geom_point()</code> and <code>geom_line()</code>, except this works with spatial data. Let’s see what happens if we run <code>geom_sf()</code> with no arguments:</p>
-<div class="sourceCode" id="cb829"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb828"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">rural</span> <span class="op">%&gt;%</span>
   <span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_sf</span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-738-1.png" width="100%"></div>
 <p>Well, that’s interesting. We have the boundaries of each state, including Alaska and Hawaii. But there are some problems. <strong>ggplot2</strong> is doing its best to fit everything on one image, which is taxing on the system. We can’t see any particular state very well, because the map is zoomed far out. Also, there are no colors because we didn’t fill it with our data.</p>
 <p>So, let’s create a new map with <code>geom_sf()</code> and fill it with <code>prop_rural</code>. And we’ll filter out Alaska, Hawaii, and Puerto Rico for now.</p>
-<div class="sourceCode" id="cb830"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb829"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">rural</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="op">!</span> <span class="va">state</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Alaska"</span>, <span class="st">"Hawaii"</span>, <span class="st">"Puerto Rico"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>fill <span class="op">=</span> <span class="va">prop_rural</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
@@ -229,7 +229,7 @@
 </ul>
 <p>A great function for providing the fill colors for maps is <code>scale_fill_viridis_c()</code>. This has a few different color palettes that can be selected with the <code>option</code> argument, all of which are easily distinguishable both when displayed in black and white and for people with common forms of colorblindness. You can also reverse the default order of the colors with the <code>direction = -1</code> option. This function is for continuous variables such as <code>prop_rural</code>; if you have a discrete variable, you can use the analogous <code>scale_fill_viridis_d()</code>.</p>
 <p>We’ll also use <code>theme_void()</code>, a great theme for maps that gets rid of the gray background. Finally, we’ll use <code>labs()</code> to give the legend the title “Percent Rural” (and multiply the values of the variable by 100) and add an overall title and caption.</p>
-<div class="sourceCode" id="cb831"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb830"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">rural</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="op">!</span> <span class="va">state</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Alaska"</span>, <span class="st">"Hawaii"</span>, <span class="st">"Puerto Rico"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>fill <span class="op">=</span> <span class="va">prop_rural</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
@@ -247,7 +247,7 @@
 <h3>Adding back Alaska and Hawaii<a class="anchor" aria-label="anchor" href="#adding-back-alaska-and-hawaii"><i class="fas fa-link"></i></a>
 </h3>
 <p>But what about Alaska and Hawaii? If you want to display those on your map without having to zoom out, you can take advantage of an argument in <code><a href="https://rdrr.io/pkg/tidycensus/man/get_decennial.html">get_decennial()</a></code>, <code>shift_geo = TRUE</code>:</p>
-<div class="sourceCode" id="cb832"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb831"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">rural_shifted</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/tidycensus/man/get_decennial.html">get_decennial</a></span><span class="op">(</span>geography <span class="op">=</span> <span class="st">"state"</span>,
                                variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"P001001"</span>, <span class="st">"P002005"</span><span class="op">)</span>,
                                year <span class="op">=</span> <span class="fl">2010</span>,
@@ -257,7 +257,7 @@
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span><span class="op">(</span>state <span class="op">=</span> <span class="va">NAME</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>prop_rural <span class="op">=</span> <span class="va">P002005</span><span class="op">/</span><span class="va">P001001</span>,
          state <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/reorder.factor.html">reorder</a></span><span class="op">(</span><span class="va">state</span>, <span class="va">prop_rural</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb833"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb832"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">rural_shifted</span> <span class="op">%&gt;%</span>
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>fill <span class="op">=</span> <span class="va">prop_rural</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_sf</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
@@ -275,7 +275,7 @@
 <h2>Faceting maps<a class="anchor" aria-label="anchor" href="#faceting-maps"><i class="fas fa-link"></i></a>
 </h2>
 <p>A powerful tool in <strong>ggplot2</strong> to use with maps is faceting. Let’s grab data from the ACS on the population in Harris County, Texas census tracts by race:</p>
-<div class="sourceCode" id="cb834"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb833"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">racevars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>White <span class="op">=</span> <span class="st">"B02001_002"</span>, 
               Black <span class="op">=</span> <span class="st">"B02001_003"</span>, 
               Asian <span class="op">=</span> <span class="st">"B02001_005"</span>,
@@ -295,7 +295,7 @@
 <li>We added a <code>summary_var</code>, “B02001_001,” which is the total population. As we’ll see, this appears as a separate column, which is helpful to us. (As an exercise, try going back to the code that created <code>rural</code> and see how you would do that in a long format with <code>summary_var</code>.)</li>
 </ul>
 <p>Let’s take a look at <code>harris</code>:</p>
-<div class="sourceCode" id="cb835"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb834"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">glimpse</span><span class="op">(</span><span class="va">harris</span><span class="op">)</span></code></pre></div>
 <pre><code>## Rows: 3,144
 ## Columns: 8
@@ -312,7 +312,7 @@
 <h3>Transforming and mapping the data<a class="anchor" aria-label="anchor" href="#transforming-and-mapping-the-data"><i class="fas fa-link"></i></a>
 </h3>
 <p>Now we can use <code>facet_wrap()</code> to look at our race variables side-by-side:</p>
-<div class="sourceCode" id="cb837"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb836"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">harris</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>Percent <span class="op">=</span> <span class="fl">100</span> <span class="op">*</span> <span class="op">(</span><span class="va">estimate</span> <span class="op">/</span> <span class="va">summary_est</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>fill <span class="op">=</span> <span class="va">Percent</span>, color <span class="op">=</span> <span class="va">Percent</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
