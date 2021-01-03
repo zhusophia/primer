@@ -414,9 +414,9 @@ draws <- tibble(ID = 1:1000000,
 draws
 ```
 
-A distribution and a sample of draws from that distribution are different things. But, if you squint, they are sort of the same thing, at least for our purposes. For example, if you want to know the mean of the distribution, then the mean of the draws will be a fairly good estimate, especially if the number of draws is large enough.
+*A distribution and a sample of draws from that distribution are different things.* But, if you squint, they are sort of the same thing, at least for our purposes. For example, if you want to know the mean of the distribution, then the mean of the draws will be a fairly good estimate, especially if the number of draws is large enough.
 
-The most common method for representing a probability distribution in the computer is as a vector of draws. Recall from Chapter \@ref(wrangling) how we can draw randomly from specified probability distributions:
+Recall from Chapter \@ref(wrangling) how we can draw randomly from specified probability distributions:
 
 ```{r}
 rnorm(10)
@@ -426,8 +426,36 @@ rnorm(10)
 runif(10)
 ```
 
-These elements of these vectors are all "draws" from the specified probability distributions. In most applied situations, our tools will produce draws rather than summary objects. Fortunately, a vector of draws is very easy to work with:
+These elements of these vectors are all "draws" from the specified probability distributions. In most applied situations, our tools will produce draws rather than summary objects. Fortunately, a vector of draws is very easy to work with. Start with summary statistics:
 
+
+```{r}
+key_stats <- draws %>% 
+  summarize(mn = mean(electoral_votes),
+            md = median(electoral_votes),
+            sd = sd(electoral_votes),
+            mad = mad(electoral_votes))
+
+key_stats
+```
+
+
+Calculate a 95% confidence interval directly:
+
+```{r}
+quantile(draws$electoral_votes, probs = c(0.025, 0.975))
+```
+
+Approximate the 95% confidence interval in two ways:
+
+```{r}
+c(key_stats$mn - 2 * key_stats$sd, 
+  key_stats$mn + 2 * key_stats$sd)
+c(key_stats$md - 2 * key_stats$mad, 
+  key_stats$md + 2 * key_stats$mad)
+```
+
+In this case, using the mean and standard deviation produces a 95% confidence interval which is closer to the true interval. In other cases, the median and scaled median absolute deviation will do better. Either approximation is generally "good enough" for most work. But, if you need to know the exact 95% interval, you must use `quantile()`.
 
 
 ### Unnormalized distributions
