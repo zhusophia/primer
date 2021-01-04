@@ -1,24 +1,42 @@
-# to load rayshader you need to have xQuartz downloaded on mac see 
-# https://www.xquartz.org/ and https://github.com/tylermorganwall/rayshader/issues/5 etc. 
+# To load rayshader you need to have xQuartz downloaded on the Mac. See
+# https://www.xquartz.org/ and
+# https://github.com/tylermorganwall/rayshader/issues/5 etc.
+
 library(rayshader)
 library(animation)
 library(gifski)
 library(tidyverse)
 
+# Key trick is the use of render_depth() to create the png, at least until we
+# try to allow for interactive use. Or maybe render_movie()?
+
 # Code for the first two models rayshader plot
 
-pop <- tibble(patient_id = 1:100000, positive_test = c(rep(1, 1980),
-                                                       rep(0, 98020)),
-              have_disease = c(rep(1, 990),
-                               rep(0, 99000),
-                               rep(1, 10))) %>%
+city_pop <- 100000
+has_disease <- 0.01 * city_pop
+
+test_positive_true <- 0.95 * has_disease
+test_negative_false <- 0.05 * has_disease
+
+test_positive_false <- (city_pop - has_disease) * 0.05  
+test_negative_true <- (city_pop - has_disease) * 0.95  
+
+pop <- tibble(patient_id = 1:100000, 
+              have_disease = c(rep(1, has_disease),
+                               rep(0, city_pop - has_disease)),         
+              positive_test = c(rep(1, test_positive_true),
+                                rep(0, test_negative_false),
+                                rep(0, test_negative_true),
+                                rep(1, test_positive_false)))
+
+pop_sum <- pop  %>%
   group_by(positive_test, have_disease) %>%
   summarize(total = n())
 
-pos_factor <- as.factor(pop$positive_test)
-disease_factor <- as.factor(pop$have_disease)
+pos_factor <- as.factor(pop_sum$positive_test)
+disease_factor <- as.factor(pop_sum$have_disease)
 
-mtplot = ggplot(pop) +
+mtplot = ggplot(pop_sum) +
   geom_point(aes(x = pos_factor, y = disease_factor, color = total)) +
   theme(legend.position = "none") +
   labs(x = "Test Result", y = "Disease Status")
@@ -26,6 +44,9 @@ mtplot = ggplot(pop) +
 plot_gg(mtplot, width = 3.5, multicore = F, windowsize = c(800, 800), 
         zoom = 0.85, phi = 30, theta = 10, sunangle = 225, soliddepth = -100,
         reduce_size = TRUE, raytrace = FALSE)
+
+# render_snapshot(file = "05-probability/images/rayshader_disease.png")
+
 
 # Code for the second two models rayshader plot where we isolate a slice
 
