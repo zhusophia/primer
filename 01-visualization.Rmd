@@ -203,21 +203,18 @@ We used the `$` operator to extract only the `age` variable and return it as a v
 
 ## Basic Plots
 
-We begin the development of your data science toolbox with data visualization. By visualizing data, we gain valuable insights we couldn't initially obtain from just looking at the raw data values. Graphics/plots/charts provide a nice way to explore the patterns in data, such as the presence of *outliers*, *distributions* of individual variables, and *relationships* between groups of variables. We'll use the **ggplot2** package, as it provides an easy way to customize your plots. 
-
-We can break a graphic into the following three essential components:
+There are three essential components to a plot:
 
 * `data`: the dataset containing the variables of interest.
-* `geom`: the geometric object in question. This refers to the type of object we want to observe in a plot (scatterplot, line graph, etc.).
-* `aes`: aesthetic attributes of the geometric object. This is where we tell R what variables should be on the x and y axis. Additionally, color and size are additional attributes we will explore later on. Aesthetic attributes are *mapped* to variables in the dataset.
+* `geom`: the geometric object to display, e.g., scatterplot, line, bar.
+* `aes`: aesthetic attributes of the geometric object. The most important are the names of the variables should be on the x and y axes. Additional attributes include color and size. Aesthetic attributes are *mapped* to variables in the dataset.
 
-Let's look at an example of a basic scatterplot. 
+Let's look at an example of a basic scatterplot using data from @enos2014 for `r nrows(trains)` Boston commuters.
 
 ```{r}
-library(gapminder)
-ggplot(data = gapminder, 
-       mapping = aes(x = gdpPercap, 
-                     y = lifeExp)) + 
+ggplot(data = trains, 
+       mapping = aes(x = age, 
+                     y = income)) + 
   geom_point()
 ```
 
@@ -236,93 +233,96 @@ Let's now dive deeper into `geom_point()`.
 Recall our scatterplot from above.
 
 ```{r}
-ggplot(data = gapminder, 
-       mapping = aes(x = gdpPercap, 
-                     y = lifeExp)) + 
+ggplot(data = trains, 
+       mapping = aes(x = age, 
+                     y = income)) + 
   geom_point()
 ```
 
 Let's break down this code, piece-by-piece.
 
-* The `data` argument is set to `gapminder` via `data = gapminder`.\
+* The `data` argument is set to `trains` via `data = trains`.
 
-* The `aes`thetic `mapping` by set via `mapping = aes(x = gdpPercap, y = lifeExp)`. Here, we map `gdpPercap` to the `x` axis and `lifeExp` maps to the `y` axis.
+* The `aes`thetic `mapping` is set via `mapping = aes(x = age, y = income)`. Here, we map `age` to the `x` axis and `income` maps to the `y` axis.
 
 * The `geom`etric object is specified to `geom_point()`, telling R we want a scatterplot. We added a layer using the `+` sign.
 
-In the graphic above, notice that a *positive relationship* exists between `lifeExp` and `gdpPercap`: as gdp per capita increases, life expectancy tends to also increase. If we do not specify the `geom`etric object, we have a blank plot like such:
+If we do not specify the `geom`etric object, we have a blank plot like such:
 
 ```{r}
-ggplot(data = gapminder, 
-       mapping = aes(x = gdpPercap, 
-                     y = lifeExp)) 
+ggplot(data = trains, 
+       mapping = aes(x = age, 
+                     y = income))
 ```
 
-#### More Aesthetics 
 
-In addition to mapping varaibles to the `x` and `y` axises, we can also map variables to `color`. They can be very useful tools. 
-
-For example, because the data plotted on our scatterplot is from more than one continent, it can be hard to know which point of data corresponds to which continent. Let's change that by setting the `color` argument of `aes()` to the variable `continent`.
+In addition to mapping variables to the `x` and `y` axes, we can also map variables to `color`. 
 
 ```{r}
-ggplot(data = gapminder, 
-       mapping = aes(x = gdpPercap, 
-                     y = lifeExp,
-                     color = continent)) +
-geom_point()
+ggplot(data = trains, 
+       mapping = aes(x = age, 
+                     y = income,
+                     color = party)) + 
+  geom_point()
 ```
 
-Now we have a slightly better understanding of our data. However, note that the points of the scatterplot are all overlapping, so we do not know if some colors are being covered by others.
+<!-- Size here? -->
 
-<!-- BG: size here? -->
-
-#### Titles and Labels
-
-We use the function `labs()` to add a plot title, axis labels, subtitles, and captions to our graph. You will have noticed that by default R simply uses the names of variables for axes and legends. Let's now add a title and axis labels to our plot.
+We use the function `labs()` to add a plot title, axis labels, subtitles, and captions to our graph. By default, R simply uses the names of variables for axes and legends. Let's now add better titles and labels.
 
 ```{r}
-ggplot(data = gapminder, 
-       mapping = aes(x = gdpPercap, 
-                     y = lifeExp)) + 
-  geom_point() + 
-  labs(title = "The Relationship Between Life
-               Expectancy and GDP Percapita",
-            x = "GDP Percapita",
-            y= "Life Expectancy")
+ggplot(data = trains, 
+       mapping = aes(x = age, 
+                     y = income)) + 
+  geom_point() +
+  labs(title = "Age and Income Among Boston Commuters",
+       subtitle = "Older commuters don't seem to make more money",
+       x = "Age",
+       y = "Income",
+       caption = "Data source: Enos (2014)")
 ```
 
-Note that like `geom`s, we add a layer  when including the function `labs()`to our plot. Note that it is up to us, which or how many of the arguments in `labs()` we use.
-
+Note that like with `geom`s, we add a layer using `+` when creating `labs()`for our plot. In general, every plot should gave a title and axes labels. You should also add a `subtitle`, the purpose of which is to give a short "main point" of the graphic. What do you want the viewer to notice? You should also provide the source for the data, usually via the `caption` argument.
 
 Let's now take a tour of some of the more useful geoms.
 
-
 ### `geom_jitter()`
 
-Our scatterplot from the previous section has a large mass of points. This makes it hard to tell the true number of points that are plotted. This is the result of a phenomenon called *overplotting*, where points are being plotted on top of each other over and over again. There are two methods we can use to address overplotting.
+Consider a different scatter plot using the `trains` data.
 
-1. Adjust the transparency of the points 
-1. Add a little random "jitter" or random "nudges" to each of the points
+```{r}
+ggplot(data = trains, 
+       mapping = aes(x = att_start, 
+                     y = att_end)) + 
+  geom_point() +
+  labs(title = "Immigration Attitudes Among Boston Commuters",
+       subtitle = "Attitudes did not change much after the experiment",
+       x = "Attitude Before Experiment",
+       y = "Attitude After Experiment",
+       caption = "Data source: Enos (2014)")
+```
+
+The problem with this display is "overplotting." Because attitudes are measured as integers, we don not know if a given point represents just one person or a dozen. There are two methods we can use to address overplotting: transparency and jitter.
 
 **Method 1: Changing the transparency**
 
 We can change the transparency/opacity of the points by using the `alpha` argument within `geom_point()`. The `alpha` argument can be set to any value between `0` and `1`, where `0` sets the points to be 100% transparent and `1` sets the points to be 100% opaque. By default, `alpha` is set to `1`. In other words, if we don't explicitly set an `alpha` value, R will use `alpha = 1`.
 
-
 Let's now add an `alpha` argument to our scatterplot. 
 
 ```{r}
-ggplot(data = gapminder, 
-       mapping = aes(x = gdpPercap, 
-                     y = lifeExp))  + 
-      labs(title= "The Relationship Between Life Expectancy 
-                    and GDP Percapita",
-                    x = "GDP Percapita",
-                    y= "Life Expectancy") +
-      geom_point(alpha = .2)
+ggplot(data = trains, 
+       mapping = aes(x = att_start, 
+                     y = att_end)) + 
+  geom_point(alpha = 0.2) +
+  labs(title = "Immigration Attitudes Among Boston Commuters",
+       subtitle = "Attitudes did not change much after the experiment",
+       x = "Attitude Before Experiment",
+       y = "Attitude After Experiment",
+       caption = "Data source: Enos (2014)")
 ```
 
-Note that there is no `aes()` surrounding `alpha = 0.2`. This is because we are not mapping a variable to an aesthetic attribute, but rather merely changing the default setting of `alpha`. In fact, you'll receive an error if you try to change the second line to read `geom_point(aes(alpha = 0.2))`.
+Note that there is no `aes()` surrounding `alpha = 0.2`. This is because we are not mapping a variable to an aesthetic attribute, but rather only changing the default setting of `alpha`. In fact, you'll receive an error if you try to change the second line to read `geom_point(aes(alpha = 0.2))`.
 
 **Method 2: Jittering the points**
 
@@ -331,17 +331,18 @@ We can also decide to jitter the points on the plot. We do this by replacing `ge
 In order to specify how much jitter to add, we use the `width` and `height` arguments to `geom_jitter()`. This corresponds to how hard you'd like to shake the plot in horizontal x-axis units and vertical y-axis units, respectively. It is important to add just enough jitter to break any overlap in points, but not to the extent where you alter the original pattern in points.
 
 ```{r}
-ggplot(data = gapminder, 
-       mapping = aes(x = gdpPercap, 
-                     y = lifeExp))  + 
-      labs(title= "The Relationship Between Life Expectancy 
-                    and GDP Percapita",
-                    x = "GDP Percapita",
-                    y= "Life Expectancy") +
-      geom_point(alpha = .2)
+ggplot(data = trains, 
+       mapping = aes(x = att_start, 
+                     y = att_end)) + 
+  geom_jitter() +
+  labs(title = "Immigration Attitudes Among Boston Commuters",
+       subtitle = "Attitudes did not change much after the experiment",
+       x = "Attitude Before Experiment",
+       y = "Attitude After Experiment",
+       caption = "Data source: Enos (2014)")
 ```
 
-As can be seen in the resulting plot, jittering doesn't really provide much new insight. It can be argued that changing the transparency of the points by setting `alpha` proved more effective. When deciding whether to jitter a scatterplot or use the `alpha` argument to `geom_point()`, know that there is no single right answer. We suggest you play around with both methods to see which one better emphasizes the point you are trying to make. 
+When deciding whether to jitter a scatterplot or use the `alpha` argument to `geom_point()`, know that there is no single right answer. We suggest you play around with both methods to see which one better emphasizes the point you are trying to make. 
 
 ### `geom_line()`
 
