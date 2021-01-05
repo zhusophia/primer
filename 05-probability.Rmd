@@ -875,15 +875,11 @@ Yet this is a distribution of raw counts. It is an unnormalized density. To turn
 
 ```{r, echo = FALSE}
 
-p_posterior <- x %>% 
+x %>% 
   filter(heads == 8) %>% 
-  group_by(p) %>% 
-  summarize(total = n(), .groups = "drop") %>%
-  mutate(probs = total/sum(total))
-
-p_posterior %>% 
-  ggplot(aes(x = p, y = probs)) +
-    geom_col() +
+  ggplot(aes(x = p)) +
+    geom_histogram(aes(y = after_stat(count/sum(count))),
+                   bins = 50) + 
     labs(title = expression(paste("Posterior Probability Distribution of ", rho[h])),
          x = expression(paste("Possible values for ", rho[h])),
          y = "Probability") +
