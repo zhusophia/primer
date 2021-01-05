@@ -6,12 +6,10 @@ Everyone loves visualizations.
 
 <!-- DK: Would be nice if the plot featured a statistical measure of some kind (maybe a 95% confidence interval) so that we have a motivation for learning about distributions. Probably need a very different plot. Maybe something political? Election 2020? -->
 
-<!-- DK: Replace airquality data set with one of our primer.data sets. -->
-
-<!-- DK: Switch geom_bar to trains? -->
+<!-- DK: Plot should be much cooler, perhaps even using big data. And an associated map. Precinct level voting changes 2012 -> 2016 -> 2020, perhaps. -->
 
 
-```{r out.width = "100%", message = FALSE, echo = FALSE}
+```{r, message = FALSE, echo = FALSE}
 library(tidyverse)
 library(ggthemes)
 library(scales)
@@ -350,7 +348,7 @@ When deciding whether to jitter a scatterplot or use the `alpha` argument to `ge
 
 Linegraphs show the relationship between two numerical variables when the variable on the x-axis, also called the *explanatory* variable, is of a sequential nature. In other words, there is an inherent ordering to the variable. 
 
-```{r, echo = FALSE, out.width = "100%"}
+```{r, echo = FALSE}
 knitr::include_graphics("https://imgs.xkcd.com/comics/decline.png")
 ```
 
@@ -787,25 +785,19 @@ This is the first of many "pipes" which we will create in *The Primer*. First, w
 knitr::include_graphics("01-visualization/images/mutate.png")
 ```
 
-Another common transformation of data is to create/compute new variables based on existing ones. In other words, we want to make a new column using already existing data. We can use the `mutate()` function from the **dplyr** package, which takes existing variables and mutates them to create new ones. 
+Another common transformation of data is to create new variables based on existing ones. In other words, we want to make a new column using already existing column We can use the `mutate()` function from the **dplyr** package, which takes existing variables and mutates them to create new ones. 
 
-Let's create a new variable using the `trains` dataset form the **primer.data** package. The `trains` dataset contains data for attitudes toward immigration-related policies, both before and after an experiment which randomly exposed a treated group to Spanish-speakers on a Boston commuter train platform.
 
-Let's first load the **primer.data** package so we can`glimpse()` the data set `trains`.
-
-```{r}
-library(primer.data)
-glimpse(trains)
-```
-
-Notice that the `income` variable is written out in full value. Let's use `mutate()` to create a new variable where income is written in thousands. The code would look like the following:
+Recall that the `income` variable in the `trains` tibble is in dollars. Let's use `mutate()` to create a new variable where income is in thousands of dollars. (We use `select()` at the start of the pipe so that it is easier to see the new and old variables at the same time.)
 
 ```{r}
 trains %>% 
-  mutate(income_in_thousands = (income) / 1000)
+  select(gender, income) %>% 
+  mutate(income_in_thousands = income / 1000)
 ```
 
-Notice that we have a newly created column at the far right-hand side of our data set named `income_in_thousands`. 
+
+Notice that we have a newly created column at the right-hand side of our tibble named `income_in_thousands`. 
 
 When creating new variables we can also *overwrite* the original data frames like `trains` like so:
 
@@ -814,7 +806,7 @@ trains <- trains %>%
   mutate(income_in_thousands = (income) / 1000)
 ```
 
-Why overwrite a data frame `trains` instead of assigning the result to a new data frame like `trains_new`? As a rough rule of thumb, as long as you are not losing original information that you might need later, it's acceptable practice to overwrite existing data frames with updated ones, as we did here. On the other hand, why did we not overwrite the variable `income`, but instead created a new variable called `income_in_thousands`?  Because if we did this, we would have erased the original information contained in `income` and would not be able to use them in the future. 
+Why overwrite a data frame `trains` instead of assigning the result to a new data frame like `trains_new`? As a rough rule of thumb, as long as you are not losing original information that you might need later, it is acceptable practice to overwrite existing data frames with updated ones, as we did here. On the other hand, why did we not overwrite the variable `income`, but instead created a new variable called `income_in_thousands`?  Because if we did this, we would have erased the original information contained in `income` and would not be able to use them in the future. 
 
 
 #### `ifelse()`
@@ -823,17 +815,19 @@ Why overwrite a data frame `trains` instead of assigning the result to a new dat
 
 <!-- DK: Edit these lines from R4DS. Are there other functions which we should mention here? Do something sensible with group_by. To get `_` to work in caption title. Found at https://github.com/rstudio/bookdown/issues/209  -->
 
-`ifelse()` has three arguments. The first argument `test` should be a logical vector. The result will contain the value of the second argument, `yes`, when test is TRUE, and the value of the third argument, `no`, when it is FALSE. 
+`ifelse()` is often used within calls to `mutate()`. It has three arguments. The first argument `test` should be a logical vector. The result will contain the value of the second argument, `yes`, when test is TRUE, and the value of the third argument, `no`, when it is FALSE. 
 
-Imagine that we want to create a new variable `compact`, which is TRUE when the class of the car is "compact" and FALSE otherwise. 
+Imagine that we want to create a new variable `old`, which is TRUE when `age > 50` and FALSE otherwise. 
 
 ```{r}
-mpg %>% 
-  select(manufacturer, model, class) %>% 
-  mutate(compact = ifelse(class == "compact", TRUE, FALSE))
+trains %>% 
+  select(age) %>% 
+  mutate(old = ifelse(age > 50, TRUE, FALSE))
 ```
 
-Alternatively to `ifelse()`, use `dplyr::case_when()`. `case_when()` is particularly useful inside mutate when you want to create a new variable that relies on a complex combination of existing variables. Note that there is a more robust version of `ifelse()` in **dplyr**: `if_else()`. This works exactly the same as the standard version but is somewhat more robust. 
+Another function similar to `ifelse()`, is `dplyr::case_when()`. `case_when()` is particularly useful inside mutate when you want to create a new variable that relies on a complex combination of existing variables. Note that there is a different version of `ifelse()` in **dplyr**: `if_else()`. This works exactly the same as the standard version but is somewhat more robust. 
+
+<!-- DK: More details? -->
 
 
 ### `summarize()`
@@ -844,31 +838,17 @@ A musical interlude inspired by the Tidyverse:
 knitr::include_app("https://www.youtube.com/watch?v=p8Py9C8iq2s")
 ```
 
-<!-- DK: Don't use this data set. -->
+The next common task when working with data frames is to compute *summary statistics*. Summary statistics are single numerical values that summarize a large number of values. Commonly known examples of summary statistics include the *mean* (also called the average) and the *median* (the middle value). Other examples of summary statistics that might not immediately come to mind include the *sum*, the *minimum*, the *maximum*, and the *standard deviation*.
 
-The next common task when working with data frames is to compute *summary statistics*. Summary statistics are single numerical values that summarize a large number of values. Commonly known examples of summary statistics include the *mean* (also called the average) and the *median* (the middle value). Other examples of summary statistics that might not immediately come to mind include the *sum*, the smallest value also called the *minimum*, the largest value also called the *maximum*, and the *standard deviation*.
-
-
-The function `sumamary()` offers an array of summary statistics for each of the columns of the dataset.
+The function `summarize()` allows us to calculate these statistics on individual columns of the dataset. Example:
 
 ```{r}
-summary(airquality)
+trains %>% 
+  summarize(mean = mean(age), 
+            std_dev = sd(age))
 ```
 
-The function `summarize()` (or alternatively `summarise()`) allows us to calculate these statistics on individual columns of the dataset. 
-
-Let's calculate summary statistics of the `Temp` variable in the `airquality` data frame. Let's calculate the mean and standard deviation. To compute these summary statistics, we need the `mean()` and `sd()` *summary functions* in R.
-
-Recall the output of the `summary()` function. 
-
-```{r}
-airquality %>% 
-  summarize(mean = mean(Temp), 
-            std_dev = sd(Temp))
-```
-
-The `mean()` and `sd()` summary functions go inside the `summarize()`  function from the **dplyr** package. Note you can also use the British English spelling of `summarise()`. The `summarize()` function takes in a data frame and returns a data frame with only one row corresponding to the summary statistics. 
-
+The `mean()` and `sd()` summary functions go inside the `summarize()`  function. (You can also use the British English spelling:  `summarise()`.) The `summarize()` function takes in a data frame and returns a data frame with only one row corresponding to the summary statistics. 
 
 
 ### Statistics for distributions
@@ -964,27 +944,27 @@ If there is an `NA` value in the variable, any statistical function like `mean()
 
 ### `group_by()`
 
-We can the use `mean()` with `summarize()` to calculate the average `Temp` value of the entire year.
+We can the use `mean()` with `summarize()` to calculate the average age for all the people in `trains`, as we did above.
 
 ```{r}
-airquality %>% 
-  summarize(mean = mean(Temp))
+trains %>% 
+  summarize(mean = mean(age))
 ```
 
-However, let's say instead of a single mean temperature for the whole year, you would like 5 mean temperatures, one for each of the 5 months in which data was gathered. In other words, we would like to compute the mean temperature split by month. We can do this by "grouping" temperature observations by the values of `Month`. Consider:
+What if we want the mean `age` for each `gender`? Consider:
 
 
 ```{r}
-airquality %>% 
-  group_by(Month)
+trains %>% 
+  group_by(gender)
 ```
 
-The data is the same as before, but note the "Groups" message at the top. R is informing you that this tibble has been grouped at that any operation you perform now will be done for each `Month`. Example: 
+The data is the same as before, but note the "Groups" message at the top. R is informing you that this tibble has been grouped so that any operation you perform now will be done for each `gender`. 
 
 ```{r}
-airquality %>% 
-  group_by(Month) %>% 
-  summarize(mean = mean(Temp))
+trains %>% 
+  group_by(gender) %>% 
+  summarize(mean = mean(age))
 ```
 
 Notice the message R sends us. The warning means that the tibble which issues forth from the end of the pipe has been "ungrouped". This means the group attribute we applied with `group_by()` has been removed. This behavior is the (sensible) default.
@@ -992,17 +972,19 @@ Notice the message R sends us. The warning means that the tibble which issues fo
 The proper way to handle the situation, here and everywhere else that we use `group_by()` and `summarize()`, is to specify the `.groups` argument.
 
 ```{r}
-airquality %>% 
-  group_by(Month) %>% 
-  summarize(mean = mean(Temp), 
+trains %>% 
+  group_by(gender) %>% 
+  summarize(mean = mean(age),
             .groups = "drop")
 ```
 
-This code does the same thing as the first version, but does not issue a warning, since we have made an affirmative decision to drop any grouping variables.
+This code does the same thing as the first version, but does not issue a message, since we have made an affirmative decision to drop any grouping variables.
 
 The `group_by()` function doesn't change data frames by itself. Rather it changes the *meta-data*, or data about the data, specifically the grouping structure. It is only after we apply the `summarize()` function that the tibble changes.
 
-If you have a tibble which has been grouped, you can remove the grouping variable by using `ungroup()`. When your R code is behaving in a weird way, especially when it is "losing" rows, the problem is often solved by using `ungroup()` in the pipe.
+If you have a tibble which has been grouped, you can remove the grouping variable by using `ungroup()`. 
+
+*When your R code is behaving in a weird way, especially when it is "losing" rows, the problem is often solved by using `ungroup()` in the pipeline.*
 
 
 
@@ -1292,7 +1274,7 @@ You now know enough to make plots like this by yourself.
 
 It is important to know that we have only seen a small part of what R offers. For example, we can use the **gganimate** package to bring a slightly modified version of our gapminder plot to life:
 
-```{r, cache = TRUE, out.width = "100%"}
+```{r, cache = TRUE}
 library(gganimate)
 
 gap_anim <- gapminder %>%
@@ -1316,7 +1298,7 @@ gap_anim
 The **plotly** package makes our plot interactive. Click on it and explore!
 
 
-```{r, cache = TRUE, message = FALSE, warning = FALSE, out.width = "100%"}
+```{r, cache = TRUE, message = FALSE, warning = FALSE}
 library(plotly)
 
 ggplotly(gap_p)
