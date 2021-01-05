@@ -783,15 +783,12 @@ To start, it is useful to consider all the things which might happen if, for exa
 ```{r, echo = FALSE}
 
 set.seed(9)
+x <- tibble(heads = rbinom(n = 1000, size = 20, p = 0.4)) 
 
-x <- tibble(heads = rbinom(n = 1000, size = 20, p = 0.4))
-
-x %>%
-  group_by(heads) %>%
-  summarize(total = n(), .groups = "drop") %>%
-  mutate(prob = total/sum(total)) %>%
-  ggplot(aes(heads, prob)) +
-    geom_col() + 
+x %>% 
+  ggplot(aes(heads)) +
+    geom_histogram(aes(y = after_stat(count/sum(count))),
+                   bins = 50) + 
     labs(title = "Empirical Distribution of Number of Heads",
          subtitle = "Based on 1,000 simulations with p = 0.4",
          x = "Number of Heads out of 20 Tosses",
@@ -807,10 +804,8 @@ First, notice that many different things can happen! Even if we *know*, for cert
 ```{r, echo = FALSE}
 
 x %>%
-  group_by(heads) %>%
-  summarize(total = n(), .groups = "drop") %>%
-  ggplot(aes(heads, total)) +
-    geom_col() + 
+  ggplot(aes(heads)) +
+     geom_histogram(bins = 50) + 
     labs(title = "Total Count of the Number of Heads Out of 20 Tosses",
          subtitle = "Based on 1,000 simulations with p = 0.4",
          x = "Number of Heads out of 20 Tosses",
