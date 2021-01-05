@@ -638,24 +638,24 @@ The `filter()` function here works much like the "Filter" option in Microsoft Ex
 Let's revisit the code from the previous section.
 
 ```{r}
-gapminder %>% 
-  filter(continent == "Asia")
+trains %>% 
+  filter(gender == "Male")
 ```
 
-The result of using `filter()` will be a transformed/modified data frame that you want, in this case, only data from Asia. When we alter our data, it can be a good idea to save the result in a new data frame by using the `<-` assignment operator.
+The result of using `filter()` will be a tibble with just the rows that you want. When we alter our data, it can be a good idea to save the result in a new data frame by using the `<-` assignment operator.
 
 ```{r}
-gapminder_asia <- gapminder %>% 
-  filter(continent == "Asia")
+trains_men <- trains %>% 
+  filter(gender == "Male")
 ```
 
 Let's break down the code here: 
 
-Here we assigned our new data to an object named `gapminder_Asia` via `gapminder_Asia <-`. Because we assigned this modified data frame to `gapminder_Asia`, it is a separate entity from the initial `gapminder` data frame. If, however, we had written the code as `gapminder <- gapminder` you would have overwritten the previous data frame, and the original `gapminder` data from the **gapminder* package would have to be re-installed to access it again.
+Here we assigned our new data to an object named `trains_men` via `trains_men <-`. Because we assigned this modified data frame to `trains_men`, it is a separate entity from the initial `trains` data frame. If, however, we had written the code as `trains <- trains` we would have overwritten the already-existing tibble. 
 
-We take the `gapminder` data frame *then* `filter()` the data frame so that only those where the `continent` equals `"Asia"` are included. We test for equality using the double equal sign `==` and not a single equal sign `=`. In other words `filter(continent = "Asia")` will yield an error. This is a convention across many programming languages. If you are new to coding, you'll probably forget to use the double equal sign `==` a few times before you get the hang of it.
+We take the `trains` tibble and  *then* `filter()` so that only those observations where the `gender` equals "Male" are included. We test for equality using the double equal sign `==` and not a single equal sign `=`. In other words, `filter(gender = "Male")` will produce an error. This is a convention across many programming languages. If you are new to coding, you'll probably forget to use the double equal sign `==` a few times before you get the hang of it.
 
-You can use other operators beyond just the `==` operator that tests for equality:
+You can use other operators beyond just the `==` operator.
 
 - `>` corresponds to "greater than"
 - `<` corresponds to "less than"
@@ -668,60 +668,18 @@ Furthermore, you can combine multiple criteria using operators that make compari
 - `|` corresponds to "or"
 - `&` corresponds to "and"
 
-
-
-Let's see see some of these in action. First, let's explore a new data set called `airquality` . The dataset includes daily airquality measurements in New York, May to September 1973. Let's filter `airquality` for all rows that contain data from months May to December. We can do this by using `>=` operator. Run the following code in your console:
+For example, let's `filter()` the `trains` tibble to include only women who are Republicans and younger than 40.
 
 ```{r}
-airquality %>% 
-  filter(Month >= 5)
+trains %>% 
+  filter(gender == "Female" & 
+           party == "Republican" &
+           age < 40)
 ```
 
+`filter()` should often be among the first verbs you consider applying to your data. This cleans your dataset to only those rows you care about.
 
-Let's now use the `mpg` tibble to explore `&` and `|` operators. Let's say we were interested in cars whose class is compact AND the manufacturer is Audi OR Volkswagen. We would use the following code:
-
-```{r}
-mpg %>% 
-  filter(class == "compact" &
-        (manufacturer == "audi" | manufacturer == "volkswagen"))
-```
-
-**Note:** We can often skip the use of `&` and just separate our conditions with a comma. The previous code will return the identical output as above.
-
-```{r}
-mpg %>% 
-  filter(class == "compact",
-        (manufacturer == "audi" | manufacturer == "volkswagen"))
-```
-
-Let's present another example that uses the `!` "not" operator to pick rows that *don't* match a criteria. As mentioned earlier, the `!` can be read as "not." Here we are filtering rows corresponding to cars that are not manufactured by Audi or Volkswagen.
-
-```{r}
-mpg %>% 
-  filter(!(manufacturer == "audi" | manufacturer == "volkswagen"))
-```
-
-Note the careful use of parentheses around the `(manufacturer == "audi" | manufacturer == "volkswagen")`. If we didn't use parentheses as follows:
-
-```{r}
-mpg %>%
-  filter(!manufacturer == "audi" | manufacturer == "volkswagen")
-```
-
-The code would read as cars NOT manufactured by Audi or cars that are actually manufactured by Volkswagen. In other words, "yes" to Audi or "no" to Volkswagen.
-
-If we decided to include more manufacturers, it would be unwieldy to write. A slightly shorter approach uses the `%in%` operator along with the `c()` function. Recall that the `c()` function "combines" or "concatenates" values into a single *vector* of values.
-
-```{r}
-mpg %>% 
-  filter(manufacturer %in% c("audi","volkswagen","toyota"))
-```
-
-What this code is doing is filtering `mpg` for all cars where `manufacturer` is in the vector: `c("audi","volkswagen","toyota")`. Remember we could have used `==` here, but using `%in%` along with `c()` takes much less energy to code.
-
-As a final note, we recommend that `filter()` should often be among the first verbs you consider applying to your data. This cleans your dataset to only those rows you care about.
-
-
+<!-- DK: More examples? -->
 
 ### `select` variables
 
