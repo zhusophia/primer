@@ -441,7 +441,7 @@ In this data, however, there are not many unique values for `income`, so neither
 
 Similarly to histograms, `geom_bar()` visualizes the distribution of a categorical variable. This is a simpler task, as we are simply counting different categories within a categorical variable, also known as the *levels* of the categorical variable. Often the best way to visualize these different counts, also known as *frequencies*, is with barplots.
 
-
+<!-- DK: Would be nice trains has a variable with 3 or 4 levels. -->
 
 ```{r}
 ggplot(data = trains, 
@@ -683,65 +683,52 @@ trains %>%
 
 ### `select` variables
 
-```{r, echo = FALSE, out.width = "100%", fig.cap = "Diagram of select() columns."}
+```{r, echo = FALSE, fig.cap = "Diagram of select() columns."}
 knitr::include_graphics("01-visualization/images/select.png")
 ```
 
-Using the `filter()` function we were able to pick out specific *rows* from the dataset. The `select()` function allows R users to pick specific *columns* (or variables) instead.
+Using the `filter()` function we were able to pick out specific *rows* from the dataset. The `select()` function allows us to pick specific *columns* (variables) instead.
 
-We've seen that the `gapminder` data frame in the `gapminder` package contains 6 different variables. You can identify the names of these 6 variables by running the `glimpse()` function from the **dplyr** package:
+Use `glimpse()` to see the names of the variables in `trains`:
 
 ```{r}
-glimpse(gapminder)
+glimpse(trains)
 ```
 
-However, say you only need 2 of these 6 variables, say `continent` and `lifeExp`. You can `select()`  these two variables:
+However, say you only need 2 of these variables, say `gender` and `treatment`. You can `select()`  these two variables:
 
 ```{r}
-gapminder %>% 
-  select(continent,lifeExp)
+trains %>% 
+  select(gender, treatment)
 ```
 
-This function makes it easier to explore large datasets since it allows us to limit the scope to only those variables we care most about. For example, if we `select()` only a smaller number of variables, it will make viewing the dataset in RStudio's spreadsheet viewer more digestible. 
-
-Let's say instead you want to drop, or de-select, certain variables. For example, consider the variable `year` in the `gapminder` data frame. Say you want to look at all the variables except year. You can remove this variable from the data frame. We can deselect `year` by using the `-` sign:
+Let's say instead you want to drop, or de-select, certain variables. Do that with the minus (`-`) sign:
 
 ```{r}
-gapminder %>% 
-  select(-year)
+trains %>% 
+  select(-gender, -liberal, -party, -age)
 ```
 
 Another way of selecting columns/variables is by specifying a range of columns using the `:` operator. 
 
 ```{r}
-gapminder %>% 
-  select(country:lifeExp)
+trains %>% 
+  select(gender:age)
 ```
 
-This will `select()` all columns between the two specified variables. By running this code, we select `country`, `continent`, `year`, and `lifeExp`.
-
-The `select()` function can also be used to rearrange columns when used with the `everything()` helper function.  For example, suppose we want the `continent`, `country` variables to appear immediately after the `year` variable, while not discarding the rest of the variables. In the following code, `everything()` will pick up all remaining variables: 
+This will `select()` all columns between the two specified variables. 
+The `select()` function can also be used to rearrange columns when used with the `everything()` helper function. We can out the `treatment` and `gender` variables first with:  
 
 ```{r}
-gapminder %>% 
-  select(year, continent, country, everything())
+trains %>% 
+  select(treatment, gender, everything())
 ```
 
-Lastly, the helper functions `starts_with()`, `ends_with()`, and `contains()` can be used to select variables/columns that match those conditions. Examples:
+The helper functions `starts_with()`, `ends_with()`, and `contains()` can be used to select variables/columns that match those conditions. Examples:
 
 ```{r}
-gapminder %>% 
-  select(starts_with("c"))
-```
-
-```{r}
-gapminder %>% 
-  select(ends_with("p"))
-```
-
-```{r}
-gapminder %>% 
-  select(contains("t"))
+trains %>% 
+  select(starts_with("a"))
 ```
 
 ### `slice()` and `pull()` and `[]`
@@ -751,7 +738,7 @@ gapminder %>%
 Using `slice()` gives us specific rows from the `gapminder` tibble:
 
 ```{r}
-slice(gapminder, 2:5)
+slice(trains, 2:5)
 ```
 
 Unlike `filter()`, `slice()` relies on numeric order of the data. 
@@ -759,55 +746,44 @@ Unlike `filter()`, `slice()` relies on numeric order of the data.
 `pull()` grabs out a variable as a vector, rather than leaving it within a tibble, as `select()` does:
 
 ```{r}
-slice(gapminder, 2:5) %>% 
-  pull(lifeExp)
+slice(trains, 2:5) %>% 
+  pull(age)
 ```
 
 
 ### `arrange()` rows
 
-One of the most commonly performed data wrangling tasks is to sort a data frame's rows in the alphanumeric order of one of the variables. Unlike `filter()` or `select()`, `arrange()` does not remove any rows or columns from the data frame. Instead, the **dplyr** package's `arrange()` function allows us to sort/reorder a data frame's rows according to the values of the specified variable.
+One of the most commonly performed data wrangling tasks is to sort a data frame's rows in the alphanumeric order of one of the variables. Unlike `filter()` or `select()`, `arrange()` does not remove any rows or columns from the data frame. Instead,  `arrange()` allows us to sort/reorder a tibble's rows according to the values of a specific variable.
 
-Suppose we are interested in finding which top 5 countries that have the highest life expectancies in the `gapminder` dataset.
-
-
-We would first want to `select()` some pertinent variables to make the data more easy to read.
+Let's start by selecting some relevant variables:
 
 ```{r}
-gapminder %>% 
-  select(country, year, lifeExp)
+trains %>% 
+  select(treatment, gender, age)
 ```
 
-It would be tedious to go through all 1,704 rows trying to find the top 5 years. This is where we can use `arrange()` to organize our data.
+Sort by `age`
 
 ```{r}
-gapminder %>% 
-  select(country, year, lifeExp) %>% 
-  arrange(lifeExp)
+trains %>% 
+  select(treatment, gender, age) %>% 
+  arrange(age)
 ```
 
-Notice how the life expectancy column is sorted with the smallest values to the largest. This is because `arrange()` always returns rows sorted in ascending order by default. To switch the ordering to be in "descending" order instead, we use the `desc()` function like so:
+Notice how the `age` column is sorted from the smallest values to the largest. This is because `arrange()` always returns rows sorted in ascending order by default. To switch the ordering to be in descending order instead, we use the `desc()` function like so:
 
 ```{r}
-gapminder %>% 
-  select(country, year, lifeExp) %>% 
-  arrange(desc(lifeExp))
-```
- 
-As you can see, we now have our countries of interest. 
-
-Be aware that when you use the `desc()` helper function with a character variable, will sort the destinations reverse alphabetically. 
-
-```{r}
-gapminder %>%
-  arrange(continent)
+trains %>% 
+  select(treatment, gender, age) %>% 
+  arrange(desc(age))
 ```
 
+This is the first of many "pipes" which we will create in *The Primer*. First, we have the `trains` tibble. Second, we pipe that to the `select()` function. Third, we pipe the results of `select()` to the `arrange()` function.
 
 
 ### `mutate()` 
 
-```{r, echo = FALSE, out.width = "100%", fig.cap = "Diagram of mutate() columns."}
+```{r, echo = FALSE, fig.cap = "Diagram of mutate() columns."}
 knitr::include_graphics("01-visualization/images/mutate.png")
 ```
 
