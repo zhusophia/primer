@@ -8,6 +8,8 @@ Everyone loves visualizations.
 
 <!-- DK: Replace airquality data set with one of our primer.data sets. -->
 
+<!-- DK: Switch geom_bar to trains? -->
+
 
 ```{r out.width = "100%", message = FALSE, echo = FALSE}
 library(tidyverse)
@@ -461,52 +463,24 @@ While pie charts present information in a way such that comparisons must be made
 
 #### Two categorical variables
 
-Barplots are a very common way to visualize the frequency of different categories, or levels, of a single categorical variable. Another use of barplots is to visualize the *joint* distribution of two categorical variables at the same time. 
-
-Let's look at a different dataset `mpg`, which contains a subset of the fuel economy data that the EPA released every year between 1999 and 2008. Each observation is a different car.
-
-Let's examine the *joint* distribution of two different types of manufacturers' cars by `class` as well as `model`. In other words, the number of cars for each `class` and `model` combination. 
-
-The code below creates a barplot of `class` frequency.
+Barplots are a very common way to visualize the frequency of different categories, or levels, of a single categorical variable. Another use of barplots is to visualize the *joint* distribution of two categorical variables at the same time. Let's look at `race`, as well as `region`, in the `nes` data by using the `fill` argument inside the `aes()` aesthetic mapping. Recall the `fill` aesthetic corresponds to the color used to fill the bars.
 
 ```{r}
-ggplot(data = mpg, 
-       mapping = aes(x = class)) + 
+ggplot(nes, 
+       aes(x = region, fill = race)) +
   geom_bar()
 ```
 
-Let's now map the additional variable `model` by adding a `fill = model` inside the `aes()` aesthetic mapping. Recall the `fill` aesthetic corresponds to the color used to fill the bars.
+This is an example of a *stacked barplot*.  While simple to make, in certain aspects it is not ideal. For example, it is difficult to compare the heights of the different colors between the bars, corresponding to comparing the number of people of different races within each region. 
 
-```{r}
-ggplot(data = mpg, 
-       mapping = aes(x = class, 
-                     fill = model)) +
-  geom_bar()
-```
-
-This is an example of a *stacked barplot*.  While simple to make, in certain aspects it is not ideal. For example, it is difficult to compare the heights of the different colors between the bars, corresponding to comparing the number of cars from each model between classes.
-
-An alternative to stacked barplots are *side-by-side barplots*, also known as *dodged barplots*. The code to create a side-by-side barplot  includes a `position = "dodge"` argument added inside `geom_bar()`. In other words, we are overriding the default barplot type, which is a *stacked* barplot, and specifying it to be a side-by-side barplot instead.
+An alternative to stacked barplots are *side-by-side barplots*, also known as *dodged barplots*. The code to create a side-by-side barplot includes a `position = "dodge"` argument added inside `geom_bar()`. In other words, we are overriding the default barplot type, which is a *stacked* barplot, and specifying it to be a side-by-side barplot instead.
 
 
 ```{r}
-ggplot(data = mpg, 
-       mapping = aes(x = class, 
-                     fill = model)) +
+ggplot(nes, 
+       aes(x = region, fill = race)) +
   geom_bar(position = "dodge")
 ```
-
-Note the width of the bars vary among one another. We can make one tweak to the `position` argument to get them to be the same size in terms of width as the other bars by using the more robust `position_dodge()` function.
-
-```{r}
-ggplot(data = mpg, 
-       mapping = aes(x = class, 
-                     fill = model)) +
-  geom_bar(position = position_dodge(preserve = "single"))
-```
-
-
-
 
 
 ### `geom_smooth()`
