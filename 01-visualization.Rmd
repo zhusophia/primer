@@ -441,12 +441,11 @@ In this data, however, there are not many unique values for `income`, so neither
 
 Similarly to histograms, `geom_bar()` visualizes the distribution of a categorical variable. This is a simpler task, as we are simply counting different categories within a categorical variable, also known as the *levels* of the categorical variable. Often the best way to visualize these different counts, also known as *frequencies*, is with barplots.
 
-Let's use the `nes` data from the **primer.tutorials** packages. (Explore the data on your own using `view()` and `glimpse()`. Read the help page by typing `?nes`.) The `nes` is data from [American National Election Studies](https://electionstudies.org/).
 
 
 ```{r}
-ggplot(data = nes, 
-       mapping = aes(x = region)) +
+ggplot(data = trains, 
+       mapping = aes(x = gender)) +
   geom_bar()
 ```
 
@@ -466,8 +465,8 @@ While pie charts present information in a way such that comparisons must be made
 Barplots are a very common way to visualize the frequency of different categories, or levels, of a single categorical variable. Another use of barplots is to visualize the *joint* distribution of two categorical variables at the same time. Let's look at `race`, as well as `region`, in the `nes` data by using the `fill` argument inside the `aes()` aesthetic mapping. Recall the `fill` aesthetic corresponds to the color used to fill the bars.
 
 ```{r}
-ggplot(nes, 
-       aes(x = region, fill = race)) +
+ggplot(trains, 
+       aes(x = gender, fill = treatment)) +
   geom_bar()
 ```
 
@@ -477,11 +476,12 @@ An alternative to stacked barplots are *side-by-side barplots*, also known as *d
 
 
 ```{r}
-ggplot(nes, 
-       aes(x = region, fill = race)) +
+ggplot(trains, 
+       aes(x = gender, fill = treatment)) +
   geom_bar(position = "dodge")
 ```
 
+Men are over-reprsented in the Control group even though the `treatment` was assigned at random.
 
 ### `geom_smooth()`
 
@@ -575,76 +575,61 @@ ggplot(trains,
 
 ## The Tidyverse
 
-Let's go over some important points about specifying the arguments (i.e., inputs) to functions. Run the following two segments of code:
-
-```{r message = FALSE}
-ggplot(data = gapminder, 
-       mapping = aes(x = lifeExp)) +
-geom_histogram(color = "white")
- 
-```
-
-```{r message = FALSE}
-ggplot(data = gapminder, 
-       mapping = aes(x = lifeExp)) +
-geom_histogram(color = "white")
-```
-
-Both code segments create the same barplot, even though in the second segment we omitted the `data = ` and `mapping = ` code argument names. This is because the `ggplot()` function by default assumes that the `data` argument comes first and the `mapping` argument comes second. As long as you specify the data frame in question first and the `aes()` mapping second, you do not need to include the explicit statement of the argument names `data = ` and `mapping = `. 
-
-Going forward for the rest of this book, all `ggplot()` code will be like the second segment: with the `data = ` and `mapping = ` explicit naming of the argument omitted with the default ordering of arguments respected. We'll do this for brevity's sake; it's common to see this style when reviewing other R users' code.
+Going forward, most `ggplot()` code will omit the `data = ` and `mapping = ` explicit naming of arguments while relying on the default ordering of those arguments. Most of the time, we include argument names and, as a rule, you should to. But we create so many plots in *The Primer* that these ommissions are unlikely to cause problems.
 
 
-### Data Wrangling 
+### Data wrangling 
 
 We can't use all the beautiful plots that we learned in the previous chapter until we have "wrangled" the data into a convenient shape. In this chapter, we'll introduce a series of functions from the **tidyverse** collection of packages which help with wrangling, and everything else we need to do to work with data. Such functions include:
 
-* `filter()`the data frame's existing rows to only pick out a subset of them.
+* `filter()` to pick out the *rows* we want to keep from a tibble .
 
-* `select()` specific variable columns in a data set. 
+* `select()` to pick out the *columns* we want to keep from a tibble.
 
-* `arrange()` its rows. You can organize your data in ascending or descending order. 
+* `arrange()` the rows in a tibble, in either ascending or descending order. 
 
-* `group_by()` its rows. This function assigns different rows to be part of the same *group*. This allows data statistics to be calculated for each group *separately*. You will see this function used with `summarize()`.
+*`mutate()` to create new columns.
 
-*`mutate()` its existing columns/variables to create new ones.
+* `group_by()` the rows of a tibble. This function assigns different rows to be part of the same *group*. This allows statistics to be calculated for each group *separately*. You will usually use `group_by` with `summarize()`.
 
-*`summarize()` the data. It creates a new data frame comprised of summary statistics for one (or more) rows for each grouped variable. 
-
-Notice how we used `computer_code` font to describe the actions we want to take on our data frames. This is because the **dplyr** package, one of the packages in the **tidyverse**, has intuitively verb-named functions that are easy to remember. 
-
-<!-- BG: stopped here -->
+*`summarize()` the data. It creates a new data frame comprised of summary statistics for one (or more) rows for each grouped variable, or for the tibble as a whole if it is ungrouped. 
 
 ### The pipe operator: `%>%`
 
 Before we start data wrangling, let's first introduce a nifty tool that gets loaded with the **dplyr** package included in the tidyverse: the pipe operator `%>%`. The pipe operator allows us to combine multiple operations in R into a single sequential *chain* of actions.
 
-Recall our code for our scatterplot.
+Recall the (modified) code for one of our graphics above.
 
 ```{r}
-ggplot(data = gapminder, 
-       mapping = aes(x = gdpPercap, 
-                     y = lifeExp)) + 
-  geom_point()
+ggplot(trains, 
+       aes(x = att_start, 
+           y = att_end)) + 
+  geom_point() +
+  geom_smooth(method = "lm", 
+              formula = y ~ x) +
+  labs(title = "Immigration Attitudes Among Boston Commuters",
+       subtitle = "Attitudes did not change much after the experiment",
+       x = "Attitude Before Experiment",
+       y = "Attitude After Experiment",
+       caption = "Data source: Enos (2014)")
+
 ```
 
-Much like how the `+` sign has to come at the end of lines when constructing plots, the pipe operator `%>%` has to come at the end of lines as well. Without the `+` at the end of the first row, your computer would not know to continue onto the second. 
+Much like how the `+` sign has to come at the end of lines when constructing plots --- because we are building the plot layer-by-layer --- the pipe operator `%>%` has to come at the end of lines because we are building a data wrangling pipeline step-by-step.
 
 
-The code below filters the `gapminder` dataset to only show about Asia, opposed to having data on all continents.
+The code below filters the `trains` dataset to only row for men.
 
 ```{r}
-gapminder %>% 
-  filter(continent == "Asia")
+trains %>% 
+  filter(gender == "Male")
 ```
 
 A single *chain* of data wrangling operations is formed here by combining verb-named functions into a single sequence using the pipe operator `%>%`. 
 
-
-
 ### `filter()` rows
 
-```{r, echo = FALSE, out.width = "100%", fig.cap = "Diagram of filter() rows operation."}
+```{r, echo = FALSE, fig.cap = "Diagram of filter() rows operation."}
 knitr::include_graphics("01-visualization/images/filter.png")
 ```
 
