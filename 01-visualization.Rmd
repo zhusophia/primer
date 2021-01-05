@@ -439,41 +439,32 @@ In this data, however, there are not many unique values for `income`, so neither
 
 Similarly to histograms, `geom_bar()` visualizes the distribution of a categorical variable. This is a simpler task, as we are simply counting different categories within a categorical variable, also known as the *levels* of the categorical variable. Often the best way to visualize these different counts, also known as *frequencies*, is with barplots.
 
-Run the following code that manually creates a data frame representing a collection of fruit: 3 apples and 2 oranges. Notice how `fruits` lists the fruit individually.
+Let's use the `nes` data from the **primer.tutorials** packages. (Explore the data on your own using `view()` and `glimpse()`. Read the help page by typing `?nes`.) The `nes` is data from [American National Election Studies](https://electionstudies.org/).
+
 
 ```{r}
-my_fruit <- tibble(fruit = c("apple", "apple", "orange", 
-                           "apple", "orange"))
-
-my_fruit
-```
-
-Using the `my_fruit` data frame where all 5 fruits are listed individually in 5 rows, we map the `fruit` variable to the x-position aesthetic and add a `geom_bar()` layer:
-
-```{r}
-ggplot(data = my_fruit, 
-       mapping = aes(x = fruit)) +
+ggplot(data = nes, 
+       mapping = aes(x = region)) +
   geom_bar()
 ```
 
 
 ### `geom_col()` 
 
-`geom_col()` is very similar to `geom_bar()`, except that `geom_col()` requires you to calculate the number of rows in each category ahead of time. `geom_bar()` does the calculation for you.
+<!-- DK: Do we really need this? I don't think so! -->
 
-<!-- DK: Don't use tibble! -->
+`geom_col()` is very similar to `geom_bar()`, except that `geom_col()` requires you to calculate the number of observations in each category ahead of time. `geom_bar()` does the calculation for you.
 
 ```{r}
-tibble(fruit = c("apple", "orange", "lemon"),
-       number = c(3, 2, 5)) %>% 
-  ggplot(aes(x = fruit, y = number)) +
+tibble(region = c("Midwest", "Northeast", "South", "West"),
+       number = c(10072, 7378, 13680, 7428)) %>% 
+  ggplot(aes(x = region, y = number)) +
     geom_col()
 ```
 
-You will learn about the `tibble()` function in the next chapter.
+You will learn about the `tibble()` function and the `%>%` (pipe) operator in the next chapter.
 
-
-Note how we must supply both an `x` and `y` aesthetic for `geom_col()`. We need a variable for the category, as with `geom_bar()` and for the count of entries for each value.
+Note how we must supply both an `x` and `y` aesthetic for `geom_col()`. We need a variable for the category, as with `geom_bar()`, and for the count of entries for each value, which `geom_bar()` calculates for us.
 
 
 #### No pie charts!
