@@ -916,17 +916,11 @@ $$p(models | data = 17)$$
 The same approach works again. We take a "slice" of the joint distribution where the number of red beads in the paddle is equal to 17. After normalization, that gives us this posterior probability for the number of red beads in the urn. Let's call the tibble with this data in it `post` and then use `post` to create a graphic of the posterior.
 
 ```{r}
-post <- x %>% 
+x %>% 
   filter(red_paddle == 17) %>% 
-  group_by(red_urn) %>% 
-  summarize(total = n(), .groups = "drop") %>%
-  mutate(probs = total/sum(total)) %>% 
-  select(-total)
-
-
-post %>% 
-  ggplot(aes(x = red_urn, y = probs)) +
-    geom_col() +
+  ggplot(aes(x = red_urn)) +
+    geom_histogram(aes(y = after_stat(count/sum(count))),
+                   bins = 50) + 
     labs(title = "Posterior Probability Distribution",
          subtitle = "Number of red beads is centered at 816",
          x = "Number of Beads in Urn which Are Red",
