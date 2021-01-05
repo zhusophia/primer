@@ -949,6 +949,14 @@ knitr::include_graphics("06-one-parameter/images/slice_rayshader.png")
 Now that we have our posterior distribution for the number of red beads in the urn, we can use that object to forecast other outcomes, outcomes which we have not yet observed. Recall, from the start of the Chapter, Question 2: "Conditional on our answer to Question 1, what is the probability, using the same urn, that we will draw more than 8 red beads if we use a shovel of size 20?"
 
 ```{r}
+post <- x %>% 
+  filter(red_paddle == 17) %>% 
+  group_by(red_urn) %>% 
+  summarize(total = n(), .groups = "drop") %>%
+  mutate(probs = total/sum(total)) %>% 
+  select(-total)
+
+
 post %>% 
   mutate(new_reds = map(red_urn, 
                             ~ rbinom(n = 100, 
