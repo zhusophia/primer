@@ -489,67 +489,85 @@ We can add trend lines to the plots we create using the `geom_smooth()` function
 
 <!-- DK: Will handle geom_smooth().explain method, se, and formula -->
 
-Recall the following scatterplot from the `geom_point()` section. 
+Recall the following scatterplot from our previous work. 
 
 ```{r}
-ggplot(data = gapminder, 
-       mapping = aes(x = gdpPercap, 
-                     y = lifeExp)) + 
-  geom_point()
+ggplot(trains, 
+       aes(x = att_start, 
+           y = att_end)) + 
+  geom_point() +
+  labs(title = "Immigration Attitudes Among Boston Commuters",
+       subtitle = "Attitudes did not change much after the experiment",
+       x = "Attitude Before Experiment",
+       y = "Attitude After Experiment",
+       caption = "Data source: Enos (2014)")
 ```
 
-We can add a trend line to our graph by adding the layer `geom_smooth()`. Including trend lines allow us to visualize the patterns in the presence of overplotting.
+We can add a trend line to our graph by adding the layer `geom_smooth()`. Including trend lines allow us to visualize the relationship between `att_start` and `att_end`.
 
 ```{r}
-ggplot(data = gapminder, 
-       mapping = aes(x = gdpPercap, 
-                     y = lifeExp)) + 
+ggplot(trains, 
+       aes(x = att_start, 
+           y = att_end)) + 
   geom_point() +
+  labs(title = "Immigration Attitudes Among Boston Commuters",
+       subtitle = "Attitudes did not change much after the experiment",
+       x = "Attitude Before Experiment",
+       y = "Attitude After Experiment",
+       caption = "Data source: Enos (2014)") +
   geom_smooth()
 ```
 
-Do you see the message R gives us? R is telling us that we need to specify the `method` and `formula` argument. 
+Do you see the message R gives us? R is telling us that we need to specify the `method` and `formula` argument, just the way it told us to provide `bins` argument when we used `geom_histogram()` before.
 
-Let's first deal with the `method` argument. Use the `geom_smooth()` function in combination with the argument `method = lm`, where `lm` stands for linear model.
+Let's add the argument `method = "lm"`, where `lm` stands for linear model. This causes the fitted line to be straight rather than curved. Let's also add the argument `formula = y ~ x`. This makes both messages go away. Again, R was not giving us an error before. It was simply telling us what options it was using since we did not specify the options ourselves.
 
-```{r}
-ggplot(data = gapminder, mapping = aes(x = gdpPercap, y = lifeExp)) + 
-  geom_point() +
-  geom_smooth(method = lm)
-```
+*Always include enough detail in your code to make those messages disappear.*
 
-Notice R continues to give us a message that we still need to include and specify the `formula` argument. Let's set the `formula` to `y ~ x` within `geom_smooth()`.
+
 
 ```{r}
-ggplot(data = gapminder, mapping = aes(x = gdpPercap, y = lifeExp)) + 
+ggplot(trains, 
+       aes(x = att_start, 
+           y = att_end)) + 
   geom_point() +
-  geom_smooth(method = "lm", formula = y ~ x)
+  labs(title = "Immigration Attitudes Among Boston Commuters",
+       subtitle = "Attitudes did not change much after the experiment",
+       x = "Attitude Before Experiment",
+       y = "Attitude After Experiment",
+       caption = "Data source: Enos (2014)") +
+  geom_smooth(method = "lm", 
+              formula = y ~ x)
 ```
 
-Notice the gray section surrounding both sides of both of the lines we plotted. This area is called the confidence interval, which is set to a 95% confidence interval by default. Therefore, using the 95% default confidence interval, we can be 95% certain that predictions for the model used in each plot fall within the gray area.
-
-If we want to remove the gray area, or the confidence interval, we can set `se = FALSE` within the `geom_smooth()` function.
-
-```{r}
-ggplot(data = gapminder, mapping = aes(x = gdpPercap, y = lifeExp)) + 
-  geom_point() +
-  geom_smooth(method = "lm", formula = y ~ x, se = FALSE)
-```
+Notice the gray section surrounding both sides of both of the lines we plotted. This area is called the confidence interval, which is set to a 95% confidence interval by default. We will learn about confidence intervals in Chapter \@ref(probability).
 
 ### `geom_density()`
 
 Recall the histogram we plotted in the `geom_histogram()` section.
 
 ```{r}
-ggplot(data = gapminder, mapping = aes(x = lifeExp)) +
-  geom_histogram(bins = 20)
+ggplot(trains, 
+       aes(x = income)) +
+  geom_histogram(bins = 50) +
+  labs(title = "Income Among Boston Commuter",
+       subtitle = "Why are there so few people with `middle' incomes?",
+       x = "Income",
+       y = "Count",
+       caption = "Data source: Enos (2014)")
 ```
 
-We can change `geom_histogram()` to `geom_density()` to make a density plot, which is a smoothed version of the histogram. This is a useful alternative to the histogram that displays continuous data in a smooth distribution.
+We can change `geom_histogram()` to `geom_density()` to make a density plot, which is a smoothed version of the histogram. 
 
 ```{r}
-ggplot(data = gapminder, mapping = aes(x = lifeExp)) +
-  geom_density()
+ggplot(trains, 
+       aes(x = income)) +
+  geom_density() +
+  labs(title = "Income Among Boston Commuter",
+       subtitle = "Why are there so few people with `middle' incomes?",
+       x = "Income",
+       y = NULL,
+       caption = "Data source: Enos (2014)")
 ```
 
 <!-- DK: Other stuff to finish this section with? -->
