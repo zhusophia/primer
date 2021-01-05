@@ -139,73 +139,66 @@ sqrt(64)
 
 * *Errors, warnings, and messages*: generally reported in a red font. When there is an error, the code will not run. Read (and/or google) the message and try fix it. Warnings don't prevent code from completing. For example, if you create a scatterplot based on data with two missing values, you will see this warning: `Warning: Removed 2 rows containing missing values (geom_point)`. Messages are similar. In both cases, you should fix the underlying issue until the warning/message goes away.    
 
-### Examining `gapminder`
+### Examining `trains`
 
-Let's put everything we've learned so far into practice and start exploring some real data! Data comes to us in a variety of formats, from pictures to text to numbers. Throughout this book, we'll focus on datasets that are saved in "spreadsheet"-type format. This is probably the most common way data are collected and saved in many fields. These "spreadsheet"-type datasets are called _data frames_ in R. Again, we will be using "data frame" and "tibble" interchangeably for this chapter.
-
-
-We'll begin by exploring the `gapminder` data frame in the **gapminder** package. This dataset is an excerpt of the Gapminder data on life expectancy, GDP per capita, and population by country.
+Most data comes to us in "spreadsheet"-type format.  These "spreadsheet"-type datasets are called *data frames* or *tibbles* in R. Let's explore the `trains` tibble in the **primer.data** package. This data comes from @enos2014, which investigated attitudes toward immigration among Boston commuuters.
 
 
 ```{r}
-library(gapminder)
-gapminder
+library(primer.data)
+trains
 ```
 
 Let's unpack this output:
 
-* `A tibble: 1,704 x 6`: A `tibble` is a specific kind of data frame in R. This particular data frame has `1,704` rows corresponding to different *observations*. 
+* A `tibble` is a specific kind of data frame. This particular data frame has `r nrow(trains)` rows corresponding to different *units*, meaing people in this case. 
 
-* The tibble also has `6` columns corresponding to 6 *variables* describing each observation. `country`, `continent`, `year`,`lifeExp`, `pop`, and `gdpPercap` are the different variables of this dataset. 
+* The tibble also has `r ncol(trains)` columns corresponding to *variables* which describe each observation. 
 
 * We see, by default, the top 10 rows. R is only showing the first 10 rows, since that is all that you probably want to see at first. You can see more (or fewer) rows with scrolling or using the `print()` command:
 
 ```{r}
-print(gapminder, n = 15)
+print(trains, n = 15)
 ```
 
-*Note:* the `n` argument tells R the number of rows you want to see. 
+The `n` argument to `print()` tells R the number of rows you want to see. 
 
 ### Exploring data frames
 
-There are many ways to get a feel for the data contained in a data frame such as `gapminder`. We present two functions that take the dataset as their "argument" (or input). We also include a third method for exploring one particular column of a data frame:
-
-1. Using the `view()` function, which brings up RStudio's built-in data viewer.
-1. Using the `glimpse()` function, which is included in the **dplyr** package.
-1. Using the `$` "extraction operator," which is used to view a single variable/column in a data frame.
-
-**1. `View()`**:
-
-Run `view(gapminder)` in your console in RStudio, either by typing it or cutting-and-pasting it into the console pane. Explore this data frame in the resulting pop up viewer. You should get into the habit of viewing any data frames you encounter.
-
-By running `view(gapminder)`, we can explore the different *variables* listed in the columns. Observe that there are many different types of variables.  Some of the variables including `year`, `lifeExp`, `pop`, `year` and `gdPercap` are *quantitative* variables. These variables are numerical in nature.  Other variables here, including `country`, `continent` are *categorical*.
-
-If you look in the leftmost column of the `view(gapminder)` output, you will see a column of numbers. These are the row numbers of the dataset. If you glance across a row with the same number, say row 5, you can get an idea of what each row is representing. This will allow you to identify what object is being described in a given row. This is often called the *observational unit*.
+There are many ways to get a feel for the data contained in a data frame such as `trains`. 
 
 
-**2. `glimpse()`**:
+#### `view()`
+
+Run `view(trains)` in the Console in RStudio, either by typing it or cutting-and-pasting it into the Console pane. Explore this data frame in the resulting pop up viewer. 
+
+`view()` allows us to explore the different *variables* listed in the columns. Observe that there are many different types of variables.  Some of the variables are *quantitative*. These variables are numerical in nature.  Other variables here, including `gender` and  `treatment` are *categorical*.
+
+
+#### `glimpse()`
 
 We can also explore a data frame using the `glimpse()`function. 
 
 ```{r}
-glimpse(gapminder)
+glimpse(trains)
 ```
 
-Observe that `glimpse()` will give you the first few entries of each variable in a row after the variable name.  In addition, the *data type* of the variable is given immediately after each variable's name inside `< >`. 
+Observe that `glimpse()` will give you the first few entries of each variable in a row after the variable name.  In addition, the *data type* of the variable is given immediately after each variable's name, inside `< >`. 
 
-Here, `dbl` refers to "double", which is computer coding terminology for quantitative/numerical variables. `int` refers to "integer" and is another data type that also represents quantitative/numerical variables.`fct` refers to "factor" and describes a variable that is nominal, or in this case the `country` and `continent` variables.
+`dbl` refers to "double", which is computer coding terminology for quantitative/numerical variables. `int` refers to "integer" and is another data type that also represents quantitative/numerical variables.`fct` refers to "factor" and describes a variable that is nominal, meaning a member of a smallish number of categories. `chr` is for character data.
 
-Not mentioned here is `chr`, which refers to "character", which is computer terminology for text data.
 
-**3. `$` operator**
+#### `$` operator
 
-Lastly, the `$` operator allows us to extract and then explore a single variable within a data frame.
+The `$` operator allows us to extract and then explore a single variable within a data frame.
 
 ```{r}
-gapminder$year
+trains$age
 ```
 
-We used the `$` operator to extract only the `year` variable and return it as a vector. We'll only be occasionally exploring data frames using the `$` operator. Mostly, we favor the `view()` and `glimpse()` functions.
+We used the `$` operator to extract only the `age` variable and return it as a vector. 
+
+<!-- DK: Other stuff? Or save $ for elsewhere? -->
 
 
 ## Basic Plots
@@ -221,6 +214,7 @@ We can break a graphic into the following three essential components:
 Let's look at an example of a basic scatterplot. 
 
 ```{r}
+library(gapminder)
 ggplot(data = gapminder, 
        mapping = aes(x = gdpPercap, 
                      y = lifeExp)) + 
