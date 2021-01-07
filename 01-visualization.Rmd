@@ -439,11 +439,10 @@ In this data, however, there are not many unique values for `income`, so neither
 
 Similarly to histograms, `geom_bar()` visualizes the distribution of a categorical variable. This is a simpler task, as we are simply counting different categories within a categorical variable, also known as the *levels* of the categorical variable. Often the best way to visualize these different counts, also known as *frequencies*, is with barplots.
 
-<!-- DK: Would be nice trains has a variable with 3 or 4 levels. -->
 
 ```{r}
 ggplot(data = trains, 
-       mapping = aes(x = gender)) +
+       mapping = aes(x = race)) +
   geom_bar()
 ```
 
@@ -464,7 +463,7 @@ Barplots are a very common way to visualize the frequency of different categorie
 
 ```{r}
 ggplot(trains, 
-       aes(x = gender, fill = treatment)) +
+       aes(x = race, fill = treatment)) +
   geom_bar()
 ```
 
@@ -475,11 +474,11 @@ An alternative to stacked barplots are *side-by-side barplots*, also known as *d
 
 ```{r}
 ggplot(trains, 
-       aes(x = gender, fill = treatment)) +
+       aes(x = race, fill = treatment)) +
   geom_bar(position = "dodge")
 ```
 
-Men are over-reprsented in the Control group even though the `treatment` was assigned at random.
+Whites are over-reprsented in the Control group even though the `treatment` was assigned at random.
 
 ### `geom_smooth()`
 
@@ -522,8 +521,6 @@ Let's add the argument `method = "lm"`, where `lm` stands for linear model. This
 
 *Always include enough detail in your code to make those messages disappear.*
 
-
-
 ```{r}
 ggplot(trains, 
        aes(x = att_start, 
@@ -538,7 +535,7 @@ ggplot(trains,
               formula = y ~ x)
 ```
 
-Notice the gray section surrounding both sides of both of the lines we plotted. This area is called the confidence interval, which is set to a 95% confidence interval by default. We will learn about confidence intervals in Chapter \@ref(probability).
+Notice the gray section surrounding both sides of both of the lines we plotted. This area is called the confidence interval, which is set to a 95% confidence interval by default. We will learn about confidence intervals in Chapter \@ref(probability). You can make the shaded disappear by adding `se = FALSE` as another argument to `geom_smooth()`.
 
 ### `geom_density()`
 
@@ -693,7 +690,7 @@ Use `glimpse()` to see the names of the variables in `trains`:
 glimpse(trains)
 ```
 
-However, say you only need 2 of these variables, say `gender` and `treatment`. You can `select()`  these two variables:
+However, if you only need two of these variables, say `gender` and `treatment`. You can `select()` just these two:
 
 ```{r}
 trains %>% 
@@ -736,7 +733,8 @@ trains %>%
 Using `slice()` gives us specific rows from the `gapminder` tibble:
 
 ```{r}
-slice(trains, 2:5)
+trains %>% 
+  slice(2:5)
 ```
 
 Unlike `filter()`, `slice()` relies on numeric order of the data. 
@@ -744,7 +742,8 @@ Unlike `filter()`, `slice()` relies on numeric order of the data.
 `pull()` grabs out a variable as a vector, rather than leaving it within a tibble, as `select()` does:
 
 ```{r}
-slice(trains, 2:5) %>% 
+trains %>% 
+  slice(2:5) %>% 
   pull(age)
 ```
 
