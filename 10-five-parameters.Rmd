@@ -1,12 +1,9 @@
 # Five Parameters {#five-parameters}
 
-<!-- Do centering properly. Create a new variable and use it throughout. Then track down the random 52 years hard-coded. -->
-
 <!-- Should lived\_after_i be replaced with y_i everywhere? Somewhere? -->
 
 <!-- Clean up all the plots, especially the legends. -->
 
-<!-- Make a joke about skipping 4 parameters. -->
 
 The next step in our model building education is to learn about *interactions*. The effect of a treatment relative to a control is almost never uniform. The effect might be bigger in women than in men, smaller in the rich relative to the poor. The technical term for such effects is "heterogenous," which is just Ph.D.'ese for "different." With enough data, all effects are heterogenous. Causal effects, at least in the social science, always vary across units. To model this reality, we rely on "interactions," on allowing for the effect size to differ. To so so, we need at least 5 parameters. 
 
@@ -303,7 +300,6 @@ fit_gov_1 %>%
 
 We center variables when the model's intercept does not make substantive sense. To center a model, we pick a constant value, usually the mean of the independent variable, and subtract that constant from every value of the independent variable. Another option would be to pick a reasonable reference value, like 50 years-old. Either way, the meaning of `election_age` changes from the raw number of years a candidate has been alive to the number of years relative to that reference value. 
 
-<!-- DK: Fix hard codes like 52 -->
 
 In this example, we want to center the value for `election_age`, the independent variable. First, we must pick the value that we will center by. Here, we will use the mean of `election_age`, which is about `r round(mean(ch10$election_age), 0)` years old.  Once we find this number, we will subtract it from every `election_age` value, creating a new variable: `election_age_c`, where the "c" stand for **c**entered.  `election_age_c` is the number of years a candidate has been alive, as of Election Day, relative to the average years alive of all candidates on their respective election days.
 
@@ -573,11 +569,11 @@ print(fit_gov_4, detail = FALSE)
 
 <!-- DK: Fix -->
 
-The intercept has increased. $\beta_0$ is around `r round(coef(fit_gov_4)["(Intercept)"], 0)`. This is the intercept for females. It still means the average number of years lived after the election for women is `r round(coef(fit_gov_4)["(Intercept)"], 0)` or so. Our `sexMale` coefficient, $\beta_1$, refers to the value that must be added to the intercept in order to get the average for males. When calculated, the result is `r round(coef(fit_gov_4)["(Intercept)"] + coef(fit_gov_4)["sexMale"], 0)`. Keep in mind, however, that these values only apply if $election\_age\_c_i = 0$, if, that is, candidate $i$ is around 52 years old. 
+The intercept has increased. $\beta_0$ is around `r round(coef(fit_gov_4)["(Intercept)"], 0)`. This is the intercept for females. It still means the average number of years lived after the election for women is `r round(coef(fit_gov_4)["(Intercept)"], 0)` or so. Our `sexMale` coefficient, $\beta_1$, refers to the value that must be added to the intercept in order to get the average for males. When calculated, the result is `r round(coef(fit_gov_4)["(Intercept)"] + coef(fit_gov_4)["sexMale"], 0)`. Keep in mind, however, that these values only apply if $election\_age\_c_i = 0$, if, that is, candidate $i$ is around `r round(mean(ch10$election_age), 0)` years old. 
 
 The coefficient for $election\_age\_c_i$, $\beta_2$, is `r round(coef(fit_gov_4)["election_age_c"], 1)`. What does this mean? It is the slope for females. So, when comparing two female candidates who differ by one year in age, we expect that the older candidate will live `r abs(round(coef(fit_gov_4)["election_age_c"], 1))` years less. Now direct your attention below at the coefficient of `sexMale:election_age_c`, $\beta_3$, which is `r round(coef(fit_gov_4)["sexMale:election_age_c"], 1)`. This is the value that must be added to the coefficient of $election\_age\_c_i$ (recall $\beta_2 + \beta_3$) in order to find the slope for males. When the two are added together, this value, or slope, is about `r round(coef(fit_gov_4)["election_age_c"] + coef(fit_gov_4)["sexMale:election_age_c"], 1)`. When comparing two male candidates who differ in age by one year, we expect the older candidate to live about `r abs(round(coef(fit_gov_4)["election_age_c"] + coef(fit_gov_4)["sexMale:election_age_c"], 1))` years less. 
 
-*Key point*: The interpretation of the intercepts only apply to candidates for whom $election\_age\_c_i = 0$. Candidates who are not 52 years-old will have different expected number of years to live. The interpretation of the slope applies to everyone. In other words, the relationship between $lived\_after_i$ and $election\_age\_c_i$ is the same, regardless of your gender or how old you are.
+*Key point*: The interpretation of the intercepts only apply to candidates for whom $election\_age\_c_i = 0$. Candidates who are not `r round(mean(ch10$election_age), 0)` years-old will have different expected number of years to live. The interpretation of the slope applies to everyone. In other words, the relationship between $lived\_after_i$ and $election\_age\_c_i$ is the same, regardless of your gender or how old you are.
 
 
 The posterior:
@@ -607,7 +603,7 @@ fit_gov_4 %>%
 ```
 
 
-Male candidates live longer on average than female candidates. Note, also, that the average years to live after the election for females is about `r round(coef(fit_gov_4)["(Intercept)"], 0)` with this model. With the previous model, it was `r round(coef(fit_gov_3)["(Intercept)"], 0)` years. Why the difference? The interpretation of "average" is different! In the previous model, it was the average for all women. In this model, it is the average for all 52 years-old women. Those are different things, so we should hardly be surprised by different posteriors.
+Male candidates live longer on average than female candidates. Note, also, that the average years to live after the election for females is about `r round(coef(fit_gov_4)["(Intercept)"], 0)` with this model. With the previous model, it was `r round(coef(fit_gov_3)["(Intercept)"], 0)` years. Why the difference? The interpretation of "average" is different! In the previous model, it was the average for all women. In this model, it is the average for all `r round(mean(ch10$election_age), 0)` years-old women. Those are different things, so we should hardly be surprised by different posteriors.
 
 <!-- DK: Is the above right? -->
  
