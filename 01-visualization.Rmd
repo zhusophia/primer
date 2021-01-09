@@ -207,7 +207,7 @@ There are three essential components to a plot:
 
 * `data`: the dataset containing the variables of interest.
 * `geom`: the geometric object to display, e.g., scatterplot, line, bar.
-* `aes`: aesthetic attributes of the geometric object. The most important are the names of the variables should be on the x and y axes. Additional attributes include color and size. Aesthetic attributes are *mapped* to variables in the dataset.
+* `aes`: aesthetic attributes of the geometric object. The most important are the names of the variables that should be on the x and y axes. Additional attributes include color and size. Aesthetic attributes are *mapped* to variables in the dataset.
 
 Let's look at an example of a basic scatterplot using data from @enos2014 for `r nrow(trains)` Boston commuters.
 
@@ -302,7 +302,7 @@ ggplot(data = trains,
        caption = "Data source: Enos (2014)")
 ```
 
-The problem with this display is "overplotting." Because attitudes are measured as integers, we don not know if a given point represents just one person or a dozen. There are two methods we can use to address overplotting: transparency and jitter.
+The problem with this display is "overplotting." Because attitudes are measured as integers, we do not not know if a given point represents just one person or a dozen. There are two methods we can use to address overplotting: transparency and jitter.
 
 **Method 1: Changing the transparency**
 
@@ -459,7 +459,7 @@ While pie charts present information in a way such that comparisons must be made
 
 #### Two categorical variables
 
-Barplots are a very common way to visualize the frequency of different categories, or levels, of a single categorical variable. Another use of barplots is to visualize the *joint* distribution of two categorical variables at the same time. Let's look at `race`, as well as `region`, in the `nes` data by using the `fill` argument inside the `aes()` aesthetic mapping. Recall the `fill` aesthetic corresponds to the color used to fill the bars.
+Barplots are a very common way to visualize the frequency of different categories, or levels, of a single categorical variable. Another use of barplots is to visualize the *joint* distribution of two categorical variables at the same time. Let's look at `race`, as well as `region`, in the `trains` data by using the `fill` argument inside the `aes()` aesthetic mapping. Recall the `fill` aesthetic corresponds to the color used to fill the bars.
 
 ```{r}
 ggplot(trains, 
@@ -577,17 +577,17 @@ Going forward, most `ggplot()` code will omit the `data = ` and `mapping = ` exp
 
 We can't use all the beautiful plots that we learned in the previous chapter until we have "wrangled" the data into a convenient shape. In this chapter, we'll introduce a series of functions from the **tidyverse** collection of packages which help with wrangling, and everything else we need to do to work with data. Such functions include:
 
-* `filter()` to pick out the *rows* we want to keep from a tibble .
+* `filter()` to pick out the *rows* we want to keep from a tibble.
 
 * `select()` to pick out the *columns* we want to keep from a tibble.
 
 * `arrange()` the rows in a tibble, in either ascending or descending order. 
 
-*`mutate()` to create new columns.
+* `mutate()` to create new columns.
 
 * `group_by()` the rows of a tibble. This function assigns different rows to be part of the same *group*. This allows statistics to be calculated for each group *separately*. You will usually use `group_by` with `summarize()`.
 
-*`summarize()` the data. It creates a new data frame comprised of summary statistics for one (or more) rows for each grouped variable, or for the tibble as a whole if it is ungrouped. 
+* `summarize()` the data. It creates a new data frame comprised of summary statistics for one (or more) rows for each grouped variable, or for the tibble as a whole if it is ungrouped. 
 
 ### The pipe operator: `%>%`
 
@@ -730,7 +730,7 @@ trains %>%
 
 `slice()` and `pull()` are additional functions that you can use to pick out specific rows or columns within a data frame.
 
-Using `slice()` gives us specific rows from the `gapminder` tibble:
+Using `slice()` gives us specific rows from the `trains` tibble:
 
 ```{r}
 trains %>% 
@@ -784,7 +784,7 @@ This is the first of many "pipes" which we will create in *The Primer*. First, w
 knitr::include_graphics("01-visualization/images/mutate.png")
 ```
 
-Another common transformation of data is to create new variables based on existing ones. In other words, we want to make a new column using already existing column We can use the `mutate()` function from the **dplyr** package, which takes existing variables and mutates them to create new ones. 
+Another common transformation of data is to create new variables based on existing ones. In other words, we want to make a new column using already existing columns. The `mutate()` function from the **dplyr** package takes existing variables and mutates them to create new ones. 
 
 
 Recall that the `income` variable in the `trains` tibble is in dollars. Let's use `mutate()` to create a new variable where income is in thousands of dollars. (We use `select()` at the start of the pipe so that it is easier to see the new and old variables at the same time.)
@@ -833,9 +833,11 @@ Another function similar to `ifelse()`, is `dplyr::case_when()`. `case_when()` i
 
 A musical interlude inspired by the Tidyverse:
 
+
 ```{r, echo = FALSE}
-knitr::include_app("https://www.youtube.com/watch?v=p8Py9C8iq2s")
+knitr::include_app("https://www.youtube.com/embed/p8Py9C8iq2s")
 ```
+
 
 The next common task when working with data frames is to compute *summary statistics*. Summary statistics are single numerical values that summarize a large number of values. Commonly known examples of summary statistics include the *mean* (also called the average) and the *median* (the middle value). Other examples of summary statistics that might not immediately come to mind include the *sum*, the *minimum*, the *maximum*, and the *standard deviation*.
 
@@ -872,9 +874,10 @@ The median is another commonly reported measure of the center of a distribution,
 
 **`sd()`**
 
-The standard deviation* (*sd*) of a distribution is a measure of its variation around the mean.  
+The standard deviation (*sd*) of a distribution is a measure of its variation around the mean.  
 
 $$\text{sd} = \sqrt{\frac{(x_1 - \bar{x})^2 + (x_2 - \bar{x})^2 + \cdots + (x_n - \bar{x})^2}{n - 1}}$$
+
 <!-- DK: More detail. How much does it cover? Plot a not-too-weirdish distribution and show two sd's on it. -->
 
 
@@ -898,7 +901,7 @@ The *quantile* of a distribution is the value of that distribution which occupie
 
 The 5th percentile distribution is the point below which 5% of the data falls. The 95th percentile is, similarly, the point below which 95% of the data falls. The 50th percentile, the median, splits the data into two separate, and equal, parts. The minimum is at the 0th percentile. The maximum is at the 100th percentile.
 
-Let's take a look at the `poverty` variable in the `kenya` tibble from the **primer.data** package. `poverty` is the percentage of residents in each community with incomes below the poverty line. Let's first confirm that connections between `quantile()` and simpler functions.
+Let's take a look at the `poverty` variable in the `kenya` tibble from the **primer.data** package. `poverty` is the percentage of residents in each community with incomes below the poverty line. Let's first confirm that  `quantile()` works by comparing its output with that from simpler functions.
 
 ```{r}
 c(min(kenya$poverty), median(kenya$poverty), max(kenya$poverty))
@@ -1009,9 +1012,10 @@ In the previous section we have seen the three components that every plot must i
 Let's start by introducing a new concept called *faceting*.  Faceting is used when we'd like to split a particular visualization by the values of another variable. This will create multiple copies of the same type of plot with matching x and y axes, but whose content will differ. 
 
 
-Before we proceed, let's create a subset of the data `gapminder` to use.
+Before we proceed, let's create a subset of the tibble `gapminder`, from the **gapminder**, package to use. (You may need to install the **gapminder** package for this code to work.)
 
 ```{r}
+library(gapminder)
 gapminder_filt <- gapminder %>% 
       filter(year == 2007, continent != "Oceania")
 ```
@@ -1039,19 +1043,6 @@ ggplot(data = gapminder_filt,
 ```
 
 This is way better! However, R chooses by default 2 plots per row, so that Asia and Europe are below the other two continents. We can specify the number of rows and columns in the grid by using the `nrow` argument inside of `facet_wrap()`. Let's get all continents in a row by setting `nrow` to 1.
-
-
-```{r}
-ggplot(data = gapminder_filt, 
-       mapping = aes(x = gdpPercap, 
-                     y = lifeExp, 
-                     color = continent)) +
-  geom_point() +
-  facet_wrap(~ continent, 
-             nrow = 1)
-```
-
-This is way better! However, R chooses by default 2 plots per row, so that Asia and Europe are below the other two continents. We can specify the number of rows and columns in the grid by using the `nrow` and `ncol` arguments inside of `facet_wrap()`. Let's get all continents in a row by setting `nrow` to 1.
 
 
 Let's now add a trend line `geom_smooth()` to our faceted plot.
@@ -1207,9 +1198,11 @@ gapminder %>%
     scale_x_log10(breaks = c(500, 5000, 50000)) 
 ```
 
-Let's now add a theme to our faceted scatterplot. We will use the theme `theme_economist()` to make our plot look like the plots in the *The Economist*.
+Let's now add a theme to our faceted scatterplot. We will use the theme `theme_economist()`, from the **ggthemes** package, to make our plot look like the plots in the *The Economist*. 
 
 ```{r}
+library(ggthemes)
+
 gapminder %>%
   filter(continent != "Oceania") %>%
   filter(year == max(year)) %>% 
