@@ -144,7 +144,7 @@ It is also important to identify the dependent variable and its meaning. In this
 
 <!-- HV: Should I include discussion of the left-hand variable (treatment?) here? Or wait until we move into the regressions? -->
 
-The voting results from other years, such as 2002 and 2004, are of less interest to us and can be removed from the abbreviated data set. In addition to removing `general_04`, `primary_02`, `general_02`, or `primary_04`, we also will not be taking particular interest in `birth_year`, or `no_of_names` within this chapter.
+The voting results from other years, such as 2002 and 2004, are of less interest to us and can be removed from the abbreviated data set. In addition to removing `general_04`, `primary_02`, `general_02`, or `primary_04`, we also will not be taking particular interest in `age`, or `no_of_names` within this chapter.
 
 <!-- HV: should I explain why we are not using any of these variables? why they are not of great use to us? -->
 
@@ -174,7 +174,6 @@ ch9_sham <- shaming %>%
   filter(treatment %in% c("Control", "Neighbors")) %>% 
   droplevels() %>% 
   mutate(solo = ifelse(hh_size == 1, TRUE, FALSE)) %>% 
-  mutate(age = 2006 - birth_year) %>% 
   select(primary_06, treatment, solo, sex, age) %>% 
   sample_n(10000, replace = FALSE)
 ```
@@ -305,7 +304,6 @@ Let's now look at another graph that aims to show the same phenomena, but also i
 
 ```{r}
 shaming %>% 
-  mutate(age = 2006 - birth_year) %>%  
   ggplot(aes(age, primary_06)) + 
   geom_jitter(alpha = 0.005, height = 0.1) + 
   geom_smooth(formula = y ~ x, method = "lm", se = FALSE) + 
