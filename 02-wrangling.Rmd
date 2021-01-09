@@ -1,41 +1,36 @@
 # Wrangling {#wrangling}
 
-<!-- TODO: --> 
 
-
-<!-- Later: Replace flights with fec16. airlines are boring. -->
+<!-- Replace flights with fec16? airlines are boring. Git rid of 538? -->
 
 <!-- Add in other join diagrams, like the one used for for inner join. -->
 
 <!-- Start joins with left_join, since it is most popular. -->
 
+*Data science is data cleaning.*
 
 Start by loading the packages which we will need in this chapter.
-
 
 ```{r, message = FALSE}
 library(tidyverse)
 library(primer.data)
 library(lubridate)
-library(skimr)
 library(janitor)
-library(gapminder)
+library(skimr)
 library(nycflights13)
+library(gapminder)
 library(fivethirtyeight)
 ```
 
-<!-- BG: no more flights. fivethirtyeight? -->
-
-The **tidyverse** package will be used in every chapter. **primer.data** is the data package created specifically for this course. **lubridate** is a package for working with dates and times. **janitor** offers functions for cleaning up dirty data. **skimr** contains functions that are useful for providing summary statistics. **nycflights** includes data associated with flights out of New York City's three major airports. **gapminder** has data for countries across decades. **fivethirtyeight** cleans up data from the [FiveThirtyEight](https://fivethirtyeight.com/) team.
+The **tidyverse** package will be used in every chapter. **primer.data** is the data package created specifically for this *Primer*. **lubridate** is a package for working with dates and times. **janitor** offers functions for cleaning up dirty data. **skimr** contains functions that are useful for providing summary statistics. **nycflights** includes data associated with flights out of New York City's three major airports. **gapminder** has annual data for countries going back more than 50 years. **fivethirtyeight** cleans up data from the [FiveThirtyEight](https://fivethirtyeight.com/) team.
 
 ## Data Gathering
 
-The `read_csv()` function turns flat files into data frames. More specifically, it turns files whose values are separated by commas (hence CSV). Let’s import a Comma Separated Values file that exists on the internet. 
-Its important to know that the `read_csv()` function included in the readr package is different than the `read.csv()` function that comes installed with R. 
+The `read_csv()` function turns flat files into data frames. More specifically, it turns files whose values are separated by commas. Let’s import a **c**omma **s**eparated **v**alues (hence "csv") file from the internet. The `read_csv()` function included in the **readr** package, which is one of the packages in the Tidyverse, is different than the `read.csv()` function that comes installed with R. Always use Tidyverse functions, if possible. 
 
-It tells us that each comma from the .csv file corresponds to a column, and the column names are taken from the first line of the file. Then, the function "guesses" an appropriate data type for each of the columns it creates. Sometimes .csv files are a lot dirtier and require significant wrangling before you can explore the data and create usable graphics. 
+Each comma from the csv file corresponds to a column, and the column names are taken from the first line of the file. Then, the function "guesses" an appropriate data type for each of the columns it creates. Sometimes csv files are a lot dirtier and require significant wrangling before you can explore the data and create usable graphics. 
 
-This link below brings you to a file containing the faculty's gender data across departments at Harvard University. Note, the file argument of the `read_csv()` function can take the link to a dataset in a number of forms. Below, the file argument takes a url. Other formats that this argument could take are full or partial file paths for .csv files saved locally on your computer. 
+The link below is for a file containing faculty gender data across departments at Harvard University. Note, the `file` argument of the `read_csv()` function is very flexible. Below, it takes a url. `file` can also be the absolute or relative paths for a file saved locally on your computer. 
 
 ```{r}
 url <- "https://raw.githubusercontent.com/PPBDS/primer/master/02-wrangling/data/faculty.csv"
@@ -47,18 +42,22 @@ fac
 
 We need to "skip" the first row of the file because there is a code comment at the top, which has nothing to do with the actual data.
 
-Run the `summary()` function on the `fac` dataframe.
+Run the `summary()` function on the `fac` tibble.
 
 ```{r}
 summary(fac)
 ```
 
-You may notice that something appears to be wrong with this dataset. Which department could have employed 644 male full professors? We will explore this mystery later in the chapter.
+Don't confuse `summary()`, which is a built-in --- generally termed "Base" --- R function for providing a summary of an object, with `summarize()`, which is one of the most important functions from **dplyr**.
+
+You may notice that something appears to be wrong with this dataset. Which department could have employed 644 male professors? We will explore this mystery later in the chapter.
 
 
 ### HTML
 
-The data we need to answer a question is not always in a spreadsheet ready for us to read. For example, we can find interesting data about murders in the US in [this Wikipedia page](https://en.wikipedia.org/w/index.php?title=Gun_violence_in_the_United_States_by_state): 
+<!-- DK: Rewrite these sections. -->
+
+The data we need to answer a question is not always in a handy spreadsheet. For example, we can find interesting data about murders in the US in [this Wikipedia page](https://en.wikipedia.org/w/index.php?title=Gun_violence_in_the_United_States_by_state): 
 
 ```{r}
 url <- paste0("https://en.wikipedia.org/w/index.php?title=",
@@ -212,13 +211,12 @@ json <- toJSON(example, pretty = TRUE)
 json
 ```
 
-The file above actually represents a data frame. To read it, we can use the function `fromJSON` from the jsonlite package. Note that JSON files are often made available via the internet. Several organizations provide a JSON API or a web service that you can connect directly to and obtain data. 
+The file above actually represents a data frame. To read it, we can use the function `fromJSON` from the **jsonlite** package. Note that JSON files are often made available via the internet. Several organizations provide a JSON API or a web service that you can connect directly to and from which you can obtain data. 
 
-You can learn much more by examining tutorials and help files from the jsonlite package. This package is intended for relatively simple tasks such as converging data into tables. For more flexibility, we recommend `rjson`.
 
 ## Tibbles
 
-Tibbles are a kind of data frame, useful for storing data in which we have the same number of observations for each variable. We can use the `tibble()` function to create data frames. Tibbles are composed of variables, the individual columns which, together, make up the tibble. Each column, or variable, can be of a different type: character, factor, date and so on.
+Tibbles are a kind of data frame, useful for storing data in which we have the same number of observations for each variable. We can use the `tibble()` function to create data frames. Tibbles are composed of columns, each of which is a variable, and rows, each of which are the values for those variables for a single "unit" or "observation." Each column (i.e., each variable) can be of a different type: character, numeric, factor, date and so on.
 
 
 ### `tibble()`
@@ -230,16 +228,16 @@ tibble(a = 2.1, b = "Hello", c = TRUE, d = 9L)
 In our code, we specify the variable names (or the names of columns) as , `a`, `b`, and `c`. Under each variable, we give a different numerical value. Under each variable name, the data type is specified for the data within that column. A tibble can consist of one or more atomic vectors, the most important types of which are double, character, logical, and integer. The tibble above includes a variable of each type. (The "L" in "9L" tells R that we want `d` to be an integer rather than the default, which would be a double.)  When you print out a tibble, the variable type is shown below the variable name.
 
 
-When giving variable names to our tibbles, there are some conditions. If the names of our variables are, or begin with, a number like `54` or include spaces like `my var`, you must include backticks around each name:
+Variables should not begin with a number (like `54abc`) or include spaces (like `my var`). If you insist on using varible names like that, you must include backticks around each name when you reference them.
 
 ```{r}
-tibble(`54` = 1, `my var` = 2, c = 3)
+tibble(`54abc` = 1, `my var` = 2, c = 3)
 ```
 
 If we did not include the backticks, R would give us an error.
 
 ```{r, error = TRUE, renv.ignore = TRUE}
-tibble(54 = 1, my var = 2, c = 3)
+tibble(54abc = 1, my var = 2, c = 3)
 ```
 
 It is sometimes easier to use the function `tribble()` to create tibbles.
@@ -252,6 +250,7 @@ tribble(
 )
 ```
 
+The tildes specifies which rows have the column names. The formatting makes it easier, relative to specifying raw vectors, to see which values are from the same observation.
 
 
 ### `clean_names()`
@@ -305,7 +304,7 @@ fac %>%
 
 ### `skim()`
 
-The `skim()` function from the **skimr** package is a useful summary function that offers an overview of a tibble  The function creates a report of the tibble, organized by variable type. Example:
+The `skim()` function from the **skimr** package is a useful summary of a tibble  
 
 ```{r}
 skim(fac)
