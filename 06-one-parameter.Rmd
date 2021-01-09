@@ -1,11 +1,54 @@
-
 # One Parameter {#one-parameter}
 
 <!-- Priorities:  --> 
 
-<!-- Switch the urn to 1,000 beads to make the math easier and the code quicker. Use 400 red beads. Do not use number of red beads as unknown parameter. MF: DONE. 
+<!-- Change axis labels as you like. Make better use of pedagogical opportunities. -->
 
-Use p throughout. Introduce $\hat{p}$ earlier and then use it consistently. That sets the stage for the standard error. MF: DONE. 
+<!-- Add code comments (if you want) which explain some of your choices. Think of them like footnotes. -->
+
+<!-- If you like, improve the quality of the graphics as you go along. -->
+
+<!-- THIS IS YOUR CHAPTER! Put multiple bad standard error discussions everywhere! -->
+
+<!-- Delete all old code that you are not using. -->
+
+<!-- Standard error is just a fancy term for your uncertainty about something you don't know. Standard error == my (uncertain) beliefs. Tell me your standard error and then I know your 95% confidence interval.-->
+
+<!-- --------------------- -->
+
+<!-- Do this like Maslow -->
+
+<!-- Preceptor's Seven Level Hierarchy of Teaching Knowledge Good -->
+
+<!-- Gif -->
+
+<!-- Standard errors are just the way that old people talk about confidence intervals. -->
+
+<!-- Standard error == my (uncertain) beliefs. -->
+
+<!-- Standard error is just a fancy term for your uncertainty about something you don't know. -->
+
+<!-- The standard error is the standard deviation of any collection of hat things. -->
+
+<!-- p -> to $\hat{p}$ to the standard error of $\hat{p}$ to our posterior probability distribution for p. -->
+
+<!-- Math (put in actual math formula) -->
+
+<!-- --------------------- -->
+
+<!-- Replace 6.1 (and other hard-coded numbers) with reference/label. -->
+
+<!-- Add longer figure captions, at your discretion. Student should be able to look at figure, read its caption, and understand the whole thing. -->
+
+<!-- Fix 816 -->
+
+<!-- Show code for final plots. Add comments to that code. -->
+
+<!-- Explain stan_glm usage! -->
+
+<!-- Find a gif for: "Standard errors are just the way that old people talk about confidence intervals." -->
+
+<!-- 
 
 "The standard error is the standard deviation of any collection of hat things." "... any collection of estimates." 
 
@@ -28,22 +71,19 @@ We do this to set the stage for continuous variables in chapter 7. Also, strictl
 
 <!-- 6.2 should do a lot of samples, then calculate the mean of those samples and the standard deviation of those samples. (Explain why?) And then the cool graphics are the standard deviation decreasing and also mean estimates more stable. Maybe use 100 times instead of 1000. That will show mean converging as shovel size increases. Maybe make it a gganimation? -->
 
-<!-- End of 6.1: If you can only keep around two numbers about that distribution, what would they be? You need a measure of the center, maybe mean or median. You need a measure of the spread, sd or mad. Summary statistics for a distribution, for when you can't keep the whole thing around, or show the pretty graph. Do those two numbers tell you everything about a distribution? No! But, if you only get to keep two numbers, those are the probably ones you want. MF: DONE BUT placed in 6.3 instead, since we hadn't covered summary statistics yet. I can modify and place at the beginning if you prefer it to come up earlier. -->
 
-<!-- 6.3  must explain clearly the concept of standard error, p-values and confidence intervals. Need this rock-solid before going into MAD SD complexity in chapter 7. MF: Are we still incorporating p-values here? -->
+<!-- 6.3  must explain clearly the concept of standard error and confidence intervals. Need this rock-solid before going into MAD SD complexity in chapter 7. -->
 
 <!-- 6.3 statistical definitions. Expand to include standard error and posterior probabilty distribution. (Rename as the posterior probablity distribution for p. Show them that posterior.) There is a truth! There is a true value for p which we do not know! We want to create a posterior probability distribution which summarizes our knowledge. (I am not sure if the words "sampling distribution" belong beyond a single sentence.) We care about the posterior probability distribution of p. We will make that, formally, in the next section. For now, here is a preview. The center of that distribution is around the mean or median of the proportion in your sample. (Which makes sense! Show how this line goes through your mean dots.) The sd (or mad) of that posterior is this formula! Give standard error formula. Note that this is the same thing as the standard deviation of the repeated samples! (Or at least say that, and then show how the red line goes through your dots.) -->
 
 
 <!-- 6.3 finishes with this. -->
 
-<!-- **The standard error is, more or less, the standard deviation of the posterior probability distribution for p.** So, +/- two standard errors is about the same as a 95% confidence interval. MF: DONE-->
 
 <!-- "Formula for the standard error. Not justified! How do we calculate a standard error if we only take one sample?!!! -->
 
 <!-- Then provide a demonstration of this! (Next summer!) Simple simulation with urns of various sizes, percentage of red beads which varies, grab a shovel of different sizes, draw a sample, calculate a standard error, calculate a confidence interval, test whetherr ci includes the truth. 95% of the time it should. -->
 
-<!-- **The mean or median is a good estimate for the center of the posterior and the standard error or mad is a good estimate for the variability of the posterior, with +/- 2 standard errors covering 95% of the outcomes.** MF: DONE-->
 
 <!-- 6.4 shows the right way -->
 
@@ -109,9 +149,6 @@ knitr::include_graphics("06-one-parameter/images/danny_sampling.png")
 
 Last chapter, we learned about probability, the act of quantifying uncertainty. This chapter, we will learn about *sampling*, the beginning of our journey toward inference. When we sample, we take a *portion* of a total population and attempt to draw a conclusion about the portion, a conclusion which we can then *generalize* to the entire population. 
 
-<!-- DK: Replace 6.1 (and other hard-coded numbers) below with reference/label. See bookdown book. 
-
-MF: Bookdown book? -->
 
 Observe the urn in Figure 6.2. It has a certain number of red and a certain number of white beads all of equal size. It appears the urn has been mixed beforehand, as there does not seem to be any coherent pattern to the spatial distribution of the red and white beads.
 
@@ -127,7 +164,7 @@ One way to answer this question would be to perform an exhaustive count: remove 
 
 *What is the probability, using the same urn, that we will draw more than 8 red beads if we use a shovel of size 20?*
 
-<!-- ADD A SECTION BRIEFING THE REST OF THE CHAPTER -->
+<!-- ADD A SECTION BRIEFING THE REST OF THE CHAPTER DK: YES!-->
 
 As always, we will need the **tidyverse** package. 
 
@@ -235,7 +272,6 @@ tactile_sample_urn %>%
        y = "Count",
        title = "Proportions Red in 33 Samples") 
 ```
-
 
 
 ### What did we just do?
@@ -353,10 +389,17 @@ Note that we add 'binwidth = 0.05' and 'boundary = 0.4' arguments as well. Recal
 ```{r}
 virtual_samples %>% 
 ggplot(aes(x = prop_red)) +
-  geom_histogram(binwidth = 0.05, boundary = 0.4, color = "white") +
+  geom_histogram(binwidth = 0.05, 
+                 boundary = 0.4, 
+                 color = "white") +
   labs(x = expression(hat(p)),
        y = "Count",
-       title = "Distribution of 33 proportions red") 
+       title = "Distribution of 33 proportions red") +
+  
+  # Labels the axes in an attractive fashion. Without this code, the axes labels
+  # would include 2.5, which makes no sense because all the values are integers.
+  
+  scale_y_continuous(breaks = seq(2, 10, 2))
 ```
 
 Observe that we occasionally obtained proportions red that are less than 30%. On the other hand, we occasionally obtained proportions that are greater than 45%. However, the most frequently occurring proportions were between 35% and 40%. Why do we have these differences in proportions red? Because of *sampling variation*. 
@@ -482,7 +525,6 @@ virtual_samples_100 %>%
 
 For easy comparison, we present the three resulting histograms in a single row with matching x and y axes in Figure 6.12.
 
-<!-- DK: Clean up, make public and explain this code. MF: Done. -->
 
 ```{r, fig.cap = "Comparing the distributions of proportion red for different sample sizes."}
 
@@ -638,7 +680,7 @@ Now, we have the standard deviation of `prop_red` for all shovel sizes from 1 to
 
 <!-- DK: Explain function(.x) 1/(2 * sqrt(.x)) 
 
-MF: I'm confused why we are using (2 * sqrt(.x)). If we are plotting for standard error, shouldn't we have the standard deviation (prop_red_sd) over sqrt of the sample size, x? -->
+MF: I'm confused why we are using (2 * sqrt(.x)). If we are plotting for standard error, shouldn't we have the standard deviation (prop_red_sd) over sqrt of the sample size, x? DK: I don't know! Math is hard! -->
 
 
 ```{r, echo = FALSE, fig.cap = "Comparing standard deviations of proportions red for 100 different shovels. The standard deviation decreases as the square root of shovel size."}
@@ -745,7 +787,7 @@ So as the sample size increases, the standard deviation of the proportion of red
 
 ### What is a "standard error"?
 
-<!-- MF: I took from explanations online, but still feel SE isn't crystal clear. Need to revisit. -->
+<!-- MF: I took from explanations online, but still feel SE isn't crystal clear. Need to revisit. Agreed! -->
 
 <!-- Standard errors quantify the effect of sampling variation induced on our estimates. In other words, they quantify how much we can expect different proportions of a shovel's beads that are red *to vary* from one sample to another sample to another sample, and so on. As a general rule, as sample size increases, the standard error decreases.
 
@@ -806,7 +848,7 @@ If we could only know two pieces of information from our data, what would they b
 The standard error measures the accuracy of a sample distribution as compared to the population by using the standard deviation. Specifically, the standard deviation of our data points divided by the square root of the sample size. As such, we find that larger sample sizes = lower standard errors = more accurate and representative guesses. 
 
 
-<!-- REWRITE THIS ENTIRE SECTION TO REFLECT FOCUS ON STANDARD ERROR. -->
+<!-- REWRITE THIS ENTIRE SECTION TO REFLECT FOCUS ON STANDARD ERROR. DK: Agreed! -->
 
 <!-- What was the value of the population proportion $p$ of the $N$ = 1000 beads in the actual urn that were red? There were 400 red beads, for a proportion red of 400/1000 = 0.375 = 37.5%! How do we know this? Did the authors do an exhaustive count of all the beads? No! They were listed in the contents of the box that the urn came in! Hence we were able to make the contents of the virtual `urn` match the tactile urn:
 
@@ -1288,7 +1330,7 @@ The first scenario provides a more accurate estimate, since the students outside
 
 <!-- DK: What are truly the things we want students to remember! -->
 
-<!-- INSERT RECAP FOR EACH SECTION WITH 2-3 IMPORTANT PIECES OF INFORMATION -->
+<!-- INSERT RECAP FOR EACH SECTION WITH 2-3 IMPORTANT PIECES OF INFORMATION DK: YES. -->
 
 
 In this chapter, we performed both tactile and virtual sampling exercises to infer about an unknown parameter We also presented a case study of sampling in real life with polls. In each case, we used the sample proportion $\hat{p}$ to estimate the population proportion $p$. However, we are not just limited to scenarios related to proportions. In other words, we can use sampling to estimate other population parameters using other point estimates as well.
