@@ -1,8 +1,6 @@
 # Two Parameters {#two-parameters}
 
-<!-- DK: Get axis labels and titles to use \sigma and \mu -->
-
-<!-- DK: Add a second logistic model after urn, with an explanatory variable this time? Show why posterior_ functions are better than parameter games? -->
+<!-- Get axis labels and titles to use \sigma and \mu -->
 
 <!-- Show posterior_interval() -->
 
@@ -17,7 +15,7 @@ $$p(models | data = data\ we\ observed)$$
 Even then, however, the relative likelihood of different models is not that important. Models are invisible, mental entities with no more physical presence than unicorns or leprechauns. In the world itself, we make and test predictions. How many red beads will come from the urn next time we use our shovel? People with better models make better predictions. That is what matters.
 
 
-In addition to a change in tools, there are two more key differences in this chapter. First, Chapter \@ref(one-parameter) dealt with a limited set of specific models: 2401 possible models. The procedure used is just what we saw in Chapter \@ref(probability).  In this chapter, on the other hand, have a continuous parameter.  Second, Chapter \@ref(one-parameter) used models with just one parameter: the number of red beads, which we can also transform into a parameter $p$, the number of red beads divided by 2,400.  The  model in Chapter \@ref(one-parameter) was binomial, and there is only one unknown parameter $p$ in such models. Here, we have two unknown parameters: the mean $\mu$ of height in the US and the standard deviation, $\sigma$, of the normally distributed error term. 
+In addition to a change in tools, there are two more key differences in this chapter. First, Chapter \@ref(one-parameter) dealt with a limited set of specific models: 1,001 possible models. The procedure used was just what we saw in Chapter \@ref(probability).  In this chapter, on the other hand, have a continuous parameter.  Second, Chapter \@ref(one-parameter) used models with just one parameter: the number of red beads, which we can also transform into a parameter $p$, the number of red beads divided by 2,400.  The  model in Chapter \@ref(one-parameter) was binomial, and there is only one unknown parameter $p$ in such models. In this chapter, we have two unknown parameters: the mean $\mu$ of height in the US and the standard deviation, $\sigma$, of the normally distributed error term. 
 
 The purpose of this chapter is to demonstrate, slowly and thoroughly, how professionals do data science.
 
@@ -35,7 +33,7 @@ knitr::include_graphics("other/images/Wisdom.jpg")
 
 What decision do we face? The reason for making models is not, primarily that making models is fun, although it is! The reason is that we face a decision. We must decide between X or Y. We must choose from A, B or C. We must set D to a specific numeric value. Given that decision, we should make a model of the world to help us.
 
-In any textbook, it will be tough to avoid the "toy problem" trap. The real world is complex. Any substantive decision problem includes a great deal of complexity and requires even more context. We do not have the time to get into that level of detail. So, we simplify. We are going to create a model of height for adult men. We will then use that model to answer four questions:
+In any textbook, it will be tough to avoid the "toy problem" trap. The real world is complex. Any substantive decision problem includes a great deal of complexity and requires even more context. We do not have the time to get into that level of detail now, although see Chapter \@ref(case-studies) provides some useful case studies. So, we simplify. We are going to create a model of height for adult men. We will then use that model to answer four questions:
 
 * What is the average height of men?
 
@@ -55,7 +53,7 @@ Before starting that process, however, we need to look at the data we have.
 
 <!-- DK: This EDA is not very good and does not build naturally to where we want to be. -->
 
-Let's look at the `nhanes` dataset from the National Health and Nutrition Examination Survey conducted by the Centers for Disease Control and Prevention and covering children and adults in the United States. 
+Let's look at the `nhanes` dataset from the National Health and Nutrition Examination Survey conducted around 2010 by the Centers for Disease Control and Prevention and covering children and adults in the United States. 
 
 
 ```{r}
@@ -65,18 +63,18 @@ library(skimr)
 glimpse(nhanes)
 ```
 
-`nhanes` has data on a diverse array of things like physical attributes, education, and sleep. Let's restrict our attention to a subset, focusing on gender, height and the year of the survey. 
+`nhanes` has data on a diverse array of things like physical attributes, education, and sleep. Let's restrict our attention to a subset, focusing on age, gender and height. 
 
 ```{r}
 nhanes %>% 
-  select(age, gender, height, survey)
+  select(age, gender, height)
 ```
 
 Look at a random sample of our data:
 
 ```{r}
 nhanes %>% 
-  select(age, gender, height, survey) %>% 
+  select(age, gender, height) %>% 
   sample_n(5)
 ```
 
@@ -86,32 +84,34 @@ Let's also run `glimpse()` on our new data.
 
 ```{r}
 nhanes %>% 
-  select(age, gender, height, survey) %>% 
+  select(age, gender, height) %>% 
   glimpse()
 ```
 
-Be on the lookout for anything suspicious. Are there any NA's in your data set? What types of data are the columns, i.e. why is `survey` characterized as integer instead of double? Was most of the data collected in 2009? Are there more females than males? You can never look at your data too closely.
+Be on the lookout for anything suspicious. Are there any NA's in your data set? What types of data are the columns, i.e. why is `age` characterized as integer instead of double? Are there more females than males? 
+
+**You can never look at your data too closely.**
 
 In addition to `glimpse()`, we can run `skim()`, from the **skimr** package, to calculate some summary statistics. 
 
 ```{r}
 nhanes %>% 
-  select(age, gender, height, survey) %>% 
+  select(age, gender, height) %>% 
   skim()
 ```
 
-Interesting! There are 353 missing values of height in our subset of data. Just using `glimpse()` does not show us that.  Let's filter out the NA's using `drop_na`. This will delete the rows in which the value of any variable is missing. For simplicity, let's only consider adults. 
+Interesting! There are 353 missing values of height in our subset of data. Just using `glimpse()` does not show us that.  Let's filter out the NA's using `drop_na()`. This will delete the rows in which the value of any variable is missing. For simplicity, let's only consider adults. 
 
 ```{r}
 ch7 <- nhanes %>% 
-  select(age, gender, height, survey) %>%
+  select(age, gender, height) %>%
   filter(age >= 18) %>% 
   drop_na()
 ```
 
 Plot your data. `geom_density()` is a smooth version of `geom_histogram()`. With `geom_density()`, the y-axis is scaled so that the area under the curve equals 1. 
 
-<!-- DK: Delete females and make a better plot. -->
+<!-- DK: Delete females and make a better plot. Add discussion about 95% interval. -->
 
 ```{r}
 ch7 %>%
@@ -131,7 +131,7 @@ Let's focus on a subset of the `nhanes` data, designed to answer our questions. 
 ```{r}
 
 ch7_all <- nhanes %>%
-  filter(survey == 2009, gender == "Male", age >= 18) %>%
+  filter(gender == "Male", age >= 18) %>%
   select(height) %>%
   drop_na() 
 
@@ -141,13 +141,13 @@ ch7 <- ch7_all %>%
 ```
 
 
-Will the data we have --- which is only for a sample of adult American men in 2009 --- allow us to answer our questions, however roughly? 
+Will the data we have --- which is only for a sample of adult American men in 2010 --- allow us to answer our questions, however roughly? 
 
-That is where Wisdom comes in. In the social sciences, *there is never a perfect relationship between the data you have and the question you are trying to answer.* Data for American males in 2009 is not the same thing as data for American males today. Nor is it the same as the data for men in France or Mexico. Moreover, the problem hasn't specified where on Earth we are, nor who we are near. Walking by a basketball tournament will generate different answers than walking around Times Square. 
+That is where Wisdom comes in. In the social sciences, *there is never a perfect relationship between the data you have and the question you are trying to answer.* Data for American males in 2010 is not the same thing as data for American males today. Nor is it the same as the data for men in France or Mexico. Moreover, the problem hasn't specified where on Earth we are, nor who we are near. Walking by a basketball tournament will generate different answers than walking around Times Square. 
 
-Yet, this data is relevant. Right? It is certainly better than nothing. That is, using not-perfect data is better than using no data at all.
+Yet, this data is relevant. Right? It is certainly better than nothing. *Using not-perfect data is generally better than using no data at all.*
 
-Is not-perfect data always better? No! If your problem is estimating the median height of 5th grade girls in Tokyo, we doubt that our data is at all relevant. Wisdom recognizes the danger of using non-relevant data to build a model and then mistakenly using that model in a way which will only make the situation worse. If the data won't help, don't use the data, don't build a model. Better to just use your common sense and experience. Or find better data.
+Is not-perfect data *always* better? No! If your problem is estimating the median height of 5th grade girls in Tokyo, we doubt that our data is at all relevant. Wisdom recognizes the danger of using non-relevant data to build a model and then mistakenly using that model in a way which will only make the situation worse. If the data won't help, don't use the data, don't build a model. Better to just use your common sense and experience. Or find better data.
 
 <!-- DK: More on population. -->
 
@@ -180,9 +180,9 @@ This is the simplest model we can construct. Note:
 
 * The model is wrong, as are all models. 
 
-* The parameter we most care about is $\mu$. That is the parameter with a substantively meaningful interpretation. Not only is the meaning of $\sigma$ difficult to describe, we also don't particular care about its value. Parameters like $\sigma$ in this context are *nuisance* or *auxiliary* parameters. We still have to estimate their posterior distributions, but we don't really care what those posteriors look like.
+* The parameter we most care about is $\mu$. That is the parameter with a substantively meaningful interpretation. Not only is the meaning of $\sigma$ difficult to describe, we also don't particular care about its value. Parameters like $\sigma$ in this context are *nuisance* or *auxiliary* parameters. We still estimate their posterior distributions, but we don't really care what those posteriors look like.
 
-* $\mu$ is not the average height of the men in the sample. We can calculate that directly. It is `r mean(ch7$height)`. No estimation required! Instead, $\mu$ is the average height of men in the *population*. Recall from the discussions in Chapter \@ref(one-parameter) that the population is the universe of people/units/whatever about which we seek to draw conclusions. On some level, this seems simple. On a deeper level, it is very subtle. For example, if we are walking around Copenhagen, then the population we really care about, in order to answer our three questions, is the set of adult men into which we might run today. This is not the same as the population of adult men in the US in 2009. But is it close enough? Is it better than nothing? Each case is a different and the details matter.
+* $\mu$ is not the average height of the men in the sample. We can calculate that directly. It is `r mean(ch7$height)`. No estimation required! Instead, $\mu$ is the average height of men in the *population*. Recall from the discussions in Chapter \@ref(one-parameter) that the population is the universe of people/units/whatever about which we seek to draw conclusions. On some level, this seems simple. On a deeper level, it is very subtle. For example, if we are walking around Copenhagen, then the population we really care about, in order to answer our three questions, is the set of adult men which we might run into today. This is not the same as the population of adult men in the US in 2010. But is it close enough? Is it better than nothing? Each case is a different and the details matter.
 
 * $\sigma$ is an estimate for the standard deviation of the errors, i.e. variability in height after accounting for the mean.
 
@@ -202,20 +202,20 @@ The Preceptor Table for this problem is almost identical to the one we saw in Ch
 ```{r echo = FALSE}
 tibble(ID = c("1", "2", "...", "473", "474",
               "...", "3,258", "3,259", "...", "N"),
-       Heights = c("?", "?", "...", "172", "?", "...", "?", "162", "...", "?")) %>%
+       Height = c("?", "?", "...", "172", "?", "...", "?", "162", "...", "?")) %>%
   
   # Then, we use the gt function to make it pretty
   
   gt() %>%
   cols_label(ID = md("ID"),
-                Heights = "Heights (cm)") %>%
+                Height = "Heights (cm)") %>%
   tab_style(cell_borders(sides = "right"),
             location = cells_body(columns = vars(ID))) %>%
   tab_style(style = cell_text(align = "left", v_align = "middle"), 
             locations = cells_column_labels(columns = vars(ID))) %>%
   cols_align(align = "center", columns = TRUE) %>%
   cols_align(align = "left", columns = vars(ID)) %>%
-  tab_spanner(label = "Outcome", columns = vars(Heights))
+  tab_spanner(label = "Outcome", columns = vars(Height))
 ```
 
 &nbsp;
@@ -258,11 +258,11 @@ Details:
 
 * If you don't set `refresh = 0`, the model will puke out many lines of confusing output. You can learn more about that output by reading the help page for `stan_glm()`. The output provides details on the fitting process as it runs as well as diagnostics about the final result. All of those details are beyond the scope of this book.
 
-* You should always assign the result of the call of `stan_glm()` to an object, as we do above. By convention, the name of that object will often included the word "fit" to indicate that it is a *fitted* model object.
+* You should always assign the result of the call of `stan_glm()` to an object, as we do above. By convention, the name of that object will often include the word "fit" to indicate that it is a *fitted* model object.
 
 * There is a direct connection between the mathematical form of the model created under Justice and the code we use to fit the model under Courage. `height ~ 1` is the code equivalent of $y_i =  \mu$. 
 
-* The default value for `family` is `gaussian`, so we did not need to include it in the call above. From the Justice section, the assumption that $\epsilon_i \sim N(0, \sigma^2)$ is equivalent to using `gaussian`. If $\epsilon_i$ had a different distribution, we would need to use a different `family`. We will see an example of such a situation at the end of this chapter, when we redo the Chapter \@ref(one-parameter) urn analysis using `stan_glm()`.
+* The default value for `family` is `gaussian`, so we did not need to include it in the call above. From the Justice section, the assumption that $\epsilon_i \sim N(0, \sigma^2)$ is equivalent to using `gaussian`. If $\epsilon_i$ had a different distribution, we would need to use a different `family`. We saw an example of such a situation at the end of Chapter \@ref(one-parameter) when we performed the urn analysis using `stan_glm()`.
 
 * Although you can use the standalone function `set.seed()` in order to make your code reproducible, it is more convenient to use the `seed` argument within `stan_glm()`. Even though the fitting process, unavoidably, contains a random component, you will get the exact same answer if we set `seed = 9` and rerun this code.
 
@@ -283,18 +283,23 @@ The third line gives us back the formula we provided. We are creating a model pr
 
 The fourth and fifth lines of the output tell us that we have `r nobs(fit_obj)`  observations and that we only have one predictor (the constant). Again, the terminology is a bit confusing. What does it mean to suggest that $\mu$ is "constant?" It means that, although $\mu$'s value is unknown, it is *fixed*. It does not change from person to person. The `1` in the formula corresponds to the parameter $\mu$ in our mathematical definition of the model. 
 
-We knew all this information before we fit the model. R records it in the `fit_obj` because we don't want to forget what we did. The second half of the display gives a summary of the parameter values.
+We knew all this information before we fit the model. R records it in the `fit_obj` because we don't want to forget what we did. The second half of the display gives a summary of the parameter values. We can look at just the second half with the `detail` argument:
+
+```{r}
+print(fit_obj, detail = FALSE)
+```
+
 
 We see the output for the two parameters of the model: "(Intercept)" and "sigma". This can be confusing! Recall that the thing we care most about is $\mu$, the average height in the population. If we had the ideal Preceptor Table --- with a row for every adult male in the population we care about and no missing data --- $\mu$ would be trivial to calculate, and with no uncertainty. But only we know that we named that parameter $\mu$. All that R sees is the `1` in the formula. In most fields of statistics, this constant term is called the "intercept." So, now we have three things --- $\mu$ (from the math), `1` (from the code), and "(Intercept)" (from the output) --- all of which refer to the exact same concept. This will not be the last time that terminology will be confusing.
 
-At this point, `stan_glm()` --- or rather the `print()` method for rstan objects --- has a problem. We have full posteriors for both $\mu$ and $\sigma$. But this is a simple printed summary. We can't show the entire distribution. So, what are the best few numbers to provide? There is no right answer to this question! Here, the choice is to provide the "Median" of the posterior and the "MAD_SD". 
+At this point, `stan_glm()` --- or rather the `print()` method for objects created with `stan_glm()` --- has a problem. We have full posteriors for both $\mu$ and $\sigma$. But this is a simple printed summary. We can't show the entire distribution. So, what are the best few numbers to provide? There is no right answer to this question! Here, the choice is to provide the "Median" of the posterior and the "MAD_SD". 
 
 * Anytime you have a distribution, whether posterior probability or otherwise, the most important single number associated with it is some measure of its *location*. Where is the data? The two most common choices for this measure are the mean and median. We use the median here because posterior distributions can often be quite skewed, making the mean a less stable measure.
 
 * The second most important number for summarizing a distribution concerns its *spread*. How far is the data spread around its center? The most common measure used for this is the standard deviation. MAD SD, the scaled standard deviations of the absolute difference between each observation and the median of all observations, is another. If the variable has a normal distribution, then the standard deviation and the MAD SD will be very similar. But the MAD SD is much more robust to outliers, which is why it is used here.
 
 
-Instead of printing the whole model, we can just print out the parameter values and also change the number of digits shown:
+We can also change the number of digits shown:
 
 ```{r}
 print(fit_obj, detail = FALSE, digits = 2)
@@ -302,7 +307,7 @@ print(fit_obj, detail = FALSE, digits = 2)
 
 <!-- DK: Are we sure that coef() and sigma() give us the median values?  -->
 
-Now that we understand the meaning of Median and MAD_SD in the above display, we can interpret the actual numbers. The median of the intercept, `r coef(fit_obj)`, is the median of our posterior distribution for $\mu$, the average height of all American men in 2009. The median of sigma, `r sigma(fit_obj)`, is the median of our posterior distribution for the true $\sigma$, which can be roughly understood as the variability in the height of men, once we account for our estimate of $\mu$.
+Now that we understand the meaning of Median and MAD_SD in the above display, we can interpret the actual numbers. The median of the intercept, `r coef(fit_obj)`, is the median of our posterior distribution for $\mu$, the average height of all American men in 2010. The median of sigma, `r sigma(fit_obj)`, is the median of our posterior distribution for the true $\sigma$, which can be roughly understood as the variability in the height of men, once we account for our estimate of $\mu$.
 
 The MAD SD for each parameter is a measure of the variability of our posterior distributions for that parameter. How spread out are they? Speaking roughly, 95% of the mass of a posterior distribution is located within +/- 2 MAD SDs from the median. For example, we would be about 95% confident that the true value of $\mu$ is somewhere between 175.6 and 176.3. 
 
@@ -330,7 +335,7 @@ fit_obj %>%
     geom_histogram(aes(y = after_stat(count/sum(count))), 
                    bins = 100) +
     labs(title = "Posterior Probability Distribution",
-         subtitle = "Average height among American adult men in 2009",
+         subtitle = "Average height among American adult men in 2010",
          x = "Height in Centimeters",
          y = "Probability") +
     scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
@@ -346,7 +351,7 @@ fit_obj %>%
     geom_histogram(aes(y = after_stat(count/sum(count))), 
                    bins = 100) +
     labs(title = "Posterior Probability Distribution",
-         subtitle = "Height standard deviation among American adult men in 2009",
+         subtitle = "Height standard deviation among American adult men in 2010",
          x = "Sigma in Centimeters",
          y = "Probability") +
     scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
@@ -509,7 +514,7 @@ Note:
 * Can calculate the exact probability.
 
 
-Again, the key conceptual difficulty is the population. The problem we actually have involves walking around London, or wherever, today. The data we have involve America in 2009. Those are not the same things! But they are not totally different. Knowing whether the data we have is "close enough" to the problem we want to solve is at the heart of Wisdom. Yet that was the decision we made at the start of the process, the decision to create a model in the first place. Now that we have created a model, we look to the virtue of Temperance for guidance in using that model. The data we have is never a perfect match for the world we face. We need to temper our confidence and act with humility. Our forecasts will never be as good as a naive use of the model might suggest. Reality will surprise us. We need to take the model's claims with a family-sized portion of salt.
+Again, the key conceptual difficulty is the population. The problem we actually have involves walking around London, or wherever, today. The data we have involve America in 2010. Those are not the same things! But they are not totally different. Knowing whether the data we have is "close enough" to the problem we want to solve is at the heart of Wisdom. Yet that was the decision we made at the start of the process, the decision to create a model in the first place. Now that we have created a model, we look to the virtue of Temperance for guidance in using that model. The data we have is never a perfect match for the world we face. We need to temper our confidence and act with humility. Our forecasts will never be as good as a naive use of the model might suggest. Reality will surprise us. We need to take the model's claims with a family-sized portion of salt.
 
 <!-- DK: More on temperance and the many ways that we should be less confident. Move material from Chapters 3 and 5 here? -->
 
@@ -603,9 +608,9 @@ Then, create a tibble, first column is ID. Second column is height_sample, which
 
 <!-- Discuss how this exercise is still useful even if we begin with all our data. That is, don't sample. Just use all 5,000 people. Then, do the bootstrap to get a confidence interval. Note that the interval will be --- how much? --- smaller than the ones we got above, because we are using 116 times as much data. But it is also weird. I know exactly what the mean is! I have the entire Rubin Table! I don't need a confidence interval for the mean.  -->
 
-<!-- That is both true, and false. If all you truly care about is the mean these 5,000 people then, it is true, you are done. But that is generally not the case! The true Rubin Table is often bigger than you might initially think. You might also be interested in data from another time period (which has occurred but which may not be available to you) or from 2021, which has not even happened yet. Your Rubin Table includes rows for all those people. They are just missing. You also care about the millions of people who are not in the 5,000. You really want the mean for the country. (Or the world?) So, you use the model that you have to estimate stuff for the data that you don't. What is your best guess for the mean in 2011 (which you can check) or in 2021 (which you can't)? How confident are you are that estimate? What is your 50/50 prediction interval? -->
+<!-- That is both true, and false. If all you truly care about is the mean these 5,000 people then, it is true, you are done. But that is generally not the case! The true Rubin Table is often bigger than you might initially think. You might also be interested in data from another time period (which has occurred but which may not be available to you) or from 2021, which has not even happened yet. Your Rubin Table includes rows for all those people. They are just missing. You also care about the millions of people who are not in the 5,000. You really want the mean for the country. (Or the world?) So, you use the model that you have to estimate stuff for the data that you don't. What is your best guess for the mean in 2010 (which you can check) or in 2021 (which you can't)? How confident are you are that estimate? What is your 50/50 prediction interval? -->
 
-<!-- Relatedly, what if I told you that your 2009 data I gave you did not include one person (or ten people or 100), which was (were) dropped at random from the data by mistake. What is your guess as to the height of that single person, or the height of the average of the 10 people or the tallest of the 10 classes? What is your confidence interval for that? Want to bet? These are all different estimands. -->
+<!-- Relatedly, what if I told you that your 2010 data I gave you did not include one person (or ten people or 100), which was (were) dropped at random from the data by mistake. What is your guess as to the height of that single person, or the height of the average of the 10 people or the tallest of the 10 classes? What is your confidence interval for that? Want to bet? These are all different estimands. -->
 
 You now understand how to use `stan_glm()` to estimate posterior probability distributions. But we have not, yet, offered evidence that these distributions are accurate, that they "work." More importantly, does the 95% confidence interval really include the true value 95% of the time? The technical term for this is "coverage," derived from the idea that any X% confidence interval for an unknown value should include that unknown value, should "cover" the value, X% of the time. We can explore coverage with a simple simulation.
 
@@ -680,7 +685,7 @@ Variables with well-behaved, continuous ranges are the easiest to handle. We sta
 
 *What is the probability that a random person who is 180 cm tall is female?*
 
-*Wisdom* suggests we start by looking at the data. Because models use numbers, we need to create a new variable, `female`, which is 1 for Females and 0 for males.
+*Wisdom* suggests we start by looking at the data. Because models use numbers, we need to create a new variable, `female`, which is 1 for Females and 0 for Males.
 
 
 ```{r}
@@ -712,7 +717,56 @@ ch7_b %>%
 
 $$  \operatorname{Pr}(\text{Female} = 1) = \frac{\text{exp}(\beta_0 + \beta_1 \text{height})}{1 + \text{exp}(\beta_0 + \beta_1 \text{height})} $$
 
-<!-- DK: Insert discussion about why we use logistic models. -->
+Why do we need this mumbo-jumbo? Look at what happens when we fit a simple linear model:
+
+```{r}
+fit_gender_linear <- stan_glm(data = ch7_b,
+                              formula = female ~ height,
+                              family = gaussian,
+                              refresh = 0,
+                              seed = 82) 
+```
+
+Recall that the default value for `family` is `gaussian`, so we did not need to include it here. Initially, the fitted model seems OK.
+
+```{r}
+print(fit_gender_linear, digits = 2)
+```
+
+Comparing two individuals who differ in `height` by 1 cm, we expect the taller individual to have a 3% lower probability of being female. That is not unreasonable. The problems show up at the extremes. Consider the fitted values across the range of our data.
+
+```{r}
+ch7_b %>% 
+  ggplot(aes(x = height, y = female)) +
+  geom_jitter(height = 0.1, alpha = 0.05) +
+  geom_smooth(aes(y = fitted(fit_gender_linear)),
+              method = "lm",
+              formula = y ~ x,
+              se = FALSE) +
+  labs(title = "Gender and Height",
+       subtitle = "Some fitted values are impossible",
+       x = "Height (cm)",
+       y = NULL,
+       caption = "Data from NHANES") +
+  scale_y_continuous(breaks = c(-0.5, 0, 0.5, 1, 1.5),
+                     labels = c("-50%", "0% (Male)", 
+                                "50%", "100% (Female)",
+                                "150%"))
+```
+
+Using 1 for Female and 0 for Male allows us to interpret fitted values as the percentage likelihood that a person is female or male. That is a handy and natural interpretation. The pronlem with a linear model arises when, as in the case, the model suggests values outside 0 to 1. Such values are, by definition, impossible. People who are 190 cm tall do not have a -25% chance of being female.
+
+The solution is to use a different functional form, one which restricts fitted values to the acceptable range. Look closely at the math:
+
+$$  \operatorname{Pr}(\text{Female} = 1) = \frac{\text{exp}(\beta_0 + \beta_1 \text{height})}{1 + \text{exp}(\beta_0 + \beta_1 \text{height})} $$
+
+This is an inverse logistic function, but don't worry about the details. Mathematical formulas are never more than a Google search away. Instead, note how the range is restricted. Even if $\beta_0 + \beta_1 \text{height}$ is a very large number, the ratio is bound below 1. Similarly, no matter how negative $\beta_0 + \beta_1 \text{height}$ is, the ratio can never be smaller than 0. The model can not, ever, produce impossible values. 
+
+Whenever you have two categories as the outcome, you should use `family = binomial`.
+
+<!-- DK: Footnote to discuss that often linear regression is used and also works. Show that you get the same answer for the 180 question, but not for 200! -->
+
+
 
 *Courage* suggests that we use the same tools for fitting this logistic regression as we did above in fitting linear models.
 
@@ -760,7 +814,7 @@ ch7_b %>%
                   y = fitted(fit_2_lm)), 
               color = "blue") +
     labs(title = "Gender and Height",
-         subtitle = "A linear model cam produce probabilities outside 0 to 1",
+         subtitle = "A linear model can produce probabilities outside 0 to 1",
          x = "Height (cm)",
          y = NULL,
          caption = "Data from NHANES") +
@@ -859,9 +913,9 @@ Let's practice this process another dozen or so times.
 
 <!-- Most textbooks would, at this stage, provide a more mathematical explanation of the transition we are making from Chapter \@ref(probability) to this chapter. In both Chapters \@ref(probability) and \@ref(one-parameter) we dealt with a discrete set of possible models. We began with examples in which there were only two or three possible "true" states of the world. You were either infected or not infected. There were either zero, one or two white marbles in the bag. These examples grew more and more complex, both by increasing the number of models under consideration and by increasing the number of possible outcomes of the experiment. In the case of the urn, there were 2,401 possible models: either zero or one or two or . . . 2,400 red beads in the urn.  -->
 
-<!-- The transition from a discrete set of possible models to an infinite set of possible models is mathematically complex but easy on the intuition. Just wave you hands, imagine lots more models, and invoke the aesthetic appeal of smoothness. In the case of height, there are an infinite number of possible models: average height of adult American men in 2009 could be 175, 175.1, 175.14, 175.148, 175.1482, and so on. There are an infinite number of possible values since height is continuous. Yet, almost miraculously, the same intuition applies.  -->
+<!-- The transition from a discrete set of possible models to an infinite set of possible models is mathematically complex but easy on the intuition. Just wave you hands, imagine lots more models, and invoke the aesthetic appeal of smoothness. In the case of height, there are an infinite number of possible models: average height of adult American men in 2010 could be 175, 175.1, 175.14, 175.148, 175.1482, and so on. There are an infinite number of possible values since height is continuous. Yet, almost miraculously, the same intuition applies.  -->
 
-<!-- Let's use $\mu$ as the parameter for the unknown average height of all the adult men in America in 2009. This is exactly analogous to the parameter $p$ from Chapter \@ref(one-parameter), the proportion of red beans in the urn. The only difference is that there are an infinite number of values which $\mu$ might take. We restricted $p$ to only 2,401 possible values: $0$, $1/2400$, $2/2400$, ..., $2399/2400$, $1$.  -->
+<!-- Let's use $\mu$ as the parameter for the unknown average height of all the adult men in America in 2010. This is exactly analogous to the parameter $p$ from Chapter \@ref(one-parameter), the proportion of red beans in the urn. The only difference is that there are an infinite number of values which $\mu$ might take. We restricted $p$ to only 2,401 possible values: $0$, $1/2400$, $2/2400$, ..., $2399/2400$, $1$.  -->
 
 <!-- Although a bootstrap can create a posterior distribution, as above, there are much simpler ways to do so. The most common involves the function `stan_glm()` from the **rstanarm** library. Halfway through the book, we are now ready for our first full scale data science project. Let us be guided by the cardinal virtues. -->
 
