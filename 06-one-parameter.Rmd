@@ -2,15 +2,15 @@
 
 <!-- Priorities:  --> 
 
-<!-- Change axis labels as you like. Make better use of pedagogical opportunities. -->
+<!-- Change axis labels as you like. Make better use of pedagogical opportunities. MF: Done.-->
 
-<!-- Add code comments (if you want) which explain some of your choices. Think of them like footnotes. -->
+<!-- Add code comments (if you want) which explain some of your choices. Think of them like footnotes. MF: Done.-->
 
-<!-- If you like, improve the quality of the graphics as you go along. -->
+<!-- If you like, improve the quality of the graphics as you go along. MF: Done (sparingly).-->
 
-<!-- THIS IS YOUR CHAPTER! Put multiple bad standard error discussions everywhere! -->
+<!-- THIS IS YOUR CHAPTER! Put multiple bad standard error discussions everywhere! MF: Done.-->
 
-<!-- Delete all old code that you are not using. -->
+<!-- Delete all old code that you are not using. MF: Done.-->
 
 <!-- Standard error is just a fancy term for your uncertainty about something you don't know. Standard error == my (uncertain) beliefs. Tell me your standard error and then I know your 95% confidence interval.-->
 
@@ -36,13 +36,13 @@
 
 <!-- --------------------- -->
 
-<!-- Replace 6.1 (and other hard-coded numbers) with reference/label. -->
+<!-- Replace 6.1 (and other hard-coded numbers) with reference/label. MF: DONE. -->
 
-<!-- Add longer figure captions, at your discretion. Student should be able to look at figure, read its caption, and understand the whole thing. -->
+<!-- Add longer figure captions, at your discretion. Student should be able to look at figure, read its caption, and understand the whole thing. MF: Done.-->
 
 <!-- Fix 816 -->
 
-<!-- Show code for final plots. Add comments to that code. -->
+<!-- Show code for final plots. Add comments to that code. MF: Done except for one overly complicated plot. -->
 
 <!-- Explain stan_glm usage! -->
 
@@ -71,7 +71,6 @@ We do this to set the stage for continuous variables in chapter 7. Also, strictl
 
 <!-- 6.2 should do a lot of samples, then calculate the mean of those samples and the standard deviation of those samples. (Explain why?) And then the cool graphics are the standard deviation decreasing and also mean estimates more stable. Maybe use 100 times instead of 1000. That will show mean converging as shovel size increases. Maybe make it a gganimation? -->
 
-
 <!-- 6.3  must explain clearly the concept of standard error and confidence intervals. Need this rock-solid before going into MAD SD complexity in chapter 7. -->
 
 <!-- 6.3 statistical definitions. Expand to include standard error and posterior probabilty distribution. (Rename as the posterior probablity distribution for p. Show them that posterior.) There is a truth! There is a true value for p which we do not know! We want to create a posterior probability distribution which summarizes our knowledge. (I am not sure if the words "sampling distribution" belong beyond a single sentence.) We care about the posterior probability distribution of p. We will make that, formally, in the next section. For now, here is a preview. The center of that distribution is around the mean or median of the proportion in your sample. (Which makes sense! Show how this line goes through your mean dots.) The sd (or mad) of that posterior is this formula! Give standard error formula. Note that this is the same thing as the standard deviation of the repeated samples! (Or at least say that, and then show how the red line goes through your dots.) -->
@@ -79,11 +78,9 @@ We do this to set the stage for continuous variables in chapter 7. Also, strictl
 
 <!-- 6.3 finishes with this. -->
 
-
 <!-- "Formula for the standard error. Not justified! How do we calculate a standard error if we only take one sample?!!! -->
 
 <!-- Then provide a demonstration of this! (Next summer!) Simple simulation with urns of various sizes, percentage of red beads which varies, grab a shovel of different sizes, draw a sample, calculate a standard error, calculate a confidence interval, test whetherr ci includes the truth. 95% of the time it should. -->
-
 
 <!-- 6.4 shows the right way -->
 
@@ -149,20 +146,20 @@ knitr::include_graphics("06-one-parameter/images/danny_sampling.png")
 
 Last chapter, we learned about probability, the act of quantifying uncertainty. This chapter, we will learn about *sampling*, the beginning of our journey toward inference. When we sample, we take a *portion* of a total population and attempt to draw a conclusion about the portion, a conclusion which we can then *generalize* to the entire population. 
 
-
-Observe the urn in Figure 6.2. It has a certain number of red and a certain number of white beads all of equal size. It appears the urn has been mixed beforehand, as there does not seem to be any coherent pattern to the spatial distribution of the red and white beads.
+Observe the urn in Figure \@ref(fig:urn_pic_one). It has a certain number of red and a certain number of white beads all of equal size. It appears the urn has been mixed beforehand, as there does not seem to be any coherent pattern to the spatial distribution of the red and white beads.
 
 Let's now ask ourselves, what proportion of this urn's beads are red? 
 
-```{r, echo = FALSE, fig.cap = "An urn with red and white beads."}
+```{r urn_pic_one, echo = FALSE, fig.cap = "An urn with red and white beads."}
 knitr::include_graphics("06-one-parameter/images/sampling_bowl_1.jpg")
 ```
 
 One way to answer this question would be to perform an exhaustive count: remove each bead individually, count the number of red beads and the number of white beads, and divide the number of red beads by the total number of beads. However, this would be a long and tedious process. Therefore, we will use sampling! Consider two questions:
 
-*If we get 17 red beads in a random sample of size 50 taken from an urn with 2,400 (white or red) beads, how many red beads are in the urn?*
+*If we get 17 red beads in a random sample of size 50 taken from an urn with 1000 (white or red) beads, how many red beads are in the urn?*
 
 *What is the probability, using the same urn, that we will draw more than 8 red beads if we use a shovel of size 20?*
+
 
 <!-- ADD A SECTION BRIEFING THE REST OF THE CHAPTER DK: YES!-->
 
@@ -181,14 +178,14 @@ knitr::include_graphics("06-one-parameter/images/sampling_bowl_1.jpg")
 
 ### Using the shovel method once 
 
-Instead of performing an exhaustive count, let's insert a shovel into the urn as seen in Figure 6.2. Using the shovel, let's remove $5 \cdot 10 = 50$ beads, as seen in Figure 6.3. Here, we are taking a *sample* of the total population of beads. 
+Instead of performing an exhaustive count, let's insert a shovel into the urn as seen in Figure \@ref(fig:urn_pic_two). Using the shovel, let's remove $5 \cdot 10 = 50$ beads, as seen in Figure \@ref(fig:urn_pic_3). Here, we are taking a *sample* of the total population of beads. 
 
-```{r, echo = FALSE, fig.cap = "Inserting a shovel into the urn."}
+```{r urn_pic_two, echo = FALSE, fig.cap = "Inserting a shovel into the urn."}
 knitr::include_graphics("06-one-parameter/images/sampling_bowl_2.jpg")
 ```
 
 
-```{r, echo = FALSE, fig.cap = "Removing 50 beads from the urn."}
+```{r urn_pic_3, echo = FALSE, fig.cap = "Removing 50 beads from the urn."}
 knitr::include_graphics("06-one-parameter/images/sampling_bowl_3_cropped.jpg")
 ```
 
@@ -268,6 +265,19 @@ tactile_sample_urn %>%
   geom_histogram(binwidth = 0.05, 
                  boundary = 0.4, 
                  color = "white") +
+  
+  # Add scale_y_continuous with breaks by 
+  # 1, as the default shows the y-axis from
+  # 1 to 10 with breaks at .5. Breaks by 1 
+  # is better for this plot, as all resulting 
+  # values are integers. 
+  
+  scale_y_continuous(breaks = seq(from = 0, to = 10, by = 1)) +
+  
+  # The call expression() is used to insert a mathematical
+  # expression, like p-hat. The paste after expression allows 
+  # us to paste text prior to said expression. 
+  
   labs(x = expression(paste("Proportion of 50 beads that were red ", hat(p))),
        y = "Count",
        title = "Proportions Red in 33 Samples") 
@@ -319,6 +329,12 @@ Let's take a sample of 50 beads from our virtual urn.
 
 
 ```{r}
+
+# Define ID as 1 to look at one example of drawing
+# fifty beads. When ID is called within map(), we
+# are performing sample_n() upon our urn once (ID
+# = 1) and taking a sample of 50 beads.
+
 tibble(ID = 1) %>% 
   mutate(shovel = map(ID, ~ sample_n(urn, size = 50)))
 ```
@@ -372,6 +388,7 @@ We'll save these results in a data frame called `virtual_samples`.
 
 ```{r}
 set.seed(9)
+
 virtual_samples <- tibble(ID = 1:33) %>% 
   mutate(shovel = map(ID, ~ sample_n(urn, size = 50))) %>% 
   mutate(numb_red = map_int(shovel, ~ sum(.$color == "red"))) %>% 
@@ -382,11 +399,11 @@ virtual_samples
 ```
 
 
-Let's visualize this variation in a histogram in Figure 6.8.
+Let's visualize this variation in a histogram in Figure \@ref(fig:histogram).
 
 Note that we add 'binwidth = 0.05' and 'boundary = 0.4' arguments as well. Recall that setting 'boundary = 0.4' ensures a binning scheme with one of the bins' boundaries at 0.4. Since the 'binwidth = 0.05' is also set, this will create bins with boundaries at 0.30, 0.35, 0.45, 0.5, etc. as well. Recall that $\hat{p}$ is equal to the proportions red in our samples. 
 
-```{r}
+```{r histogram}
 virtual_samples %>% 
 ggplot(aes(x = prop_red)) +
   geom_histogram(binwidth = 0.05, 
@@ -396,8 +413,9 @@ ggplot(aes(x = prop_red)) +
        y = "Count",
        title = "Distribution of 33 proportions red") +
   
-  # Labels the axes in an attractive fashion. Without this code, the axes labels
-  # would include 2.5, which makes no sense because all the values are integers.
+  # Labels the axes in an attractive fashion. Without this code, 
+  # the axes labels would include 2.5, which makes no sense because
+  # all the values are integers.
   
   scale_y_continuous(breaks = seq(2, 10, 2))
 ```
@@ -408,17 +426,44 @@ Compare our virtual results with our tactile results from the previous section. 
 
 <!-- DK: Clean up this code. Discuss more? -->
 
-```{r, echo = FALSE, fig.cap = "Comparing 33 virtual and 33 tactile proportions red."}
+```{r, fig.cap = "Comparing 33 virtual and 33 tactile proportions red. Note that, though the figures differ slightly, both are centered around .35 to .40. This shows that, in both sampling distributions, the most frequently occuring proportion red is between 35 and 40%."}
+
+# bind_rows() takes our data from virtual_samples and 
+# "binds" it with our data from tactile_sample_urn, resulting
+# in one set of data for us to work with. Mutating to create
+# the "type" column allows us to see which pieces of data come
+# from virtual sampling and which come from tactical sampling.
+
 facet_compare <- bind_rows(virtual_samples %>% 
                               mutate(type = "Virtual sampling"), 
                            tactile_sample_urn %>% 
                               select(ID, red = red_beads, prop_red) %>% 
                               mutate(type = "Tactile sampling")) %>% 
+  
+  # Use mutate() to alter the column factor into a factor
+  # column, rather than the default character column. Calling
+  # levels() establishes our two "factors". This step is 
+  # here to help R interpret this column for when we perform 
+  # our facet_wrap(). 
+  
   mutate(type = factor(type, 
-                       levels = c("Virtual sampling", "Tactile sampling"))) %>% 
+                       levels = c("Virtual sampling", 
+                                  "Tactile sampling"))) %>% 
   ggplot(aes(x = prop_red)) +
-    geom_histogram(binwidth = 0.05, boundary = 0.4, color = "white") +
+    geom_histogram(binwidth = 0.05, 
+                   boundary = 0.4, 
+                   color = "white") +
+  
+  # facet_wrapping by type creates two different graphs
+  # on our plane. The data is separated into two graphs 
+  # based upon the column after the ~. 
+  
     facet_wrap(~ type) +
+  
+  # Add an x axis with p-hat using expression() with paste()
+  # for clarification on p-hat's meaning. Add an appropriate 
+  # title and inspect our creation. 
+  
     labs(x = expression(paste("Proportion of 50 beads that were red ", hat(p))),
          title = "Comparing distributions") 
 
@@ -436,6 +481,7 @@ Now say we want to study the effects of sampling variation not for 33 samples, b
 
 ```{r}
 set.seed(9)
+
 virtual_samples <- tibble(ID = 1:1000) %>% 
   mutate(shovel = map(ID, ~ sample_n(urn, size = 50))) %>% 
   mutate(numb_red = map_int(shovel, ~ sum(.$color == "red"))) %>% 
@@ -445,9 +491,9 @@ virtual_samples <- tibble(ID = 1:1000) %>%
 virtual_samples
 ```
 
-Observe that we now have 1,000 replicates of `prop_red`, the proportion of 50 beads that are red. Using the same code as earlier, let's now visualize the distribution of these 1,000 replicates of `prop_red` in a histogram in Figure 6.10.
+Observe that we now have 1,000 replicates of `prop_red`, the proportion of 50 beads that are red. Using the same code as earlier, let's now visualize the distribution of these 1,000 replicates of `prop_red` in a histogram in Figure \@ref(fig:hist_distribution).
 
-```{r}
+```{r hist_distribution}
 virtual_samples %>% 
   ggplot(aes(x = prop_red)) +
     geom_histogram(binwidth = 0.01, 
@@ -486,7 +532,9 @@ virtual_samples_25 <- tibble(ID = 1:1000) %>%
 
 virtual_samples_25 %>%
   ggplot(aes(x = prop_red)) +
-  geom_histogram(binwidth = 0.05, boundary = 0.4, color = "white") +
+  geom_histogram(binwidth = 0.05, 
+                 boundary = 0.4, 
+                 color = "white") +
   labs(x = "Proportion of 25 beads that were red", 
        title = "25") 
 ```
@@ -503,8 +551,11 @@ virtual_samples_50 <- tibble(ID = 1:1000) %>%
 
 virtual_samples_50  %>%
   ggplot(aes(x = prop_red)) +
-  geom_histogram(binwidth = 0.05, boundary = 0.4, color = "white") +
-  labs(x = "Proportion of 50 beads that were red", title = "50")  
+  geom_histogram(binwidth = 0.05, 
+                 boundary = 0.4, 
+                 color = "white") +
+  labs(x = "Proportion of 50 beads that were red", 
+       title = "50")  
 ```
 
 Finally, we will perform the same process with 1000 replicates to map the histogram using a shovel size of **100**.
@@ -519,14 +570,16 @@ virtual_samples_100 <- tibble(ID = 1:1000) %>%
 
 virtual_samples_100 %>%
   ggplot(aes(x = prop_red)) +
-  geom_histogram(binwidth = 0.05, boundary = 0.4, color = "white") +
-  labs(x = "Proportion of 100 beads that were red", title = "100") 
+  geom_histogram(binwidth = 0.05, 
+                 boundary = 0.4, 
+                 color = "white") +
+  labs(x = "Proportion of 100 beads that were red", 
+       title = "100") 
 ```
 
-For easy comparison, we present the three resulting histograms in a single row with matching x and y axes in Figure 6.12.
+For easy comparison, we present the three resulting histograms in a single row with matching x and y axes in Figure \@ref(fig:multiple_hist).
 
-
-```{r, fig.cap = "Comparing the distributions of proportion red for different sample sizes."}
+```{r multiple_hist, fig.cap = "Comparing the distributions of proportion red for different sample sizes (25, 50, 100). The important takeaway is that our center becomes more concentrated as our sample size increases, indicating a smaller standard deviation between our guesses."}
 
 # Use bind_rows to combine the data from our three saved virtual sampling
 # objects. Use mutate() in each to clarify the n as the necessary number
@@ -572,20 +625,42 @@ virtual_samples_100 %>%
 ```
 
 
-```{r, echo = FALSE, fig.cap = "Comparing the number of slots in the shovel with the standard deviation of proportions red."}
+```{r, fig.cap = "Comparing the number of slots in the shovel with the standard deviation of proportions red. Here, we see that SD decreases with higher sample sizes. This indicates that larger sample sizes yield more precise estimates."}
+
+# Start by performing group_by(n) to get data separated
+# by our different shovel sizes. 
+
 comparing_n_table <- virtual_prop %>% 
   group_by(n) %>% 
+  
+  # Take the standard deviation and mean of prop_red
+  # using summarize. 
+  
   summarize(sd = sd(prop_red), .groups = 'drop_last',
             mean = mean(prop_red)) %>% 
+  
+  # Rename using backslashes (with the desired) text
+  # on the left and the existing column on the right.
+  # This is for clarity once we create our table. 
+  
   rename(`Number of slots in shovel` = n, 
          `Standard deviation of proportions red` = sd,
          `Mean of proportions red` = mean) 
 
+# Create a table using gt().
+
 comparing_n_table  %>% 
   gt() %>% 
+  
+  # Use tab_header to add an appropriate title. 
+  
   tab_header(
     title = "Comparing standard deviations of proportions red for three different shovels"
   ) %>% 
+  
+  # Use fmt_number() to adjust the number of desired decimals
+  # in the resulting table. 
+  
   fmt_number(
     columns = "Standard deviation of proportions red",
     decimals = 3
@@ -658,7 +733,16 @@ shovels <- tibble(shovel_size = c(25, 50, 100)) %>%
                                 ~ prop_red(x = urn, 
                                            shovel_size = .x, 
                                            reps = 1000))) %>% 
-  mutate(prop_red_sd = map_dbl(prop_red_results, ~ pull(., prop_red) %>% sd()))
+  
+  # Use map_dbl() to create a column that draws the 
+  # standard deviations of our prop_red values. We 
+  # can use pull after our ~ to isolate the prop_red
+  # values and use a pipe (as we normally do) here
+  # to draw the sd() of this column. 
+  
+  
+  mutate(prop_red_sd = map_dbl(prop_red_results, 
+                               ~ pull(., prop_red) %>% sd()))
 
 glimpse(shovels)
 ```
@@ -671,7 +755,8 @@ shovels_100 <- tibble(shovel_size = 1:100) %>%
                                 ~ prop_red(x = urn, 
                                            shovel_size = .x, 
                                            reps = 1000))) %>% 
-  mutate(prop_red_sd = map_dbl(prop_red_results, ~ pull(., prop_red) %>% sd()))
+  mutate(prop_red_sd = map_dbl(prop_red_results, 
+                               ~ pull(., prop_red) %>% sd()))
 
 glimpse(shovels_100)
 ```
@@ -683,7 +768,7 @@ Now, we have the standard deviation of `prop_red` for all shovel sizes from 1 to
 MF: I'm confused why we are using (2 * sqrt(.x)). If we are plotting for standard error, shouldn't we have the standard deviation (prop_red_sd) over sqrt of the sample size, x? DK: I don't know! Math is hard! -->
 
 
-```{r, echo = FALSE, fig.cap = "Comparing standard deviations of proportions red for 100 different shovels. The standard deviation decreases as the square root of shovel size."}
+```{r, echo = FALSE, fig.cap = "Comparing standard deviations of proportions red for 100 different shovels. The standard deviation decreases at the same rate as the square root of shovel size. The red line shows the standard error."}
 shovels_100 %>%
  ggplot(aes(x = shovel_size, y = prop_red_sd)) +
  geom_point() +
@@ -693,6 +778,7 @@ shovels_100 %>%
  labs(x = "Shovel size",
       y = "Standard deviation of the proportion red")
 ```
+
 The red line here represents an important statistical concept: standard error (SE). The mathematical definition of SE for our purposes is the standard deviation divided by the square root of the sample size. As the shovel size increases, and thus our sample size increases, we find that the standard error decreases.  If this is confusing right now, fear not! We will delve into this explanation in our next section. 
 
 ```{r, echo = FALSE, out.width="80%", fig.align='center', fig.cap = "To any poets and philosophers confused about this: don't worry! It won't be on a problem set."}
@@ -703,9 +789,15 @@ This is the power of running many analyses at once using `map_*` functions and l
 
 ## Standard error {#standard-errors}
 
-<!-- DK: The point of this section is to make the concept of a standard error crystal clear. Also, explain that the standard error is just one possible measure of how close we are to the truth. It isn't magic! There are other reasonable measures, like average absolute error. Connect this to MAD SD so that students are no surprised. Title of this section should be -->
+Standard errors quantify the effect of sampling variation induced on our estimates. In other words, they quantify how much we can expect different proportions of a shovel's beads that are red *to vary* from one sample to another sample to another sample, and so on. As a general rule, as sample size increases, the standard error decreases.
 
-<!-- When we sample, how close is our guess to the truth? How close is our guess if we do it 100 times? Lots of different ways to measure that! -->
+*SE refers to the standard deviation of a sample statistic (aka point estimate), such as the mean or median.* For example, the "standard error of the mean" refers to the standard deviation of the distribution of sample means taken from a population. 
+
+The relationship between the standard error and the standard deviation is such that, for a given sample size, the standard error equals the standard deviation divided by the square root of the sample size. Accordingly, the standard error is inversely proportional to the sample size; the larger the sample size, the smaller the standard error because the statistic will approach the actual value. 
+
+If this sounds confusing, don't worry! It should. Before we can explain this in more depth, it is important to understand some terminology pertaining to standard error. 
+
+<!-- DK: The point of this section is to make the concept of a standard error crystal clear. Also, explain that the standard error is just one possible measure of how close we are to the truth. It isn't magic! There are other reasonable measures, like average absolute error. Connect this to MAD SD so that students are no surprised. Title of this section should be -->
 
 
 ### Terminology and notation {#terminology-and-notation}
@@ -787,12 +879,6 @@ So as the sample size increases, the standard deviation of the proportion of red
 
 ### What is a "standard error"?
 
-<!-- MF: I took from explanations online, but still feel SE isn't crystal clear. Need to revisit. Agreed! -->
-
-<!-- Standard errors quantify the effect of sampling variation induced on our estimates. In other words, they quantify how much we can expect different proportions of a shovel's beads that are red *to vary* from one sample to another sample to another sample, and so on. As a general rule, as sample size increases, the standard error decreases.
-
-Unfortunately, these names confuse many people who are new to statistical inference. For example, it's common for people who are new to statistical inference to call the "sampling distribution" the "sample distribution." Another additional source of confusion is the name "standard deviation" and "standard error." Remember that a standard error is merely a *kind* of standard deviation: the standard deviation of any point estimate from sampling. In other words, all standard errors are standard deviations, but not every standard deviation is necessarily a standard error. -->
-
 The "standard error" (SE) is a term that measures the accuracy with which a sample distribution represents a population through the use of standard deviation. Specifically, SE is used to refer to the standard deviation of a sample statistic (aka point estimate), such as the mean or median. For example, the "standard error of the mean" refers to the standard deviation of the distribution of sample means taken from a population. 
 
 > In statistics, a sample mean deviates from the actual mean of a population; this deviation is the standard error of the mean. 
@@ -803,9 +889,9 @@ Many students struggle to differentiate the standard error from the standard dev
 
 The more data points involved in the calculations of the mean, the smaller the standard error tends to be. When the standard error is small, the data is said to be more representative of the true mean. In cases where the standard error is large, the data may have some notable irregularities. Thus, larger sample size = smaller standard error = more representative of the truth. 
 
-To help reinforce these concepts, let's re-display Figure 6.14 but using our new terminology, notation, and definitions relating to sampling in the figure below.
+To help reinforce these concepts, let's re-display Figure \@ref(fig:compare_p_hat) but using our new terminology, notation, and definitions relating to sampling in the figure below.
 
-```{r, echo = FALSE, fig.cap = "Three sampling distributions of the sample proportion $\\hat{p}$."}
+```{r compare_p_hat, echo = FALSE, fig.cap = "Three sampling distributions of the sample proportion $\\hat{p}$. Note the increased concentration on the bins around .4 as our sample size increases."}
 p_hat_compare <- virtual_prop %>% 
   mutate(
     n = str_c("n = ", n),
@@ -847,48 +933,15 @@ If we could only know two pieces of information from our data, what would they b
 
 The standard error measures the accuracy of a sample distribution as compared to the population by using the standard deviation. Specifically, the standard deviation of our data points divided by the square root of the sample size. As such, we find that larger sample sizes = lower standard errors = more accurate and representative guesses. 
 
+To really drive home our point: standard error is just a fancy term for your uncertainty about something you don't know. Standard error == our (uncertain) beliefs. 
 
-<!-- REWRITE THIS ENTIRE SECTION TO REFLECT FOCUS ON STANDARD ERROR. DK: Agreed! -->
+<!-- MF: Add more SE discussion here. -->
 
-<!-- What was the value of the population proportion $p$ of the $N$ = 1000 beads in the actual urn that were red? There were 400 red beads, for a proportion red of 400/1000 = 0.375 = 37.5%! How do we know this? Did the authors do an exhaustive count of all the beads? No! They were listed in the contents of the box that the urn came in! Hence we were able to make the contents of the virtual `urn` match the tactile urn:
-
-```{r}
-urn %>% 
-  summarize(sum_red = sum(color == "red"), 
-            sum_not_red = sum(color != "red"), .groups = 'drop_last')
-```
-
-Let's re-display our sampling distributions from earlier, but now with a vertical red line marking the true population proportion $p$ of beads that are red = 37.5% in Figure 6.19. We see that while there is a certain amount of error in the sample proportions $\hat{p}$ for all three sampling distributions, on average the $\hat{p}$ are centered at the true population proportion red $p$. -->
-
-<!-- DK: Clean up code. 
-
-```{r, echo = FALSE, fig.cap = "Three sampling distributions with population proportion $p$ marked by vertical line."}
-p <- urn %>% 
-  summarize(mean(color == "red")) %>% 
-  pull()
-
-samp_distn_compare <- virtual_prop %>% 
-  mutate(
-    n = str_c("n = ", n),
-    n = factor(n, levels = c("n = 25", "n = 50", "n = 100"))
-    ) %>% 
-  ggplot(aes(x = prop_red)) +
-  geom_histogram(binwidth = 0.05, boundary = 0.4, 
-                 color = "black", fill = "white") +
-  labs(x = expression(paste("Sample proportion ", hat(p))), 
-       title = expression(paste("Sampling distributions of ", hat(p), 
-                                " based on n = 25, 50, 100.")) ) +
-  facet_wrap(~ n) +
-  geom_vline(xintercept = p, col = "red", size = 1)
-
-samp_distn_compare
-```
+Before we move on from our urn, do we know what the true value of the population proportion $p$ of the $N$ = 1000 beads in the urn was? Yes, actually. There were 400 red beads, for a proportion red of 400/1000 = .40 = 40%! How do we know this? Did the authors do an exhaustive count of all the beads? No! They were listed in the contents of the box that the urn came in! Hence we were able to make the contents of the virtual `urn` match the tactile urn. 
 
 At this point, you might be asking yourself: "If we already knew the true proportion of the urn's beads that are red was 37.5%, then why did we do any sampling?" You might also be asking: "Why did we take 1,000 repeated samples of various sizes (n = 1 to n = 100)? Shouldn't we be taking only *one* sample that's as large as possible?". If you did ask yourself these questions, your suspicion is merited! 
 
-The sampling activity involving the urn is merely an *idealized version* of how sampling is done in real life. 
-
-This is not how sampling is done in real life. In a real life scenario, we won't know what the true value of the population parameter is. Furthermore, we wouldn't be able to take 1,000 replicated samples. Rather, we take a single sample that's as large as we can afford. In the next section, we'll study a real life example of sampling: polls. -->
+The sampling activity involving the urn is merely an *idealized version* of how sampling is done in real life. This is *not* how sampling is done in real life. In a real life scenario, we won't know what the true value of the population parameter is. Furthermore, we wouldn't be able to take 1,000 replicated samples. Rather, we take a single sample that's as large as we can afford. In the next section, we'll study a real life example of sampling: polls. 
 
 ```{r, echo = FALSE, out.width="80%", fig.align='center', fig.cap = "Real life sampling is hard! In most scenarios, it's impossible to ask the entire population for their opinions."}
 knitr::include_graphics("06-one-parameter/images/that_would_be_great.png")
@@ -904,7 +957,7 @@ knitr::include_graphics("06-one-parameter/images/that_would_be_great.png")
 
 Recall the question we asked at the beginning of our chapter: 
 
-*If we get 17 red beads in a random sample of size 50 taken from an urn with 2,400 (white or red) beads, how many red beads are in the urn?*
+*If we get 17 red beads in a random sample of size 50 taken from an urn with 1000 (white or red) beads, how many red beads are in the urn?*
 
 *What is the probability, using the same urn, that we will draw more than 8 red beads if we use a shovel of size 20?*
 
@@ -922,7 +975,7 @@ We then add the specific results of the experiment, and calculate the conditiona
 $$p(models | data = results\ of\ experiment)$$
 The rest is just details.
 
-We can do the same thing with our sampling problem. Assume that we know that there are 2,400 beads in the urn, and that all of them are either red or white. Our experiment involves the one time use of a paddle with 50 slots. We have 2,401 models under consideration. There might be zero red beads or one red bead or ... 2,399 red beads or 2,400 red beads. With a paddle of size 50, there are 51 possible results from our experiment: zero red beads or one red bead or . . . or 49 red beads or 50 red beads. With this information we can calculate *the joint distribution of models which we are considering and the experiment results we might observe.* Once we have that joint distribution, we can calculate the conditional distribution of the total number of red beads, given however many we observed in our sample. 
+We can do the same thing with our sampling problem. Assume that we know that there are 1000 beads in the urn, and that all of them are either red or white. Our experiment involves the one time use of a paddle with 50 slots. We have 1001 models under consideration. There might be zero red beads or one red bead or ... 999 red beads or 1000 red beads. With a paddle of size 50, there are 51 possible results from our experiment: zero red beads or one red bead or . . . or 49 red beads or 50 red beads. With this information we can calculate *the joint distribution of models which we are considering and the experiment results we might observe.* Once we have that joint distribution, we can calculate the conditional distribution of the total number of red beads, given however many we observed in our sample. 
 
 <!-- Note to future authors: I am somewhat concerned that this is not exactly correct since we really ought to sample what happens when you pick 50 beads out of an urn. This can be approximated with the binomial, which is what we have done here. And, with such big numbers, it is a good approximation. But it is not exactly correct. -->
 
@@ -986,7 +1039,7 @@ To visualize this in a 3D plot, see the slice in the figure below. There are a f
 
 For any value of red beads found in the paddle (from 0 to 50), there is a posterior distribution of possible values of red beads in the total urn. This distribution is meant to illustrate that, though our sample gives an estimate of the total proportion of red beads in the entire urn, there is much variation in what the actual proportion might be. 
 
-Recall Question #1 from the start of the Chapter: "If we get 17 red beads in a random sample of size 50, how many red beads are in the entire urn?" The answer is not a single number. Our posterior distribution is just that: a distribution. From our sample, we have many different results for the total number of red beads in the entire urn. Certain totals of red beads, like the extremes close to 0 or 2,400, are essentially impossible due to our sample value being 32%. Some totals, like 800, occur far more frequently than other totals. 
+Recall Question #1 from the start of the Chapter: "If we get 17 red beads in a random sample of size 50, how many red beads are in the entire urn?" The answer is not a single number. Our posterior distribution is just that: a distribution. From our sample, we have many different results for the total number of red beads in the entire urn. Certain totals of red beads, like the extremes close to 0 or 1000, are essentially impossible due to our sample value being 32%. Some totals, like 400, occur far more frequently than other totals. 
 
 This means that, while we can provide a range of possibilities (and we can estimate which of those possibilities occur most frequently), we can never say that we know the total number of red beads with certainty. 
 
@@ -1029,6 +1082,8 @@ But we can not simply take the mean values of these positive results because dif
 ## Discussion
 
 ### stan_glm()
+
+<!-- MF: So, we just want to show stan_glm here, right? No explanations? -->
 
 Instead of building the joint and conditional probability distributions "by hand" as above, we can just use `stan_glm()` from the **rstanarm* package. For now, we will just walk through the code for doing this very quickly. Chapter \@ref(two-parameters) will provide a step-by-step explanation.
 
@@ -1297,7 +1352,7 @@ We can only claim *for certain* that, of the 100 beads that we sampled (of the t
 
 We saw in a previous section that as our sample size $n$ increases, our point estimates will vary less and less and be more and more concentrated around the true population parameter. This variation is quantified by the decreasing *standard error*. In other words, the typical error of your point estimates will decrease. In our sampling exercise, as the sample size increased, the variation of our sample proportions $\hat{p}$ decreased. This is also known as having a *precise* estimate. 
 
-So random sampling ensures our point estimates are *accurate*, while on the other hand having a large sample size ensures our point estimates are *precise*. While the terms "accuracy" and "precision" may sound like they mean the same thing, there is a subtle difference. Accuracy describes how "on target" our estimates are, whereas precision describes how "consistent" our estimates are. The figure below illustrates the difference.
+So random sampling ensures our point estimates are *accurate*, while on the other hand having a large sample size ensures our point estimates are *precise*. While the terms "accuracy" and "precision" may sound like they mean the same thing, there is a subtle difference. Accuracy describes how "on target" our estimates are, whereas precision describes how "consistent" our estimates are. The image below illustrates the difference.
 
 ```{r, echo = FALSE, out.width="80%", fig.align='center', fig.cap = "Comparing accuracy and precision."}
 knitr::include_graphics("06-one-parameter/images/accuracy_vs_precision.jpg")
@@ -1321,17 +1376,44 @@ To apply this to a more complex example than an urn, imagine we are conducting a
 
 The first scenario provides a more accurate estimate, since the students outside of Lamont Library are much less likely to be a biased sample. The second scenario, however, provides a more precise estimate due to the larger sample size. Even though the students **outside** of El Jefe's might not be patrons, it is safe to assume that at least some will be patrons, making our sample somewhat biased. What is the better option? It depends on your views of the trade-offs between accuracy and precision. The more that precision matters, the more you should prefer the larger sample.
 
-
- 
-
-
-
 ## Summary
+
+To finish our chapter, we will summarize each section and emphasize the most important takeaways. 
 
 <!-- DK: What are truly the things we want students to remember! -->
 
-<!-- INSERT RECAP FOR EACH SECTION WITH 2-3 IMPORTANT PIECES OF INFORMATION DK: YES. -->
 
+### Tactial sampling
+
+- Sampling allows us to make guesses at an unknown, difficult-to-obtain value by looking at a smaller subset of data and generalizing it to the larger population. 
+- Sampling is preferable in the urn example because counting out 1000 beads from an urn is intensive and tedious. 
+- Sampling is preferable in the real-world because it is often impossible to sample "all the beads" (all the people) in a population. 
+- With sampling, you see variations in your results. This is known as sampling variation and is expected, especially if you draw samples at random (unbiased).
+
+### Virtual sampling
+
+- By creating a virtual analog of our urn and our shovel, we were able to look at *even more* samples and observe the effects of sampling size on our results. 
+- More samples yield more even distributions which should resemble a bell. 
+- Larger sample sizes decrease standard deviation, meaning that the resulting proportions red are closer to one another than when the sample sizes are smaller. This means that larger samples = lower SD = more precise guesses. 
+- When we are writing a lot of code for something we want to perform frequently, write a function instead! This saves time and functions can be called within `map()` for more ease when plotting results.
+
+### Standard error
+
+- Standard error is just a fancy term for your uncertainty about something you don't know. Standard error == our (uncertain) beliefs. 
+- The standard error measures the accuracy of a sample distribution as compared to the population by using the standard deviation. 
+- We find that larger sample sizes = lower standard errors = more accurate and representative guesses. 
+- If we could only know two pieces of information from our data, we would need a measure of the **center** of the distribution (like mean or median) and a measure of the **variability** of the distribution (like sd or MAD). 
+- SE refers to the standard deviation of a sample statistic (aka point estimate), such as the mean or median. Therefore, the "standard error of the mean" refers to the standard deviation of the distribution of sample means taken from a population. 
+
+### Answering the questions
+<!-- MF: ADD SUMMARY FOR ANSWERING THE QUESTIONS AFTER RE-READING AND EDITING. -->
+
+### Discussion
+
+- `stan_glm()` can create a joint distribution and then estimate the posterior probability distribution, conditional on the data which was passed in to the data argument. This is a much easier way to create the posterior distribution, and will be explored in more detail in Chapter 7. 
+- The sampling mechanism is responsible for which items/beads/people/etc are selected to be sampled. In the urn example, the *sampling mechanism* is the shovel. 
+- Random sampling ensures that our point estimates are **accurate**, while having a large sample size ensures that our estimates are **precise**. THe difference between precision and accuracy is important if we are to make informed estimates. 
+- Real life sampling is *extremely* prone to error. This cannot be emphasized enough. We are often forced to choose between precision and accuracy during real-life sampling. 
 
 In this chapter, we performed both tactile and virtual sampling exercises to infer about an unknown parameter We also presented a case study of sampling in real life with polls. In each case, we used the sample proportion $\hat{p}$ to estimate the population proportion $p$. However, we are not just limited to scenarios related to proportions. In other words, we can use sampling to estimate other population parameters using other point estimates as well.
 
