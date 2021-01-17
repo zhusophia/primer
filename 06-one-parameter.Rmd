@@ -2,15 +2,9 @@
 
 <!-- Priorities:  --> 
 
-<!-- Change axis labels as you like. Make better use of pedagogical opportunities. MF: Done.-->
+<!-- Fix using the posterior section. Give it a new name? Entire Answering the question section could be written to be more like Chapter 7. And code fix! -->
 
-<!-- Add code comments (if you want) which explain some of your choices. Think of them like footnotes. MF: Done.-->
-
-<!-- If you like, improve the quality of the graphics as you go along. MF: Done (sparingly).-->
-
-<!-- THIS IS YOUR CHAPTER! Put multiple bad standard error discussions everywhere! MF: Done.-->
-
-<!-- Delete all old code that you are not using. MF: Done.-->
+<!-- Make the stan_glm work directly connected to that. -->
 
 <!-- Standard error is just a fancy term for your uncertainty about something you don't know. Standard error == my (uncertain) beliefs. Tell me your standard error and then I know your 95% confidence interval.-->
 
@@ -36,13 +30,9 @@
 
 <!-- --------------------- -->
 
-<!-- Replace 6.1 (and other hard-coded numbers) with reference/label. MF: DONE. -->
-
-<!-- Add longer figure captions, at your discretion. Student should be able to look at figure, read its caption, and understand the whole thing. MF: Done.-->
 
 <!-- Fix 816 -->
 
-<!-- Show code for final plots. Add comments to that code. MF: Done except for one overly complicated plot. -->
 
 <!-- Explain stan_glm usage! -->
 
@@ -935,7 +925,7 @@ The standard error measures the accuracy of a sample distribution as compared to
 
 To really drive home our point: standard error is just a fancy term for your uncertainty about something you don't know. Standard error == our (uncertain) beliefs. 
 
-<!-- MF: Add more SE discussion here. -->
+<!-- Add more SE discussion here. -->
 
 Before we move on from our urn, do we know what the true value of the population proportion $p$ of the $N$ = 1000 beads in the urn was? Yes, actually. There were 400 red beads, for a proportion red of 400/1000 = .40 = 40%! How do we know this? Did the authors do an exhaustive count of all the beads? No! They were listed in the contents of the box that the urn came in! Hence we were able to make the contents of the virtual `urn` match the tactile urn. 
 
@@ -1053,7 +1043,21 @@ knitr::include_graphics("06-one-parameter/images/slice_rayshader.png")
 
 Now that we have our posterior distribution for the number of red beads in the urn, we can use that object to forecast other outcomes, outcomes which we have not yet observed. Recall, from the start of the Chapter, Question 2: "Conditional on our answer to Question 1, what is the probability, using the same urn, that we will draw more than 8 red beads if we use a shovel of size 20?"
 
+
+<!-- Better way: Do not make the post object. It is confusing and unecessary. Instead, just work from x. Filter red_paddle = 17. -->
+<!-- Those rows provide a natural weighting! No need to normalize yet! And then simulate from each of those rows! Passing in p to rbinom! Note that x now has two columns: p and red_paddle. -->
+
 ```{r}
+# x %>% 
+#   filter(red_paddle == 17) %>% 
+#   mutate(new_reds = map(p, ~ rbinom(n = 1, 
+#                                     size = 20,
+#                                     prob = p)))
+# Done! new_reds is the unnormalized posterior for how many reds
+# you will see with a shovel of size 20.
+
+# Below is garbage.
+
 post <- x %>% 
   filter(red_paddle == 17) %>% 
   group_by(red_urn) %>% 
@@ -1083,9 +1087,11 @@ But we can not simply take the mean values of these positive results because dif
 
 ### stan_glm()
 
-<!-- MF: So, we just want to show stan_glm here, right? No explanations? -->
+<!-- MF: So, we just want to show stan_glm here, right? No explanations? Yes. Explain not to worry! -->
 
-Instead of building the joint and conditional probability distributions "by hand" as above, we can just use `stan_glm()` from the **rstanarm* package. For now, we will just walk through the code for doing this very quickly. Chapter \@ref(two-parameters) will provide a step-by-step explanation.
+<!-- Change "centered at" to reference p. Use rho instead of p -->
+
+Instead of building the joint and conditional probability distributions "by hand" as above, we can just use `stan_glm()` from the **rstanarm** package. For now, we will just walk through the code for doing this very quickly. Chapter \@ref(two-parameters) will provide a step-by-step explanation.
 
 Assume that, as before, a shovel of size 50 drawn from the urn has returned 17 red beads and 33 white. Create an object which contains this data.
 
