@@ -2,6 +2,8 @@
 
 <!-- Priorities:  --> 
 
+<!-- All plots need rho instead of p. -->
+
 <!-- Fix using the posterior section. Give it a new name? Entire Answering the question section could be written to be more like Chapter 7. And code fix! -->
 
 <!-- Make the stan_glm work directly connected to that. -->
@@ -929,7 +931,7 @@ To really drive home our point: standard error is just a fancy term for your unc
 
 Before we move on from our urn, do we know what the true value of the population proportion $p$ of the $N$ = 1000 beads in the urn was? Yes, actually. There were 400 red beads, for a proportion red of 400/1000 = .40 = 40%! How do we know this? Did the authors do an exhaustive count of all the beads? No! They were listed in the contents of the box that the urn came in! Hence we were able to make the contents of the virtual `urn` match the tactile urn. 
 
-At this point, you might be asking yourself: "If we already knew the true proportion of the urn's beads that are red was 37.5%, then why did we do any sampling?" You might also be asking: "Why did we take 1,000 repeated samples of various sizes (n = 1 to n = 100)? Shouldn't we be taking only *one* sample that's as large as possible?". If you did ask yourself these questions, your suspicion is merited! 
+At this point, you might be asking yourself: "If we already knew the true proportion of the urn's beads that are red was 40%, then why did we do any sampling?" You might also be asking: "Why did we take 1,000 repeated samples of various sizes (n = 1 to n = 100)? Shouldn't we be taking only *one* sample that's as large as possible?". If you did ask yourself these questions, your suspicion is merited! 
 
 The sampling activity involving the urn is merely an *idealized version* of how sampling is done in real life. This is *not* how sampling is done in real life. In a real life scenario, we won't know what the true value of the population parameter is. Furthermore, we wouldn't be able to take 1,000 replicated samples. Rather, we take a single sample that's as large as we can afford. In the next section, we'll study a real life example of sampling: polls. 
 
@@ -942,59 +944,76 @@ knitr::include_graphics("06-one-parameter/images/that_would_be_great.png")
 
 ## Answering the questions
 
-<!-- We should discuss this in the chapter. In this case, we know the exact number of red beads. That is just like having the ideal Preceptor Table. Draw this comparison explicitly.  When we actually answer this question, should it address the fact that we know the true proportion of red bead to be 37.5% as stated earlier in the chapter? If so, would the ultimate solution just build a model showing the # of beads at which we get a proportion red between 32.5 - 42.5 90% of the time? How do we show that? -->
 
-
-Recall the question we asked at the beginning of our chapter: 
+Recall the questions we asked at the beginning of our chapter: 
 
 *If we get 17 red beads in a random sample of size 50 taken from an urn with 1000 (white or red) beads, how many red beads are in the urn?*
 
 *What is the probability, using the same urn, that we will draw more than 8 red beads if we use a shovel of size 20?*
 
-We have looked at a number of different models and their accuracy and precision. To delve into our primary question, we must return to our discussion of distributions: posterior, joint, and marginal. 
+We have looked at a number of different models and their accuracy and precision. To delve into our primary questions, we must return to our discussion of distributions: posterior, joint, and marginal. 
 
 ### Joint distribution
 
 In Chapter \@ref(probability) we outlined the key intuition behind all inference: there is a joint distribution of data-which-we-might-see-from-our-experiment and models-which-we-are-considering. We take this joint distribution, combine it with the actual results of the experiment, and calculate a posterior distribution over the set of possible models. In other words, we start with 
 
-$$p(models, data)$$ 
+$$\text{Prob}(\text{models}, \text{data})$$ 
 
 We then add the specific results of the experiment, and calculate the conditional distribution of the models, given the data that we have seen:
 
+$$\text{Prob}(\text{models} | \text{data} = \text{results of experiment})$$
 
-$$p(models | data = results\ of\ experiment)$$
 The rest is just details.
 
-We can do the same thing with our sampling problem. Assume that we know that there are 1000 beads in the urn, and that all of them are either red or white. Our experiment involves the one time use of a paddle with 50 slots. We have 1001 models under consideration. There might be zero red beads or one red bead or ... 999 red beads or 1000 red beads. With a paddle of size 50, there are 51 possible results from our experiment: zero red beads or one red bead or . . . or 49 red beads or 50 red beads. With this information we can calculate *the joint distribution of models which we are considering and the experiment results we might observe.* Once we have that joint distribution, we can calculate the conditional distribution of the total number of red beads, given however many we observed in our sample. 
+We can do the same thing with our sampling problem. Assume that we know that there are 1,000 beads in the urn, and that all of them are either red or white. Our experiment involves the one-time use of a paddle with 50 slots. We have 1,001 models under consideration. There might be zero red beads or one red bead or ... 999 red beads or 1000 red beads. With a paddle of size 50, there are 51 possible results from our experiment: zero red beads or one red bead or . . . or 49 red beads or 50 red beads. With this information we can calculate *the joint distribution of models which we are considering and the experiment results we might observe.* Once we have that joint distribution, we can calculate the conditional distribution of the total number of red beads, given however many we observed in our sample. 
+
+It is useful to define a parameter, $p$, which is the proportion of red beads in the urn. This also takes on exactly 1,001 possible values: $0, 1/1000, 2/1000, ..., 999/1000, 1$. With these assumptions, we can create an unnormalized joint distribution:
 
 <!-- Note to future authors: I am somewhat concerned that this is not exactly correct since we really ought to sample what happens when you pick 50 beads out of an urn. This can be approximated with the binomial, which is what we have done here. And, with such big numbers, it is a good approximation. But it is not exactly correct. -->
 
-```{r, echo = FALSE, cache=TRUE}
+
+```{r, cache = TRUE}
 set.seed(10)
 
 urn_size <- 1000
 paddle_size <- 50
+reps <- 100
 
-# Make a tibble with 2.4 millions rows . . . Maybe that works OK. But making the
-# graph is then intensive.
+joint_dist <- 
+  tibble(red_in_urn = seq(from = 0, to = urn_size, by = 1)) %>% 
+    mutate(p = red_in_urn / urn_size) %>% 
+    mutate(red_in_paddle = map(p, ~ rbinom(n = reps, 
+                                               size = paddle_size, 
+                                               prob = .))) %>%
+    unnest(red_in_paddle) 
 
-x <- tibble(red_urn = rep(seq(0, urn_size, 1), 1000)) %>%
-  mutate(red_paddle = map_int(red_urn, ~ rbinom(n = 1, 
-                                                size = paddle_size, 
-                                                prob = ./urn_size)))
-
+joint_dist %>% 
+  sample_n(10)
 ```
 
 
-```{r, echo = FALSE, cache=TRUE}
-x %>%
-  ggplot(aes(y = red_urn, x = red_paddle)) +
+```{r, cache = TRUE}
+joint_dist %>%
+  ggplot(aes(y = red_in_urn, x = red_in_paddle)) +
     geom_point(alpha = 0.005) +
     labs(title = "Joint Distribution of Red Beads in Paddle and in Urn",
          x = "Number of Red Beads in Paddle",
          y = "Number of Red Beads in Urn")
 
 ```
+
+It is easier to define our "model" in this joint distribution in terms of the unknown parameter $p$ rather than, as above, in terms of the unknown number of red beads in the urn. 
+
+```{r, cache = TRUE}
+joint_dist %>%
+  ggplot(aes(y = p, x = red_in_paddle)) +
+    geom_point(alpha = 0.005) +
+    labs(title = "Joint Distribution of Red Beads in Paddle and Proportion Red Beads in Urr",
+         x = "Number of Red Beads in Paddle",
+         y = "Proportion of Red Beads in Urn")
+
+```
+
 
 To better visualize this distribution, take a look at the 3D version of this plot. Note the U shape of the graph. By this, we mean to note the peaks at the areas where the number of red beads in the paddle is 0 out of 50 and 50 out of 50. This is due to the fact that, when we draw 0 red beads in a sample of 50 beads, the possibilities for the number of red beads in the urn is consistently close to 0. Similarily, when our sample of 50 beads comes out with 50 red beads, the possibilities for the number of red beads in the urn is consistently closer to 1000. 
 
@@ -1006,21 +1025,21 @@ knitr::include_graphics("06-one-parameter/images/rayshader_full.png")
 
 We follow the same steps now as we did in Chapter \@ref(probability). We run the experiment. When we look at our question -- we are asking for the posterior probability of a certain case. This case is where we find that, using the 50 slot shovel, we get a result of 17 red beads. What does that make our posterior probability? We want:
 
-$$p(models | data = 17)$$ 
+$$\text{Prob}(\text{models} | \text{data} = 17)$$
 
-The same approach works again. We take a "slice" of the joint distribution where the number of red beads in the paddle is equal to 17. After normalization, that gives us this posterior probability for the number of red beads in the urn. Let's call the tibble with this data in it `post` and then use `post` to create a graphic of the posterior.
+The same approach works again. We take a "slice" of the joint distribution where the number of red beads in the paddle is equal to 17. After normalization, that gives us the posterior probability for $p$, or for the number of red beads in the urn. Recall that there is a one-to-one mapping between $p$ and the number of red beads. 
 
 ```{r}
-x %>% 
-  filter(red_paddle == 17) %>% 
-  ggplot(aes(x = red_urn)) +
+joint_dist %>% 
+  filter(red_in_paddle == 17) %>% 
+  ggplot(aes(x = p)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    bins = 50) + 
     labs(title = "Posterior Probability Distribution",
-         subtitle = "Number of red beads is centered at 816",
-         x = "Number of Beads in Urn which Are Red",
+         subtitle = "Proportion of red beads in urn is centered around 0.34",
+         x = "Proportion p of Red Beads in Urn",
          y = "Probability") + 
-    scale_x_continuous(labels = scales::number_format(accuracy = 1)) +
+    scale_x_continuous(labels = scales::number_format()) +
     scale_y_continuous(labels = scales::percent_format()) +
     theme_classic()
 ```
@@ -1041,45 +1060,54 @@ knitr::include_graphics("06-one-parameter/images/slice_rayshader.png")
 
 ### Using the posterior
 
-Now that we have our posterior distribution for the number of red beads in the urn, we can use that object to forecast other outcomes, outcomes which we have not yet observed. Recall, from the start of the Chapter, Question 2: "Conditional on our answer to Question 1, what is the probability, using the same urn, that we will draw more than 8 red beads if we use a shovel of size 20?"
+Now that we have our posterior distribution for the proportion $p$ of red beads in the urn, we can use that object to forecast other outcomes, outcomes which we have not yet observed. Recall, from the start of the Chapter: 
+
+*Conditional on our answer to Question 1, what is the probability, using the same urn, that we will draw more than 8 red beads if we use a shovel of size 20?*
 
 
-<!-- Better way: Do not make the post object. It is confusing and unecessary. Instead, just work from x. Filter red_paddle = 17. -->
-<!-- Those rows provide a natural weighting! No need to normalize yet! And then simulate from each of those rows! Passing in p to rbinom! Note that x now has two columns: p and red_paddle. -->
+We need to create an (unnormalized) posterior distribution for the number of red beads in a new draw with a 20-slot paddle.
 
 ```{r}
-# x %>% 
-#   filter(red_paddle == 17) %>% 
-#   mutate(new_reds = map(p, ~ rbinom(n = 1, 
-#                                     size = 20,
-#                                     prob = p)))
-# Done! new_reds is the unnormalized posterior for how many reds
-# you will see with a shovel of size 20.
-
-# Below is garbage.
-
-post <- x %>% 
-  filter(red_paddle == 17) %>% 
-  group_by(red_urn) %>% 
-  summarize(total = n(), .groups = "drop") %>%
-  mutate(probs = total/sum(total)) %>% 
-  select(-total)
+set.seed(16)
+paddle_size <- 20
 
 
-post %>% 
-  mutate(new_reds = map(red_urn, 
-                            ~ rbinom(n = 100, 
-                                     size = 20,
-                                     prob = ./1000))) %>% 
-  unnest(new_reds) %>% 
-  mutate(res = ifelse(new_reds > 8, TRUE, FALSE)) %>% 
-  summarise(final = weighted.mean(res, probs))
+post_dist <- joint_dist %>% 
+  filter(red_in_paddle == 17) %>% 
+  select(-red_in_urn, -red_in_paddle) %>% 
+  mutate(new_reds = map_int(p, ~ rbinom(n = 1,
+                                        size = paddle_size,
+                                        prob = .)))
+  
+post_dist %>% 
+  sample_n(10)
+```
+
+With this unnormalized distribution, it is easy to create the normalized posterior probability distribution.
+
+```{r}
+post_dist %>% 
+  ggplot(aes(x = new_reds)) +
+    geom_histogram(aes(y = after_stat(count/sum(count))),
+                   bins = 50) + 
+    labs(title = "Posterior Probability Distribution",
+         subtitle = "Number of red beads in new draw of 20",
+         x = "Number of Red Beads",
+         y = "Probability") + 
+    scale_x_continuous(labels = scales::number_format(accuracy = 1)) +
+    scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+    theme_classic()
+```
+
+To calculate the exact probability of drawing more than 8 reds, we can work directly with the unnormalized distribution.
+
+```{r}
+sum(post_dist$new_reds > 8) /  length(post_dist$new_reds)
   
 ```
 
-The answer is about 25%. The R code above is a bit tricky. We begin with the `post` tibble, which is a simple way to specify our posterior distribution for the number of red beads in the urn. For each row, we can simulate, 100 times, the number of red beads we might draw, conditional on the assumption that there are `red_urn` red beads in the urn. The list-column which results is annoying to work with, so we `unnest()` it. We then identify the simulations which result in more than 8 red beads drawn. 
 
-But we can not simply take the mean values of these positive results because different rows in the posterior have radically different probabilities of being true. We need a weighted mean, in which the weights correspond to the probability that the number of red beads in the urn is, indeed, equal to `red_urn` in `post`.
+The answer is about 25%. 
 
 
 
@@ -1320,7 +1348,7 @@ urn %>%
 
 &nbsp;
 
-We can create the ideal Preceptor Table by performing the exhaustive census of the entire urn. Let's say that, after this tedious process, we find that the **true** and **real** proportion of red beads is exactly 37.5%. We know the color of every bead. 
+We can create the ideal Preceptor Table by performing the exhaustive census of the entire urn. Let's say that, after this tedious process, we find that the **true** and **real** proportion of red beads is exactly 40%. We know the color of every bead. 
 
 In this world, the estimand, the proportion of red beads in the urn, is a simple matter of arithmetic. However, as has been emphasized before, performing an exhaustive count is not the easiest way to estimate the proportion of red beads. Real life sampling is far more complex. The process is **extremely** prone to error. Despite that, most people overestimate the validity of conclusions drawn from sampling. To stress the unknowns in sampling, let's look at our actual Preceptor Table.
 
