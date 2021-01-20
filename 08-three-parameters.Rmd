@@ -1,13 +1,10 @@
+# Three Parameters {#three-parameters}
 
+<!-- Where is the best place to modify income and discuss it? -->
 
+<!-- Review concept of dummy variables in the context of the intercept model with categorical predictor. -->
 
-<!-- We will need to update the ch8 tibble creation to use other variables. -->
-
-<!-- Stop using set.seed(). Maybe start using seed =  -->
-
-<!-- DK: Review dummy variables in the context of the intercept model with categorical predictor. -->
-
-<!-- DK: Also add a logistic model of liberal explained by income. (Need to put income in increments of 100,000.) Just barely significant! (Is this a three parameter model? I don't see an error term.) -->
+<!-- Also add a logistic model of liberal explained by income. (Need to put income in increments of 100,000.) Just barely significant! (Is this a three parameter model? I don't see an error term.) -->
 
 <!-- Need to add a plot of fitted values and raw data. This will look a bit weird since, for each model, there are only two fitted values. Best is a jittered scatter plot with two columns, and then the fitted values put in the middle in red. -->
 
@@ -17,7 +14,6 @@
 <!--     geom_point(data = sex_means, aes(y = avg), color = "red") -->
 <!-- ``` -->
 
-# Three Parameters {#three-parameters}
 
 Models have parameters. In Chapter \@ref(one-parameter) we created models with a single parameter $p$, the proportion of red beads in an urn. In Chapter \@ref(two-parameters), we used models with two parameters: $\mu$ (the average height in the population, generically known as a model "intercept") and $\sigma$ (the variation in height in the population). Here --- can you guess where this is going? --- we will build models with three parameters: $\sigma$ (which serves the same role throughout the book) and two coefficients. In models which relate a continuous predictor to the outcome, those two parameters will be labeled $\beta_0$ and $\beta_1$. In models which estimate two averages, the parameters will be $\beta_1$ and $\beta_2$. All this notation is confusing, not least because different academic fields use inconsistent schemes. The key is to just follow the Cardinal Virtues and tackle your problem step by step.
 
@@ -46,7 +42,7 @@ Wisdom begins with a look at your data.
 #### EDA for `trains`
 
 
-Always explore your data. To demonstrate modeling with three parameters, we will use the `trains` data set from the **primer.data** package. Recall the discussion from Chapter \@ref(rubin-causal-model). @enos2014 randomly placed Spanish-speaking confederates on nine train platforms around Boston, Massachusetts. Exposure to Spanish-speakers -- the `treatment` -- influenced attitudes toward immigration. These reactions were measured through changes in answers to three survey questions. Let's load the libraries we will need in this chapter, all of which we have used before, and look at the data.
+*Always explore your data*. To demonstrate modeling with three parameters, we will use the `trains` data set from the **primer.data** package. Recall the discussion from Chapter \@ref(rubin-causal-model). @enos2014 randomly placed Spanish-speaking confederates on nine train platforms around Boston, Massachusetts. Exposure to Spanish-speakers -- the `treatment` -- influenced attitudes toward immigration. These reactions were measured through changes in answers to three survey questions. Let's load the libraries we will need in this chapter, all of which we have used before, and look at the data.
 
 ```{r, message=FALSE}
 library(primer.data)
@@ -59,11 +55,11 @@ library(tidyverse)
 glimpse(trains)
 ```
 
-Here, we can see information about each respondent's gender, political affiliations, age, and income. Additionally, `treatment` indicates whether a subject was in the control or treatment group, and their attitudes toward immigration both before (`att_start`) and after (`att_end`) the experiment. You can type `?trains` to read the help page for more information about each variable. Let's restrict attention to a subset of the variables.
+The data include information about each respondent's gender, political affiliations, age, income and so on. `treatment` indicates whether a subject was in the control or treatment group. The key outcomes are their attitudes toward immigration both before (`att_start`) and after (`att_end`) the experiment. We also have a measure of their ideology before and after the experiment, but there is little change. Type `?trains` to read the help page for more information about each variable. Let's restrict attention to a subset of the variables.
 
 ```{r}
 ch8 <- trains %>% 
-  select(age, att_end, party, income, treatment)
+  select(age, att_end, party, income, treatment, liberal)
 ```
 
 It is always smart to look at a some random samples of the data:
@@ -109,7 +105,7 @@ There are more Democrats in this dataset than Republicans. Democrats also span a
 
 In data science, there are two main aspects to Wisdom: representativeness and ethics. The data that we have are very limited. There are only 115 observations, all from 2012 and involving train commuters to Boston. How useful will this data be today, or for other populations around Boston, or for other cities in the US? Only your judgment, along with advice from your colleagues, can guide you.
 
-The key concept is the idea of a "population." From which larger population is the data we have being (conceptually) drawn? If we were only interested in the age of indidividuals in our data set, we would have no need for inference. *We know everyone's ages already.* We only need tools like `stan_glm()` if we seek to understand individuals not in our data. So, at the very start of any data science, we need to decide something about the larger population which we are interested in. Only if our data is "representative," at least to some extent, of that larger population can we use our data to answer our questions.
+The key concept is the idea of a "population." From which larger population is the data we have being (conceptually) drawn? If we were only interested in the age of indidividuals in our data set, we would have no need for inference. *We know everyone's ages already.* We only need tools like `stan_glm()` if we seek to understand individuals not in our data. Only if our data is "representative," at least to some extent, of that larger population can we use our data to answer our questions.
 
 The ethical issues are, fortunately, not fraught. Estimating someone's age is (universally?) viewed as OK. Estimating someone's health or income or criminal record are far dicier. 
 
@@ -125,7 +121,7 @@ Justice, in data science, consists of three topics: predictive versus causal mod
 
 Any model with age as its dependent variable will be predictive, not causal, for the simple reason that nothing, other than time, can change your age. You are X years old. It would not matter if you changed your party registration from Democrat to Republican or vice versa. Your age is your age.
 
-In terms of the Preceptor Table, this fact means that there is only one potential outcome, i.e., one outcome. There is not a potential outcome if you are Democrat and a different potential outcome if you are a Republican.
+There is only one potential outcome, i.e., one outcome. There is not a potential outcome if you are Democrat and a different potential outcome if you are a Republican.
 
 When dealing with a non-causal model, the focus is on predicting things. The underlying mechanism which connects age with party is less important than the brute statistical fact that there is a connection.  *Predictive models care little about causality.*
 
@@ -133,7 +129,7 @@ When dealing with a non-causal model, the focus is on predicting things. The und
 
 <!-- DK: Need a table which shows all 4 (?) languages for describing a model together: English, math, code, output. -->
 
-A good way at looking at this is with a Preceptor Table, as seen below. Unlike the previous table in Chapter \@ref(two-parameters), we now have two columns in addition to the ID one. To the left, we have the predictor used in the model, which is political party, and to the right we have what that variable will be predicting, which is age. Since our data does not include all Republicans and Democrats in the world, not every row is filled in. 
+A good way at looking at this is with a Preceptor Table, as seen below. Unlike the previous table in Chapter \@ref(two-parameters), we now have two columns in addition to ID.  Since our data does not include all Republicans and Democrats in the world, not every row is filled in. 
 
 ```{r echo = FALSE}
 tibble(ID = c("1", "2", "...", "473", "474",
@@ -159,11 +155,11 @@ tibble(ID = c("1", "2", "...", "473", "474",
 
 We now know that we are working with a predictive model. Recall:
 
-$$outcome = model + not\ in\ the\ model$$
+$$\text{outcome} = \text{model} + \text{not in the model}$$
 
 In words, any event depends on our explicitly described model as well as on influences unknown to us. Everything that happens in the world is the result of various factors, and we can only consider some of them in our model (because we do not know about some influences, or because we have no data about them).  
 
-So far we have only treated the equation above conceptually, but in fact it works just like any other equation. Let's be a bit more concrete. 
+The mathematics:
 
 <!-- DK: Should standardize the notation across the book. -->
 
@@ -192,6 +188,8 @@ Don't panic dear poets and philosophers, the whole thing is easier than it looks
 
 * Although terminology differs across academic fields, the most common term to describe a model like this is a "regression." We are "regressing" `age` on `party` in order to see if they are associated with each other. The formula above is a "regression formula", and the model is a "regression model." This terminology would also apply to our model of `height` in Chapter \@ref(two-parameters). 
 
+* The model in Chapter \@ref(two-parameters) is sometimes called "intercept-only" because the only (interesting) parameter is the intercept. Here we have a "two intercept" model because, instead of estimating an average for the whole population, we are estimating two averages.
+
 
 
 ### Courage
@@ -208,6 +206,7 @@ To get posterior distributions for our three parameters, we will again use `stan
 ```{r}
 fit_obj <- stan_glm(age ~ party - 1, 
                     data = trains, 
+                    seed = 17,
                     refresh = 0)
 ```
 
@@ -238,7 +237,7 @@ fit_obj %>%
   pivot_longer(cols = Democrat:Republican,
                names_to = "parameter",
                values_to = "age") %>% 
-  ggplot(aes(x = age, color = parameter)) +
+  ggplot(aes(x = age, fill = parameter)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    alpha = 0.5, 
                    bins = 100, 
@@ -253,9 +252,9 @@ fit_obj %>%
 
 The unknown parameters $\beta_1$ (partyDemocrat) and $\beta_2$ (partyRepublican) are still unknown. We can never know the true average age of all Democrats in the population. But we can calculate a posterior probability distribution for the parameters. Comments:
 
-* Democrats seem slightly older than Republicans. That was true in our sample and so, almost (but not quite!) by definition, it will be true in our the posterior probability distributions.
+* Democrats seem slightly older than Republicans. That was true in the sample and so, almost (but not quite!) by definition, it will be true in our the posterior probability distributions.
 
-* Our estimate for the average age of Democrats in the population is much more precise than that for Republicans because we have five times as many Democrats as Republicans in our sample. A central lesson from Chapter \@ref(one-parameter) is that, the more data you have related to a parameter, the narrower your posterior distribution will be.
+* Our estimate for the average age of Democrats in the population is much more precise than that for Republicans because we have five times as many Democrats as Republicans in our sample. A central lesson from Chapter \@ref(one-parameter) is that the more data you have related to a parameter, the narrower your posterior distribution will be.
 
 * There is a great deal of overlap between the two distributions. Would we be surprised if, in truth, the average age of Republicans in the population was greater than that for Democrats? Not really. We don't have enough data to be sure either way.
 
@@ -368,13 +367,13 @@ Start with a simple question, what are the chances that a random Democrat is ove
 new_obs <- tibble(party = "Democrat")
 ```
 
+<!-- DK: Does this D_age work? If so, similar discussion should be used more broadly. Also discuss R_age. Even Person_age for a random person, an analysis which accounts for the mix of Rs and Ds in the sample/population. -->
 
-Next, we'll use the `posterior_predict()` function to get some draws from the posterior for this scenario. Note that we have a new posterior distribution under consideration here. The unknown parameter, call it $D_{age}$, is the age of a Democrat. This could be the age of a randomly selected Democrat from the population or of the next Democrat we meet or of the next Democrat we interview on the train platform. The definition of "population" determines the appropriate interpretation. Yet, regardless, $D_{age}$ is an unknown parameter. But it is not one --- like $\beta_1$,  $\beta_2$, or $\sigma$ --- for which we have already created a posterior probability distribution. That is why we need `posterior_predict()`.
+Use `posterior_predict()` to create draws from the posterior for this scenario. Note that we have a new posterior distribution under consideration here. The unknown parameter, call it $D_{age}$, is the age of a Democrat. This could be the age of a randomly selected Democrat from the population or of the next Democrat we meet or of the next Democrat we interview on the train platform. The definition of "population" determines the appropriate interpretation. Yet, regardless, $D_{age}$ is an unknown parameter. But it is not one --- like $\beta_1$,  $\beta_2$, or $\sigma$ --- for which we have already created a posterior probability distribution. That is why we need `posterior_predict()`.
 
 `posterior_predict()` takes two arguments: the model for which the simulations should be run, and a tibble indicating for which and how many parameters we want to run these simulations. In this case, the model is the one from Courage and the tibble is the one we just created.
 
 ```{r}
-set.seed(9)
 pp <- posterior_predict(fit_obj, newdata = new_obs) %>%
     as_tibble() %>%
     mutate_all(as.numeric)
@@ -384,7 +383,7 @@ head(pp, 10)
 
 We might expect that we can use `as_tibble()` directly after the object returned `posterior_predict()`. Sadly, for obscure technical reasons, that won't quite work. So, we need the incantation `mutate_all(as.numeric)` to make sure that the resulting tibble is well-behaved. This command ensures that every column in the tibble is a simple numeric vector, which is what we want.
 
-A look at the first few observations shows that we simply get ten draws from the model's posterior distribution of the age of a Democrat. It is important to understand that this is not a concrete person from the `trains` dataset - the algorithm in `posterior_predict()` simply uses the existing data from  `trains` to estimate this posterior distribution. 
+The result are draws from the posterior distribution of the age of a Democrat. It is important to understand that this is not a concrete person from the `trains` dataset - the algorithm in `posterior_predict()` simply uses the existing data from  `trains` to estimate this posterior distribution. 
 
 
 
@@ -417,50 +416,53 @@ Recall the second question:
 As before we start by creating a tibble with the desired input. Note that the name of the column ("party") and the observations ("Democrat", "Republican") must always be *exactly* as they are in the original data set. This tibble as well as our model can then be used as arguments for `posterior_predict()`:
 
 ```{r}
-new <- tibble(party = c("Democrat", "Democrat", "Democrat", 
+newobs <- tibble(party = c("Democrat", "Democrat", "Democrat", 
                         "Republican", "Republican","Republican"))
 
-set.seed(27)
-pp <- posterior_predict(fit_obj, newdata = new) %>%
+posterior_predict(fit_obj, newdata = newobs) %>%
     as_tibble() %>%
     mutate_all(as.numeric)
-
-head(pp, 10)
-
 ```
 
-<!-- DK: These pp objects are fundamentally flawed because some of the predicted values are absurdly low, even negative! This is not the fault of the model or the code. It is simply that the sigma is large enough, then the model things a negative age is plausible. We should at least mention this, ideally as part of a posterior predictive check, perhaps in a problem set. -->
+<!-- DK: These pp objects are fundamentally flawed because some of the predicted values are absurdly low, even negative! This is not the fault of the model or the code. It is simply that, if sigma is large enough, then the model thinks a negative age is plausible. We should at least mention this, ideally as part of a posterior predictive check, perhaps in a problem set. -->
 
-A look at the output shows that we now have 6 columns: one for each person. R does not name the columns, but they are arranged in the same order in which we specified the persons in the tibble (D, D, D, R, R, R). To determine the expected age difference, we can then proceed as follows:
+We have 6 columns: one for each person. `posterior_predict()` does not name the columns, but they are arranged in the same order in which we specified the persons in `newobs`: D, D, D, R, R, R. To determine the expected age difference, we add code which works with these posterior draws:
 
 <!-- DK: I am unsure about this code. Would c() in place of c_across() work as well? -->
 
-<!-- DK: This works, but it takes much more time than it should because the the pp object still has every column as a ppd object, even after as_tibble(). The rest of the code still works, but takes a 100x longer than it should. Maybe this is the best approach for handling the ppd problem? Just ignore it and take the time hit? -->
+<!-- DK: This works without mutate(all...), but it takes much more time than it should because the the pp object still has every column as a ppd object, even after as_tibble(). The rest of the code still works, but takes a 100x longer than it should. Maybe that is a better approach for handling the ppd problem? Just ignore it and take the time hit? -->
 
 
 ```{r}
-
-pp %>% 
-  set_names(c("dem_1", "dem_2", "dem_3", 
-              "rep_1", "rep_2", "rep_3")) %>% 
-  rowwise() %>% 
+pp <- posterior_predict(fit_obj, newdata = newobs) %>%
+    as_tibble() %>%
+    mutate_all(as.numeric) %>% 
   
-  # Creating three new columns. The first two are the 
-  # highest age among Democrats and the lowest age
-  # among Republicans, respectively. The third one is
-  # the difference between the first two.
+    # We don't need to rename the columns, but doing so makes the subsequest
+    # code much easier to understand. We could just have worked with columns 1,
+    # 2, 3 and so on. Either way, the key is to ensure that you correctly map
+    # the covariates in newobs to the columns in the posterior_predict object.
+  
+    set_names(c("dem_1", "dem_2", "dem_3", 
+                "rep_1", "rep_2", "rep_3")) %>% 
+    rowwise() %>% 
+  
+  # Creating three new columns. The first two are the highest age among
+  # Democrats and the lowest age among Republicans, respectively. The third one
+  # is the difference between the first two.
   
   mutate(dems_oldest = max(c_across(dem_1:dem_3)),
          reps_youngest = min(c_across(rep_1:rep_3)),
-         age_diff = dems_oldest - reps_youngest) %>% 
-  
-  # Ungroup to tell R not to perform rowwise operations
-  # anymore.
-  
-  ungroup() %>% 
-  
-  # Create posterior probability distribution
-  
+         age_diff = dems_oldest - reps_youngest)
+
+pp
+```
+
+The plotting code is similar to what we have seen before:
+
+```{r}
+
+pp %>%  
   ggplot(aes(x = age_diff)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    bins = 100) +
@@ -473,7 +475,7 @@ pp %>%
   
 ```
 
-In words, we would expect the oldest Democrat to be about 22 years older than the youngest Republican, but we would not be surprised if the oldest Democrat was actually younger than the youngest Republican in a group of 6.
+In words, we would expect the oldest Democrat to be about 22 years older than the youngest Republican, but we would not be too surprised if the oldest Democrat was actually younger than the youngest Republican in a group of 6.
 
 ### Addendum
 
@@ -487,6 +489,7 @@ To fit this model, we use the exact same code as before, except without the `-1`
 ```{r}
 stan_glm(age ~ party, 
          data = trains, 
+         seed = 98,
          refresh = 0)
 ```
 
@@ -602,9 +605,9 @@ knitr::include_graphics("other/images/Courage.jpg")
 With Justice satisfied, we gather our Courage and fit the model. Note that, except for the change in variable names, the code is exactly the same as it was above, in our predictive model for age. *Predictive models and causal models use the same math and the same code.* The differences, and they are very important, lie in the interpretation of the results, not in their creation. 
 
 ```{r}
-set.seed(9)
 fit_obj <- stan_glm(att_end ~ treatment - 1, 
                     data = trains, 
+                    seed = 45,
                     refresh = 0)
 
 fit_obj
@@ -689,7 +692,6 @@ Recall the first question with which we began this section:
 Recall from Chapter \@ref(rubin-causal-model) the discussion of the *average treatment effect*. One simple estimator of the average treatment effect is the difference between $\beta_1$ and $\beta_2$. After all, the definition of $\beta_1$ is the average attitude toward immigration, of the population, for anyone, under exposure to the treatment. So, $\beta_1 - \beta_2$ is the average treatment effect for the population, roughly 1.5. However, estimating the posterior probability distribution for this parameter is tricky, unless we make use of the posterior distributions of $\beta_1$ and $\beta_2$. With that information, the problem is simple:
 
 ```{r}
-set.seed(14)
 fit_obj %>% 
   as_tibble() %>% 
   mutate(ate = treatmentTreated - treatmentControl) %>% 
@@ -824,6 +826,7 @@ The use of `stan_glm()` is the same as above.
 ```{r}
 fit_3 <- stan_glm(income ~ age, 
                   data = trains, 
+                  seed = 28,
                   refresh = 0)
 
 print(fit_3, details = FALSE)
