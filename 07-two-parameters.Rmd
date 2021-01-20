@@ -244,7 +244,7 @@ Bayesian models are not hard to create in R. The **rstanarm** package provides t
 library(rstanarm)
 ```
 
-The first argument in `stan_glm()` is `data`, which in our case is the filtered `ch7` tibble which contains 50 observations. The only other mandatory argument is the `formula` that we want to use to build the model. In this case, since we have no predictor variables, our equation will be `height ~ 1`. 
+The first argument in `stan_glm()` is `data`, which in our case is the filtered `ch7` tibble which contains 50 observations. The only other mandatory argument is the `formula` that we want to use to build the model. In this case, since we have no predictor variables, our formula is `height ~ 1`. 
 
 
 ```{r, cache = TRUE}
@@ -267,9 +267,9 @@ Details:
 
 * There is a direct connection between the mathematical form of the model created under Justice and the code we use to fit the model under Courage. `height ~ 1` is the code equivalent of $y_i =  \mu$. 
 
-* The default value for `family` is `gaussian`, so we did not need to include it in the call above. From the Justice section, the assumption that $\epsilon_i \sim N(0, \sigma^2)$ is equivalent to using `gaussian`. If $\epsilon_i$ had a different distribution, we would need to use a different `family`. We saw an example of such a situation at the end of Chapter \@ref(one-parameter) when we performed the urn analysis using `stan_glm()`.
+* The default value for `family` is `gaussian`, so we did not need to include it in the call above. From the Justice section, the assumption that $\epsilon_i \sim N(0, \sigma^2)$ is equivalent to using `gaussian`. If $\epsilon_i$ had a different distribution, we would need to use a different `family`. We saw an example of such a situation at the end of Chapter \@ref(one-parameter) when we performed the urn analysis using `stan_glm()` and setting `family = binomial`.
 
-* Although you can use the standalone function `set.seed()` in order to make your code reproducible, it is more convenient to use the `seed` argument within `stan_glm()`. Even though the fitting process, unavoidably, contains a random component, you will get the exact same answer if we set `seed = 9` and rerun this code.
+* Although you can use the standalone function `set.seed()` in order to make your code reproducible, it is more convenient to use the `seed` argument within `stan_glm()`. Even though the fitting process, unavoidably, contains a random component, you will get the exact same answer if we set `seed = 9` and rerun this code. It does not matter what number you use for the seed.
 
 
 ##### Printed model
@@ -309,12 +309,12 @@ At this point, `stan_glm()` --- or rather the `print()` method for objects creat
 We can also change the number of digits shown:
 
 ```{r}
-print(fit_obj, detail = FALSE, digits = 2)
+print(fit_obj, detail = FALSE, digits = 1)
 ```
 
 <!-- DK: Are we sure that coef() and sigma() give us the median values?  -->
 
-Now that we understand the meaning of Median and MAD_SD in the above display, we can interpret the actual numbers. The median of the intercept, `r coef(fit_obj)`, is the median of our posterior distribution for $\mu$, the average height of all American men in 2010. The median of sigma, `r sigma(fit_obj)`, is the median of our posterior distribution for the true $\sigma$, which can be roughly understood as the variability in the height of men, once we account for our estimate of $\mu$.
+Now that we understand the meaning of Median and MAD_SD in the above display, we can interpret the actual numbers. The median of the intercept, `r round(coef(fit_obj), 1)`, is the median of our posterior distribution for $\mu$, the average height of all men in the population. The median of sigma, `r round(sigma(fit_obj), 1)`, is the median of our posterior distribution for the true $\sigma$, which can be roughly understood as the variability in the height of men, once we account for our estimate of $\mu$.
 
 
 ```{r, echo = FALSE}
@@ -329,18 +329,18 @@ median_fit <- fit_obj %>%
 
 mad_sd <- fit_obj %>% 
   as_tibble() %>% 
-  pull(sigma) %>% 
+  pull(`(Intercept)`) %>% 
   mad()
 ```
 
 
-The MAD SD for each parameter is a measure of the variability of our posterior distributions for that parameter. How spread out are they? Speaking roughly, 95% of the mass of a posterior probability distribution is located within +/- 2 MAD SDs from the median. For example, we would be about 95% confident that the true value of $\mu$ is somewhere between `r median_fit - 2 * mad_sd` and `r median_fit + 2 * mad_sd`. 
+The MAD SD for each parameter is a measure of the variability of our posterior distributions for that parameter. How spread out are they? Speaking roughly, 95% of the mass of a posterior probability distribution is located within +/- 2 MAD SDs from the median. For example, we would be about 95% confident that the true value of $\mu$ is somewhere between `r round(median_fit - 2 * mad_sd, 1)` and `r round(median_fit + 2 * mad_sd, 1)`. 
 
 ##### Plotting the posterior distributions
 
 Instead of doing this math in our heads, we can display both posterior probability distributions. *Pictures speak where math mumbles.* Fortunately, getting draws from those posteriors is easy:
 
-<!-- DK: Why don't we see decimals for the intercept in this print out? The decimals are there when I run it here. -->
+<!-- as_tibble() is just trying to make things "pretty", for certain meanings of that word. This causes the decimals for the intercept to vanish when this chapter is knit. The decimals are present when I run it here. Worth worrying about? -->
 
 ```{r}
 fit_obj %>% 
@@ -360,7 +360,7 @@ fit_obj %>%
     geom_histogram(aes(y = after_stat(count/sum(count))), 
                    bins = 100) +
     labs(title = "Posterior Probability Distribution",
-         subtitle = "Average height among American adult men in 2010",
+         subtitle = "Average height among American adult men",
          x = "Height in Centimeters",
          y = "Probability") +
     scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
@@ -378,7 +378,7 @@ fit_obj %>%
     geom_histogram(aes(y = after_stat(count/sum(count))), 
                    bins = 100) +
     labs(title = "Posterior Probability Distribution",
-         subtitle = "Height standard deviation among American adult men in 2010",
+         subtitle = "Height standard deviation among American adult men",
          x = "Sigma in Centimeters",
          y = "Probability") +
     scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
@@ -450,7 +450,7 @@ knitr::include_graphics("other/images/Temperance.jpg")
 ```
 
 
-We have a model. What can we do with it? Let's answer the four questions with which we started this section.
+We have a model. What can we do with it? Let's answer the four questions with which we started.
 
 ### Question 1
 
@@ -466,13 +466,17 @@ newobs <- tibble(constant = 1)
 pe <- posterior_epred(object = fit_obj,
                       newdata = newobs) %>% 
         as_tibble()
+
+pe
 ```
 
-The key function is `posterior_epred()`. The two arguments we provide are `object`, the fitted model object returned by `stan_glm()` and, `newdata`, which are the covariates associated with the unit (or units) for which we want to make a forecast. (In this case, `newdata` can be any tibble because an intercept-only model does not make use of covariates. We don't really need a variable named `constant`, but including it does no harm.) The `epred` in `posterior_epred()` stands for **e**xpected **pred**iction. In other words, if we pick a random adult male what do we "expect" his height to be. We also call this the "expected value."
+We will use `posterior_epred()` many times. The two key arguments are `object`, the fitted model object returned by `stan_glm()`, and `newdata`, which is the tibble in which are the covariate values associated with the unit (or units) for which we want to make a forecast. (In this case, `newdata` can be any tibble because an intercept-only model does not make use of covariates. We don't really need a variable named `constant`, but including it does no harm.) The `epred` in `posterior_epred()` stands for **e**xpected **pred**iction. In other words, if we pick a random adult male what do we "expect" his height to be. We also call this the *expected value*.
 
 <!-- DK: Tell the story about "mathematical hope." Maybe give more details on what the tibble is doing. Once new version comes out, replace with tibble(.rows = 1). -->
 
-We use `as_tibble()` to convert the matrix which is returned by `posterior_epred()`. Converting these 4,000 draws into a posterior probability distribution is straightforward.
+We use `as_tibble()` to convert the matrix which is returned by `posterior_epred()`. We have a tibble with 1 column and 4,000 rows. The column, unhelpfully named `1`, is 4,000 draws from the posterior probability distribution for the expected height of a random male. Recall from earlier chapters how a posterior probability distribution and the draws from a posterior probability distribution are, more or less, the same thing. Or, rather, a posterior probability distribution, its ownself, is hard to work with. Draws from that distribution, on the other hand, are easy to manipulate. We use draws to answer our questions. 
+
+Converting these 4,000 draws into a posterior probability distribution is straightforward.
 
 ```{r}
 pe %>% 
@@ -484,14 +488,13 @@ pe %>%
          x = "Average Height in Centimeters",
          y = "Probability",
          caption = "Data source: NHANES") + 
-    scale_x_continuous(labels = scales::number_format()) +
+    scale_x_continuous(labels = scales::number_format(accuracy = 1)) +
     scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
     theme_classic()
 ```
 
 The rest of the *Primer* will be filled with graphics like this one. You will make dozens of them yourself. The fundamental structure for doing algebra is the real number. The fundamental structure for data science is the posterior probability distribution. You need to be able to create and interpret them.
 
-<!-- DK: Add something about how expected value means we can ignore the epsilon. Perhaps walk through what the different parts of the graphic code is doing. Add theme_classic()? -->
 
 ### Question 2
 
@@ -504,7 +507,7 @@ Recall the mathematics:
 
 $$ y_i =  \mu + \epsilon_i $$
 
-With expected values or averages, we can ignore the $\epsilon_i$ term in this model. The expected value of $$\epsilon_i$$ is zero since, by assumption, $\epsilon_i \sim N(0, \sigma^2)$. However, we can't ignore $\epsilon_i$ when predicting the height for a single individual.
+With expected values or averages, we can ignore the $\epsilon_i$ term in this formula. The expected value of $$\epsilon_i$$ is zero since, by assumption, $\epsilon_i \sim N(0, \sigma^2)$. However, we can't ignore $\epsilon_i$ when predicting the height for a single individual.
 
 ```{r}
 newobs <- tibble(constant = 1)
@@ -575,16 +578,16 @@ pp <- posterior_predict(object = fit_obj,
         mutate_all(as.numeric)
 ```
 
-Note we need to add `mutate_all(as.numeric)` to the end of the pipe. This is caused by a bug --- or at least an awkwardness --- whereby the variable type provided by `posterior_predict()` is `ppd` rather than `dbl`. Using `mutate_all(as.numeric)` makes each column of type double. Avoid working with columns of type `ppd`. Doing so will only lead to heart ache.
+Note we need to add `mutate_all(as.numeric)` to the end of the pipe. This is caused by a bug --- or at least an awkwardness --- whereby the variable type provided by `posterior_predict()` is `ppd` rather than `dbl`. Using `mutate_all(as.numeric)` makes each column of type double. Avoid working with columns of type `ppd`. Doing so will only lead to heartache.
 
 ```{r}
 pp
 ```
 
-The next step is to calculate the number of interest. We can not, directly, draw the height of the tallest or shortest out of 4 random men. However, having drawn 4 random men, we can calculate those numbers, and the different between them.
+The next step is to calculate the number of interest. We can not, directly, draw the height of the tallest or shortest out of 4 random men. However, having drawn 4 random men, we can calculate those numbers, and the difference between them.
 
 ```{r}
-# First part of the code as the same as we did above.
+# First part of the code is the same as we did above.
 
 pp <- posterior_predict(object = fit_obj,
                         newdata = newobs) %>% 
@@ -603,7 +606,7 @@ pp
 
 These steps serve as a template for much of the analysis we do later. It is often very hard to create a model *directly* of the thing we want to know. There is no *easy* way to create a model which estimates this height difference *directly*. It is easy, however, to create a model which allows for random draws. 
 
-*Give yourself enough random draws, and a tibble in which to store them, and you can estimate the world.*
+*Give us enough random draws, and a tibble in which to store them, and we can estimate the world.*
 
 Once we have random draws from the posterior distribution we care about, graphing the posterior probability distribution is the same-old, same-old.
 
@@ -685,11 +688,9 @@ Then, create a tibble, first column is ID. Second column is height_sample, which
 
 <!-- Relatedly, what if I told you that your 2010 data I gave you did not include one person (or ten people or 100), which was (were) dropped at random from the data by mistake. What is your guess as to the height of that single person, or the height of the average of the 10 people or the tallest of the 10 classes? What is your confidence interval for that? Want to bet? These are all different estimands. -->
 
-You now understand how to use `stan_glm()` to estimate posterior probability distributions. But we have not, yet, offered evidence that these distributions are accurate, that they "work." More importantly, does the 95% confidence interval really include the true value 95% of the time? The technical term for this is "coverage," derived from the idea that any X% confidence interval for an unknown value should include that unknown value, should "cover" the value, X% of the time. We can explore coverage with a simple simulation.
+You now understand how to use `stan_glm()` to estimate posterior probability distributions. But we have not, yet, offered evidence that these distributions are accurate, that they "work." Does the 95% confidence interval really include the true value 95% of the time? The technical term for this is "coverage," derived from the idea that any X% confidence interval for an unknown value should include that unknown value, should "cover" the value, X% of the time. We can explore coverage with a simple simulation.
 
-<!-- DK: Useful problem set might be looking at coverage for a skewed variable like kenya$distance. Presumably, coverage would not be great, but that is because the variable isn't well behaved. If we take the log of it and then do the analysis, coverage is probably a lot better. Right?  -->
 
-<!-- DK: Another problem set question could very the sample size in each row. -->
 
 <!-- DK: Could make a fun plot which shows, first, all 1000 confidence intervals as lines in order, with the 50 or so who misssed the truth in red. And, next to it, show the same but ordered by lower bound. Then, the misses would be 25 at the top and 25 at the bottom. -->
 
@@ -703,12 +704,12 @@ true_value <- mean(ch7_all$height)
 # iterations to make sure that the code is working. Once it is, switch n to a
 # larger number.
 
-n <- 100
+n <- 1000
 
 # Using set.seed() ensures that you will get the same result when you run this
 # code as we did in writing the book.
 
-set.seed(97)
+set.seed(96)
 
 # Simulations like this demonstrate the power of list-columns and map functions.
 # It is always a good idea to start with a tibble that only includes an ID or
@@ -717,24 +718,37 @@ set.seed(97)
 
 cov_analysis <- tibble(ID = 1:n) %>% 
   
-  # It is easy to forget both the ~. Note how sample_id is a tibble, not just a
-  # number, as we are used to in tibbles. List-columns can contain almost
-  # anything. The first argument to map() is the thing that we are iterating
-  # over. In this case, ID does not matter since we are not using its value in
-  # the function call to sample_n().
+  # Note how sample_id is a tibble, not just a number, as we are used to in
+  # tibbles. List-columns can contain almost anything. The first argument to
+  # map() is the thing that we are iterating over. In this case, ID does not
+  # matter since we are not using its value in the function call to sample_n().
   
   mutate(sample_data = map(ID, ~ sample_n(ch7_all, 50))) %>% 
   
-  # 
+  # It is easy to forget both the tilde and the period when using map functions.
+  # In this row, we are doing the exact same modeling as we did above. But, in
+  # this case, we are making a new model, with new data, in each row. That can
+  # be an expensive operations, especially since we are saving the fitted model
+  # each time.
   
   mutate(model = map(sample_data, ~ stan_glm(data = ., 
                                              height ~ 1, 
                                              refresh = 0))) %>% 
   
+  # For each model, we need the 95% confidence interval. posterior_interval(),
+  # when given a fitted model and a paramter, returns that confidence interval
+  # as a matrix with two columns.
+  
   mutate(conf_interval = map(model, 
                              ~ posterior_interval(., 
                                                   pars = "(Intercept)",
                                                   prob = 0.95))) %>% 
+  
+  # The next chunk of code is not really necessary. We don't need to pull out
+  # the lower and uppper bound into separate columns and then, after doing so,
+  # check the coverage. But, when debugging, it is nice to check each step. Note
+  # the use of [] to pull values from the conf_interval matrix.
+  
   mutate(lower = map_dbl(conf_interval, ~ .[1, 1])) %>% 
   mutate(upper = map_dbl(conf_interval, ~ .[1, 2])) %>% 
   mutate(coverage = ifelse(true_value > lower & 
@@ -785,12 +799,7 @@ ch7_b %>%
                      labels = c("Male", "Female"))
 ```
 
-
-*Justice* guides us in noting that this is a predictive model. The math is complex:
-
-$$  \operatorname{Pr}(\text{Female} = 1) = \frac{\text{exp}(\beta_0 + \beta_1 \text{height})}{1 + \text{exp}(\beta_0 + \beta_1 \text{height})} $$
-
-Why do we need this mumbo-jumbo? Look at what happens when we fit a simple linear model:
+Why not just fit a linear model, as we did above? Consider:
 
 ```{r}
 fit_gender_linear <- stan_glm(data = ch7_b,
@@ -827,11 +836,11 @@ ch7_b %>%
                                 "150%"))
 ```
 
-Using 1 for Female and 0 for Male allows us to interpret fitted values as the percentage likelihood that a person is female or male. That is a handy and natural interpretation. The pronlem with a linear model arises when, as in the case, the model suggests values outside 0 to 1. Such values are, by definition, impossible. People who are 190 cm tall do not have a -25% chance of being female.
+Using 1 for Female and 0 for Male allows us to interpret fitted values as *the probability that a person is female or male*. That is a handy and natural interpretation. The problem with a linear model arises when, as in this case, the model suggests values outside 0 to 1. Such values are, by definition, impossible. People who are 190 cm tall do not have a -25% chance of being female.
 
-The solution is to use a different functional form, one which restricts fitted values to the acceptable range. Look closely at the math:
+*Justice* suggests a different functional form, one which restricts fitted values to the acceptable range. Look closely at the math:
 
-$$  \operatorname{Pr}(\text{Female} = 1) = \frac{\text{exp}(\beta_0 + \beta_1 \text{height})}{1 + \text{exp}(\beta_0 + \beta_1 \text{height})} $$
+$$  p(\text{Female} = 1) = \frac{\text{exp}(\beta_0 + \beta_1 \text{height})}{1 + \text{exp}(\beta_0 + \beta_1 \text{height})} $$
 
 This is an inverse logistic function, but don't worry about the details. Mathematical formulas are never more than a Google search away. Instead, note how the range is restricted. Even if $\beta_0 + \beta_1 \text{height}$ is a very large number, the ratio is bound below 1. Similarly, no matter how negative $\beta_0 + \beta_1 \text{height}$ is, the ratio can never be smaller than 0. The model can not, ever, produce impossible values. 
 
@@ -841,8 +850,7 @@ Whenever you have two categories as the outcome, you should use `family = binomi
 
 
 
-*Courage* suggests that we use the same tools for fitting this logistic regression as we did above in fitting linear models.
-
+*Courage* allows us to use the same tools for fitting this logistic regression as we did above in fitting linear models.
 
 
 ```{r}
@@ -857,46 +865,9 @@ fit_2 <- stan_glm(data = ch7_b,
 print(fit_2, digits = 3)
 ```
 
-One major difference between linear and logistic models is that parameters in the latter are much harder to interpret. What does it mean, substantively, that $\beta_1$ is `r round(coef(fit_2)["height"], 2)`?
+One major difference between linear and logistic models is that parameters in the latter are much harder to interpret. What does it mean, substantively, that $\beta_1$ is `r round(coef(fit_2)["height"], 2)`? That is a topic for a more advanced course.
 
-We could, of course, estimate a linear model by using `family = guassian`.
-
-```{r}
-fit_2_lm <- stan_glm(data = ch7_b,
-                     formula = female ~ height,
-                     family = gaussian,
-                     refresh = 0,
-                     seed = 27)
-
-print(fit_2_lm, digits = 3)
-```
-
-
-Although the parameters are easier to interpret, that ease is a Siren's call. Follow it, and you will crash on the rocks on nonsense. 
-
-If you use a linear model with a Gaussian error term, you will have a model which can produce predicted values outside of the 0 to 1 range allowed for probabilities, as in this case.
-
-```{r}
-ch7_b %>% 
-  ggplot(aes(x = height, y = female)) +
-    geom_jitter(height = 0.1, alpha = 0.05) +
-    geom_line(aes(x = height, 
-                  y = fitted(fit_2)), 
-              color = "red") +
-    geom_line(aes(x = height, 
-                  y = fitted(fit_2_lm)), 
-              color = "blue") +
-    labs(title = "Gender and Height",
-         subtitle = "A linear model can produce probabilities outside 0 to 1",
-         x = "Height (cm)",
-         y = NULL,
-         caption = "Data from NHANES") +
-    scale_y_continuous(breaks = c(0, 1),
-                       labels = c("Male", "Female"))
-  
-```
-
-Imagine we have a person who is 190 cm tall. What is the probability that this person is female? If we just use that input in the linear model, we get: $6.2 -0.034 * 190$ = -0.26$. Since it is impossible for a probability to be less than zero, this result is nonsense. Indeed, the primary impetus behind the creation of logistic regression models was to avoid such results.
+<!-- DK: Footnote to discuss? -->
 
 
 Fortunately, parameters are not what we care about. They are epiphenomenon, unicorns of our imagination. Instead, we want answers to our questions, for which *Temperance* --- and the functions in **rstanarm** --- is our guide. Recall our question:
@@ -914,7 +885,7 @@ pe %>%
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    bins = 100) +
     labs(title = "Posterior Probability Distribution",
-         subtitle = "For probability 180 cm tall person is female",
+         subtitle = "For the probability that a 180 cm tall person is female",
          x = "Probability",
          y = "Probability",
          caption = "Data source: NHANES") + 
@@ -925,7 +896,8 @@ pe %>%
 
 There is only about a 1 in 20 chance that a 180 centimeter tall person is female.
 
-<!-- DK: Discuss the meaning of ppd of a probability. -->
+Note that both the x and y axes are probabilities. Whenever we create a posterior probability distribution then, by definition, the y-axis is a probability. The x-axis is the unknown number we do not know. That unknow number can be anything --- the weight of the average male, the height of 3rd tallest out of 100 men, the probability that a 180 cm tall person is female. A probability is just another number. The interpretation is the same as always.
+
 
 Another major difference with logistic models is that `posterior_epred()` and `posterior_predict()` return different types of objects. `posterior_epred()` returns probabilities, as above. `posterior_predict()`, on the other hand, returns predictions, as its name suggests. In other words, it returns zeros and ones. Consider another question:
 
@@ -938,13 +910,15 @@ pp <- posterior_predict(fit_2, newdata = newobs) %>%
   as_tibble() %>% 
   mutate_all(as.numeric)
 
-pp
+pp[, 1:4]
 ```
 
 
 <!-- DK: I am confused! Is this a posterior predictive distribution or a posterior preditive probability distribution? -->
 
-Each column is 4,000 draws from the posterior predictive distribution for the gender of a person who is 180 cm tall. (Since all 100 people have the same height, all the columns are draws from the same distribution.) We can treat this object on a row-by-row basis.
+We show just the first 4 columns for convenience. Each column is 4,000 draws from the posterior predictive distribution for the gender of a person who is 180 cm tall. (Since all 100 people have the same height, all the columns are draws from the same distribution.) 
+
+We can manipulate this object on a row-by-row basis.
 
 <!-- DK: More detail! -->
 
@@ -965,12 +939,12 @@ pp %>%
     scale_y_continuous(labels = scales::percent_format()) 
 ```
 
-That 5 or 6 women is the most likely number is very consistent with the answer to the first question. There we found that a random person who is 180 cm tall has a 5% or 6% chance of being female. So, with 100 such people, 5 or 6 seems a reasonable total. But the *expect value* from `posterior_epred()`, although it does provide a sense of where the center of the predictive distribution will be, does not tell us much about the range of possible outcomes. For that, we need `posterior_predict()`.
+That 5 or 6 women is the most likely number is very consistent with the answer to the first question. There we found that a random person who is 180 cm tall has a 5% or 6% chance of being female. So, with 100 such people, 5 or 6 seems a reasonable total. But the *expected value* from `posterior_epred()`, although it does provide a sense of where the center of the predictive distribution will be, does not tell us much about the range of possible outcomes. For that, we need `posterior_predict()`.
 
 
 ## Summary
 
-The next five chapters will follow the same process we have just completed here. We start with a decision we have to make. With luck, we will have some data to guide us. (Without data, even the best data scientist will struggle to make progress.) *Wisdom* asks us: "Is the data we have close enough to the decision we face to make using that data likely to be helpful?" Often times, the answer is "No." Even if we do have data, and the ability to make a model, Wisdom will tap us on the shoulder and say, "Even if you can make a model, don't forget to ask yourself if you should." Ethics matter.
+The next five chapters will follow the same process we have just completed here. We start with a decision we have to make. With luck, we will have some data to guide us. (Without data, even the best data scientist will struggle to make progress.) *Wisdom* asks us: "Is the data we have close enough to the decision we face to make using that data helpful?" Often times, the answer is "No." Even if we do have data, and the ability to make a model, Wisdom will tap us on the shoulder and say, "Even if you can make a model, don't forget to ask yourself if you should." Ethics matter.
 
 Once we start to build the model, *Justice* will guide us. Is the model descriptive or causal? What is the mathematical relationship between the dependent variable we are trying to explain and the independent variables we can use to explain it? What assumptions are we making about distributions, especially with regard to the error term?
 
