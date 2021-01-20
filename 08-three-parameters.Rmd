@@ -42,7 +42,7 @@ Wisdom begins with a look at your data.
 #### EDA for `trains`
 
 
-*Always explore your data*. To demonstrate modeling with three parameters, we will use the `trains` data set from the **primer.data** package. Recall the discussion from Chapter \@ref(rubin-causal-model). @enos2014 randomly placed Spanish-speaking confederates on nine train platforms around Boston, Massachusetts. Exposure to Spanish-speakers -- the `treatment` -- influenced attitudes toward immigration. These reactions were measured through changes in answers to three survey questions. Let's load the libraries we will need in this chapter, all of which we have used before, and look at the data.
+*Always explore your data.* To demonstrate modeling with three parameters, we will use the `trains` data set from the **primer.data** package. Recall the discussion from Chapter \@ref(rubin-causal-model). @enos2014 randomly placed Spanish-speaking confederates on nine train platforms around Boston, Massachusetts. Exposure to Spanish-speakers -- the `treatment` -- influenced attitudes toward immigration. These reactions were measured through changes in answers to three survey questions. Let's load the libraries we will need in this chapter, all of which we have used before, and look at the data.
 
 ```{r, message=FALSE}
 library(primer.data)
@@ -250,7 +250,7 @@ fit_obj %>%
     theme_classic()
 ```
 
-The unknown parameters $\beta_1$ (partyDemocrat) and $\beta_2$ (partyRepublican) are still unknown. We can never know the true average age of all Democrats in the population. But we can calculate a posterior probability distribution for the parameters. Comments:
+The unknown parameters $\beta_1$ (partyDemocrat) and $\beta_2$ (partyRepublican) are still unknown. We can never know the true average age of all Democrats in the population. But we can calculate a posterior probability distribution for each parameter. Comments:
 
 * Democrats seem slightly older than Republicans. That was true in the sample and so, almost (but not quite!) by definition, it will be true in our the posterior probability distributions.
 
@@ -260,8 +260,10 @@ The unknown parameters $\beta_1$ (partyDemocrat) and $\beta_2$ (partyRepublican)
 
 * The phrase "in the population" is doing a great deal of work because we have not said what, precisely, we mean by the "population." Is it the set of people on those commuter platforms on those days in 2012 when the experiment was done? Is it the set of people on all platforms, including ones never visited? Is it the set of all Boston commuter? All Massachusetts residents? All US residents? Does it include people today, or can we only draw inferences for 2012? We will explore these questions in every model we create.
 
+* The parameters $\beta_1$ and $\beta_2$ can be interpreted in two ways. First, like all parameters, they are a part of the model. We need to estimate them. But, in many cases, we don't really care what the value of the parameter is. The exact value of $\sigma$, for examole, does not really matter. Second, some parameters have a substantive interpretaion, as with $\beta_1$ and $\beta_2$ being the average ages in the population. But this will often not be the case! Fortunately, with such models, we can use functions like `posterior_epred()` and `posterior_predict()` to answer our questions.
 
-Look at the following table that shows a sample of 8 individuals.
+
+Consider a table which shows a sample of 8 individuals.
 
 ```{r, echo = FALSE}
 trains %>% 
@@ -289,53 +291,33 @@ The fitted values are the same for all Republicans and for all Democrats, as the
 
 The following three histograms show the actual outcomes, fitted values, and residuals of all people in `trains`:
 
-<!-- DK: Clean up these plots to be similar across chapters! Also, we should ensure that the width of 10 units is the same in each plot. Or does that already happen? Want the intuition that, the more predictive the model, the smaller the remaining variation in the residuals. -->
+<!-- DK: Clean up these plots to be similar across chapters! Also, we should ensure that the width of 10 units is the same in each plot. Or does that already happen? Want the intuition that, the more predictive the model, the smaller the remaining variation in the residuals. The below is from chapter 7. -->
 
-```{r, echo = FALSE, warning=FALSE, message=FALSE, fig.align='center'}
+```{r}
+outcome <- ch8 %>% 
+  ggplot(aes(age)) +
+    geom_histogram(bins = 100) +
+    labs(x = "Age",
+         y = "Count") 
 
-trains_both <- trains %>% 
-              select(party, age) %>% 
-              mutate("fitted" = ifelse(party == "Democrat", 41.1, 42.6),
-                     "residual" = age - fitted)
+fitted <- tibble(age = fitted(fit_obj)) %>% 
+  ggplot(aes(age)) +
+    geom_bar() +
+    labs(x = "Fitted Values",
+         y = NULL) +
+    scale_x_continuous(limits = c(20, 70)) 
 
+res <- tibble(resids = residuals(fit_obj)) %>% 
+  ggplot(aes(resids)) +
+    geom_histogram(bins = 100) +
+    labs(x = "Residuals",
+         y = NULL) 
+  
 
-
-# Actual outcomes (both)
-
-act_both <- ggplot(trains_both, aes(x = age)) +
-  geom_histogram(bins = 100, binwidth = 1.5, boundary = 20) +
-  scale_x_continuous(expand = c(0, 0), limits = c(18, 70)) + 
-  scale_y_continuous(expand = c(0, 0), limits = c(0, 10), breaks = c(2, 4, 6, 8, 10)) +
-  labs(
-    x = "Age",
-    y = "Count") 
-
-
-# Predicted outcomes (both)
-
-pred_both <- ggplot(trains_both, aes(x = fitted)) +
-  geom_histogram(binwidth = 1.5) +
-  scale_x_continuous(expand = c(0, 0), limits = c(18, 70)) + 
-  scale_y_continuous(expand = c(0, 0), limits = c(0, 100)) +
-  labs(
-    x = "Fitted Values",
-    y = "") 
-
-
-# Residuals (both)
-
-res_both <- ggplot(trains_both, aes(x = residual)) +
-  geom_histogram(bins = 100, binwidth = 1.5) +
-  scale_y_continuous(expand = c(0, 0), 
-                     limits = c(0, 10), 
-                     breaks = c(2, 4, 6, 8, 10)) +
-  labs(x = "Residuals",
-       y = "") 
-
-act_both + pred_both + res_both + 
-  plot_annotation(title = "Decomposition of Age into Fitted Values and Residuals")
-
+outcome + fitted + res +
+  plot_annotation(title = "Decomposition of Height into Fitted Values and Residuals")
 ```
+
 
 The three plots are structured like our equation and table above. A value in the left plot is the sum of one value from the middle plot plus one from the right plot. 
 
@@ -401,12 +383,10 @@ pp %>%
 
 ```
 
-Once we have the posterior distribution, we can answer (almost) any reasonable question. In this case, the probability that the next Democrat will be over 50 is around 27%.
+Once we have the posterior distribution, we can answer (almost) any reasonable question. In this case, the probability that the next Democrat will be over 50 is around 28%.
 
 ```{r}
-tibble(age = pp$`1`) %>% 
-  mutate(ot_50 = ifelse(age > 50, TRUE, FALSE)) %>% 
-  summarize(perc = sum(ot_50)/n())
+sum(pp$`1` > 50) / nrow(pp)
 ```
 
 Recall the second question:
@@ -482,7 +462,7 @@ In words, we would expect the oldest Democrat to be about 22 years older than th
 Instead of parameterizing this model without an intercept, we could have used one. In that case, the math would be:
 
 $$ y_i = \beta_0  + \beta_1 x_{d,i} + \epsilon_i$$
-The interpretations of the parameters is now different. $\beta_0$ is now the average age of Republicans. This is the same interpretation as $\beta_1$ in the original set up. $beta_1$ is now the difference between the the average age of Republicans and that of Democrats. 
+The interpretations of the parameters are different from the prior model. $\beta_0$ is now the average age of Republicans. This is the same interpretation as $\beta_1$ in the original set up. $\beta_1$ is now the difference between the the average age of Republicans and that of Democrats. 
 
 To fit this model, we use the exact same code as before, except without the `-1` in the `formula` argument.
 
@@ -500,7 +480,7 @@ Little else about the models will be different. They will have the same fitted v
 
 ## att_end ~ treatment
 
-Above, we created a predictive model: with someone's party affiliation, we can make a better guess as to what their age is then what we could have in the absence of information about their party. There was nothing causal about that model. Changing someone's party registration can not change their age. In this example, we build a causal model. Consider these two questions:
+Above, we created a predictive model: with someone's party affiliation, we can make a better guess as to what their age is than we could have in the absence of information about their party. There was nothing causal about that model. Changing someone's party registration can not change their age. In this example, we build a causal model. Consider these two questions:
 
 *What is the average treatment effect, of exposing people to Spanish-speakers, on their attitudes toward immigration?* 
 
@@ -515,7 +495,7 @@ Models help us answer questions better than we could without those models, but o
 knitr::include_graphics("other/images/Wisdom.jpg")
 ```
 
-Look at your data! Before making a model which seeks to explain `att_end`, we should plot `att_end` and the variable we think is connected to it.
+*Look at your data!* Before making a model which seeks to explain `att_end`, we should plot `att_end` and the variable we think is connected to it.
 
 ```{r}
 ch8 %>%
@@ -531,9 +511,9 @@ Treated individuals seem to have a higher values for `att_end` than control indi
 
 <!-- DK: Could do more here. -->
 
-We are still using the data from @enos2014. Yet the world is a very different place today! Is data from 2012, four years before Donald Trump's election as president, still relevant? Can we generalize data from Boston commuters to other people in Massachusetts, to other people in the US? There are no obvious answers to these questions. *The data we have is never a perfect match to the problem we face because data is always old.* The world is constantly changing. To use old data, we need to make assumptions about the stability of our model of the world and of the parameters we are estimating. Whether those assumptions are reasonable is a difficult question, one that requires knowledge about the world as it was and the world as it now is. Math won't save us.
+We are still using the data from @enos2014. Yet the world is a very different place today! Is data from 2012, four years before Donald Trump's election as president, still relevant? Can we generalize data from Boston commuters to other people in Massachusetts, to other people in the US? There are no obvious answers to these questions. *The data we have is never a perfect match to the problem we face because data is always old.* The world is constantly changing. To use old data, we need to make assumptions about the stability of our model of the world and of the parameters we are estimating. Whether those assumptions are reasonable is a difficult question, one that requires knowledge about the world as it was and the world as it now is. *Math won't save us.*
 
-The critical issue is always: Which population are we interested in and does our data come from that population? If there is no connection between the two, progress is impossible. But, in this case, if we are willing to consider the population of US residents over the last decade (including today), and if we are willing to assume that our data set of 115 individuals is representative of that population, then we can use our data to create a model to answer our question.
+The issue is always: Do the data we have and the data we want to have come from the same population? If there is no connection between the two, progress is impossible. But, in this case, if we are willing to consider the population to be US residents over the last decade (including today), and if we are willing to assume that our data set of 115 individuals is representative of that population, then we can use our data to create a model to answer our question.
 
 Ethical issues are tricky, or at least trickier than they were in the context of models in which the dependent variable was height or age. (And the ethical issues in conducting the experiment in the first place are non-trivial.) Assume we make a good model. What is to prevent someone from using that information to, say, influence voting and donations? Imagine a Republican Senate candidate who hires Spanish-speakers to ride commuter trains in order to shift voters' attitudes toward immigration in a conservative direction. She believes (correctly?) that doing so will increase her odds of winning the election. Is that the sort of knowledge we seek to create? We can make such models. Indeed, the purpose of this chapter is to show you how to do so! But should you make those models?
 
@@ -543,34 +523,14 @@ Ethical issues are tricky, or at least trickier than they were in the context of
 knitr::include_graphics("other/images/Justice.jpg")
 ```
 
-The three elements of Justice in data science remain the same: predictive/causal models, Preceptor Table, and mathematical formula.
+The two elements of Justice in a data science project remain the same: the Preceptor Table and the  mathematical formula.
 
-A Preceptor Table for this model would look very similar to the one in the first half of this chapter, except that we have now possible outcomes for each individual: `att_end` if they are exposed to treatment and `att_end` they are exposed to control. 
+A Preceptor Table for this model would look very similar to the one in the first half of this chapter, except that we have now possible outcomes for each individual: `att_end` if they are exposed to treatment and `att_end` if they are exposed to control. 
 
-<!-- DK: We need to add Preceptor Tables here and elsewhere. The below one is wrong because it does not show two potential outcomes. -->
-
-<!-- ```{r echo = FALSE} -->
-<!-- tibble(ID = c("1", "2", "...", "473", "474", -->
-<!--               "...", "3,258", "3,259", "...", "N"), -->
-<!--        Treatment = c("Treatment", "?", "...", "Control", "?", "...", "?", "Control", "...", "?"), -->
-<!--       Attitude_End = c("10", "?", "...", "8", "?", "...", "?", "11", "...", "?")) %>% -->
-
-<!--   # Then, we use the gt function to make it pretty -->
-
-<!--   gt() %>% -->
-<!--   cols_label(ID = md("ID"),Treatment= "Condition", Attitude_End = "Attitude at End") %>% -->
-<!--   tab_style(cell_borders(sides = "right"), -->
-<!--             location = cells_body(columns = vars(ID))) %>% -->
-<!--   tab_style(style = cell_text(align = "left", v_align = "middle"),  -->
-<!--             locations = cells_column_labels(columns = vars(ID))) %>% -->
-<!--   cols_align(align = "center", columns = TRUE) %>% -->
-<!--   cols_align(align = "left", columns = vars(ID)) %>% -->
-<!--   tab_spanner(label = "Outcome", columns = vars(Attitude_End)) %>% -->
-<!--   tab_spanner(label = "Explanitory Variable", columns = vars(Treatment)) -->
-<!-- ``` -->
+<!-- DK: We need to add Preceptor Tables here and elsewhere. The below one is wrong because it does not show two potential outcomes.  Should use proper potential outcome notation, as introduced in chapter 4. -->
 
 
-The math for this model is exactly the same as the math for the predictive model in the first half of the chapter, although we change the notation a bit for clarity.
+The math for this model is exactly the same as the math for the predictive model in the first part of this chapter, although we change the notation a bit for clarity.
 
 $$ y_i = \beta_1 x_{t,i} + \beta_2 x_{c,i} + \epsilon_i$$
 
@@ -585,7 +545,7 @@ Nothing has changed, except for the meaning of the data items and the interpreta
 
 * On the left-hand side we have the outcome, $y_i$, which is the variable to be explained. In our case, this is a person's attitude toward immigration after the experiment is complete.  $y_i$ takes on integer values between 3 and 15 inclusive.
 
-* On the right-hand side we first have the part contained in the model, consisting of two similar terms. The two terms stand for Treated and Control and work as follows. Each term consists of a parameter and a data point.  $\beta_1$ is the average attitude toward immigration for treated individuals --- those exposed to Spanish-speakers ---   in the population. $\beta_2$ is the average attitude toward immigration for control individuals --- those not exposed to Spanish-speakers ---  in the population. The $x$'s are our explanatory variables and take the values 1 or 0. If someone is a Treated we have $x_{t,i} = 1$ and $x_{c,i} = 0$, if someone is a Control we have $x_{t,i} = 0$ and $x_{c,i} = 1$. In other words, the $x$'s are binary variables and are mutually exclusive -- if you are a Treated, you cannot also be a Control.
+* On the right-hand side we first have the part contained in the model, consisting of two similar terms. The two terms stand for Treated and Control and work as follows. Each term consists of a parameter and a data point.  $\beta_1$ is the average attitude toward immigration for treated individuals --- those exposed to Spanish-speakers ---   in the population. $\beta_2$ is the average attitude toward immigration for control individuals --- those not exposed to Spanish-speakers ---  in the population. The $x$'s are our explanatory variables and take the values 1 or 0. If person $i$ is Treated, $x_{t,i} = 1$ and $x_{c,i} = 0$. If person $i$ is Control, $x_{t,i} = 0$ and $x_{c,i} = 1$. In other words, the $x$'s are binary variables and are mutually exclusive -- if you are Treated, you cannot also be Control.
 
 * Note that the formula applies to everyone in the population, not just the 115 people for whom we have data. The index $i$ does not just go from 1 through 115. It goes from 1 through $N$, where $N$ is the number of individuals in the population. Conceptually, everyone has an `att_end` under treatment and under control. 
 
@@ -593,7 +553,7 @@ Nothing has changed, except for the meaning of the data items and the interpreta
 
 * The last part, $\epsilon_i$ (“epsilon”), represents the unexplained part and is called the error term. It is simply the difference between the outcome and our model predictions. In our particular case, this includes all factors that have an influence on someone's attitude toward immigration but are not explained by treatment status. We assume that this error follows a normal distribution with an expected value of 0.
 
-* The small $i$'s are an index to number observations in our data set. It is equivalent to the "ID" column in our Preceptor Table and simply states that the outcome for person $i$ is explained by the modeled and non-modelled factors for person i. The corresponding $x$'s have a $t$ or $c$ subscript, for Treated or Control.
+* The small $i$'s are an index for the data set. It is equivalent to the "ID" column in our Preceptor Table and simply states that the outcome for person $i$ is explained by the modeled and non-modelled factors for person $i$. The corresponding $x$'s have a $t$ or $c$ subscript, for Treated or Control.
 
 
 ### Courage
@@ -619,18 +579,20 @@ fit_obj
 
 Up until now, we have used the Bayesian interpretation of "confidence interval." This is also the intuitive meaning which, outside of academia, is almost universal. There is a truth out there. We don't know, and sometimes can't know, the truth. A confidence interval, and its associated confidence level, tells us how likely the truth is to lie within a specific range. If your boss asks you for a confidence interval, she almost certainly is using this interpretation.
 
-But, in contemporary academic research, the phrase "confidence interval" is usually given a "Frequentist" interpretation. (The biggest divide in statistics is between Bayesians and Frequentist interpretations. The Frequentist approach, also known as "Classical" statistics, has been dominant for 100 years. Its power is fading, which is why this textbook uses the Bayesian approach.) For a Frequentist, a 95% confidence interval means that, if we were to apply the procedure we used in an infinite number of future situations like this, we would expect the true value to fall within the calculated confidence intervals 95% of the time. In academia, a distinction is sometimes made between confidence intervals (which use the Frequentist interpretation) and credible intervals (which use the Bayesian interpretation). We won't worry about that difference in this book.
+But, in contemporary academic research, the phrase "confidence interval" is usually given a "Frequentist" interpretation. (The biggest divide in statistics is between Bayesians and Frequentist interpretations. The Frequentist approach, also known as "Classical" statistics, has been dominant for 100 years. Its power is fading, which is why this textbook uses the Bayesian approach.) For a Frequentist, a 95% confidence interval means that, if we were to apply the procedure we used in an infinite number of future situations like this, we would expect the true value to fall within the calculated confidence intervals 95% of the time. In academia, a distinction is sometimes made between *confidence intervals* (which use the Frequentist interpretation) and *credible intervals* (which use the Bayesian interpretation). We won't worry about that difference in this *Primer*.
 
-Let's look at the entire posteriors for both $\beta_1$ and $\beta_2$. 
+Let's look at the full posteriors for both $\beta_1$ and $\beta_2$. 
+
+<!-- DK: Change Parameter levels to something nice. -->
 
 ```{r}
 fit_obj %>% 
   as_tibble() %>% 
   select(-sigma) %>% 
   pivot_longer(cols = treatmentTreated:treatmentControl,
-               names_to = "parameter",
+               names_to = "Parameter",
                values_to = "attitude") %>% 
-  ggplot(aes(x = attitude, color = parameter)) +
+  ggplot(aes(x = attitude, fill = Parameter)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    alpha = 0.5, 
                    bins = 100, 
@@ -646,6 +608,14 @@ fit_obj %>%
 It appears that the affect of the treatment is to change people's attitudes to be more conservative about immigration issues. Which is somewhat surprising!
 
 We can decompose the the dependent variable, `att_end` into two parts: the fitted values and the residuals. There are only two possible fitted values, one for the Treated and one for the Control. The residuals, as always, are simply the difference between the outcomes and the fitted values. 
+
+<!-- DK: Does this section cause this warning? -->
+
+<!-- Warning messages: -->
+<!-- 1: Removed 2 rows containing missing values (geom_bar).  -->
+<!-- 2: Removed 2 rows containing missing values (geom_bar). -->
+
+<!-- I think it does. Definitely comes from this chapter. How to fix it? -->
 
 ```{r, echo = FALSE}
 outcome <- trains %>% 
