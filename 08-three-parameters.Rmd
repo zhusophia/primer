@@ -204,7 +204,7 @@ Courage allows us to translate math to code.
 To get posterior distributions for our three parameters, we will again use `stan_glm()`, just as we did in Chapter \@ref(two-parameters). If we take a look at the formula, we can see that it is similar to the equation from before. 
 
 ```{r}
-fit_obj <- stan_glm(age ~ party - 1, 
+fit_obj_1 <- stan_glm(age ~ party - 1, 
                     data = trains, 
                     seed = 17,
                     refresh = 0)
@@ -219,7 +219,7 @@ fit_obj <- stan_glm(age ~ party - 1,
 The resulting output:
 
 ```{r}
-fit_obj
+fit_obj_1
 ```
 
 
@@ -230,7 +230,7 @@ fit_obj
 <!-- DK: Should we use different parameter names like beta_r? -->
 
 ```{r}
-fit_obj %>% 
+fit_obj_1 %>% 
   as_tibble() %>% 
   select(-sigma) %>% 
   mutate(Democrat = partyDemocrat, Republican = partyRepublican) %>%
@@ -268,8 +268,8 @@ Consider a table which shows a sample of 8 individuals.
 ```{r, echo = FALSE}
 trains %>% 
   select(age, party) %>% 
-  mutate(fitted = fitted(fit_obj)) %>% 
-  mutate(residual = residuals(fit_obj)) %>% 
+  mutate(fitted = fitted(fit_obj_1)) %>% 
+  mutate(residual = residuals(fit_obj_1)) %>% 
   slice(1:8) %>% 
   gt() %>%
   cols_label(age = md("**Age**"),
@@ -300,14 +300,14 @@ outcome <- ch8 %>%
     labs(x = "Age",
          y = "Count") 
 
-fitted <- tibble(age = fitted(fit_obj)) %>% 
+fitted <- tibble(age = fitted(fit_obj_1)) %>% 
   ggplot(aes(age)) +
     geom_bar() +
     labs(x = "Fitted Values",
          y = NULL) +
     scale_x_continuous(limits = c(20, 70)) 
 
-res <- tibble(resids = residuals(fit_obj)) %>% 
+res <- tibble(resids = residuals(fit_obj_1)) %>% 
   ggplot(aes(resids)) +
     geom_histogram(bins = 100) +
     labs(x = "Residuals",
@@ -356,7 +356,7 @@ Use `posterior_predict()` to create draws from the posterior for this scenario. 
 `posterior_predict()` takes two arguments: the model for which the simulations should be run, and a tibble indicating for which and how many parameters we want to run these simulations. In this case, the model is the one from Courage and the tibble is the one we just created.
 
 ```{r}
-pp <- posterior_predict(fit_obj, newdata = new_obs) %>%
+pp <- posterior_predict(fit_obj_1, newdata = new_obs) %>%
     as_tibble() %>%
     mutate_all(as.numeric)
 
@@ -399,7 +399,7 @@ As before we start by creating a tibble with the desired input. Note that the na
 newobs <- tibble(party = c("Democrat", "Democrat", "Democrat", 
                         "Republican", "Republican","Republican"))
 
-posterior_predict(fit_obj, newdata = newobs) %>%
+posterior_predict(fit_obj_1, newdata = newobs) %>%
     as_tibble() %>%
     mutate_all(as.numeric)
 ```
@@ -414,7 +414,7 @@ We have 6 columns: one for each person. `posterior_predict()` does not name the 
 
 
 ```{r}
-pp <- posterior_predict(fit_obj, newdata = newobs) %>%
+pp <- posterior_predict(fit_obj_1, newdata = newobs) %>%
     as_tibble() %>%
     mutate_all(as.numeric) %>% 
   
@@ -476,6 +476,8 @@ stan_glm(age ~ party,
 The intercept, 42.6, is the same as the `partyDemocrat` estimate in the first model. The `partyRepublican` estimate, which was previously 41.0, is now -1.5, meaning it is the difference (allowing for rounding) between the average age of Democrats and Republicans.
 
 Little else about the models will be different. They will have the same fitted values and residuals. `posterior_predict()` will generate the same posterior predictive probabilty distributions. Which parameterization we use does not matter much. But you should be able to interpret the meaning of the coefficients in both.
+
+<!-- DK: Need more here? -->
 
 
 ## att_end ~ treatment
@@ -565,12 +567,12 @@ knitr::include_graphics("other/images/Courage.jpg")
 With Justice satisfied, we gather our Courage and fit the model. Note that, except for the change in variable names, the code is exactly the same as it was above, in our predictive model for age. *Predictive models and causal models use the same math and the same code.* The differences, and they are very important, lie in the interpretation of the results, not in their creation. 
 
 ```{r}
-fit_obj <- stan_glm(att_end ~ treatment - 1, 
-                    data = trains, 
-                    seed = 45,
-                    refresh = 0)
+fit_obj_2 <- stan_glm(att_end ~ treatment - 1, 
+                      data = trains, 
+                      seed = 45,
+                      refresh = 0)
 
-fit_obj
+fit_obj_2
 ```
 
 `treatmentTreated` corresponds to $\beta_1$. As always, R has, behind the scenes, estimated the entire posterior probability distribution for $\beta_1$. We will graph that distribution in the next section. But the basic print method for these objects can't show the entire distribution, so it gives us summary numbers: the median and the MAD SD. Speaking roughly, we would expect about 95% of the values in the posterior to be within two MAD SD's of the median. In other words, we are 95% confident that the true, but unknowable, average attitude toward immigration among the Treated in the population to be between 9.2 and 10.8. 
@@ -586,7 +588,7 @@ Let's look at the full posteriors for both $\beta_1$ and $\beta_2$.
 <!-- DK: Change Parameter levels to something nice. -->
 
 ```{r}
-fit_obj %>% 
+fit_obj_2 %>% 
   as_tibble() %>% 
   select(-sigma) %>% 
   pivot_longer(cols = treatmentTreated:treatmentControl,
@@ -609,22 +611,15 @@ It appears that the affect of the treatment is to change people's attitudes to b
 
 We can decompose the the dependent variable, `att_end` into two parts: the fitted values and the residuals. There are only two possible fitted values, one for the Treated and one for the Control. The residuals, as always, are simply the difference between the outcomes and the fitted values. 
 
-<!-- DK: Does this section cause this warning? -->
-
-<!-- Warning messages: -->
-<!-- 1: Removed 2 rows containing missing values (geom_bar).  -->
-<!-- 2: Removed 2 rows containing missing values (geom_bar). -->
-
-<!-- I think it does. Definitely comes from this chapter. How to fix it? -->
 
 ```{r, echo = FALSE}
 outcome <- trains %>% 
   ggplot(aes(att_end)) +
-    geom_histogram(bins = 10) +
+    geom_histogram(bins = 50) +
     labs(x = "Attitude toward Immigration",
          y = "Count") 
 
-fitted <- tibble(height = fitted(fit_obj)) %>% 
+fitted <- tibble(height = fitted(fit_obj_2)) %>% 
   ggplot(aes(height)) +
     geom_bar(width = 0.2) +
     labs(x = "Fitted Values",
@@ -632,9 +627,9 @@ fitted <- tibble(height = fitted(fit_obj)) %>%
     scale_x_continuous(limits = c(3.5, 15),
                        breaks = c(4, 8, 12))
 
-res <- tibble(resids = residuals(fit_obj)) %>% 
+res <- tibble(resids = residuals(fit_obj_2)) %>% 
   ggplot(aes(resids)) +
-    geom_histogram(bins = 10) +
+    geom_histogram(bins = 50) +
     labs(x = "Residuals",
          y = NULL) 
   
@@ -659,10 +654,10 @@ Recall the first question with which we began this section:
 
 <!-- DK: Below is also not clear. -->
 
-Recall from Chapter \@ref(rubin-causal-model) the discussion of the *average treatment effect*. One simple estimator of the average treatment effect is the difference between $\beta_1$ and $\beta_2$. After all, the definition of $\beta_1$ is the average attitude toward immigration, of the population, for anyone, under exposure to the treatment. So, $\beta_1 - \beta_2$ is the average treatment effect for the population, roughly 1.5. However, estimating the posterior probability distribution for this parameter is tricky, unless we make use of the posterior distributions of $\beta_1$ and $\beta_2$. With that information, the problem is simple:
+Chapter \@ref(rubin-causal-model) defined the *average treatment effect*. One simple estimator of the average treatment effect is the difference between $\beta_1$ and $\beta_2$. After all, the definition of $\beta_1$ is the average attitude toward immigration, of the population, for anyone, under exposure to the treatment. So, $\beta_1 - \beta_2$ is the average treatment effect for the population, roughly 1.5. However, estimating the posterior probability distribution for this parameter is tricky, unless we make use of the posterior distributions of $\beta_1$ and $\beta_2$. With that information, the problem is simple:
 
 ```{r}
-fit_obj %>% 
+fit_obj_2 %>% 
   as_tibble() %>% 
   mutate(ate = treatmentTreated - treatmentControl) %>% 
   ggplot(aes(x = ate)) +
@@ -678,52 +673,82 @@ fit_obj %>%
 
 Could the true value of the average treatment effect be as much as 2 or as little as 1? Of course! The most likely value is around 1.5, but the variation in the data and the smallness of our sample cause the estimate to be imprecise. However, it is quite unlikely that the true average treatment effect is below zero.
 
+We can use `posterior_epred()` to answer this question. Create a tibble and use it as we have done before:
+
+```{r}
+newobs <- tibble(treatment = c("Treated", "Control"))
+
+pe <- posterior_epred(fit_obj_2, newobs) %>% 
+    as_tibble() %>% 
+    mutate(ate = `1` - `2`)
+
+pe
+```
+
+The posterior probability distribution created with `posterior_epred()` is the same as the one produced by manipulating the parameters directly.
+
+```{r}
+pe %>% 
+  ggplot(aes(x = ate)) +
+    geom_histogram(aes(y = after_stat(count/sum(count))),
+                   bins = 100) +
+    labs(title = "Posterior Probability Distribution for ATE",
+         subtitle = "Exposure to Spanish-speakers shifts immigration attitudes rightward",
+         x = "Difference in Attitude",
+         y = "Probability") +
+    scale_y_continuous(labels = scales::percent_format()) +
+    theme_classic()
+```
+
+
+
 <!-- DK: Much more discussion. Explain what a test might be used for in this situation and why we should reject testing. -->
 
 Our second question: 
 
 * What is the largest effect size which still has a 1 in 10 chance of occurring? 
 
-To answer this question, we first need to create a tibble which we can pass to `posterior_predict()`. The variables in the tibbles which will be passed in as `newdata` must be exactly the same as their counterparts in the original data. For example, `treatment` must be a factor, with the same levels as it has in `trains`.
+Create a tibble which we can pass to `posterior_predict()`. The variables in the tibble which will be passed in as `newdata`. Fortunately, the tibble we created above is just what we need for this question also. 
 
+Consider the result of `posterior_predict()` for two people, one treated and one control. Take the difference.
+
+<!-- DK: This goes a bit fast. Slow down. -->
 
 ```{r}
-ate_data <- tibble(treatment =
-                     factor(c("Treated", "Control"),
-                            levels = c("Treated", "Control")))
+pp <- posterior_predict(fit_obj_2, 
+                        newdata = newobs) %>%
+    as_tibble() %>%
+    mutate_all(as.numeric) %>% 
+    mutate(te = `1` - `2`)
+  
+pp
 ```
 
-
-Consider the result of posterior_predict() for someone treated and someone in the control group.
-
+Create a graphic:
 
 ```{r}
-pp <- posterior_predict(fit_obj, 
-                        newdata = ate_data) %>%
-    as_tibble() %>%
-    mutate_all(as.numeric)
-
-
-te <- tibble(Treated = pp$`1`, Control = pp$`2`)  %>% 
-  mutate(te = Treated - Control) 
-
-te %>% 
+pp %>% 
   ggplot(aes(x = te)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    bins = 100)  +
-    labs(title = "Posterior Probability Distribution for Treatment Effect",
-         subtitle = "Causal effects are more variable for indivduals",
+    labs(title = "Posterior Probability Distribution for Treatment Eff  ct",
+         subtitle = "Causal effects are more variable for indvduals",
          x = "Difference in Attitude",
          y = "Probability") +
     scale_y_continuous(labels = scales::percent_format()) +
     theme_classic()
-  
 ```
 
 
 In this case, we are looking at the distribution of the treatment effect for a single individual. This is very different than the *average* treatment effect. In particular, it is much more variable. We are looking at one row in the Preceptor Table. For a single individual, `att_end` can be anywhere from 3 to 15, both under treatment and under control. The causal effect --- the difference between the two potential outcomes can, in theory, be anywhere from -12 to +12. Such extreme values are rare, but not impossible.
 
-The question, however, was interested in the value at the 90th percentile. For this model, that is `r quantile(te$te, prob = 0.9)`. We would not expect a treatment effect of this magnitude to be common, but, at the same time, effects this big and bigger will occur about 10% of the time.
+The question, however, was interested in the value at the 90th percentile. 
+
+```{r}
+quantile(pp$te, prob = 0.9)
+```
+
+We would not expect a treatment effect of this magnitude to be common, but, at the same time, effects this big and bigger will occur about 10% of the time.
 
 ## income ~ age
 
