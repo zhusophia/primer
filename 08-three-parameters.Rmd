@@ -204,7 +204,7 @@ Courage allows us to translate math to code.
 To get posterior distributions for our three parameters, we will again use `stan_glm()`, just as we did in Chapter \@ref(two-parameters). If we take a look at the formula, we can see that it is similar to the equation from before. 
 
 ```{r}
-fit_obj_1 <- stan_glm(age ~ party - 1, 
+fit_1 <- stan_glm(age ~ party - 1, 
                     data = trains, 
                     seed = 17,
                     refresh = 0)
@@ -219,7 +219,7 @@ fit_obj_1 <- stan_glm(age ~ party - 1,
 The resulting output:
 
 ```{r}
-fit_obj_1
+fit_1
 ```
 
 
@@ -230,7 +230,7 @@ fit_obj_1
 <!-- DK: Should we use different parameter names like beta_r? -->
 
 ```{r}
-fit_obj_1 %>% 
+fit_1 %>% 
   as_tibble() %>% 
   select(-sigma) %>% 
   mutate(Democrat = partyDemocrat, Republican = partyRepublican) %>%
@@ -268,8 +268,8 @@ Consider a table which shows a sample of 8 individuals.
 ```{r, echo = FALSE}
 trains %>% 
   select(age, party) %>% 
-  mutate(fitted = fitted(fit_obj_1)) %>% 
-  mutate(residual = residuals(fit_obj_1)) %>% 
+  mutate(fitted = fitted(fit_1)) %>% 
+  mutate(residual = residuals(fit_1)) %>% 
   slice(1:8) %>% 
   gt() %>%
   cols_label(age = md("**Age**"),
@@ -300,14 +300,14 @@ outcome <- ch8 %>%
     labs(x = "Age",
          y = "Count") 
 
-fitted <- tibble(age = fitted(fit_obj_1)) %>% 
+fitted <- tibble(age = fitted(fit_1)) %>% 
   ggplot(aes(age)) +
     geom_bar() +
     labs(x = "Fitted Values",
          y = NULL) +
     scale_x_continuous(limits = c(20, 70)) 
 
-res <- tibble(resids = residuals(fit_obj_1)) %>% 
+res <- tibble(resids = residuals(fit_1)) %>% 
   ggplot(aes(resids)) +
     geom_histogram(bins = 100) +
     labs(x = "Residuals",
@@ -356,7 +356,7 @@ Use `posterior_predict()` to create draws from the posterior for this scenario. 
 `posterior_predict()` takes two arguments: the model for which the simulations should be run, and a tibble indicating for which and how many parameters we want to run these simulations. In this case, the model is the one from Courage and the tibble is the one we just created.
 
 ```{r}
-pp <- posterior_predict(fit_obj_1, newdata = new_obs) %>%
+pp <- posterior_predict(fit_1, newdata = new_obs) %>%
     as_tibble() %>%
     mutate_all(as.numeric)
 
@@ -399,7 +399,7 @@ As before we start by creating a tibble with the desired input. Note that the na
 newobs <- tibble(party = c("Democrat", "Democrat", "Democrat", 
                         "Republican", "Republican","Republican"))
 
-posterior_predict(fit_obj_1, newdata = newobs) %>%
+posterior_predict(fit_1, newdata = newobs) %>%
     as_tibble() %>%
     mutate_all(as.numeric)
 ```
@@ -414,7 +414,7 @@ We have 6 columns: one for each person. `posterior_predict()` does not name the 
 
 
 ```{r}
-pp <- posterior_predict(fit_obj_1, newdata = newobs) %>%
+pp <- posterior_predict(fit_1, newdata = newobs) %>%
     as_tibble() %>%
     mutate_all(as.numeric) %>% 
   
@@ -457,7 +457,7 @@ pp %>%
 
 In words, we would expect the oldest Democrat to be about 22 years older than the youngest Republican, but we would not be too surprised if the oldest Democrat was actually younger than the youngest Republican in a group of 6.
 
-### Addendum
+### Addendum {#addendum}
 
 Instead of parameterizing this model without an intercept, we could have used one. In that case, the math would be:
 
@@ -567,12 +567,12 @@ knitr::include_graphics("other/images/Courage.jpg")
 With Justice satisfied, we gather our Courage and fit the model. Note that, except for the change in variable names, the code is exactly the same as it was above, in our predictive model for age. *Predictive models and causal models use the same math and the same code.* The differences, and they are very important, lie in the interpretation of the results, not in their creation. 
 
 ```{r}
-fit_obj_2 <- stan_glm(att_end ~ treatment - 1, 
+fit_2 <- stan_glm(att_end ~ treatment - 1, 
                       data = trains, 
                       seed = 45,
                       refresh = 0)
 
-fit_obj_2
+fit_2
 ```
 
 `treatmentTreated` corresponds to $\beta_1$. As always, R has, behind the scenes, estimated the entire posterior probability distribution for $\beta_1$. We will graph that distribution in the next section. But the basic print method for these objects can't show the entire distribution, so it gives us summary numbers: the median and the MAD SD. Speaking roughly, we would expect about 95% of the values in the posterior to be within two MAD SD's of the median. In other words, we are 95% confident that the true, but unknowable, average attitude toward immigration among the Treated in the population to be between 9.2 and 10.8. 
@@ -588,7 +588,7 @@ Let's look at the full posteriors for both $\beta_1$ and $\beta_2$.
 <!-- DK: Change Parameter levels to something nice. -->
 
 ```{r}
-fit_obj_2 %>% 
+fit_2 %>% 
   as_tibble() %>% 
   select(-sigma) %>% 
   pivot_longer(cols = treatmentTreated:treatmentControl,
@@ -619,7 +619,7 @@ outcome <- trains %>%
     labs(x = "Attitude toward Immigration",
          y = "Count") 
 
-fitted <- tibble(height = fitted(fit_obj_2)) %>% 
+fitted <- tibble(height = fitted(fit_2)) %>% 
   ggplot(aes(height)) +
     geom_bar(width = 0.2) +
     labs(x = "Fitted Values",
@@ -627,7 +627,7 @@ fitted <- tibble(height = fitted(fit_obj_2)) %>%
     scale_x_continuous(limits = c(3.5, 15),
                        breaks = c(4, 8, 12))
 
-res <- tibble(resids = residuals(fit_obj_2)) %>% 
+res <- tibble(resids = residuals(fit_2)) %>% 
   ggplot(aes(resids)) +
     geom_histogram(bins = 50) +
     labs(x = "Residuals",
@@ -657,7 +657,7 @@ Recall the first question with which we began this section:
 Chapter \@ref(rubin-causal-model) defined the *average treatment effect*. One simple estimator of the average treatment effect is the difference between $\beta_1$ and $\beta_2$. After all, the definition of $\beta_1$ is the average attitude toward immigration, of the population, for anyone, under exposure to the treatment. So, $\beta_1 - \beta_2$ is the average treatment effect for the population, roughly 1.5. However, estimating the posterior probability distribution for this parameter is tricky, unless we make use of the posterior distributions of $\beta_1$ and $\beta_2$. With that information, the problem is simple:
 
 ```{r}
-fit_obj_2 %>% 
+fit_2 %>% 
   as_tibble() %>% 
   mutate(ate = treatmentTreated - treatmentControl) %>% 
   ggplot(aes(x = ate)) +
@@ -678,7 +678,7 @@ We can use `posterior_epred()` to answer this question. Create a tibble and use 
 ```{r}
 newobs <- tibble(treatment = c("Treated", "Control"))
 
-pe <- posterior_epred(fit_obj_2, newobs) %>% 
+pe <- posterior_epred(fit_2, newobs) %>% 
     as_tibble() %>% 
     mutate(ate = `1` - `2`)
 
@@ -715,7 +715,7 @@ Consider the result of `posterior_predict()` for two people, one treated and one
 <!-- DK: This goes a bit fast. Slow down. -->
 
 ```{r}
-pp <- posterior_predict(fit_obj_2, 
+pp <- posterior_predict(fit_2, 
                         newdata = newobs) %>%
     as_tibble() %>%
     mutate_all(as.numeric) %>% 
@@ -752,9 +752,9 @@ We would not expect a treatment effect of this magnitude to be common, but, at t
 
 ## income ~ age
 
-So far, we have only created models in which the predictor variable is discrete, with two possible values. `party` is either "Democrat" or "Republican". `treatment` is either "Treated" or "Control". Often times, however, the predictor variable will be continuous. Fortunately, the exact same approach works in this case. 
+So far, we have only created models in which the predictor variable is discrete, with two possible values. `party` is either "Democrat" or "Republican". `treatment` is either "Treated" or "Control". Often times, however, the predictor variable will be continuous. Fortunately, the exact same approach works in this case. Consider:
 
-* What would you expect the income to be for a random 40 year old?
+* What would you expect the income to be for a 40-year old?
 
 ### Wisdom
 
@@ -784,11 +784,11 @@ Is that data believable? Maybe? One could imagine that income was not recorded e
 knitr::include_graphics("other/images/Justice.jpg")
 ```
 
-The mathematics with a continuous predictor is unchanged from the intercept-including example we discussed above.
+The mathematics for a continuous predictor is unchanged from the intercept-including example we explored in Section \@ref(addendum):
 
 $$ y_i = \beta_0  + \beta_1 age_i + \epsilon_i$$
 
-When comparing two people (persons 1 and 2), one aged one year older than the other, $\beta_1$ is the expected difference in their incomes. The algebra is simple:
+When comparing two people (persons 1 and 2), the first one year older than the second, $\beta_1$ is the expected difference in their incomes. The algebra is simple:
 
 $$ y_1 = \beta_0  + \beta_1 age_1$$
 $$ y_2 = \beta_0  + \beta_1 age_2$$
@@ -806,6 +806,9 @@ $$y_1 - y_2 = \beta_1 (age_1 - age_2)\\
 y_1 - y_2 = \beta_1 (1)\\
 y_1 - y_2 = \beta_1 $$
 
+The algebra demonstrates that $\beta_1$ is the same for all ages. The difference in expected income between two people aged 23 and 24 is the same as the difference between two people aged 80 and 81. Is that plausible? Maybe. *The algebra does not lie.* When we create a model like this, this is the assumption we are making.
+
+Note how careful we are not to imply that increasing age by one year "causes" an increase in income. That is nonsense! *No causation without manipulation.* Since it is impossible to change someone's age, there is only one potential outcome. With only one potential outcome, a causal effect is not defined. 
 
 
 ### Courage
@@ -814,7 +817,7 @@ y_1 - y_2 = \beta_1 $$
 knitr::include_graphics("other/images/Courage.jpg")
 ``` 
 
-The use of `stan_glm()` is the same as above.
+The use of `stan_glm()` is the same as usual.
 
 ```{r}
 fit_3 <- stan_glm(income ~ age, 
@@ -825,10 +828,52 @@ fit_3 <- stan_glm(income ~ age,
 print(fit_3, details = FALSE)
 ```
 
+*When comparing two individuals, one 30 years old and one 40, we expect the older to earn about $9,000 more. But we are far from certain: the 95% confidence interval ranges from -$3,000 to $20,000.*
 
+The above is a good summary of the models. 
 
+* It is brief! No one wants to listen to too much of your prattle. One sentence gives a number of interest. The second sentence provides a confidence interval. 
 
-<!-- DK: Some more discussion! And some plots. Explain what the residuals are. And predicted values! -->
+* It rounds appropriately. No one wants to hear a bunch of decimals. Use sensible units. 
+
+* It does not just blindly repeat numbers in the printed display. A one year difference in age, which is associated with a $900 difference in income, is awkward. (We think.) A decade comparison is more sensible. 
+
+* It starts with "When comparing." That is a great way to start the summary of any non-causal model. Avoid language like "associated with" or "leads to" or "implies" or anything which even hints at a causal claim. 
+
+Consider our usual decomposition of the outcome into two parts: the model and the error term.
+
+```{r, echo = FALSE}
+outcome <- trains %>% 
+  ggplot(aes(income)) +
+    geom_histogram(bins = 50) +
+    labs(x = "Income  in $1,000's",
+         y = "Count") +
+    scale_x_continuous(labels = scales::dollar_format(scale = 1/1000))
+
+fitted <- tibble(fits = fitted(fit_3)) %>% 
+  ggplot(aes(fits)) +
+    geom_histogram(bins = 50) +
+    labs(x = "Fitted Values in $1,000's",
+         y = NULL) +
+    scale_x_continuous(labels = scales::dollar_format(scale = 1/1000))
+
+res <- tibble(resids = residuals(fit_3)) %>% 
+  ggplot(aes(resids)) +
+    geom_histogram(bins = 50) +
+    labs(x = "Residuals in $1,000's",
+         y = NULL) +
+    scale_x_continuous(labels = scales::dollar_format(scale = 1/1000))
+  
+
+outcome + fitted + res +
+  plot_annotation(title = "Decomposition of Income into Fitted Values and Residuals")
+```
+
+There are scores of different fitted values. Indeed, there are a greater number of different fitted values than there are different outcome values! This is often true for models which have continuous predictor variables, we have here with `age`.
+
+<!-- DK: Next step: A scatter plot with the fitted line drawn through it and a residual highlighted. -->
+
+<!-- DK: Some more discussion! And some plots. Explain what the residuals are. And predicted values! Talk about sigma. More could be done. -->
 
 
 ### Temperance
@@ -869,7 +914,7 @@ pe %>%
     theme_classic()
 ```
 
-<!-- DK: Discussion! -->
+<!-- DK: More discussion! -->
 
 
 ## liberal ~ income
@@ -901,9 +946,22 @@ print(fit_4, digits = 3)
 
 ## Summary
 
-<!-- Need to highlight the key commands. -->
 
 In this chapter, we explored relationships between different variables in the `trains` data set. We built three predictive models and one causal model.
 
-Similar to previous chapters, our first task is to use *Wisdom* . We judge how relevant our data is to the questions we ask, using ethics to guide our decision. Could income data from 2012 really be suitable for making predictions today? Probably?  *Justice* is necessary to decide the best way to represent the models we make. We use  *Courage* to translate our models into code. Our goal is to understand, generate posterior distributions, and interpret their meaning. Temperance leads us to the final stage. We remind ourselves that there are so many unknown factors that affect our data. Our models are never as good as we hope them to be. We always use caution in applying our models to the real world. 
+Similar to previous chapters, our first task is to use *Wisdom* . We judge how relevant our data is to the questions we ask. Is it reasonable to consider the data we have (e.g., income and age data from Boston commuters in 2012) as being drawn from the same population as the data we want to have (e.g., income and age data from today for the entire US)? Probably?  
+
+*Justice* is necessary to decide the best way to represent the models we make. A little math won't kill you. We use  *Courage* to translate our models into code. Our goal is to understand, generate posterior distributions for the parameters, and interpret their meaning. *Temperance* leads us to the final stage, using our models to answer our questions. The key commands:
+
+* Create a model with `stan_glm()`.
+
+```{r, eval = FALSE}
+
+```
+
+* Use `posterior_epred()` to estimate expected values. The **e** in **e**pred stands for **e**xpected.
+
+* Use `posterior_predict()` to make forecasts for individuals. The variable in predictions is always greater than the variability in expectations because predictions can't pretend than $\epsilon_i$ is always zero.
+
+Once we have draws from a posterior distribution for our outcome variable --- whether that be an expectation or a prediction --- we can manipulate those draws to answer our question. 
 
