@@ -55,11 +55,11 @@ fit_1_c <- stan_glm(formula = income ~ c_age,
 print(fit_1_c, detail = FALSE)
 ```
 
-The intercept, `r round(coef(fit_1_c)["(Intercept)"], 0)`, is the expected income for someone with `age_c = 0`, i.e., someone of an average age in the data, which is around `r round(mean(trains$age), 0)`. 
+The intercept, `r scales::comma(round(coef(fit_1_c)["(Intercept)"], 0))`, is the expected income for someone with `age_c = 0`, i.e., someone of an average age in the data, which is around `r round(mean(trains$age), 0)`. 
 
 ### Scaling
 
-Centering --- changing a vector via addition/subtraction --- often makes the intercept easier to interpret. Scaling --- changing a vector via multiplication/division --- often makes it easier to interpret coefficients. The most common scaling method is to divide the vector by its standard deviation.
+Centering --- changing a variable via addition/subtraction --- often makes the intercept easier to interpret. Scaling --- changing a variable via multiplication/division --- often makes it easier to interpret coefficients. The most common scaling method is to divide the variable by its standard deviation.
 
 ```{r}
 trains_3 <- trains %>% 
@@ -75,14 +75,14 @@ print(fit_1_s, detail = FALSE)
 
 `s_age` is age **s**caled by its own standard deviation. A change in one unit of `s_age` is the same as a change in one standard deviation of the `age`, which is about `r round(sd(trains$age))`. The interpretation of $\beta_1$ is now:
 
-*When comparing two people, one about 1 standard deviation worth of years older than the other, we expect the older person to earn about `r scales::comma(round(coef(fit_1_s)["age_s"], -3))` more.*
+*When comparing two people, one about 1 standard deviation worth of years older than the other, we expect the older person to earn about `r scales::comma(round(coef(fit_1_s)["s_age"], -3))` more.*
 
 But, because we scaled without centering, the intercept is now back to the (nonsensical) meaning of the expected income for people of age 0. 
 
 
 ### *z*-scores
 
-The most common transformation applies both centering and scaling. The base R function `scale()` subtracts the mean and divides by the standard deviation. A variable so transformed is a "*z*-score, meaning a vector with a mean of zero and a standard deviation of one. Using *z*-scores makes interpretation easier, especially when we seek to compare the importance of different predictors.
+The most common transformation applies both centering and scaling. The base R function `scale()` subtracts the mean and divides by the standard deviation. A variable so transformed is a "*z*-score," meaning a variable with a mean of zero and a standard deviation of one. Using *z*-scores makes interpretation easier, especially when we seek to compare the importance of different predictors.
 
 ```{r}
 trains_4 <- trains %>% 
@@ -98,11 +98,11 @@ print(fit_1_z, detail = FALSE)
 
 The two parameters are easy to interpret after this transformation.
 
-*The expected income of someone of average age, which is about `r round(mean(trains$age))` in this study, is about `r round(coef(fit_1_z)["(Intercept)"], 0)` dollars.*
+*The expected income of someone of average age, which is about `r round(mean(trains$age))` in this study, is about `r scales::comma(round(coef(fit_1_z)["(Intercept)"], -3))` dollars.*
 
-*When comparing two individuals who differ in age by one standard deviation, which is about `r round(sd(trains$age))` in this study, the older person is expected to earn about `r `scales::comma(round(coef(fit_1_z)["age_z"], -3))` more than the younger.*
+*When comparing two individuals who differ in age by one standard deviation, which is about `r round(sd(trains$age))` years in this study, the older person is expected to earn about `r scales::comma(round(coef(fit_1_z)["z_age"], -3))` more than the younger.*
 
-Note that, when using *z*-scores, we would often phrase this comparison in terms of "sigmas." One person is "one sigma" older than another person means that they are one standard deviation older. This is simple enough, once you get used to it, but also confusing since we already using the word "sigma" to mean $\sigma$, the standard deviation of $\epsilon_i$. Alas, *language is something we deal with rather than control.* You will hear the same word "sigma" applied to both concepts, even in the same sentence. Determine meaning by context.
+Note that, when using *z*-scores, we would often phrase this comparison in terms of "sigmas." One person is "one sigma" older than another person means that they are one standard deviation older. This is simple enough, once you get used to it, but also confusing since we are already using the word "sigma" to mean $\sigma$, the standard deviation of $\epsilon_i$. Alas, *language is something we deal with rather than control.* You will hear the same word "sigma" applied to both concepts, even in the same sentence. Determine meaning by context.
 
 ### Taking logs
 
@@ -129,7 +129,7 @@ nhanes_1 <- stan_glm(height ~ age,
 no_na_nhanes %>% 
   ggplot(aes(x = age, y = height)) +
     geom_point(alpha = 0.1) +
-    geom_line(aes(y = predict(nhanes_1)), 
+    geom_line(aes(y = fitted(nhanes_1)), 
               color = "red") +
     labs(title = "Age and Height",
          subtitle = "Children are shorter, but a linear fit is poor",
@@ -152,7 +152,7 @@ nhanes_2 <- stan_glm(height ~ age + I(age^2),
 no_na_nhanes %>% 
   ggplot(aes(x = age, y = height)) +
     geom_point(alpha = 0.1) +
-    geom_line(aes(y = predict(nhanes_2)), 
+    geom_line(aes(y = fitted(nhanes_2)), 
               color = "red") +
     labs(title = "Age and Height",
          subtitle = "Quadratic fit is much better, but still poor",
@@ -172,7 +172,7 @@ nhanes_3 <- stan_glm(height ~ I(ifelse(age > 18, 18, age)),
 no_na_nhanes %>% 
   ggplot(aes(x = age, y = height)) +
     geom_point(alpha = 0.1) +
-    geom_line(aes(y = predict(nhanes_2)), 
+    geom_line(aes(y = fitted(nhanes_2)), 
               color = "red") +
     labs(title = "Age and Height",
          subtitle = "Domain knowledge makes for better models",
@@ -244,7 +244,7 @@ The most obvious criteria for comparing models is the accuracy of the prediction
 
 ```{r}
 trains %>% 
-  mutate(pred_liberal = predict(fit_liberal)) %>% 
+  mutate(pred_liberal = fitted(fit_liberal)) %>% 
   ggplot(aes(x = pred_liberal, y = att_end)) +
     geom_jitter(width = 0.05, height = 0.2, alpha = 0.5) +
     labs(title = "Modeling Attitude Toward Immigration",
@@ -261,7 +261,7 @@ Consider our second model, using `att_start` to forecast `att_end`.
 
 ```{r}
 trains %>% 
-  mutate(pred_liberal = predict(fit_att_start)) %>% 
+  mutate(pred_liberal = fitted(fit_att_start)) %>% 
   ggplot(aes(x = pred_liberal, y = att_end)) +
     geom_jitter(width = 0.05, height = 0.2, alpha = 0.5) +
     labs(title = "Modeling Attitude Toward Immigration",
@@ -279,10 +279,10 @@ Rather than looking at individual cases, we need to look at the errors for all t
 ```{r}
 trains %>% 
   select(att_end, att_start, liberal) %>% 
-  mutate(pred_lib = predict(fit_liberal)) %>% 
-  mutate(resid_lib = predict(fit_liberal) - att_end) %>% 
-  mutate(pred_as = predict(fit_att_start)) %>% 
-  mutate(resid_as = predict(fit_att_start) - att_end)
+  mutate(pred_lib = fitted(fit_liberal)) %>% 
+  mutate(resid_lib = fitted(fit_liberal) - att_end) %>% 
+  mutate(pred_as = fitted(fit_att_start)) %>% 
+  mutate(resid_as = fitted(fit_att_start) - att_end)
 ```
 
 Let's look at the square root of the average squared error. 
@@ -290,8 +290,8 @@ Let's look at the square root of the average squared error.
 ```{r}
 trains %>% 
   select(att_end, att_start, liberal) %>% 
-  mutate(lib_err = (predict(fit_liberal) - att_end)^2) %>% 
-  mutate(as_err = (predict(fit_att_start) - att_end)^2) %>% 
+  mutate(lib_err = (fitted(fit_liberal) - att_end)^2) %>% 
+  mutate(as_err = (fitted(fit_att_start) - att_end)^2) %>% 
   summarize(lib_sigma = sqrt(mean(lib_err)),
             as_sigma = sqrt(mean(as_err))) 
 ```
