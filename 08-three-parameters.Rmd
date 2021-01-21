@@ -752,7 +752,7 @@ We would not expect a treatment effect of this magnitude to be common, but, at t
 
 ## income ~ age
 
-So far, we have only created models in which the predictor variable is discrete, with only two possible values. `party` is either "Democrat" or "Republican". `treatment` is either "Treated" or "Control". Often times, however, the predictor variable will be continuous. Fortunately, the exact same approach works in this case as well. 
+So far, we have only created models in which the predictor variable is discrete, with two possible values. `party` is either "Democrat" or "Republican". `treatment` is either "Treated" or "Control". Often times, however, the predictor variable will be continuous. Fortunately, the exact same approach works in this case. 
 
 * What would you expect the income to be for a random 40 year old?
 
@@ -775,7 +775,7 @@ ch8 %>%
   scale_y_continuous(labels = scales::dollar_format(accuracy = 1))
 ```
 
-Is that data believable? Maybe? One could imagine that income was not recorded exactly and that, therefore, it is not surprising that many people had exactly the same income. Rounding makes different numbers the same, after all. But what about the (almost) complete lack of people reporting income between \$150,000 and \$250,000. In a real data science project, this puzzle would require further investigation. For now, we ignore the issue and blithely press on.
+Is that data believable? Maybe? One could imagine that income was not recorded exactly and that, therefore, it is not surprising that many people had exactly the same income. Rounding makes different numbers the same, after all. But what about the (almost) complete lack of people reporting income between \$150,000 and \$250,000? In a real data science project, this puzzle would require further investigation. For now, we ignore the issue and blithely press on.
 
 
 ### Justice
@@ -784,11 +784,11 @@ Is that data believable? Maybe? One could imagine that income was not recorded e
 knitr::include_graphics("other/images/Justice.jpg")
 ```
 
-The mathematics with continuous predictor is unchanges from the intercept-including example we discussed above.
+The mathematics with a continuous predictor is unchanged from the intercept-including example we discussed above.
 
 $$ y_i = \beta_0  + \beta_1 age_i + \epsilon_i$$
 
-When comparing two people (persons 1 and 2), one aged one year older than the other, $\beta_1$ the expected difference in their incomes. The algebra is simple:
+When comparing two people (persons 1 and 2), one aged one year older than the other, $\beta_1$ is the expected difference in their incomes. The algebra is simple:
 
 $$ y_1 = \beta_0  + \beta_1 age_1$$
 $$ y_2 = \beta_0  + \beta_1 age_2$$
@@ -797,16 +797,14 @@ $$ y_1 - y_2 = \beta_0  + \beta_1 age_1 - \beta_0 - \beta_1 age_2\\
 
 y_1 - y_2 = \beta_1 age_1 - \beta_1 age_2\\
 
-y_1 - y_2 = \beta_1 (age_1 - age_2)\\
+y_1 - y_2 = \beta_1 (age_1 - age_2)$$
 
-$$
 So, if person 1 is one year older than person 2, we have:
 
 
 $$y_1 - y_2 = \beta_1 (age_1 - age_2)\\
 y_1 - y_2 = \beta_1 (1)\\
-y_1 - y_2 = \beta_1 \\
-$$
+y_1 - y_2 = \beta_1 $$
 
 
 
@@ -827,6 +825,9 @@ fit_3 <- stan_glm(income ~ age,
 print(fit_3, details = FALSE)
 ```
 
+
+
+
 <!-- DK: Some more discussion! And some plots. Explain what the residuals are. And predicted values! -->
 
 
@@ -846,9 +847,15 @@ Given that we are looking for an expected value, we use `posterior_epred()`.
 newobs <- tibble(age = 40)
 
 pe <- posterior_epred(fit_3, newdata = newobs) %>% 
-  as_tibble() %>% 
-  mutate_all(as.numeric)
+  as_tibble() 
 
+pe
+```
+
+Plotting is the same as always.
+
+
+```{r}
 pe %>% 
   ggplot(aes(x = `1`)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
@@ -862,7 +869,7 @@ pe %>%
     theme_classic()
 ```
 
-<!-- DK: Discussion. -->
+<!-- DK: Discussion! -->
 
 
 ## liberal ~ income
@@ -872,7 +879,7 @@ So far in this chapter, we have only considered *continuous* outcome variables. 
 `liberal`, however, only takes on two values: TRUE and FALSE. In order to model it, we must use the `binomial` family. 
 
 
-But first, following wisdom, let's look at our data.
+But first, following *Wisdom*, let's look at our data.
 
 
 ```{r}
@@ -896,7 +903,7 @@ print(fit_4, digits = 3)
 
 <!-- Need to highlight the key commands. -->
 
-In this chapter, we explored relationships between different variables in the `trains` data set. We built a predictive model and a causal model.
+In this chapter, we explored relationships between different variables in the `trains` data set. We built three predictive models and one causal model.
 
-Similar to previous chapters, our first task is to use _Wisdom_ . We judge how relevant our data is to the questions we ask, using ethics to guide our decision. Could income data from 2012 really be suitable for making predictions today? Probably?  _Justice_ is necessary to decide the best way to represent the models we make. We use  _Courage_ to translate our models into code. Our goal is to understand, generate posterior distributions, and interpret their meaning. Temperance leads us to the final stage. We remind ourselves that there are so many unknown factors that affect our data. Our models are never as good as we hope them to be. We always use caution in applying our models to the real world. 
+Similar to previous chapters, our first task is to use *Wisdom* . We judge how relevant our data is to the questions we ask, using ethics to guide our decision. Could income data from 2012 really be suitable for making predictions today? Probably?  *Justice* is necessary to decide the best way to represent the models we make. We use  *Courage* to translate our models into code. Our goal is to understand, generate posterior distributions, and interpret their meaning. Temperance leads us to the final stage. We remind ourselves that there are so many unknown factors that affect our data. Our models are never as good as we hope them to be. We always use caution in applying our models to the real world. 
 
