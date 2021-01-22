@@ -117,13 +117,13 @@
 ## Auxiliary parameter(s):
 ##       Median  MAD_SD 
 ## sigma 74273.6  4882.0</code></pre>
-<p>The intercept, 1.42^{5}, is the expected income for someone with <code>age_c = 0</code>, i.e., someone of an average age in the data, which is around 42.</p>
+<p>The intercept, 141,804, is the expected income for someone with <code>age_c = 0</code>, i.e., someone of an average age in the data, which is around 42.</p>
 </div>
 <div id="scaling" class="section level3" number="9.1.2">
 <h3>
 <span class="header-section-number">9.1.2</span> Scaling<a class="anchor" aria-label="anchor" href="#scaling"><i class="fas fa-link"></i></a>
 </h3>
-<p>Centering — changing a vector via addition/subtraction — often makes the intercept easier to interpret. Scaling — changing a vector via multiplication/division — often makes it easier to interpret coefficients. The most common scaling method is to divide the vector by its standard deviation.</p>
+<p>Centering — changing a variable via addition/subtraction — often makes the intercept easier to interpret. Scaling — changing a variable via multiplication/division — often makes it easier to interpret coefficients. The most common scaling method is to divide the variable by its standard deviation.</p>
 <div class="sourceCode" id="cb723"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains_3</span> <span class="op">&lt;-</span> <span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>s_age <span class="op">=</span> <span class="va">age</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html">sd</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span><span class="op">)</span>
@@ -142,14 +142,14 @@
 ##       Median  MAD_SD 
 ## sigma 74124.8  4959.5</code></pre>
 <p><code>s_age</code> is age <strong>s</strong>caled by its own standard deviation. A change in one unit of <code>s_age</code> is the same as a change in one standard deviation of the <code>age</code>, which is about 12. The interpretation of <span class="math inline">\(\beta_1\)</span> is now:</p>
-<p><em>When comparing two people, one about 1 standard deviation worth of years older than the other, we expect the older person to earn about NA more.</em></p>
+<p><em>When comparing two people, one about 1 standard deviation worth of years older than the other, we expect the older person to earn about 11,000 more.</em></p>
 <p>But, because we scaled without centering, the intercept is now back to the (nonsensical) meaning of the expected income for people of age 0.</p>
 </div>
 <div id="z-scores" class="section level3" number="9.1.3">
 <h3>
 <span class="header-section-number">9.1.3</span> <em>z</em>-scores<a class="anchor" aria-label="anchor" href="#z-scores"><i class="fas fa-link"></i></a>
 </h3>
-<p>The most common transformation applies both centering and scaling. The base R function <code><a href="https://rdrr.io/r/base/scale.html">scale()</a></code> subtracts the mean and divides by the standard deviation. A variable so transformed is a "<em>z</em>-score, meaning a vector with a mean of zero and a standard deviation of one. Using <em>z</em>-scores makes interpretation easier, especially when we seek to compare the importance of different predictors.</p>
+<p>The most common transformation applies both centering and scaling. The base R function <code><a href="https://rdrr.io/r/base/scale.html">scale()</a></code> subtracts the mean and divides by the standard deviation. A variable so transformed is a “<em>z</em>-score,” meaning a variable with a mean of zero and a standard deviation of one. Using <em>z</em>-scores makes interpretation easier, especially when we seek to compare the importance of different predictors.</p>
 <div class="sourceCode" id="cb725"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains_4</span> <span class="op">&lt;-</span> <span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>z_age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/scale.html">scale</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span><span class="op">)</span>
@@ -168,9 +168,9 @@
 ##       Median  MAD_SD 
 ## sigma 74300.4  5019.0</code></pre>
 <p>The two parameters are easy to interpret after this transformation.</p>
-<p><em>The expected income of someone of average age, which is about 42 in this study, is about 1.42^{5} dollars.</em></p>
-<p><em>When comparing two individuals who differ in age by one standard deviation, which is about 12 in this study, the older person is expected to earn about <code>r</code>scales::comma(round(coef(fit_1_z)[“age_z”], -3))` more than the younger.</em></p>
-<p>Note that, when using <em>z</em>-scores, we would often phrase this comparison in terms of “sigmas.” One person is “one sigma” older than another person means that they are one standard deviation older. This is simple enough, once you get used to it, but also confusing since we already using the word “sigma” to mean <span class="math inline">\(\sigma\)</span>, the standard deviation of <span class="math inline">\(\epsilon_i\)</span>. Alas, <em>language is something we deal with rather than control.</em> You will hear the same word “sigma” applied to both concepts, even in the same sentence. Determine meaning by context.</p>
+<p><em>The expected income of someone of average age, which is about 42 in this study, is about 142,000 dollars.</em></p>
+<p><em>When comparing two individuals who differ in age by one standard deviation, which is about 12 years in this study, the older person is expected to earn about 11,000 more than the younger.</em></p>
+<p>Note that, when using <em>z</em>-scores, we would often phrase this comparison in terms of “sigmas.” One person is “one sigma” older than another person means that they are one standard deviation older. This is simple enough, once you get used to it, but also confusing since we are already using the word “sigma” to mean <span class="math inline">\(\sigma\)</span>, the standard deviation of <span class="math inline">\(\epsilon_i\)</span>. Alas, <em>language is something we deal with rather than control.</em> You will hear the same word “sigma” applied to both concepts, even in the same sentence. Determine meaning by context.</p>
 </div>
 <div id="taking-logs" class="section level3" number="9.1.4">
 <h3>
@@ -197,14 +197,14 @@
 <span class="va">no_na_nhanes</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">age</span>, y <span class="op">=</span> <span class="va">height</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">geom_point</span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu">geom_line</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">nhanes_1</span><span class="op">)</span><span class="op">)</span>, 
+    <span class="fu">geom_line</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html">fitted</a></span><span class="op">(</span><span class="va">nhanes_1</span><span class="op">)</span><span class="op">)</span>, 
               color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Age and Height"</span>,
          subtitle <span class="op">=</span> <span class="st">"Children are shorter, but a linear fit is poor"</span>,
          x <span class="op">=</span> <span class="st">"Age"</span>,
          y <span class="op">=</span> <span class="st">"Height (cm)"</span>,
          caption <span class="op">=</span> <span class="st">"Data source: NHANES"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-578-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-577-1.png" width="100%"></div>
 <p>That is not a very good model, obviously.</p>
 <p>Adding a quadratic term makes it better. (Note the need for <code><a href="https://rdrr.io/r/base/AsIs.html">I()</a></code> in creating the squared term within the <code>formula</code> argument.)</p>
 <div class="sourceCode" id="cb729"><pre class="downlit sourceCode r">
@@ -216,14 +216,14 @@
 <span class="va">no_na_nhanes</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">age</span>, y <span class="op">=</span> <span class="va">height</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">geom_point</span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu">geom_line</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">nhanes_2</span><span class="op">)</span><span class="op">)</span>, 
+    <span class="fu">geom_line</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html">fitted</a></span><span class="op">(</span><span class="va">nhanes_2</span><span class="op">)</span><span class="op">)</span>, 
               color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Age and Height"</span>,
          subtitle <span class="op">=</span> <span class="st">"Quadratic fit is much better, but still poor"</span>,
          x <span class="op">=</span> <span class="st">"Age"</span>,
          y <span class="op">=</span> <span class="st">"Height (cm)"</span>,
          caption <span class="op">=</span> <span class="st">"Data source: NHANES"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-579-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-578-1.png" width="100%"></div>
 <p>Still, we have not made use of our background knowledge in creating these variables. We know that people don’t get any taller after age 18 or so. Let’s create variables which capture that break.</p>
 <div class="sourceCode" id="cb730"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">nhanes_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span><span class="va">height</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html">I</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">age</span> <span class="op">&gt;</span> <span class="fl">18</span>, <span class="fl">18</span>, <span class="va">age</span><span class="op">)</span><span class="op">)</span>,
@@ -234,14 +234,14 @@
 <span class="va">no_na_nhanes</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">age</span>, y <span class="op">=</span> <span class="va">height</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">geom_point</span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu">geom_line</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">nhanes_2</span><span class="op">)</span><span class="op">)</span>, 
+    <span class="fu">geom_line</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html">fitted</a></span><span class="op">(</span><span class="va">nhanes_3</span><span class="op">)</span><span class="op">)</span>, 
               color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Age and Height"</span>,
          subtitle <span class="op">=</span> <span class="st">"Domain knowledge makes for better models"</span>,
          x <span class="op">=</span> <span class="st">"Age"</span>,
          y <span class="op">=</span> <span class="st">"Height (cm)"</span>,
          caption <span class="op">=</span> <span class="st">"Data source: NHANES"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-580-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-579-1.png" width="100%"></div>
 <p>The point is that we should not take the variables we receive as <em>given</em>. We are the captains of our souls. We transform variables as needed.</p>
 </div>
 <div id="if-parameters-are-unicorns-why-bother-with-transformations" class="section level3" number="9.1.6">
@@ -309,36 +309,36 @@
 <p>The most obvious criteria for comparing models is the accuracy of the predictions. For example, consider the use of <code>liberal</code> to predict <code>att_end</code>.</p>
 <div class="sourceCode" id="cb735"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>pred_liberal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">fit_liberal</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>pred_liberal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html">fitted</a></span><span class="op">(</span><span class="va">fit_liberal</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">pred_liberal</span>, y <span class="op">=</span> <span class="va">att_end</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">geom_jitter</span><span class="op">(</span>width <span class="op">=</span> <span class="fl">0.05</span>, height <span class="op">=</span> <span class="fl">0.2</span>, alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Modeling Attitude Toward Immigration"</span>,
          subtitle <span class="op">=</span> <span class="st">"Liberals are less conservative"</span>,
          x <span class="op">=</span> <span class="st">"Predicted Attitude"</span>,
          y <span class="op">=</span> <span class="st">"True Attitude"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-583-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-582-1.png" width="100%"></div>
 <!-- DK: Could put this discussion in fig.cap. Could add some details to the plots to indicate the points that I am talking about. Should create an animation, which brings in new point, forecasts it, and then measures how wrong the model was. -->
-<p>Because there are only two possible values for <code>liberal</code> — TRUE and FALSE — there are only two predictions which this model will make: about 10 for <code>liberal == FALSE</code> and about 8 for <code>liberal == TRUE</code>. (The points in the above plot are jittered.) For some individuals, these are perfect predictions. For others, they are poor predictions. (Note the two individuals who are <code>liberal == TRUE</code>, and who the model thinks will have <code>att_end == 8</code>, but who have <code>att_end == 15</code>. The mode got them both very, very wrong.)</p>
+<p>Because there are only two possible values for <code>liberal</code> — TRUE and FALSE — there are only two predictions which this model will make: about 10 for <code>liberal == FALSE</code> and about 8 for <code>liberal == TRUE</code>. (The points in the above plot are jittered.) For some individuals, these are perfect predictions. For others, they are poor predictions. (Note the two individuals who are <code>liberal == TRUE</code>, and who the model thinks will have <code>att_end == 8</code>, but who have <code>att_end == 15</code>. The model got them both very, very wrong.)</p>
 <p>Consider our second model, using <code>att_start</code> to forecast <code>att_end</code>.</p>
 <div class="sourceCode" id="cb736"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>pred_liberal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">fit_att_start</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>pred_liberal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html">fitted</a></span><span class="op">(</span><span class="va">fit_att_start</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">pred_liberal</span>, y <span class="op">=</span> <span class="va">att_end</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">geom_jitter</span><span class="op">(</span>width <span class="op">=</span> <span class="fl">0.05</span>, height <span class="op">=</span> <span class="fl">0.2</span>, alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Modeling Attitude Toward Immigration"</span>,
          subtitle <span class="op">=</span> <span class="st">"Survey responses are somewhat consistent"</span>,
          x <span class="op">=</span> <span class="st">"Predicted Attitude"</span>,
          y <span class="op">=</span> <span class="st">"True Attitude"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-584-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-583-1.png" width="100%"></div>
 <p>Because <code>att_end</code> takes on 13 unique values, the model makes 13 unique predictions. Some of those predictions are perfect! But others are very wrong. Note the individual with a predicted <code>att_end</code> of around 9 but with an actual value of <code>15</code>. That is a big miss!</p>
 <p>Rather than looking at individual cases, we need to look at the errors for all the predictions. Fortunately, a prediction error is the same thing as a residual, which is easy enough to calculate.</p>
 <div class="sourceCode" id="cb737"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">att_end</span>, <span class="va">att_start</span>, <span class="va">liberal</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>pred_lib <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">fit_liberal</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>resid_lib <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">fit_liberal</span><span class="op">)</span> <span class="op">-</span> <span class="va">att_end</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>pred_as <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">fit_att_start</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>resid_as <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">fit_att_start</span><span class="op">)</span> <span class="op">-</span> <span class="va">att_end</span><span class="op">)</span></code></pre></div>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>pred_lib <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html">fitted</a></span><span class="op">(</span><span class="va">fit_liberal</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>resid_lib <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html">fitted</a></span><span class="op">(</span><span class="va">fit_liberal</span><span class="op">)</span> <span class="op">-</span> <span class="va">att_end</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>pred_as <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html">fitted</a></span><span class="op">(</span><span class="va">fit_att_start</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>resid_as <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html">fitted</a></span><span class="op">(</span><span class="va">fit_att_start</span><span class="op">)</span> <span class="op">-</span> <span class="va">att_end</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 115 x 7
 ##    att_end att_start liberal pred_lib resid_lib pred_as resid_as
 ##      &lt;dbl&gt;     &lt;dbl&gt; &lt;lgl&gt;      &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;
@@ -357,8 +357,8 @@
 <div class="sourceCode" id="cb739"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">att_end</span>, <span class="va">att_start</span>, <span class="va">liberal</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>lib_err <span class="op">=</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">fit_liberal</span><span class="op">)</span> <span class="op">-</span> <span class="va">att_end</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>as_err <span class="op">=</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">fit_att_start</span><span class="op">)</span> <span class="op">-</span> <span class="va">att_end</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>lib_err <span class="op">=</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html">fitted</a></span><span class="op">(</span><span class="va">fit_liberal</span><span class="op">)</span> <span class="op">-</span> <span class="va">att_end</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>as_err <span class="op">=</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html">fitted</a></span><span class="op">(</span><span class="va">fit_att_start</span><span class="op">)</span> <span class="op">-</span> <span class="va">att_end</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">summarize</span><span class="op">(</span>lib_sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">lib_err</span><span class="op">)</span><span class="op">)</span>,
             as_sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">as_err</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> </code></pre></div>
 <pre><code>## # A tibble: 1 x 2
@@ -375,12 +375,12 @@
 <span class="header-section-number">9.4.2</span> Beware overfitting<a class="anchor" aria-label="anchor" href="#beware-overfitting"><i class="fas fa-link"></i></a>
 </h3>
 <p>One of the biggest dangers in data science is <em>overfitting</em>, using a model with too many parameters which fits the data we have too well and, therefore, works poorly on data we have yet to see. Consider a simple example with 10 data points.</p>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-587-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-586-1.png" width="100%"></div>
 <p>What happens when we fit a model with one predictor?</p>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-588-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-587-1.png" width="100%"></div>
 <p>That is a reasonable model. It does not fit the data particularly well, but we certainly believe that higher values of <code>x</code> are associated with higher values of <code>y</code>. A linear fit is not unreasonable.</p>
 <p>But we can also use some of the lessons from above and try a quadratic fit by adding <span class="math inline">\(x^2\)</span> as a predictor.</p>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-589-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-588-1.png" width="100%"></div>
 <p>Is this a better model? Maybe?</p>
 <p>But why stop at adding <span class="math inline">\(x^2\)</span> to the regression? Why not add <span class="math inline">\(x^3\)</span>, <span class="math inline">\(x^4\)</span> and all the way to <span class="math inline">\(x^9\)</span>? When we do so, the fit is much better.</p>
 <div class="sourceCode" id="cb741"><pre class="downlit sourceCode r">
@@ -399,7 +399,7 @@
     <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"`y` as a 9-Degree Polynomial Function of `x`"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_x_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">10</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_y_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">10</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> </code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-590-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-589-1.png" width="100%"></div>
 <p><em>If the only criteria we cared about was how well the model predicts using the data on which the parameters were estimated, then a model with more parameters will always be better.</em> But that is not what truly matters. What matters is how well the model works on data which was not used to create the model.</p>
 </div>
 <div id="better-models-make-better-predictions-on-new-data" class="section level3" number="9.4.3">
