@@ -8,7 +8,7 @@
 
 # Packages used by almost all chapters, and which we don't choose to show to
 # students since the code they see does not make use of them. Should ggthemes be
-# here?
+# here? Do we need gifski here?
 
 library(knitr)
 library(scales)
