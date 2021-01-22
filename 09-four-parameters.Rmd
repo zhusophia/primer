@@ -10,7 +10,7 @@
 In our haste to make progress --- to get all the way through the process of building, interpreting and using models --- we have given short shrift to some of the messy details of model building and evaluation. This chapter fills in those lacunae. We will also introduce models with four parameters. 
 
 
-## Transforming predictor variables
+## Transforming variables
 
 It is often convenient to transform a predictor variable. 
 
@@ -106,7 +106,43 @@ Note that, when using *z*-scores, we would often phrase this comparison in terms
 
 ### Taking logs
 
-<!-- * taking logs. When? Why? Doing so on dependent variable is a much bigger deal than doing it on independent variables since the former changes he very essence of the model. You can't really (?) compare two different models if one has taken logs of Y and one has not. -->
+It is often helpful to take the log of predictor variables, especially in cases in which their distribution is skewed. You should generally only take the log of variables for which all the values are strictly positive. The log of a negative number is not defined. Consider the number of registered voters (`rv13`) at each of the polling stations in `kenya`. 
+
+```{r}
+x <- kenya %>% 
+  filter(rv13 > 0)
+
+rv_p <- x %>% 
+  ggplot(aes(rv13)) + 
+    geom_histogram(bins = 100) +
+    labs(x = "Registered Voters",
+         y = NULL) 
+
+log_rv_p <- x %>% 
+  ggplot(aes(log(rv13))) + 
+    geom_histogram(bins = 100) +
+    labs(x = "Log of Registered Voters",
+         y = NULL) +
+    expand_limits(y = c(0, 175))
+
+rv_p + log_rv_p +
+  plot_annotation(title = 'Registered Votes In Kenya Communities',
+                  subtitle = "Taking logs helps us deal with outliers")
+```
+
+Most experienced data scientists would use the log of `rv13` rather than the raw value. Comments:
+
+* We do not know the "true" model. Who is to say that a model using the raw value is right or wrong?
+
+* Check whether or not this choice meaningfully effects the answer to your question. Much of the time, it won't. That is, our inferences are often fairly "robust" to small changes in the model. If you get the same answer with `rv13` as from `log_rv13`, then no one cares which you use.
+
+* Follow the conventions in your field. If everyone does X, then you should probably do X, unless you have a good reason not to. If you do have such a reason, explain it prominently.
+
+* Most professionals, when presented with data distributed like `rv13` would take the log. Professionals hate (irrationally?) outliers. Any transformation which makes a distribution look more normal is generally considered a good idea.
+
+Many of these suggestions apply to every aspect of the modeling process.
+
+<!-- Split out general advice to elsewhere. -->
 
 ### Adding transformed terms
 
@@ -185,25 +221,39 @@ The point is that we should not take the variables we receive as *given*. We are
 
 
 
-### If parameters are unicorns, why bother with transformations?
+<!-- ### If parameters are unicorns, why bother with transformations? -->
 
 <!-- * standardizing variables. Key advantage is to make the coefficients easier to interpret. Even though the "right" thing to do in looking at models is to use posterior_* to look at model predictions, this takes some time. It is very handy, first pass, to look at all the coefficients and get a sense of which ones are "interesting." Then, focus on those when making newobs tibbles. -->
 
-## Transforming the outcome variable
+### Transforming the outcome variable
 
-Transforming predictor variables is generally uncontroversial. It does not matter much. Change most continuous predictor variables to $z$-scores and you won't go far wrong. Or keep them in their original form, and take care with your interpretations. It's all good.
+Transforming predictor variables is uncontroversial. It does not matter much. Change most continuous predictor variables to $z$-scores and you won't go far wrong. Or keep them in their original form, and take care with your interpretations. It's all good.
 
-Transforming the outcome variable is a much more difficult question, to which there are few right answers.
+Transforming the outcome variable is a much more difficult question. Imagine that we seek to create a model which explains `rv13` from the `kenya` tibble. Should we transform it?
+
+* Maybe? There are no right answers. A model with `rv13` as the outcome variable is different from a model with `log(rv13)` as the outcome. The two are not directly comparable.
+
+* 
 
 
+See @roas
 
 
 ## Selecting variables
 
 
-How do we decide which variables to include in a model? There is not
+How do we decide which variables to include in a model? There is no one right answer to this question. Our advice is to keep a variable X if any of the following circumstances apply:
 
-<!-- * Keeping or throwing away variables. How do we decide? If something is big and significant, we always keep it. If it is small and insignificant, we don't, unless our audience really wants to see it. If a mix, reasonable people differ. No right answer! -->
+
+* The variable has a large and well-estimated coefficient. This means, roughly, that the 95% confidence interval excludes zero.
+
+* Underlying theory/observation suggests that X has a meaningfully connection to the outcome variable.
+
+* It is standard in your field to include X in such regressions.
+
+* Your boss/client/reviewer/supervisor wants to include X.
+
+
 
 <!-- * Creating new variables, especially by combining different ones into one combined variable. -->
 
@@ -397,6 +447,10 @@ ovrftng %>%
 ### Selecting the rows
 
 ## Testing is nonsense
+
+## Parallel lines
+
+
 
 
 ## Summary
