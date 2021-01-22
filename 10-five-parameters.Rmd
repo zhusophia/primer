@@ -6,7 +6,7 @@
 
 *This chapter is still a DRAFT. Check back in a few weeks.*
 
-The next step in our model building education is to learn about *interactions*. The effect of a treatment relative to a control is almost never uniform. The effect might be bigger in women than in men, smaller in the rich relative to the poor. The technical term for such effects is "heterogenous," which is just Ph.D.'ese for "different." With enough data, all effects are heterogenous. Causal effects, at least in the social science, always vary across units. To model this reality, we rely on "interactions," on allowing for the effect size to differ. To so so, we need at least 5 parameters. 
+The next step in our model building education is to learn about *interactions*. The effect of a treatment relative to a control is almost never uniform. The effect might be bigger in women than in men, smaller in the rich relative to the poor. The technical term for such effects is "heterogeneous," which is just Ph.D.'ese for "different." With enough data, all effects are heterogeneous. Causal effects, at least in the social science, always vary across units. To model this reality, we rely on "interactions," on allowing the effect size to differ. To so so, we need models with at least 5 parameters. 
 
 <!-- DK: Add some more. What are the key lessons? What do we carry over from previous chapters? What is new? Hit the data science research cycle. -->
 
@@ -22,9 +22,9 @@ library(tidyverse)
 library(rstanarm)
 ```
 
-<!-- Perhaps we need more detail in this EDA?  Explain how we only have data for people who are already dead. That is an interesting restriction, and effects the Preceptor Table in interesting ways. Or is such a discussion too advanced? -->
+<!-- We discuss below that we only have data for people who are already dead. That is an interesting restriction, and effects the Preceptor Table in interesting ways. Or is such a discussion too advanced? -->
 
-We will use the `governors` data set from the **primer.data** package. This data set, from @barfort2020, features the demographic information about the candidates for governor in the United States. @barfort2020 conclude that winning a gubernatorial election increases a candidate's lifespan.
+The **primer.data** package includes the  `governors` data set which features the demographic information about the candidates for governor in the United States. @barfort2020 gathered this data concluded that winning a gubernatorial election increases a candidate's lifespan.
 
 
 ```{r}
@@ -40,7 +40,7 @@ ch10 <- governors %>%
   select(last_name, year, state, sex, lived_after, election_age)
 ```
 
-`election_age` and `lived_after` are how many years a candidate lived before the election and how many years a candidate lived after the election, respectively. As a consequence, only politicians who are already deceased are included in this data set. This means that there are only a handful of observations from elections in the last 20 years. Most candidates from that time period are still alive and are, therefore, excluded.
+`election_age` and `lived_after` are how many years a candidate lived before and after the election, respectively. As a consequence, only politicians who are already deceased are included in this data set. This means that there are only a handful of observations from elections in the last 20 years. Most candidates from that time period are still alive and are, therefore, excluded.
 
 ```{r, echo = FALSE}
 # Bit of a cheat to ensure that one of the sampled candidates is female.
@@ -79,7 +79,7 @@ ch10 %>%
 
 <!-- DK: Fix -->
 
-Starting with the relationship between `lived_after` and `year`, we can see that there is a rough line above which there are no observations. There are no data points in the top right portion of the graph because it is not possible to have run in 2011 and then live 50 years after the election took place. This edge of the data represents, approximately, the most years a candidate could have possibly lived, and still have died, given the year of the election. The reason the data is slanted downward is because the maximum value for this scenario is greater in earlier years. That is, those candidates who ran for governor in earlier years could live a long time after the election and still have died prior to the data set creation, giving them higher `lived_after` values than those who ran for office in more recent years. The edge of the scatter plot is not perfectly straight because, for many election years, no candidate had the decency to die just before data collection.
+Starting with the relationship between `lived_after` and `year`, there is a rough line above which there are no observations. There are no data points in the top right portion of the graph because it is not possible to have run in 2011 and then live 50 years after the election took place. This edge of the data represents, approximately, the most years a candidate could have possibly lived, and still have died, given the year of the election. The reason the data is slanted downward is because the maximum value for this scenario is greater in earlier years. That is, those candidates who ran for governor in earlier years could live a long time after the election and still have died prior to the data set creation, giving them higher `lived_after` values than those who ran for office in more recent years. The edge of the scatter plot is not perfectly straight because, for many election years, no candidate had the decency to die just before data collection.
 
 There are fewer observations in later years because fewer recent candidates have died recently. 
 
@@ -165,18 +165,23 @@ ch10 %>%
 
 The math is fairly simple:
 
-$$ lived\_after_i =  \beta_0 + \beta_1 election\_age_i + \epsilon_i $$
+$$ y_i =  \beta_0 + \beta_1 election\_age_i + \epsilon_i $$
 
 
-with $\epsilon_i \sim N(0, \sigma^2)$. $lived\_after_i$ is the number of years lived after the election for candidate $i$. $election\_age_i$ is the number of years lived before the election for candidate $i$. $\epsilon_i$ is the "error term," the difference between the actual years-lived for candidate $i$ and the modeled years-lived.  $\epsilon_i$ is normally distributed with a mean of 0 and a standard deviation of $\sigma$. The key distinction is between:
+with $\epsilon_i \sim N(0, \sigma^2)$. $y_i$ is the number of years lived after the election for candidate $i$. $election\_age_i$ is the number of years lived before the election for candidate $i$. $\epsilon_i$ is the "error term," the difference between the actual years-lived for candidate $i$ and the modeled years-lived.  $\epsilon_i$ is normally distributed with a mean of 0 and a standard deviation of $\sigma$. The key distinction is between:
 
 * *Variables*, always subscripted with $i$, whose values (potentially) vary across individuals.
 
 * *Parameters*, never subscripted with $i$, whose values are constant across individuals.
 
+Why do we use $y_i$ in this formula instead of $lived\_after_i$? Convention. The dependent variable is most regressions is referred to with the variable $y$, even though the outcome variable is rarely actually called $y$. However, it would not be usual to describe this model as:
+
+$$ lived\_after_i =  \beta_0 + \beta_1 election\_age_i + \epsilon_i $$
+Both mean the same thing. 
+
 <!-- DK: Better words needed. -->
 
-$\beta_0$ is the "intercept" of the regression, the average value for the population of $alive\_post$, among those for whom $alive\_pre = 0$. $\beta_1$ is the "coefficient" of  $alive\_pre$. Each one day increase in $alive\_pre$ is associated with a $\beta_1$ change in $alive\_post$. Again, this is the value for the population from which our data is drawn.  
+Either way, $\beta_0$ is the "intercept" of the regression, the average value for the population of $lived\_after$, among those for whom $election\_age = 0$. $\beta_1$ is the "coefficient" of  $election\_age$. When comparing two individuals, the first with an $election\_age$ 1 year older than the second,  we expect the first to have a $lived\_after$ value $\beta_1$ different from the second. In other words, we expect the older to have fewer years remaining, because $\beta_1$ is negative. Again, this is the value for the population from which our data is drawn.  
 
 
 There are three unknown parameters --- $\beta_0$, $\beta_1$ and $\sigma$ --- just as with the models we used in Chapter \@ref(three-parameters).
@@ -205,7 +210,7 @@ Consider someone who is about 40 years old on Election Day. We have a score or m
 
 <!-- DK: Add a red circle to the graphic to show how we figured that out? -->
 
-This model, with a continuous independent (or "predictor") variable, has an infinite number of fitted values, one for each possible value of `election_age`. This is very different from the models we saw in Chapter \@ref(three-parameters). Those models only had two possible fitted values because the predictor variable only took two possible values.
+This model, with a continuous independent (or "predictor") variable, has an infinite number of fitted values, one for each possible value of `election_age`. 
 
 <!-- DK: I am nervous that election_age, as used here, is a different variable that election_age when, later, we transform it.  -->
 
@@ -258,7 +263,7 @@ We can create a formula for the fitted values by placing the median values of th
 <!-- DK: This seems sloppy. equinomatic usage case?-->
 
 
-$$ lived\_after_i =  26,500 - 0.9 election\_age_i$$
+$$ y_i =  72.7 - 0.9 election\_age_i$$
 
 Consider the intercept. Since our independent variable is $election\_age_i$, the intercept is the $lived\_after_i$ value when $election\_age_i$ is zero. Here, we would interpret this intercept as the average lifespan of a gubernatorial candidate after the election, if the candidate was alive for zero years prior to the election. 
 
