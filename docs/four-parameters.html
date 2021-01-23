@@ -68,9 +68,9 @@
 <!-- Explore causal effects of models following chapter 18/19 in ROAS. Regress ending att on starting attitude and treatment effect. Show parallel lines. That is four parameters! Can also do the same thing with income and treatment. That will be a much worse model. Save interaction for five parameter chapter. -->
 <p><em>This chapter is still a DRAFT. Check back in a few weeks.</em></p>
 <p>In our haste to make progress — to get all the way through the process of building, interpreting and using models — we have given short shrift to some of the messy details of model building and evaluation. This chapter fills in those lacunae. We will also introduce models with four parameters.</p>
-<div id="transforming-predictor-variables" class="section level2" number="9.1">
+<div id="transforming-variables" class="section level2" number="9.1">
 <h2>
-<span class="header-section-number">9.1</span> Transforming predictor variables<a class="anchor" aria-label="anchor" href="#transforming-predictor-variables"><i class="fas fa-link"></i></a>
+<span class="header-section-number">9.1</span> Transforming variables<a class="anchor" aria-label="anchor" href="#transforming-variables"><i class="fas fa-link"></i></a>
 </h2>
 <p>It is often convenient to transform a predictor variable.</p>
 <div id="centering" class="section level3" number="9.1.1">
@@ -176,19 +176,49 @@
 <h3>
 <span class="header-section-number">9.1.4</span> Taking logs<a class="anchor" aria-label="anchor" href="#taking-logs"><i class="fas fa-link"></i></a>
 </h3>
-<!-- * taking logs. When? Why? Doing so on dependent variable is a much bigger deal than doing it on independent variables since the former changes he very essence of the model. You can't really (?) compare two different models if one has taken logs of Y and one has not. -->
+<p>It is often helpful to take the log of predictor variables, especially in cases in which their distribution is skewed. You should generally only take the log of variables for which all the values are strictly positive. The log of a negative number is not defined. Consider the number of registered voters (<code>rv13</code>) at each of the polling stations in <code>kenya</code>.</p>
+<div class="sourceCode" id="cb727"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">x</span> <span class="op">&lt;-</span> <span class="va">kenya</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">rv13</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span>
+
+<span class="va">rv_p</span> <span class="op">&lt;-</span> <span class="va">x</span> <span class="op">%&gt;%</span> 
+  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span><span class="va">rv13</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">geom_histogram</span><span class="op">(</span>bins <span class="op">=</span> <span class="fl">100</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Registered Voters"</span>,
+         y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> 
+
+<span class="va">log_rv_p</span> <span class="op">&lt;-</span> <span class="va">x</span> <span class="op">%&gt;%</span> 
+  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">rv13</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">geom_histogram</span><span class="op">(</span>bins <span class="op">=</span> <span class="fl">100</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Log of Registered Voters"</span>,
+         y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu">expand_limits</span><span class="op">(</span>y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">175</span><span class="op">)</span><span class="op">)</span>
+
+<span class="va">rv_p</span> <span class="op">+</span> <span class="va">log_rv_p</span> <span class="op">+</span>
+  <span class="fu">plot_annotation</span><span class="op">(</span>title <span class="op">=</span> <span class="st">'Registered Votes In Kenya Communities'</span>,
+                  subtitle <span class="op">=</span> <span class="st">"Taking logs helps us deal with outliers"</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-578-1.png" width="100%"></div>
+<p>Most experienced data scientists would use the log of <code>rv13</code> rather than the raw value. Comments:</p>
+<ul>
+<li><p>We do not know the “true” model. Who is to say that a model using the raw value is right or wrong?</p></li>
+<li><p>Check whether or not this choice meaningfully effects the answer to your question. Much of the time, it won’t. That is, our inferences are often fairly “robust” to small changes in the model. If you get the same answer with <code>rv13</code> as from <code>log_rv13</code>, then no one cares which you use.</p></li>
+<li><p>Follow the conventions in your field. If everyone does X, then you should probably do X, unless you have a good reason not to. If you do have such a reason, explain it prominently.</p></li>
+<li><p>Most professionals, when presented with data distributed like <code>rv13</code> would take the log. Professionals hate (irrationally?) outliers. Any transformation which makes a distribution look more normal is generally considered a good idea.</p></li>
+</ul>
+<p>Many of these suggestions apply to every aspect of the modeling process.</p>
+<!-- Split out general advice to elsewhere. -->
 </div>
 <div id="adding-transformed-terms" class="section level3" number="9.1.5">
 <h3>
 <span class="header-section-number">9.1.5</span> Adding transformed terms<a class="anchor" aria-label="anchor" href="#adding-transformed-terms"><i class="fas fa-link"></i></a>
 </h3>
 <p>Instead of simply transforming variables, we can add more terms which are transformed versions of a variable. Consider the relation of <code>height</code> to <code>age</code> in <code>nhanes</code>. Let’s start by dropping the missing values.</p>
-<div class="sourceCode" id="cb727"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb728"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">no_na_nhanes</span> <span class="op">&lt;-</span> <span class="va">nhanes</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">height</span>, <span class="va">age</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">drop_na</span><span class="op">(</span><span class="op">)</span> </code></pre></div>
 <p>Fit and plot a simple linear model:</p>
-<div class="sourceCode" id="cb728"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb729"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">nhanes_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span><span class="va">height</span> <span class="op">~</span> <span class="va">age</span>,
                      data <span class="op">=</span> <span class="va">no_na_nhanes</span>,
                      refresh <span class="op">=</span> <span class="fl">0</span>,
@@ -204,10 +234,10 @@
          x <span class="op">=</span> <span class="st">"Age"</span>,
          y <span class="op">=</span> <span class="st">"Height (cm)"</span>,
          caption <span class="op">=</span> <span class="st">"Data source: NHANES"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-577-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-580-1.png" width="100%"></div>
 <p>That is not a very good model, obviously.</p>
 <p>Adding a quadratic term makes it better. (Note the need for <code><a href="https://rdrr.io/r/base/AsIs.html">I()</a></code> in creating the squared term within the <code>formula</code> argument.)</p>
-<div class="sourceCode" id="cb729"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb730"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">nhanes_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span><span class="va">height</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html">I</a></span><span class="op">(</span><span class="va">age</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>,
                      data <span class="op">=</span> <span class="va">no_na_nhanes</span>,
                      refresh <span class="op">=</span> <span class="fl">0</span>,
@@ -223,9 +253,9 @@
          x <span class="op">=</span> <span class="st">"Age"</span>,
          y <span class="op">=</span> <span class="st">"Height (cm)"</span>,
          caption <span class="op">=</span> <span class="st">"Data source: NHANES"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-578-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-581-1.png" width="100%"></div>
 <p>Still, we have not made use of our background knowledge in creating these variables. We know that people don’t get any taller after age 18 or so. Let’s create variables which capture that break.</p>
-<div class="sourceCode" id="cb730"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb731"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">nhanes_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span><span class="va">height</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html">I</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">age</span> <span class="op">&gt;</span> <span class="fl">18</span>, <span class="fl">18</span>, <span class="va">age</span><span class="op">)</span><span class="op">)</span>,
                      data <span class="op">=</span> <span class="va">no_na_nhanes</span>,
                      refresh <span class="op">=</span> <span class="fl">0</span>,
@@ -241,38 +271,44 @@
          x <span class="op">=</span> <span class="st">"Age"</span>,
          y <span class="op">=</span> <span class="st">"Height (cm)"</span>,
          caption <span class="op">=</span> <span class="st">"Data source: NHANES"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-579-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-582-1.png" width="100%"></div>
 <p>The point is that we should not take the variables we receive as <em>given</em>. We are the captains of our souls. We transform variables as needed.</p>
-</div>
-<div id="if-parameters-are-unicorns-why-bother-with-transformations" class="section level3" number="9.1.6">
-<h3>
-<span class="header-section-number">9.1.6</span> If parameters are unicorns, why bother with transformations?<a class="anchor" aria-label="anchor" href="#if-parameters-are-unicorns-why-bother-with-transformations"><i class="fas fa-link"></i></a>
-</h3>
+<!-- ### If parameters are unicorns, why bother with transformations? -->
 <!-- * standardizing variables. Key advantage is to make the coefficients easier to interpret. Even though the "right" thing to do in looking at models is to use posterior_* to look at model predictions, this takes some time. It is very handy, first pass, to look at all the coefficients and get a sense of which ones are "interesting." Then, focus on those when making newobs tibbles. -->
 </div>
+<div id="transforming-the-outcome-variable" class="section level3" number="9.1.6">
+<h3>
+<span class="header-section-number">9.1.6</span> Transforming the outcome variable<a class="anchor" aria-label="anchor" href="#transforming-the-outcome-variable"><i class="fas fa-link"></i></a>
+</h3>
+<p>Transforming predictor variables is uncontroversial. It does not matter much. Change most continuous predictor variables to <span class="math inline">\(z\)</span>-scores and you won’t go far wrong. Or keep them in their original form, and take care with your interpretations. It’s all good.</p>
+<p>Transforming the outcome variable is a much more difficult question. Imagine that we seek to create a model which explains <code>rv13</code> from the <code>kenya</code> tibble. Should we transform it?</p>
+<ul>
+<li><p>Maybe? There are no right answers. A model with <code>rv13</code> as the outcome variable is different from a model with <code><a href="https://rdrr.io/r/base/Log.html">log(rv13)</a></code> as the outcome. The two are not directly comparable.</p></li>
+<li><p>Much of the same advice with regard to taking logs of predictor variables applies here as well.</p></li>
+</ul>
+<p>See <span class="citation"><a href="references.html#ref-roas" role="doc-biblioref">Gelman, Hill, and Vehtari</a> (<a href="references.html#ref-roas" role="doc-biblioref">2020</a>)</span></p>
 </div>
-<div id="transforming-the-outcome-variable" class="section level2" number="9.2">
-<h2>
-<span class="header-section-number">9.2</span> Transforming the outcome variable<a class="anchor" aria-label="anchor" href="#transforming-the-outcome-variable"><i class="fas fa-link"></i></a>
-</h2>
-<p>Transforming predictor variables is generally uncontroversial. It does not matter much. Change most continuous predictor variables to <span class="math inline">\(z\)</span>-scores and you won’t go far wrong. Or keep them in their original form, and take care with your interpretations. It’s all good.</p>
-<p>Transforming the outcome variable is a much more difficult question, to which there are few right answers.</p>
 </div>
-<div id="selecting-variables" class="section level2" number="9.3">
+<div id="selecting-variables" class="section level2" number="9.2">
 <h2>
-<span class="header-section-number">9.3</span> Selecting variables<a class="anchor" aria-label="anchor" href="#selecting-variables"><i class="fas fa-link"></i></a>
+<span class="header-section-number">9.2</span> Selecting variables<a class="anchor" aria-label="anchor" href="#selecting-variables"><i class="fas fa-link"></i></a>
 </h2>
-<p>How do we decide which variables to include in a model? There is not</p>
-<!-- * Keeping or throwing away variables. How do we decide? If something is big and significant, we always keep it. If it is small and insignificant, we don't, unless our audience really wants to see it. If a mix, reasonable people differ. No right answer! -->
+<p>How do we decide which variables to include in a model? There is no one right answer to this question. Our advice is to keep a variable X if any of the following circumstances apply:</p>
+<ul>
+<li><p>The variable has a large and well-estimated coefficient. This means, roughly, that the 95% confidence interval excludes zero.</p></li>
+<li><p>Underlying theory/observation suggests that X has a meaningfully connection to the outcome variable.</p></li>
+<li><p>It is standard in your field to include X in such regressions.</p></li>
+<li><p>Your boss/client/reviewer/supervisor wants to include X.</p></li>
+</ul>
 <!-- * Creating new variables, especially by combining different ones into one combined variable. -->
 </div>
-<div id="comparing-models" class="section level2" number="9.4">
+<div id="comparing-models" class="section level2" number="9.3">
 <h2>
-<span class="header-section-number">9.4</span> Comparing models<a class="anchor" aria-label="anchor" href="#comparing-models"><i class="fas fa-link"></i></a>
+<span class="header-section-number">9.3</span> Comparing models<a class="anchor" aria-label="anchor" href="#comparing-models"><i class="fas fa-link"></i></a>
 </h2>
 <p>Deciding which variables to include in a model is a subset of the larger question: How do we decide which model, out of the set of possible models, to choose?</p>
 <p>Consider two models which explain attitudes to immigration among Boston commuters.</p>
-<div class="sourceCode" id="cb731"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb732"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_liberal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">att_end</span> <span class="op">~</span> <span class="va">liberal</span>,
                   data <span class="op">=</span> <span class="va">trains</span>,
                   refresh <span class="op">=</span> <span class="fl">0</span>,
@@ -286,7 +322,7 @@
 ## Auxiliary parameter(s):
 ##       Median MAD_SD
 ## sigma 2.7    0.2</code></pre>
-<div class="sourceCode" id="cb733"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb734"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_att_start</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">att_end</span> <span class="op">~</span> <span class="va">att_start</span>,
                   data <span class="op">=</span> <span class="va">trains</span>,
                   refresh <span class="op">=</span> <span class="fl">0</span>,
@@ -302,12 +338,12 @@
 ## sigma 1.4    0.1</code></pre>
 <p>They both seem like good models! The results make sense. People who are liberal have more liberal attitudes about immigration, so we would expect their <code>att_end</code> scores to be lower. We would also expect people to provide similar answers in two surveys administered a week or two apart. It makes sense that those with higher (more conservative) values for <code>att_start</code> would also have higher values for <code>att_end</code>.</p>
 <p>How do we choose between these models?</p>
-<div id="better-models-make-better-predictions" class="section level3" number="9.4.1">
+<div id="better-models-make-better-predictions" class="section level3" number="9.3.1">
 <h3>
-<span class="header-section-number">9.4.1</span> Better models make better predictions<a class="anchor" aria-label="anchor" href="#better-models-make-better-predictions"><i class="fas fa-link"></i></a>
+<span class="header-section-number">9.3.1</span> Better models make better predictions<a class="anchor" aria-label="anchor" href="#better-models-make-better-predictions"><i class="fas fa-link"></i></a>
 </h3>
 <p>The most obvious criteria for comparing models is the accuracy of the predictions. For example, consider the use of <code>liberal</code> to predict <code>att_end</code>.</p>
-<div class="sourceCode" id="cb735"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb736"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>pred_liberal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html">fitted</a></span><span class="op">(</span><span class="va">fit_liberal</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">pred_liberal</span>, y <span class="op">=</span> <span class="va">att_end</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
@@ -316,11 +352,11 @@
          subtitle <span class="op">=</span> <span class="st">"Liberals are less conservative"</span>,
          x <span class="op">=</span> <span class="st">"Predicted Attitude"</span>,
          y <span class="op">=</span> <span class="st">"True Attitude"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-582-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-585-1.png" width="100%"></div>
 <!-- DK: Could put this discussion in fig.cap. Could add some details to the plots to indicate the points that I am talking about. Should create an animation, which brings in new point, forecasts it, and then measures how wrong the model was. -->
 <p>Because there are only two possible values for <code>liberal</code> — TRUE and FALSE — there are only two predictions which this model will make: about 10 for <code>liberal == FALSE</code> and about 8 for <code>liberal == TRUE</code>. (The points in the above plot are jittered.) For some individuals, these are perfect predictions. For others, they are poor predictions. (Note the two individuals who are <code>liberal == TRUE</code>, and who the model thinks will have <code>att_end == 8</code>, but who have <code>att_end == 15</code>. The model got them both very, very wrong.)</p>
 <p>Consider our second model, using <code>att_start</code> to forecast <code>att_end</code>.</p>
-<div class="sourceCode" id="cb736"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb737"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>pred_liberal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html">fitted</a></span><span class="op">(</span><span class="va">fit_att_start</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">pred_liberal</span>, y <span class="op">=</span> <span class="va">att_end</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
@@ -329,10 +365,10 @@
          subtitle <span class="op">=</span> <span class="st">"Survey responses are somewhat consistent"</span>,
          x <span class="op">=</span> <span class="st">"Predicted Attitude"</span>,
          y <span class="op">=</span> <span class="st">"True Attitude"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-583-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-586-1.png" width="100%"></div>
 <p>Because <code>att_end</code> takes on 13 unique values, the model makes 13 unique predictions. Some of those predictions are perfect! But others are very wrong. Note the individual with a predicted <code>att_end</code> of around 9 but with an actual value of <code>15</code>. That is a big miss!</p>
 <p>Rather than looking at individual cases, we need to look at the errors for all the predictions. Fortunately, a prediction error is the same thing as a residual, which is easy enough to calculate.</p>
-<div class="sourceCode" id="cb737"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb738"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">att_end</span>, <span class="va">att_start</span>, <span class="va">liberal</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>pred_lib <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html">fitted</a></span><span class="op">(</span><span class="va">fit_liberal</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -354,7 +390,7 @@
 ## 10      10         9 FALSE      10.0     0.0259    8.97   -1.03 
 ## # … with 105 more rows</code></pre>
 <p>Let’s look at the square root of the average squared error.</p>
-<div class="sourceCode" id="cb739"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb740"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">att_end</span>, <span class="va">att_start</span>, <span class="va">liberal</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>lib_err <span class="op">=</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html">fitted</a></span><span class="op">(</span><span class="va">fit_liberal</span><span class="op">)</span> <span class="op">-</span> <span class="va">att_end</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -370,20 +406,20 @@
 <!-- DK: Could discuss uncertainty in the estimated sigma. But left it out in this draft. -->
 <p>Sadly, it is not wise to simply select the model which fits the data best because doing so can be misleading. After all, you are cheating! You are using that very data to select your parameters and then, after using the data once, turning around and “checking” to see how well your model fits the data. It better fit! You used it to pick your parameters! This is the danger of <em>overfitting</em>.</p>
 </div>
-<div id="beware-overfitting" class="section level3" number="9.4.2">
+<div id="beware-overfitting" class="section level3" number="9.3.2">
 <h3>
-<span class="header-section-number">9.4.2</span> Beware overfitting<a class="anchor" aria-label="anchor" href="#beware-overfitting"><i class="fas fa-link"></i></a>
+<span class="header-section-number">9.3.2</span> Beware overfitting<a class="anchor" aria-label="anchor" href="#beware-overfitting"><i class="fas fa-link"></i></a>
 </h3>
 <p>One of the biggest dangers in data science is <em>overfitting</em>, using a model with too many parameters which fits the data we have too well and, therefore, works poorly on data we have yet to see. Consider a simple example with 10 data points.</p>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-586-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-589-1.png" width="100%"></div>
 <p>What happens when we fit a model with one predictor?</p>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-587-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-590-1.png" width="100%"></div>
 <p>That is a reasonable model. It does not fit the data particularly well, but we certainly believe that higher values of <code>x</code> are associated with higher values of <code>y</code>. A linear fit is not unreasonable.</p>
 <p>But we can also use some of the lessons from above and try a quadratic fit by adding <span class="math inline">\(x^2\)</span> as a predictor.</p>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-588-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-591-1.png" width="100%"></div>
 <p>Is this a better model? Maybe?</p>
 <p>But why stop at adding <span class="math inline">\(x^2\)</span> to the regression? Why not add <span class="math inline">\(x^3\)</span>, <span class="math inline">\(x^4\)</span> and all the way to <span class="math inline">\(x^9\)</span>? When we do so, the fit is much better.</p>
-<div class="sourceCode" id="cb741"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb742"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">nine_pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/poly.html">poly</a></span><span class="op">(</span><span class="va">x</span>, <span class="fl">9</span><span class="op">)</span>,
                        data <span class="op">=</span> <span class="va">ovrftng</span><span class="op">)</span>
 
@@ -399,23 +435,28 @@
     <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"`y` as a 9-Degree Polynomial Function of `x`"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_x_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">10</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_y_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">10</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> </code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-589-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-592-1.png" width="100%"></div>
 <p><em>If the only criteria we cared about was how well the model predicts using the data on which the parameters were estimated, then a model with more parameters will always be better.</em> But that is not what truly matters. What matters is how well the model works on data which was not used to create the model.</p>
 </div>
-<div id="better-models-make-better-predictions-on-new-data" class="section level3" number="9.4.3">
+<div id="better-models-make-better-predictions-on-new-data" class="section level3" number="9.3.3">
 <h3>
-<span class="header-section-number">9.4.3</span> Better models make better predictions on new data<a class="anchor" aria-label="anchor" href="#better-models-make-better-predictions-on-new-data"><i class="fas fa-link"></i></a>
+<span class="header-section-number">9.3.3</span> Better models make better predictions on new data<a class="anchor" aria-label="anchor" href="#better-models-make-better-predictions-on-new-data"><i class="fas fa-link"></i></a>
 </h3>
 </div>
-<div id="selecting-the-rows" class="section level3" number="9.4.4">
+<div id="selecting-the-rows" class="section level3" number="9.3.4">
 <h3>
-<span class="header-section-number">9.4.4</span> Selecting the rows<a class="anchor" aria-label="anchor" href="#selecting-the-rows"><i class="fas fa-link"></i></a>
+<span class="header-section-number">9.3.4</span> Selecting the rows<a class="anchor" aria-label="anchor" href="#selecting-the-rows"><i class="fas fa-link"></i></a>
 </h3>
 </div>
 </div>
-<div id="testing-is-nonsense" class="section level2" number="9.5">
+<div id="testing-is-nonsense" class="section level2" number="9.4">
 <h2>
-<span class="header-section-number">9.5</span> Testing is nonsense<a class="anchor" aria-label="anchor" href="#testing-is-nonsense"><i class="fas fa-link"></i></a>
+<span class="header-section-number">9.4</span> Testing is nonsense<a class="anchor" aria-label="anchor" href="#testing-is-nonsense"><i class="fas fa-link"></i></a>
+</h2>
+</div>
+<div id="parallel-lines" class="section level2" number="9.5">
+<h2>
+<span class="header-section-number">9.5</span> Parallel lines<a class="anchor" aria-label="anchor" href="#parallel-lines"><i class="fas fa-link"></i></a>
 </h2>
 </div>
 <div id="summary-9" class="section level2" number="9.6">
@@ -433,26 +474,26 @@
       <ul class="nav navbar-nav">
 <li><a class="nav-link" href="#four-parameters"><span class="header-section-number">9</span> Four Parameters</a></li>
 <li>
-<a class="nav-link" href="#transforming-predictor-variables"><span class="header-section-number">9.1</span> Transforming predictor variables</a><ul class="nav navbar-nav">
+<a class="nav-link" href="#transforming-variables"><span class="header-section-number">9.1</span> Transforming variables</a><ul class="nav navbar-nav">
 <li><a class="nav-link" href="#centering"><span class="header-section-number">9.1.1</span> Centering</a></li>
 <li><a class="nav-link" href="#scaling"><span class="header-section-number">9.1.2</span> Scaling</a></li>
 <li><a class="nav-link" href="#z-scores"><span class="header-section-number">9.1.3</span> z-scores</a></li>
 <li><a class="nav-link" href="#taking-logs"><span class="header-section-number">9.1.4</span> Taking logs</a></li>
 <li><a class="nav-link" href="#adding-transformed-terms"><span class="header-section-number">9.1.5</span> Adding transformed terms</a></li>
-<li><a class="nav-link" href="#if-parameters-are-unicorns-why-bother-with-transformations"><span class="header-section-number">9.1.6</span> If parameters are unicorns, why bother with transformations?</a></li>
+<li><a class="nav-link" href="#transforming-the-outcome-variable"><span class="header-section-number">9.1.6</span> Transforming the outcome variable</a></li>
 </ul>
 </li>
-<li><a class="nav-link" href="#transforming-the-outcome-variable"><span class="header-section-number">9.2</span> Transforming the outcome variable</a></li>
-<li><a class="nav-link" href="#selecting-variables"><span class="header-section-number">9.3</span> Selecting variables</a></li>
+<li><a class="nav-link" href="#selecting-variables"><span class="header-section-number">9.2</span> Selecting variables</a></li>
 <li>
-<a class="nav-link" href="#comparing-models"><span class="header-section-number">9.4</span> Comparing models</a><ul class="nav navbar-nav">
-<li><a class="nav-link" href="#better-models-make-better-predictions"><span class="header-section-number">9.4.1</span> Better models make better predictions</a></li>
-<li><a class="nav-link" href="#beware-overfitting"><span class="header-section-number">9.4.2</span> Beware overfitting</a></li>
-<li><a class="nav-link" href="#better-models-make-better-predictions-on-new-data"><span class="header-section-number">9.4.3</span> Better models make better predictions on new data</a></li>
-<li><a class="nav-link" href="#selecting-the-rows"><span class="header-section-number">9.4.4</span> Selecting the rows</a></li>
+<a class="nav-link" href="#comparing-models"><span class="header-section-number">9.3</span> Comparing models</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#better-models-make-better-predictions"><span class="header-section-number">9.3.1</span> Better models make better predictions</a></li>
+<li><a class="nav-link" href="#beware-overfitting"><span class="header-section-number">9.3.2</span> Beware overfitting</a></li>
+<li><a class="nav-link" href="#better-models-make-better-predictions-on-new-data"><span class="header-section-number">9.3.3</span> Better models make better predictions on new data</a></li>
+<li><a class="nav-link" href="#selecting-the-rows"><span class="header-section-number">9.3.4</span> Selecting the rows</a></li>
 </ul>
 </li>
-<li><a class="nav-link" href="#testing-is-nonsense"><span class="header-section-number">9.5</span> Testing is nonsense</a></li>
+<li><a class="nav-link" href="#testing-is-nonsense"><span class="header-section-number">9.4</span> Testing is nonsense</a></li>
+<li><a class="nav-link" href="#parallel-lines"><span class="header-section-number">9.5</span> Parallel lines</a></li>
 <li><a class="nav-link" href="#summary-9"><span class="header-section-number">9.6</span> Summary</a></li>
 </ul>
 

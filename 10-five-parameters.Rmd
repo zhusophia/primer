@@ -1,7 +1,5 @@
 # Five Parameters {#five-parameters}
 
-<!-- Should lived\_after_i be replaced with y_i everywhere? Somewhere? -->
-
 <!-- Clean up all the plots, especially the legends. -->
 
 *This chapter is still a DRAFT. Check back in a few weeks.*
@@ -165,18 +163,18 @@ ch10 %>%
 
 The math is fairly simple:
 
-$$ y_i =  \beta_0 + \beta_1 election\_age_i + \epsilon_i $$
+$$ lived\_after_i =  \beta_0 + \beta_1 election\_age_i + \epsilon_i $$
 
 
-with $\epsilon_i \sim N(0, \sigma^2)$. $y_i$ is the number of years lived after the election for candidate $i$. $election\_age_i$ is the number of years lived before the election for candidate $i$. $\epsilon_i$ is the "error term," the difference between the actual years-lived for candidate $i$ and the modeled years-lived.  $\epsilon_i$ is normally distributed with a mean of 0 and a standard deviation of $\sigma$. The key distinction is between:
+with $\epsilon_i \sim N(0, \sigma^2)$. $lived\_after_i$ is the number of years lived after the election for candidate $i$. $election\_age_i$ is the number of years lived before the election for candidate $i$. $\epsilon_i$ is the "error term," the difference between the actual years-lived for candidate $i$ and the modeled years-lived.  $\epsilon_i$ is normally distributed with a mean of 0 and a standard deviation of $\sigma$. The key distinction is between:
 
 * *Variables*, always subscripted with $i$, whose values (potentially) vary across individuals.
 
 * *Parameters*, never subscripted with $i$, whose values are constant across individuals.
 
-Why do we use $y_i$ in this formula instead of $lived\_after_i$? Convention. The dependent variable is most regressions is referred to with the variable $y$, even though the outcome variable is rarely actually called $y$. However, it would not be usual to describe this model as:
+Why do we use $lived\_after_i$ in this formula instead of $y_i$? The more often we remind ourselves about the variables actual substance, the better. But there is another common convention: to always use $y_i$ as the symbol for the dependent variable. It would not be usual to describe this model as:
 
-$$ lived\_after_i =  \beta_0 + \beta_1 election\_age_i + \epsilon_i $$
+$$ y_i =  \beta_0 + \beta_1 election\_age_i + \epsilon_i $$
 Both mean the same thing. 
 
 <!-- DK: Better words needed. -->
@@ -187,32 +185,6 @@ Either way, $\beta_0$ is the "intercept" of the regression, the average value fo
 There are three unknown parameters --- $\beta_0$, $\beta_1$ and $\sigma$ --- just as with the models we used in Chapter \@ref(three-parameters).
 
 You may recall from middle school algebra that the equation of a line is $y = m x + b$. There are two parameters: $m$ and $b$. The intercept $b$ is the value of $y$ when $x = 0$. The slope coefficient $m$ for $x$ is the increase in $y$ for every increase of one in $x$. When defining a regression line, we use slightly different notation but the fundamental relationship is the same. 
-
-We can use `geom_smooth()` to create the fitted regression line:
-
-```{r}
-ch10 %>% 
-  ggplot(aes(x = election_age, y = lived_after)) +
-    geom_point() +
-    geom_smooth(formula = y ~ x, method = "lm", se = FALSE) +
-    labs(title = "Longevity of Gubernatorial Candidates",
-         subtitle = "Younger candidates live longer", 
-         caption = "Data Source: Barfort, Klemmensen and Larsen (2019)",
-         x = "Age in Years",
-         y = "Years Lived After Election") +
-    scale_x_continuous(labels = scales::label_number()) +
-    scale_y_continuous(labels = scales::label_number()) +
-    theme_classic() 
-```
-
-
-Consider someone who is about 40 years old on Election Day. We have a score or more data points for candidates around that age. Two died soon after the election. Some of them lived for 50 or more years after the election. *Variation fills the world.* But the fitted line tells us that, on average, we would expect a candidate that age to live for a little less than 40 years after the election. 
-
-<!-- DK: Add a red circle to the graphic to show how we figured that out? -->
-
-This model, with a continuous independent (or "predictor") variable, has an infinite number of fitted values, one for each possible value of `election_age`. 
-
-<!-- DK: I am nervous that election_age, as used here, is a different variable that election_age when, later, we transform it.  -->
 
 We can implement this model with `stan_glm()`. 
 
@@ -253,17 +225,24 @@ ch10 %>%
     theme_classic()
 ```
 
-This code is the same as the code we used above, except that we have replaced `geom_smooth()` with `geom_line()`. Calling `fitted()` on a model returns the set of fitted values, which we have here plotted by hand.
+
+Consider someone who is about 40 years old on Election Day. We have a score or more data points for candidates around that age. Two died soon after the election. Some of them lived for 50 or more years after the election. *Variation fills the world.* But the fitted line tells us that, on average, we would expect a candidate that age to live for a little less than 40 years after the election. 
+
+<!-- DK: Add a red circle to the graphic to show how we figured that out? -->
+
+This model, with a continuous independent (or "predictor") variable, has an infinite number of fitted values, one for each possible value of `election_age`. 
+
+<!-- DK: I am nervous that election_age, as used here, is a different variable that election_age when, later, we transform it.  -->
 
 
 <!-- DK: Does this section work? If it does, we ought to do it in every chapter. If not, then why bother? It is certainly confusing to understand why sticking in the median is a good idea . . . Need to connected math to fitted values more clearly. But that might be difficult since I am hazy on how fitted values fit in a Bayesian context . . .-->
 
-We can create a formula for the fitted values by placing the median values of the parameters into the model:
+We can create a formula for the fitted values by placing the median values of the parameters into the mathematical formula:
 
 <!-- DK: This seems sloppy. equinomatic usage case?-->
 
 
-$$ y_i =  72.7 - 0.9 election\_age_i$$
+$$ lived\_after_i =  72.7 - 0.9 election\_age_i$$
 
 Consider the intercept. Since our independent variable is $election\_age_i$, the intercept is the $lived\_after_i$ value when $election\_age_i$ is zero. Here, we would interpret this intercept as the average lifespan of a gubernatorial candidate after the election, if the candidate was alive for zero years prior to the election. 
 
