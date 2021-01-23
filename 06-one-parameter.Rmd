@@ -2,6 +2,8 @@
 
 <!-- Priorities:  --> 
 
+<!-- All references to estimating the number of red beads should be change to estimating p, the proportion of red beads.  -->
+
 <!-- MF: References to code chunks not working. I'm troubleshooting now. Create a simple example (three line Rmd file) and then ask on RStudio Community.  -->
 
 <!-- Add to Maslow something like 95% confidence interval squiggly mean plus/minus 2 standard errors -->
@@ -58,21 +60,7 @@ knitr::include_graphics("06-one-parameter/images/Reaping_ball.webp")
 <!-- DK: Get the video to work. Cut half these words. -->
 
 
-This scene is from  *The Hunger Games*, a dystopian novel in which children are selected via lottery to fight to the death. The basic elements of this event, called the "Reaping", are:
-
-- All children ages 12+ are entered into the lottery. 
-
-- Children aged 12 are entered once, children aged 13 entered twice, children aged 14 entered three times, etc. 
-
-- Families may enter names of children more than required in exchange for food. 
-
-- One boy and one girl are selected each year as tributes to represent their district in a battle to the death.
-
-- Children not selected from the urn may volunteer as tribute.
-
-In the scene above, Primrose Everdeen is selected from the urn. As a twelve year old, her name is entered only once. Though we do not know the total number of names, we do know that poor families (which make up the majority of Everdeen's district) are able to enter more times in exchange for food. Therefore, we can reasonably assume that *most* children, including Primrose's sister, are entered many more times than required. Why, then, does Primrose have the misfortune of being selected? Or, as we will refer to it henceforth, sampled?
-
-As we explore sampling, we will come to understand that, while very unlikely, anomalies like Primrose Everdeen are certainly possible. Let's get started!
+This scene is from  *The Hunger Games*, a dystopian novel in which children are selected via lottery to fight to the death. Primrose Everdeen is selected from the urn. Why does she have the misfortune of being selected? Or, as we will refer to it henceforth, sampled?
 
 
 ```{r, echo = FALSE, fig.cap = "Mr. DeVito is correct: sampling *is* badass.", out.width="80%", fig.align='center'}
@@ -84,24 +72,22 @@ knitr::include_graphics("06-one-parameter/images/danny_sampling.png")
 
 Last chapter, we learned about probability, the act of quantifying uncertainty. This chapter, we will learn about *sampling*, the beginning of our journey toward inference. When we sample, we take a *portion* of a total population and attempt to draw a conclusion about the portion, a conclusion which we can then *generalize* to the entire population. 
 
-Observe the urn in Figure \@ref(fig:urn_pic_one). It has a certain number of red and a certain number of white beads all of equal size. It appears the urn has been mixed beforehand, as there does not seem to be any coherent pattern to the spatial distribution of the red and white beads.
-
-Let's now ask ourselves, what proportion of this urn's beads are red? 
+Observe the urn in Figure \@ref(fig:urn_pic_one). It has a certain number of red and a certain number of white beads all of equal size, mixed well together. What proportion of this urn's beads are red? That is, what is the value of $p$?
 
 ```{r urn_pic_one, echo = FALSE, fig.cap = "An urn with red and white beads."}
 knitr::include_graphics("06-one-parameter/images/sampling_bowl_1.jpg")
 ```
 
-One way to answer this question would be to perform an exhaustive count: remove each bead individually, count the number of red beads and the number of white beads, and divide the number of red beads by the total number of beads. However, this would be a long and tedious process. Therefore, we will use sampling! Consider two questions:
+One way to answer this question would be to perform an exhaustive count: remove each bead individually, count the number of red beads, count the number of white beads, and divide the number of red beads by the total number of beads. Call that ratio $p$, the proportion of red beads in the urn. However, this would be a long and tedious process. Therefore, we will use sampling! Consider two questions:
 
-*If we get 17 red beads in a random sample of size 50 taken from an urn with 1000 (white or red) beads, how many red beads are in the urn?*
+*If we get 17 red beads in a random sample of size 50 taken from an urn, what proportion $p$ of the beads in the urn are red?*
 
 *What is the probability, using the same urn, that we will draw more than 8 red beads if we use a shovel of size 20?*
 
 
 <!-- ADD A SECTION BRIEFING THE REST OF THE CHAPTER DK: YES!-->
 
-As always, we will need the **tidyverse** package. 
+Use the **tidyverse** package. 
 
 ```{r, message=FALSE}
 library(tidyverse)
@@ -888,15 +874,13 @@ knitr::include_graphics("06-one-parameter/images/preceptor_hierarchy.png")
 
 Recall the questions we asked at the beginning of our chapter: 
 
-*If we get 17 red beads in a random sample of size 50 taken from an urn with 1000 (white or red) beads, how many red beads are in the urn?*
+*If we get 17 red beads in a random sample of size 50 taken from an urn, what proportion $p$ of the beads in the urn are red?*
 
 *What is the probability, using the same urn, that we will draw more than 8 red beads if we use a shovel of size 20?*
 
 We have looked at a number of different models and their accuracy and precision. To delve into our primary questions, we must return to our discussion of distributions: posterior, joint, and marginal. 
 
 ### Joint distribution
-
-Let's start with our first question: **If we get 17 red beads in a random sample of size 50 taken from an urn with 1000 (white or red) beads, how many red beads are in the urn?**
 
 In Chapter \@ref(probability) we outlined the key intuition behind all inference: there is a joint distribution of data-which-we-might-see-from-our-experiment and models-which-we-are-considering. We take this joint distribution, combine it with the actual results of the experiment, and calculate a posterior distribution over the set of possible models. In other words, we start with 
 
@@ -1019,11 +1003,15 @@ To visualize this in a 3D plot, see the slice in the figure below. There are a f
 
 For any value of red beads found in the paddle (from 0 to 50), there is a posterior distribution of possible values of red beads in the total urn. This distribution is meant to illustrate that, though our sample gives an estimate of the total proportion of red beads in the entire urn, there is much variation in what the actual proportion might be. 
 
-Recall Question #1 from the start of the Chapter: "If we get 17 red beads in a random sample of size 50, how many red beads are in the entire urn?" The answer is not a single number. Our posterior distribution is just that: a distribution. From our sample, we have many different results for the total number of red beads in the entire urn. Certain totals of red beads, like the extremes close to 0 or 1000, are essentially impossible due to our sample value being 32%. Some totals, like 400, occur far more frequently than other totals. 
+Recall the first question from the start of the Chapter: 
+
+*If we get 17 red beads in a random sample of size 50 taken from an urn, what proportion $p$ of the beads in the urn are red?*
+
+The answer is not a single number. Our posterior distribution is just that: a distribution. From our sample, we have many different results for the proportion of red beads in the entire urn. Certain proportions, like the extremes close to 0% or 100%, are essentially impossible due to our sample value being 32%. Some sample proportions, like 40%, occur far more frequently than other sample proportions. 
 
 This means that, while we can provide a range of possibilities (and we can estimate which of those possibilities occur most frequently), we can never say that we know the total number of red beads with certainty. 
 
-The key issue with the urn paradigm is that, unlike real world data science, we *can* technically find the total number of red beads. We just have to perform that exhaustive count that we've been so desperately avoiding. In the real world, the "true" solution can never be known. This is why we require inference, and why tools like sampling are so helpful for making assumptions about the world around us. 
+The key issue with the urn paradigm is that, unlike real world data science, we *can* technically find the true proportion. We just have to perform that exhaustive count that we've been so desperately avoiding. In the real world, the "true" solution can never be known. This is why we require inference, and why tools like sampling are so helpful for making assumptions about the world around us. 
 
 ```{r, echo = FALSE, cache=TRUE, fig.cap = "A 3D image of our joint distribution created with Rayshader."}
 knitr::include_graphics("06-one-parameter/images/slice_rayshader.png")
