@@ -2,16 +2,18 @@
 
 <!-- Priorities:  --> 
 
+<!-- MF: References to code chunks not working. I'm troubleshooting now. -->
+
 <!-- All plots need rho instead of p. -->
 
-<!-- Fix using the posterior section. Give it a new name? Entire Answering the question section could be written to be more like Chapter 7. And code fix! -->
+<!-- Fix using the posterior section. Give it a new name? Entire Answering the question section could be written to be more like Chapter 7. And code fix! MF: Done.-->
 
 <!-- Make the stan_glm work directly connected to that. -->
 
 <!-- Standard error is just a fancy term for your uncertainty about something you don't know. Standard error == my (uncertain) beliefs. Tell me your standard error and then I know your 95% confidence interval.-->
 
 <!-- --------------------- -->
-
+<!-- MF: DONE -->
 <!-- Do this like Maslow -->
 
 <!-- Preceptor's Seven Level Hierarchy of Teaching Knowledge Good -->
@@ -32,13 +34,11 @@
 
 <!-- --------------------- -->
 
-
 <!-- Fix 816 -->
-
 
 <!-- Explain stan_glm usage! -->
 
-<!-- Find a gif for: "Standard errors are just the way that old people talk about confidence intervals." -->
+<!-- Find a gif for: "Standard errors are just the way that old people talk about confidence intervals." MF: DONE-->
 
 <!-- 
 
@@ -65,14 +65,14 @@ We do this to set the stage for continuous variables in chapter 7. Also, strictl
 
 <!-- 6.3  must explain clearly the concept of standard error and confidence intervals. Need this rock-solid before going into MAD SD complexity in chapter 7. -->
 
-<!-- 6.3 statistical definitions. Expand to include standard error and posterior probabilty distribution. (Rename as the posterior probablity distribution for p. Show them that posterior.) There is a truth! There is a true value for p which we do not know! We want to create a posterior probability distribution which summarizes our knowledge. (I am not sure if the words "sampling distribution" belong beyond a single sentence.) We care about the posterior probability distribution of p. We will make that, formally, in the next section. For now, here is a preview. The center of that distribution is around the mean or median of the proportion in your sample. (Which makes sense! Show how this line goes through your mean dots.) The sd (or mad) of that posterior is this formula! Give standard error formula. Note that this is the same thing as the standard deviation of the repeated samples! (Or at least say that, and then show how the red line goes through your dots.) -->
+<!-- 6.3 statistical definitions. Expand to include standard error and posterior probability distribution. (Rename as the posterior probability distribution for p. Show them that posterior.) There is a truth! There is a true value for p which we do not know! We want to create a posterior probability distribution which summarizes our knowledge. (I am not sure if the words "sampling distribution" belong beyond a single sentence.) We care about the posterior probability distribution of p. We will make that, formally, in the next section. For now, here is a preview. The center of that distribution is around the mean or median of the proportion in your sample. (Which makes sense! Show how this line goes through your mean dots.) The sd (or mad) of that posterior is this formula! Give standard error formula. Note that this is the same thing as the standard deviation of the repeated samples! (Or at least say that, and then show how the red line goes through your dots.) -->
 
 
 <!-- 6.3 finishes with this. -->
 
 <!-- "Formula for the standard error. Not justified! How do we calculate a standard error if we only take one sample?!!! -->
 
-<!-- Then provide a demonstration of this! (Next summer!) Simple simulation with urns of various sizes, percentage of red beads which varies, grab a shovel of different sizes, draw a sample, calculate a standard error, calculate a confidence interval, test whetherr ci includes the truth. 95% of the time it should. -->
+<!-- Then provide a demonstration of this! (Next summer!) Simple simulation with urns of various sizes, percentage of red beads which varies, grab a shovel of different sizes, draw a sample, calculate a standard error, calculate a confidence interval, test whether ci includes the truth. 95% of the time it should. -->
 
 <!-- 6.4 shows the right way -->
 
@@ -596,7 +596,7 @@ comparing_sampling_distributions <- ggplot(virtual_prop, aes(x = prop_red)) +
        title = "Comparing distributions of proportions red for three different shovel sizes.") +
   facet_wrap(~ n) 
 
-# Inspect our new facetted graph. 
+# Inspect our new faceted graph. 
 
 comparing_sampling_distributions
 ```
@@ -755,9 +755,7 @@ glimpse(shovels_100)
 
 Now, we have the standard deviation of `prop_red` for all shovel sizes from 1 to 100.  Let's plot that value to see how it changes as the shovel gets larger:
 
-<!-- DK: Explain function(.x) 1/(2 * sqrt(.x)) 
-
-MF: I'm confused why we are using (2 * sqrt(.x)). If we are plotting for standard error, shouldn't we have the standard deviation (prop_red_sd) over sqrt of the sample size, x? DK: I don't know! Math is hard! -->
+<!-- MF: Still researching the below problem. -->
 
 
 ```{r, echo = FALSE, fig.cap = "Comparing standard deviations of proportions red for 100 different shovels. The standard deviation decreases at the same rate as the square root of shovel size. The red line shows the standard error."}
@@ -780,6 +778,10 @@ knitr::include_graphics("06-one-parameter/images/meme_math.png")
 This is the power of running many analyses at once using `map_*` functions and list columns: before, we could tell that the standard deviation was decreasing as the shovel size increased, but when only looking at shovel sizes of 25, 50, and 100, it wasn't clear *how quickly* it was decreasing.
 
 ## Standard error {#standard-errors}
+
+```{r, echo = FALSE, fig.cap= "Standard errors are just the way old people talk about confidence intervals.", fig.align= 'center'}
+knitr::include_graphics("06-one-parameter/images/old_man_SE.png")
+```
 
 Standard errors quantify the effect of sampling variation induced on our estimates. In other words, they quantify how much we can expect different proportions of a shovel's beads that are red *to vary* from one sample to another sample to another sample, and so on. As a general rule, as sample size increases, the standard error decreases.
 
@@ -927,6 +929,10 @@ The standard error measures the accuracy of a sample distribution as compared to
 
 To really drive home our point: standard error is just a fancy term for your uncertainty about something you don't know. Standard error == our (uncertain) beliefs. 
 
+```{r, echo = FALSE, fig.cap= "If you are wondering how much you need to know, follow this helpful guide of the information we have learned this chapter!", fig.align= 'center'}
+knitr::include_graphics("06-one-parameter/images/preceptor_hierarchy.png")
+```
+
 <!-- Add more SE discussion here. -->
 
 Before we move on from our urn, do we know what the true value of the population proportion $p$ of the $N$ = 1000 beads in the urn was? Yes, actually. There were 400 red beads, for a proportion red of 400/1000 = .40 = 40%! How do we know this? Did the authors do an exhaustive count of all the beads? No! They were listed in the contents of the box that the urn came in! Hence we were able to make the contents of the virtual `urn` match the tactile urn. 
@@ -955,6 +961,8 @@ We have looked at a number of different models and their accuracy and precision.
 
 ### Joint distribution
 
+Let's start with our first question: **If we get 17 red beads in a random sample of size 50 taken from an urn with 1000 (white or red) beads, how many red beads are in the urn?**
+
 In Chapter \@ref(probability) we outlined the key intuition behind all inference: there is a joint distribution of data-which-we-might-see-from-our-experiment and models-which-we-are-considering. We take this joint distribution, combine it with the actual results of the experiment, and calculate a posterior distribution over the set of possible models. In other words, we start with 
 
 $$\text{Prob}(\text{models}, \text{data})$$ 
@@ -975,9 +983,22 @@ It is useful to define a parameter, $p$, which is the proportion of red beads in
 ```{r, cache = TRUE}
 set.seed(10)
 
+# Set values for the urn, paddle, and reps
+# as this helps with creating our joint
+# distribution later. 
+
 urn_size <- 1000
 paddle_size <- 50
 reps <- 100
+
+# Create a tibble where red_in_urn creates 
+# a sequence from 0 to urn_size(1000) by
+# a value of 1. Create p as red_in_urn
+# divided by the total urn_size. Column
+# red_in_paddle will map p using rbinom().
+# Call n = reps (where reps is defined
+# as 100) and size as paddle_size (defined
+# as 50). Finally, unnest!
 
 joint_dist <- 
   tibble(red_in_urn = seq(from = 0, to = urn_size, by = 1)) %>% 
@@ -987,10 +1008,14 @@ joint_dist <-
                                                prob = .))) %>%
     unnest(red_in_paddle) 
 
+# After making our joint distribution, take a 
+# sample of size 10. 
+
 joint_dist %>% 
   sample_n(10)
 ```
 
+After looking at our joint distribution, let's plot it. Call the `red_in_urn` for our y-axis, to indicate the number of red beads in the urn. Call `red_in_paddle` for our x-axis, to indicate the number of red beads in each paddle. This allows us to see which possible values of red beads in our samples correspond with the total number of red beads in the urn.
 
 ```{r, cache = TRUE}
 joint_dist %>%
@@ -1008,22 +1033,23 @@ It is easier to define our "model" in this joint distribution in terms of the un
 joint_dist %>%
   ggplot(aes(y = p, x = red_in_paddle)) +
     geom_point(alpha = 0.005) +
-    labs(title = "Joint Distribution of Red Beads in Paddle and Proportion Red Beads in Urr",
+    labs(title = "Joint Distribution of Red Beads in Paddle and Proportion Red Beads in Urn",
          x = "Number of Red Beads in Paddle",
          y = "Proportion of Red Beads in Urn")
 
 ```
 
-
-To better visualize this distribution, take a look at the 3D version of this plot. Note the U shape of the graph. By this, we mean to note the peaks at the areas where the number of red beads in the paddle is 0 out of 50 and 50 out of 50. This is due to the fact that, when we draw 0 red beads in a sample of 50 beads, the possibilities for the number of red beads in the urn is consistently close to 0. Similarily, when our sample of 50 beads comes out with 50 red beads, the possibilities for the number of red beads in the urn is consistently closer to 1000. 
+To better visualize this distribution, take a look at the 3D version of this plot. Note the U shape of the graph. By this, we mean to note the peaks at the areas where the number of red beads in the paddle is 0 out of 50 and 50 out of 50. This is due to the fact that, when we draw 0 red beads in a sample of 50 beads, the possibilities for the number of red beads in the urn is consistently close to 0. Similarly, when our sample of 50 beads comes out with 50 red beads, the possibilities for the number of red beads in the urn is consistently closer to 1000. 
 
 ```{r, echo = FALSE, cache=TRUE, fig.cap = "A 3D image of our joint distribution created with Rayshader."}
 knitr::include_graphics("06-one-parameter/images/rayshader_full.png")
 ```
 
+Now, we have explored the most likely possibilities according to all possible models of this scenario. Let's pivot to a posterior distribution, which will take a *slice* of our joint distribution that is more specific to our question. 
+
 ### Posterior distribution
 
-We follow the same steps now as we did in Chapter \@ref(probability). We run the experiment. When we look at our question -- we are asking for the posterior probability of a certain case. This case is where we find that, using the 50 slot shovel, we get a result of 17 red beads. What does that make our posterior probability? We want:
+When we look at our question -- we are asking for the posterior probability of a certain case. This case is where we find that, using the 50 slot shovel, we get a result of 17 red beads. What does that make our posterior probability? We want:
 
 $$\text{Prob}(\text{models} | \text{data} = 17)$$
 
@@ -1031,6 +1057,11 @@ The same approach works again. We take a "slice" of the joint distribution where
 
 ```{r}
 joint_dist %>% 
+  
+  # Filtering for where the red_in_paddle
+  # equals 17 allows us to isolate the 
+  # data that pertains to our question.
+  
   filter(red_in_paddle == 17) %>% 
   ggplot(aes(x = p)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
@@ -1039,6 +1070,11 @@ joint_dist %>%
          subtitle = "Proportion of red beads in urn is centered around 0.34",
          x = "Proportion p of Red Beads in Urn",
          y = "Probability") + 
+  
+  # Here, the labels call allows us to format
+  # our axises by whether we would like them to
+  # display as numbers or percentages. 
+  
     scale_x_continuous(labels = scales::number_format()) +
     scale_y_continuous(labels = scales::percent_format()) +
     theme_classic()
@@ -1069,6 +1105,7 @@ We need to create an (unnormalized) posterior distribution for the number of red
 
 ```{r}
 set.seed(16)
+
 paddle_size <- 20
 
 
@@ -1106,20 +1143,15 @@ sum(post_dist$new_reds > 8) /  length(post_dist$new_reds)
   
 ```
 
-
 The answer is about 25%. 
-
-
 
 ## Discussion
 
 ### stan_glm()
 
-<!-- MF: So, we just want to show stan_glm here, right? No explanations? Yes. Explain not to worry! -->
-
 <!-- Change "centered at" to reference p. Use rho instead of p -->
 
-Instead of building the joint and conditional probability distributions "by hand" as above, we can just use `stan_glm()` from the **rstanarm** package. For now, we will just walk through the code for doing this very quickly. Chapter \@ref(two-parameters) will provide a step-by-step explanation.
+Instead of building the joint and conditional probability distributions "by hand" as above, we can just use `stan_glm()` from the **rstanarm** package. For now, we will just walk through the code for doing this very quickly. Chapter \@ref(two-parameters) will provide a step-by-step explanation. **To be clear, you do not need to fully understand this section or how this code works. This is an introduction, not a formal lesson.**
 
 Assume that, as before, a shovel of size 50 drawn from the urn has returned 17 red beads and 33 white. Create an object which contains this data.
 
@@ -1200,7 +1232,6 @@ new_shovel %>%
 Recall the second question:
 
 *What is the probability, using the same urn, that we will draw more than 8 red beads if we use a shovel of size 20?*
-
 
 We can either eyeball this graphic or calculate the value from the `new_shovel` object directly:
 
@@ -1308,7 +1339,7 @@ What you have visualized in this chapter was a demonstration of a famous theorem
 
 One of the most important aspects of sampling is the **sampling mechanism**: the mechanism through which we sample our population. This concept is related, but distinctly different, from the **assignment mechanism** that we learned about in Chapter 3. 
 
-The assignment mechanism sorts units into control and experiment groups, while the sampling mechanism is the means through which we aquire our sample. Assignment mechanisms do not have a place in our urn paradigm since we are not measuring any causal relationship or assigning beads to specific groups.  
+The assignment mechanism sorts units into control and experiment groups, while the sampling mechanism is the means through which we acquire our sample. Assignment mechanisms do not have a place in our urn paradigm since we are not measuring any causal relationship or assigning beads to specific groups.  
 
 To think about the sampling mechanism further: why are certain beads sampled, while others are not? Is this completely random? 
 
@@ -1416,13 +1447,11 @@ To finish our chapter, we will summarize each section and emphasize the most imp
 
 <!-- DK: What are truly the things we want students to remember! -->
 
-
 ### Tactial sampling
 
 - Sampling allows us to make guesses at an unknown, difficult-to-obtain value by looking at a smaller subset of data and generalizing it to the larger population. 
 - Sampling is preferable in the urn example because counting out 1000 beads from an urn is intensive and tedious. 
-- Sampling is preferable in the real-world because it is often impossible to sample "all the beads" (all the people) in a population. 
-- With sampling, you see variations in your results. This is known as sampling variation and is expected, especially if you draw samples at random (unbiased).
+- Sampling is preferable in the real-world because it is often impossible to sample "all the beads" (all the people) in a population. - With sampling, you see variations in your results. This is known as sampling variation and is expected, especially if you draw samples at random (unbiased).
 
 ### Virtual sampling
 
