@@ -162,26 +162,26 @@ The mathematics:
 
 <!-- DK: Should standardize the notation across the book. -->
 
-$$ y_i = \beta_1 x_{r,i} + \beta_2 x_{d,i} + \epsilon_i$$
+$$ y_i = \beta_1 republican_i + \beta_2 democrat_i + \epsilon_i$$
 
 where \n
-$$x_{r,i}, x_{d,i} \in \{0,1\}$$ \n
-$$x_{r,i} +  x_{d,i} = 1$$ \n
+$$republican_i, democrat_i \in \{0,1\}$$ \n
+$$republican_i +  democrat_i = 1$$ \n
 $$\epsilon_i \sim N(0, \sigma^2)$$   
 
 Don't panic dear poets and philosophers, the whole thing is easier than it looks.
 
 <!-- DK: This whole section is very awkward. Start with which is data and which is parameters. -->
 
-* On the left-hand side we have the outcome, $y_i$, which is the variable to be explained. In our case, this is the age.
+* On the left-hand side we have the outcome, $y_i$, which is the variable to be explained. In our case, this is the age of an individual in the population.
 
-* On the right-hand side we first have the part contained in the model, consisting of two similar terms. Each term consists of a parameter and a data point. The betas are our two parameters: $\beta_1$ is the average age of Republicans in the population and $\beta_2$ is the average age of  Democrats in the population. The $x$'s are our explanatory variables and take the values 1 or 0. If someone is a Republican we have $x_{r,i} = 1$ and $x_{d,i} = 0$, if someone is a Democrat we have $x_{r,i} = 0$ and $x_{d,i} = 1$. In other words, the $x$'s are binary variables and are mutually exclusive (if you are a Democrat, you cannot also be a Republican).
+* On the right-hand side we first have the part contained in the model, consisting of two similar terms. Each term consists of a parameter and a data point. The betas are our two parameters: $\beta_1$ is the average age of Republicans in the population and $\beta_2$ is the average age of Democrats in the population.  $republican_i$ and $democrat_i$ are our explanatory variables and take the values 1 or 0. If someone is a Republican we have $republican_i = 1$ and $democrat_i = 0$, if someone is a Democrat we have $republican_i = 0$ and $democrat_i = 1$. In other words, their values mutually exclusive -- if you are a Democrat, you cannot also be a Republican.
 
 <!-- DK: "Connected to" is awkward here. -->
 
 * The last part, $\epsilon_i$ (“epsilon”), represents the unexplained part and is called the error term. It is simply the difference between the outcome and our model predictions. This includes all factors that have an influence on someone's age but are not connected to party affiliation. We assume that this error follows a normal distribution with an expected value of 0 (meaning it is 0 on average).
 
-* The small $i$'s are an index to number observations. It is equivalent to the "ID" column in our Preceptor Table and simply states that the outcome for person $i$ is explained by the modeled and non-modeled factors for person $i$. The corresponding $x$'s have an $r$ or $d$ subscript, for Republican or Democrat.
+* The small $i$'s are an index to number observations. It is equivalent to the "ID" column in our Preceptor Table and simply states that the outcome for person $i$ is explained by the modeled and non-modeled factors for person $i$. 
 
 * Keep in mind that the model is a claim about how the world works, not just for the 115 individuals for which we have data but for the all the people in the population for which we seek to draw inferences.
 
@@ -461,7 +461,7 @@ In words, we would expect the oldest Democrat to be about 22 years older than th
 
 Instead of parameterizing this model without an intercept, we could have used one. In that case, the math would be:
 
-$$ y_i = \beta_0  + \beta_1 x_{d,i} + \epsilon_i$$
+$$ y_i = \beta_0  + \beta_1 democratic_i + \epsilon_i$$
 The interpretations of the parameters are different from the prior model. $\beta_0$ is now the average age of Republicans. This is the same interpretation as $\beta_1$ in the original set up. $\beta_1$ is now the difference between the the average age of Republicans and that of Democrats. 
 
 To fit this model, we use the exact same code as before, except without the `-1` in the `formula` argument.
@@ -534,11 +534,11 @@ A Preceptor Table for this model would look very similar to the one in the first
 
 The math for this model is exactly the same as the math for the predictive model in the first part of this chapter, although we change the notation a bit for clarity.
 
-$$ y_i = \beta_1 x_{t,i} + \beta_2 x_{c,i} + \epsilon_i$$
+$$ y_i = \beta_1 treatment_i + \beta_2 control_i + \epsilon_i$$
 
 where \n
-$$x_{t,i}, x_{c,i} \in \{0,1\}$$ \n
-$$x_{t,i} +  x_{c,i} = 1$$ \n
+$$treatment_i, control_i \in \{0,1\}$$ \n
+$$treatment_i +  control_i = 1$$ \n
 $$\epsilon_i \sim N(0, \sigma^2)$$  
 
 <!-- DK: make these sections much more similar across the chapters, always separating out the data and the paramters -->
@@ -547,7 +547,7 @@ Nothing has changed, except for the meaning of the data items and the interpreta
 
 * On the left-hand side we have the outcome, $y_i$, which is the variable to be explained. In our case, this is a person's attitude toward immigration after the experiment is complete.  $y_i$ takes on integer values between 3 and 15 inclusive.
 
-* On the right-hand side we first have the part contained in the model, consisting of two similar terms. The two terms stand for Treated and Control and work as follows. Each term consists of a parameter and a data point.  $\beta_1$ is the average attitude toward immigration for treated individuals --- those exposed to Spanish-speakers ---   in the population. $\beta_2$ is the average attitude toward immigration for control individuals --- those not exposed to Spanish-speakers ---  in the population. The $x$'s are our explanatory variables and take the values 1 or 0. If person $i$ is Treated, $x_{t,i} = 1$ and $x_{c,i} = 0$. If person $i$ is Control, $x_{t,i} = 0$ and $x_{c,i} = 1$. In other words, the $x$'s are binary variables and are mutually exclusive -- if you are Treated, you cannot also be Control.
+* On the right-hand side we first have the part contained in the model, consisting of two similar terms. The two terms stand for Treated and Control and work as follows. Each term consists of a parameter and a data point.  $\beta_1$ is the average attitude toward immigration for treated individuals --- those exposed to Spanish-speakers ---   in the population. $\beta_2$ is the average attitude toward immigration for control individuals --- those not exposed to Spanish-speakers ---  in the population. The $x$'s are our explanatory variables and take the values 1 or 0. If person $i$ is Treated, $treatment_i = 1$ and $control_i = 0$. If person $i$ is Control, $treatment_i = 0$ and $control_i = 1$. In other words, these are binary variables and are mutually exclusive -- if you are Treated, you cannot also be Control.
 
 * Note that the formula applies to everyone in the population, not just the 115 people for whom we have data. The index $i$ does not just go from 1 through 115. It goes from 1 through $N$, where $N$ is the number of individuals in the population. Conceptually, everyone has an `att_end` under treatment and under control. 
 
@@ -555,7 +555,7 @@ Nothing has changed, except for the meaning of the data items and the interpreta
 
 * The last part, $\epsilon_i$ (“epsilon”), represents the unexplained part and is called the error term. It is simply the difference between the outcome and our model predictions. In our particular case, this includes all factors that have an influence on someone's attitude toward immigration but are not explained by treatment status. We assume that this error follows a normal distribution with an expected value of 0.
 
-* The small $i$'s are an index for the data set. It is equivalent to the "ID" column in our Preceptor Table and simply states that the outcome for person $i$ is explained by the modeled and non-modelled factors for person $i$. The corresponding $x$'s have a $t$ or $c$ subscript, for Treated or Control.
+* The small $i$'s are an index for the data set. It is equivalent to the "ID" column in our Preceptor Table and simply states that the outcome for person $i$ is explained by the predictor variables ($treatment$ and $control$) for person $i$, along with an error term. 
 
 
 ### Courage
