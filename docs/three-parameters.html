@@ -766,20 +766,20 @@ FIGURE 8.2: Justice
 <p>In words, any event depends on our explicitly described model as well as on influences unknown to us. Everything that happens in the world is the result of various factors, and we can only consider some of them in our model (because we do not know about some influences, or because we have no data about them).</p>
 <p>The mathematics:</p>
 <!-- DK: Should standardize the notation across the book. -->
-<p><span class="math display">\[ y_i = \beta_1 x_{r,i} + \beta_2 x_{d,i} + \epsilon_i\]</span></p>
+<p><span class="math display">\[ y_i = \beta_1 republican_i + \beta_2 democrat_i + \epsilon_i\]</span></p>
 <p>where 
-<span class="math display">\[x_{r,i}, x_{d,i} \in \{0,1\}\]</span> 
-<span class="math display">\[x_{r,i} +  x_{d,i} = 1\]</span> 
+<span class="math display">\[republican_i, democrat_i \in \{0,1\}\]</span> 
+<span class="math display">\[republican_i +  democrat_i = 1\]</span> 
 <span class="math display">\[\epsilon_i \sim N(0, \sigma^2)\]</span></p>
 <p>Don’t panic dear poets and philosophers, the whole thing is easier than it looks.</p>
 <!-- DK: This whole section is very awkward. Start with which is data and which is parameters. -->
 <ul>
-<li><p>On the left-hand side we have the outcome, <span class="math inline">\(y_i\)</span>, which is the variable to be explained. In our case, this is the age.</p></li>
-<li><p>On the right-hand side we first have the part contained in the model, consisting of two similar terms. Each term consists of a parameter and a data point. The betas are our two parameters: <span class="math inline">\(\beta_1\)</span> is the average age of Republicans in the population and <span class="math inline">\(\beta_2\)</span> is the average age of Democrats in the population. The <span class="math inline">\(x\)</span>’s are our explanatory variables and take the values 1 or 0. If someone is a Republican we have <span class="math inline">\(x_{r,i} = 1\)</span> and <span class="math inline">\(x_{d,i} = 0\)</span>, if someone is a Democrat we have <span class="math inline">\(x_{r,i} = 0\)</span> and <span class="math inline">\(x_{d,i} = 1\)</span>. In other words, the <span class="math inline">\(x\)</span>’s are binary variables and are mutually exclusive (if you are a Democrat, you cannot also be a Republican).</p></li>
+<li><p>On the left-hand side we have the outcome, <span class="math inline">\(y_i\)</span>, which is the variable to be explained. In our case, this is the age of an individual in the population.</p></li>
+<li><p>On the right-hand side we first have the part contained in the model, consisting of two similar terms. Each term consists of a parameter and a data point. The betas are our two parameters: <span class="math inline">\(\beta_1\)</span> is the average age of Republicans in the population and <span class="math inline">\(\beta_2\)</span> is the average age of Democrats in the population. <span class="math inline">\(republican_i\)</span> and <span class="math inline">\(democrat_i\)</span> are our explanatory variables and take the values 1 or 0. If someone is a Republican we have <span class="math inline">\(republican_i = 1\)</span> and <span class="math inline">\(democrat_i = 0\)</span>, if someone is a Democrat we have <span class="math inline">\(republican_i = 0\)</span> and <span class="math inline">\(democrat_i = 1\)</span>. In other words, their values mutually exclusive – if you are a Democrat, you cannot also be a Republican.</p></li>
 </ul>
 <!-- DK: "Connected to" is awkward here. --><ul>
 <li><p>The last part, <span class="math inline">\(\epsilon_i\)</span> (“epsilon”), represents the unexplained part and is called the error term. It is simply the difference between the outcome and our model predictions. This includes all factors that have an influence on someone’s age but are not connected to party affiliation. We assume that this error follows a normal distribution with an expected value of 0 (meaning it is 0 on average).</p></li>
-<li><p>The small <span class="math inline">\(i\)</span>’s are an index to number observations. It is equivalent to the “ID” column in our Preceptor Table and simply states that the outcome for person <span class="math inline">\(i\)</span> is explained by the modeled and non-modeled factors for person <span class="math inline">\(i\)</span>. The corresponding <span class="math inline">\(x\)</span>’s have an <span class="math inline">\(r\)</span> or <span class="math inline">\(d\)</span> subscript, for Republican or Democrat.</p></li>
+<li><p>The small <span class="math inline">\(i\)</span>’s are an index to number observations. It is equivalent to the “ID” column in our Preceptor Table and simply states that the outcome for person <span class="math inline">\(i\)</span> is explained by the modeled and non-modeled factors for person <span class="math inline">\(i\)</span>.</p></li>
 <li><p>Keep in mind that the model is a claim about how the world works, not just for the 115 individuals for which we have data but for the all the people in the population for which we seek to draw inferences.</p></li>
 <li><p>Although terminology differs across academic fields, the most common term to describe a model like this is a “regression.” We are “regressing” <code>age</code> on <code>party</code> in order to see if they are associated with each other. The formula above is a “regression formula,” and the model is a “regression model.” This terminology would also apply to our model of <code>height</code> in Chapter <a href="two-parameters.html#two-parameters">7</a>.</p></li>
 <li><p>The model in Chapter <a href="two-parameters.html#two-parameters">7</a> is sometimes called “intercept-only” because the only (interesting) parameter is the intercept. Here we have a “two intercept” model because, instead of estimating an average for the whole population, we are estimating two averages.</p></li>
@@ -843,8 +843,8 @@ FIGURE 8.3: Courage
                    alpha <span class="op">=</span> <span class="fl">0.5</span>, 
                    bins <span class="op">=</span> <span class="fl">100</span>, 
                    position <span class="op">=</span> <span class="st">"identity"</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Posterior Probability Distribution"</span>,
-         subtitle <span class="op">=</span> <span class="st">"Average age for Boston commuters in 2012"</span>,
+    <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Posterior for Average Age"</span>,
+         subtitle <span class="op">=</span> <span class="st">"More data allows for a more precise posterior for Democrats"</span>,
          x <span class="op">=</span> <span class="st">"Age"</span>,
          y <span class="op">=</span> <span class="st">"Probability"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_y_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org//reference/label_percent.html">percent_format</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
@@ -1345,7 +1345,8 @@ FIGURE 8.4: Temperance
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">`1`</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">geom_histogram</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y <span class="op">=</span> <span class="fu">after_stat</span><span class="op">(</span><span class="va">count</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">count</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
                    bins <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>  <span class="op">+</span>
-    <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Posterior Probability Distribution for a Democrat's Age"</span>,
+    <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Posterior for a Random Democrat's Age"</span>,
+         subtitle <span class="op">=</span> <span class="st">"Individual predictions are always more variable than expected values"</span>,
          x <span class="op">=</span> <span class="st">"Age"</span>,
          y <span class="op">=</span> <span class="st">"Probability"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_y_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org//reference/label_percent.html">percent_format</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
@@ -1429,8 +1430,8 @@ FIGURE 8.4: Temperance
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">age_diff</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">geom_histogram</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y <span class="op">=</span> <span class="fu">after_stat</span><span class="op">(</span><span class="va">count</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">count</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
                    bins <span class="op">=</span> <span class="fl">100</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Posterior Probability Distribution"</span>,
-         subtitle <span class="op">=</span> <span class="st">"Age difference between the oldest/youngest of three Democrats/Republicans"</span>,
+    <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Posterior for Age Difference"</span>,
+         subtitle <span class="op">=</span> <span class="st">"Oldest of three Democrats compared to youngest of three Republicans"</span>,
          x <span class="op">=</span> <span class="st">"Age"</span>,
          y <span class="op">=</span> <span class="st">"Probability"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_y_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org//reference/label_percent.html">percent_format</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
@@ -1443,7 +1444,7 @@ FIGURE 8.4: Temperance
 <span class="header-section-number">8.1.5</span> Addendum<a class="anchor" aria-label="anchor" href="#addendum"><i class="fas fa-link"></i></a>
 </h3>
 <p>Instead of parameterizing this model without an intercept, we could have used one. In that case, the math would be:</p>
-<p><span class="math display">\[ y_i = \beta_0  + \beta_1 x_{d,i} + \epsilon_i\]</span>
+<p><span class="math display">\[ y_i = \beta_0  + \beta_1 democratic_i + \epsilon_i\]</span>
 The interpretations of the parameters are different from the prior model. <span class="math inline">\(\beta_0\)</span> is now the average age of Republicans. This is the same interpretation as <span class="math inline">\(\beta_1\)</span> in the original set up. <span class="math inline">\(\beta_1\)</span> is now the difference between the the average age of Republicans and that of Democrats.</p>
 <p>To fit this model, we use the exact same code as before, except without the <code>-1</code> in the <code>formula</code> argument.</p>
 <div class="sourceCode" id="cb689"><pre class="downlit sourceCode r">
@@ -1521,21 +1522,21 @@ FIGURE 8.6: Justice
 <p>A Preceptor Table for this model would look very similar to the one in the first half of this chapter, except that we have now possible outcomes for each individual: <code>att_end</code> if they are exposed to treatment and <code>att_end</code> if they are exposed to control.</p>
 <!-- DK: We need to add Preceptor Tables here and elsewhere. The below one is wrong because it does not show two potential outcomes.  Should use proper potential outcome notation, as introduced in chapter 4. -->
 <p>The math for this model is exactly the same as the math for the predictive model in the first part of this chapter, although we change the notation a bit for clarity.</p>
-<p><span class="math display">\[ y_i = \beta_1 x_{t,i} + \beta_2 x_{c,i} + \epsilon_i\]</span></p>
+<p><span class="math display">\[ y_i = \beta_1 treatment_i + \beta_2 control_i + \epsilon_i\]</span></p>
 <p>where 
-<span class="math display">\[x_{t,i}, x_{c,i} \in \{0,1\}\]</span> 
-<span class="math display">\[x_{t,i} +  x_{c,i} = 1\]</span> 
+<span class="math display">\[treatment_i, control_i \in \{0,1\}\]</span> 
+<span class="math display">\[treatment_i +  control_i = 1\]</span> 
 <span class="math display">\[\epsilon_i \sim N(0, \sigma^2)\]</span></p>
 <!-- DK: make these sections much more similar across the chapters, always separating out the data and the paramters -->
 <p>Nothing has changed, except for the meaning of the data items and the interpretations of the parameters.</p>
 <ul>
 <li><p>On the left-hand side we have the outcome, <span class="math inline">\(y_i\)</span>, which is the variable to be explained. In our case, this is a person’s attitude toward immigration after the experiment is complete. <span class="math inline">\(y_i\)</span> takes on integer values between 3 and 15 inclusive.</p></li>
-<li><p>On the right-hand side we first have the part contained in the model, consisting of two similar terms. The two terms stand for Treated and Control and work as follows. Each term consists of a parameter and a data point. <span class="math inline">\(\beta_1\)</span> is the average attitude toward immigration for treated individuals — those exposed to Spanish-speakers — in the population. <span class="math inline">\(\beta_2\)</span> is the average attitude toward immigration for control individuals — those not exposed to Spanish-speakers — in the population. The <span class="math inline">\(x\)</span>’s are our explanatory variables and take the values 1 or 0. If person <span class="math inline">\(i\)</span> is Treated, <span class="math inline">\(x_{t,i} = 1\)</span> and <span class="math inline">\(x_{c,i} = 0\)</span>. If person <span class="math inline">\(i\)</span> is Control, <span class="math inline">\(x_{t,i} = 0\)</span> and <span class="math inline">\(x_{c,i} = 1\)</span>. In other words, the <span class="math inline">\(x\)</span>’s are binary variables and are mutually exclusive – if you are Treated, you cannot also be Control.</p></li>
+<li><p>On the right-hand side we first have the part contained in the model, consisting of two similar terms. The two terms stand for Treated and Control and work as follows. Each term consists of a parameter and a data point. <span class="math inline">\(\beta_1\)</span> is the average attitude toward immigration for treated individuals — those exposed to Spanish-speakers — in the population. <span class="math inline">\(\beta_2\)</span> is the average attitude toward immigration for control individuals — those not exposed to Spanish-speakers — in the population. The <span class="math inline">\(x\)</span>’s are our explanatory variables and take the values 1 or 0. If person <span class="math inline">\(i\)</span> is Treated, <span class="math inline">\(treatment_i = 1\)</span> and <span class="math inline">\(control_i = 0\)</span>. If person <span class="math inline">\(i\)</span> is Control, <span class="math inline">\(treatment_i = 0\)</span> and <span class="math inline">\(control_i = 1\)</span>. In other words, these are binary variables and are mutually exclusive – if you are Treated, you cannot also be Control.</p></li>
 <li><p>Note that the formula applies to everyone in the population, not just the 115 people for whom we have data. The index <span class="math inline">\(i\)</span> does not just go from 1 through 115. It goes from 1 through <span class="math inline">\(N\)</span>, where <span class="math inline">\(N\)</span> is the number of individuals in the population. Conceptually, everyone has an <code>att_end</code> under treatment and under control.</p></li>
 </ul>
 <!-- DK: Above is not overly clear. --><ul>
 <li><p>The last part, <span class="math inline">\(\epsilon_i\)</span> (“epsilon”), represents the unexplained part and is called the error term. It is simply the difference between the outcome and our model predictions. In our particular case, this includes all factors that have an influence on someone’s attitude toward immigration but are not explained by treatment status. We assume that this error follows a normal distribution with an expected value of 0.</p></li>
-<li><p>The small <span class="math inline">\(i\)</span>’s are an index for the data set. It is equivalent to the “ID” column in our Preceptor Table and simply states that the outcome for person <span class="math inline">\(i\)</span> is explained by the modeled and non-modelled factors for person <span class="math inline">\(i\)</span>. The corresponding <span class="math inline">\(x\)</span>’s have a <span class="math inline">\(t\)</span> or <span class="math inline">\(c\)</span> subscript, for Treated or Control.</p></li>
+<li><p>The small <span class="math inline">\(i\)</span>’s are an index for the data set. It is equivalent to the “ID” column in our Preceptor Table and simply states that the outcome for person <span class="math inline">\(i\)</span> is explained by the predictor variables (<span class="math inline">\(treatment\)</span> and <span class="math inline">\(control\)</span>) for person <span class="math inline">\(i\)</span>, along with an error term.</p></li>
 </ul>
 </div>
 <div id="courage-3" class="section level3" number="8.2.3">
@@ -1591,8 +1592,8 @@ FIGURE 8.7: Courage
                    alpha <span class="op">=</span> <span class="fl">0.5</span>, 
                    bins <span class="op">=</span> <span class="fl">100</span>, 
                    position <span class="op">=</span> <span class="st">"identity"</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Posterior Probability Distribution"</span>,
-         subtitle <span class="op">=</span> <span class="st">"Average attitude toward immigration"</span>,
+    <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Posterior for Expected Attitude Toward Immigration"</span>,
+         subtitle <span class="op">=</span> <span class="st">"Treated individuals are more conservative"</span>,
          x <span class="op">=</span> <span class="st">"Attitude"</span>,
          y <span class="op">=</span> <span class="st">"Probability"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_y_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org//reference/label_percent.html">percent_format</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
@@ -1626,7 +1627,7 @@ FIGURE 8.8: Temperance
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">ate</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">geom_histogram</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y <span class="op">=</span> <span class="fu">after_stat</span><span class="op">(</span><span class="va">count</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">count</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
                    bins <span class="op">=</span> <span class="fl">100</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Posterior Probability Distribution for ATE"</span>,
+    <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Posterior for Average Treatment Effect"</span>,
          subtitle <span class="op">=</span> <span class="st">"Exposure to Spanish-speakers shifts immigration attitudes rightward"</span>,
          x <span class="op">=</span> <span class="st">"Difference in Attitude"</span>,
          y <span class="op">=</span> <span class="st">"Probability"</span><span class="op">)</span> <span class="op">+</span>
@@ -1663,7 +1664,7 @@ FIGURE 8.8: Temperance
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">ate</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">geom_histogram</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y <span class="op">=</span> <span class="fu">after_stat</span><span class="op">(</span><span class="va">count</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">count</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
                    bins <span class="op">=</span> <span class="fl">100</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Posterior Probability Distribution for ATE"</span>,
+    <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Posterior for Average Treatment Effect"</span>,
          subtitle <span class="op">=</span> <span class="st">"Exposure to Spanish-speakers shifts immigration attitudes rightward"</span>,
          x <span class="op">=</span> <span class="st">"Difference in Attitude"</span>,
          y <span class="op">=</span> <span class="st">"Probability"</span><span class="op">)</span> <span class="op">+</span>
@@ -1706,7 +1707,7 @@ FIGURE 8.8: Temperance
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">te</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">geom_histogram</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y <span class="op">=</span> <span class="fu">after_stat</span><span class="op">(</span><span class="va">count</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">count</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
                    bins <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>  <span class="op">+</span>
-    <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Posterior Probability Distribution for Treatment Eff  ct"</span>,
+    <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Posterior for Treatment Effect for One Person"</span>,
          subtitle <span class="op">=</span> <span class="st">"Causal effects are more variable for indvduals"</span>,
          x <span class="op">=</span> <span class="st">"Difference in Attitude"</span>,
          y <span class="op">=</span> <span class="st">"Probability"</span><span class="op">)</span> <span class="op">+</span>
@@ -1772,7 +1773,7 @@ $$ y_1 - y_2 = _0 + _1 age_1 - _0 - _1 age_2\</p>
 <p>y_1 - y_2 = _1 age_1 - _1 age_2\</p>
 <p>y_1 - y_2 = _1 (age_1 - age_2)$$</p>
 <p>So, if person 1 is one year older than person 2, we have:</p>
-<p><span class="math display">\[y_1 - y_2 = \beta_1 (age_1 - age_2)\\
+<p><span class="math display">\[ y_1 - y_2 = \beta_1 (age_1 - age_2)\\
 y_1 - y_2 = \beta_1 (1)\\
 y_1 - y_2 = \beta_1 \]</span></p>
 <p>The algebra demonstrates that <span class="math inline">\(\beta_1\)</span> is the same for all ages. The difference in expected income between two people aged 23 and 24 is the same as the difference between two people aged 80 and 81. Is that plausible? Maybe. <em>The algebra does not lie.</em> When we create a model like this, this is the assumption we are making.</p>
@@ -1867,8 +1868,8 @@ FIGURE 8.12: Temperance
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">`1`</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">geom_histogram</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y <span class="op">=</span> <span class="fu">after_stat</span><span class="op">(</span><span class="va">count</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">count</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
                    bins <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>  <span class="op">+</span>
-    <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Posterior Probability Distribution"</span>,
-         subtitle <span class="op">=</span> <span class="st">"Expected income for a 40 year-old commuter"</span>,
+    <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Posterior for Expected Income"</span>,
+         subtitle <span class="op">=</span> <span class="st">"A 40-years old commuter earns around $140,000"</span>,
          x <span class="op">=</span> <span class="st">"Income"</span>,
          y <span class="op">=</span> <span class="st">"Probability"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_x_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org//reference/label_dollar.html">dollar_format</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
