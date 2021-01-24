@@ -254,7 +254,7 @@ Consider the coefficient for $election\_age_i$, $\beta_1$. The median of the pos
 
 This is a descriptive model, not a causal model. Remember our motto from Chapter \@ref(rubin-causal-model): *No causation without manipulation.* There is no way, for person $i$, to change the years that she has been alive on Election Day. On the day of this election, she is X years old. There is no way to change that. So, there are not two (or more) potential outcomes. Without more than one potential outcome, there can not be a causal effect.
 
-Given that, it is important to monitor our language. We do not believe that that changes in `election_age` "cause" changes in `lived_after`. That is obvious. But there are some words and phrases --- like "associated with" and "change by" --- which are too close to causal. (And which we are guilty of using just a few paragraphs ago!) Be wary of their use. *Always think in terms of comparisons when using a predictive model.* We can't change `election_age` from X to Y for an individual candidate. We can only compare two candidates (or two groups of candidates), one with `election_age` equal to X and the other with `election_age` equal to Y. If our model is correct, such candidates will, on average, differ in `lived_after` by $\beta_1$ times the difference between X and Y.
+Given that, it is important to monitor our language. We do not believe that that changes in `election_age` "cause" changes in `lived_after`. That is obvious. But there are some words and phrases --- like "associated with" and "change by" --- which are too close to causal. (And which we are guilty of using just a few paragraphs ago!) Be wary of their use. *Always think in terms of comparisons when using a predictive model.* We can't change `election_age` from 40 to 50 for an individual candidate. We can only compare two candidates (or two groups of candidates), one with `election_age` equal to 40 and the other with `election_age` equal to 50. If our model is correct, such candidates will, on average, differ in `lived_after` by $\beta_1$ times the difference between 40 and 50.
 
 <!-- DK: THis is a critical point. Maybe give a precise example? Go through the math slowly, like ModernDive does? Highlight this somehow? At the very least, we should emphasize the point for each model going forward. -->
 
@@ -343,9 +343,9 @@ $$x_{f,i}, x_{m,i} \in \{0,1\}$$ \n
 $$x_{f,i} +  x_{m,i} = 1$$ \n
 $$\epsilon_i \sim N(0, \sigma^2)$$  
 
-<!-- DK: Provide more details on what each of the items in the formula means, even though this is a repeat of what we did in chapter 8. Don't use "where" with line skips. Just one paragrpah, like elsewhere. -->
+<!-- DK: Provide more details on what each of the items in the formula means, even though this is a repeat of what we did in chapter 8. Don't use "where" with line skips. Just one paragraph, like elsewhere. Discuss index and dummy variables somewhere. -->
 
-The meanings of $lived\_after_i$ and $\epsilon_i$ are the same as in the first model. Indeed, they are the same throughout these exercises.  $x_{f,i}$ and $x_{m,i}$ are 0/1 variables, just like last chapter. They are *variables* whose values vary across individuals.
+The meaning of $lived\_after_i$ and of $\epsilon_i$ is the same as in the first model. Indeed, they are the same throughout these exercises.  $x_{f,i}$ and $x_{m,i}$ are 0/1 variables, just like last chapter. They are *variables* whose values vary across individuals.
 
 The important parameters are $\beta_1$ and $\beta_2$. They are the average years-lived post-election for, respectively, women and men. Again, this is not the "average" for the data we have. That is easy to calculate! No estimation required. $\beta_1$ and $\beta_2$ are averages for the entire "population," however we have chosen to define that term. Those averages can not be calculated directly. They can only be estimated, by creating a posterior probability distribution.
 
@@ -526,17 +526,16 @@ fit_gov_3 %>%
 
 ### c_election_age, sex and c_election_age*sex
 
-Let's create another model. This time, however, the numeric outcome variable of lived_after as a function of the two explanatory variables we used above, `c_election_age` and `sex`, and of their interaction.
+Let's create another model. This time, however, the numeric outcome variable of `lived_after` is a function of the two explanatory variables we used above, `c_election_age` and `sex`, and of their interaction. To look at interactions, we need 5 parameters, which is why we needed to wait until this chapter to introduce the concept.
 
 Math:
 
 $$ lived\_after_i =  \beta_0 + \beta_1 male_i + \beta_2 election\_age\_c_i + \\ \beta_3 male_i *  election\_age\_c_i + \epsilon_i $$
 
-<!-- DK: Need to make these interpretations clearer and more consistent across the examples. -->
+<!-- DK: Need to make these interpretations clearer and more consistent across the examples. Explain how you can have more predictors than you have variables. -->
 
-* Our outcome variable is still $lived\_after_i$. We want to know how many years a candidate will live after an election. 
+* Our outcome variable is still $lived\_after_i$. We want to know how many years a candidate will live after an election. Our explanatory variables as the same as before. $male_i$ is zero for male candidates and one for female candidates. $election\_age\_c_i$ the number of years a candidate has lived before the election, relative to the average value for all candidates. In this model, we have a third predictor variable: the interaction between $male_i$ and $election\_age\_c_i$. 
 
-* $male_i$ is still one of our explanatory variables. If we are predicting the amount of years a male candidate lives after the election, this will be 1. When we are making this prediction for female candidate, this will be 0. $election\_age\_c_i$ is still our other explanatory variable, representing the number of years a candidate has lived before the election, relative to the average value for all candidates. 
 
 * $\beta_0$ is the average number of years lived after the election for women, who on the day of election, have been alive the average number of years of all candidates. In a sense, this is the same meaning as in the previous model, without an interaction term. But, always remember that the meaning of a parameter is conditional on the model in which it is embedded. Even if a parameter is called $\beta_0$ in two different regressions does necessitate that it means the same thing in both regressions. Parameter names are arbitrary, or at least simply a matter of convention.
 
@@ -567,7 +566,7 @@ The intercept has increased. $\beta_0$ is around `r round(coef(fit_gov_4)["(Inte
 
 The coefficient for $election\_age\_c_i$, $\beta_2$, is `r round(coef(fit_gov_4)["c_election_age"], 1)`. What does this mean? It is the slope for females. So, when comparing two female candidates who differ by one year in age, we expect that the older candidate will live `r abs(round(coef(fit_gov_4)["c_election_age"], 1))` years less. Now direct your attention below at the coefficient of `sexMale:c_election_age`, $\beta_3$, which is `r round(coef(fit_gov_4)["sexMale:c_election_age"], 1)`. This is the value that must be added to the coefficient of $election\_age\_c_i$ (recall $\beta_2 + \beta_3$) in order to find the slope for males. When the two are added together, this value, or slope, is about `r round(coef(fit_gov_4)["c_election_age"] + coef(fit_gov_4)["sexMale:c_election_age"], 1)`. When comparing two male candidates who differ in age by one year, we expect the older candidate to live about `r abs(round(coef(fit_gov_4)["c_election_age"] + coef(fit_gov_4)["sexMale:c_election_age"], 1))` years less. 
 
-*Key point*: The interpretation of the intercepts only apply to candidates for whom $election\_age\_c_i = 0$. Candidates who are not `r round(mean(ch10$election_age), 0)` years-old will have different expected number of years to live. The interpretation of the slope applies to everyone. In other words, the relationship between $lived\_after_i$ and $election\_age\_c_i$ is the same, regardless of your gender or how old you are.
+*Key point*: The interpretation of the intercepts only apply to candidates for whom $election\_age\_c_i = 0$. Candidates who are not `r round(mean(ch10$election_age), 0)` years-old will have a different expected number of years to live. The interpretation of the slope applies to everyone. In other words, the relationship between $lived\_after_i$ and $election\_age\_c_i$ is the same, regardless of your gender or how old you are.
 
 
 The posterior:
@@ -596,6 +595,7 @@ fit_gov_4 %>%
     theme_classic()
 ```
 
+Again, *we do not recommend working directly with parameters.* The above analysis would be much easier with `posterior_epred()`, as we will see in the Temperance Section.
 
 Male candidates live longer on average than female candidates. Note, also, that the average years to live after the election for females is about `r round(coef(fit_gov_4)["(Intercept)"], 0)` with this model. With the previous model, it was `r round(coef(fit_gov_3)["(Intercept)"], 0)` years. Why the difference? The interpretation of "average" is different! In the previous model, it was the average for all women. In this model, it is the average for all `r round(mean(ch10$election_age), 0)` years-old women. Those are different things, so we should hardly be surprised by different posteriors.
 
@@ -603,7 +603,7 @@ Male candidates live longer on average than female candidates. Note, also, that 
  
 <!-- DK: Need a better title. How do we describe the meaning of slope without using the word slope? -->
 
-Slope posteriors:
+*Slope* posteriors:
 
 ```{r}
 fit_gov_4 %>% 
@@ -938,6 +938,7 @@ The same reasoning applies to every parameter we estimate, to every prediction w
 
 ## Summary
 
+*Avoid answering questions by working with parameters directly. Use `posterior_epred()` instead.*
 
 *Good data science involves an intelligent tour of the space of possible models.*
 
