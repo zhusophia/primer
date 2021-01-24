@@ -2,6 +2,8 @@
 
 <!-- Clean up all the plots, especially the legends. -->
 
+<!-- Is fit_gov_* a good naming scheme for the models? -->
+
 *This chapter is still a DRAFT. Check back in a few weeks.*
 
 The next step in our model building education is to learn about *interactions*. The effect of a treatment relative to a control is almost never uniform. The effect might be bigger in women than in men, smaller in the rich relative to the poor. The technical term for such effects is "heterogeneous," which is just Ph.D.'ese for "different." With enough data, all effects are heterogeneous. Causal effects, at least in the social science, always vary across units. To model this reality, we rely on "interactions," on allowing the effect size to differ. To so so, we need models with at least 5 parameters. 
@@ -349,11 +351,10 @@ The important parameters are $\beta_1$ and $\beta_2$. They are the average years
 
 <!-- DK: Fix -->
 
-Looking back to the regression model we just created, we see that there is no intercept. Instead of having a $\beta_0$ value, we have $\beta_1$ and $\beta_2$ for female and male. This makes things easier to interpret. Without having to add or subtract anything from an intercept, this regression tells us that, on average, women are expected to live about `r round(coef(fit_gov_2)["sexFemale"], 0)` years after running for governor, and men are expected to live about `r `round(coef(fit_gov_2)["sexMale"], 0)` years.
+Looking back to the regression model we just created, we see that there is no intercept. Instead of having a $\beta_0$ value, we have $\beta_1$ and $\beta_2$ for female and male. This makes things easier to interpret. Without having to add or subtract anything from an intercept, this regression tells us that, on average, women are expected to live about `r round(coef(fit_gov_2)["sexFemale"], 0)` years after running for governor, and men are expected to live about `r round(coef(fit_gov_2)["sexMale"], 0)` years.
 
 This is a strange result. Why would men live almost twice as long as women after the election? One explanation for this might be that women don't run for governor until later in life, and therefore are not expected to live as long.
 
-<!-- DK: Weird result, huh? Men live twice as long as women! Useful to discuss why that might be the case in more detail. -->
 
 Now that we have interpreted the model using a -1 in the formula to estimate $\beta_1$ and $\beta_2$, let's take away the -1 and regress `lived_after` on an intercept and  `sex` to see how our equation changes.
 
@@ -400,8 +401,15 @@ fit_gov_2a %>%
     theme_classic()
 ```
 
+But is that actually so "simple?" Not really! Manipulating parameters directly is bothersome. Dealing with variables named `(Intercept)` is error-prone. Nothing about this approach scales to realistic cases involving numerous predictor variables. Using `posterior_epred()` and associated functions is much easier.
 
-<!-- DK: Fix -->
+```{r}
+
+```
+
+
+
+<!-- Insert posterior_epred() method. Same answer! No reason to manipulate parameters directly. So, we stop doing it! -->
 
 The interpretation of this parameter is the same as we have seen before. There is a true average, across the entire population, of the number of years that male candidates live after the election. We can never know what that true average is. But, it seems very likely that the true average is somewhere between 27.5 and 29.5 years.
 
@@ -522,7 +530,8 @@ Let's create another model. This time, however, the numeric outcome variable of 
 
 Math:
 
-$$ lived\_after_i =  \beta_0 + \beta_1 male_i + \beta_2 election\_age\_c_i + \\ \beta_3 male_i *  election\_age\_c_i + \epsilon_i$$
+$$ lived\_after_i =  \beta_0 + \beta_1 male_i + \beta_2 election\_age\_c_i + \\ \beta_3 male_i *  election\_age\_c_i + \epsilon_i $$
+
 <!-- DK: Need to make these interpretations clearer and more consistent across the examples. -->
 
 * Our outcome variable is still $lived\_after_i$. We want to know how many years a candidate will live after an election. 
@@ -578,7 +587,7 @@ fit_gov_4 %>%
                    alpha = 0.5, 
                    bins = 100, 
                    position = "identity") +
-    labs(title = "Posterior Probability Distribution",
+    labs(title = "Posterior for Years Lived After the Election",
          subtitle = "Men live longer",
          x = "Average Years Lived Post Election",
          y = "Probability") + 
@@ -592,6 +601,7 @@ Male candidates live longer on average than female candidates. Note, also, that 
 
 <!-- DK: Is the above right? -->
  
+<!-- DK: Need a better title. How do we describe the meaning of slope without using the word slope? -->
 
 Slope posteriors:
 
@@ -609,7 +619,7 @@ fit_gov_4 %>%
                    alpha = 0.5, 
                    bins = 100, 
                    position = "identity") +
-    labs(title = "Posterior Probability Distribution",
+    labs(title = "Posterior for Slope of Years-Lived on Years-to_Live",
          subtitle = "Men have a steeper slope",
          x = "slope",
          y = "Probability") + 
@@ -728,8 +738,8 @@ pe %>%
                    alpha = 0.5, 
                    bins = 100, 
                    position = "identity") +
-    labs(title = "Posterior Probability Distribution",
-         subtitle = "Expected years lived post-election",
+    labs(title = "Posterior for Expected Years Lived Post-Election",
+         subtitle = "Male candidates live longer",
          x = "Years",
          y = "Probability") + 
     scale_x_continuous(labels = 
@@ -759,8 +769,8 @@ pe %>%
                    alpha = 0.5, 
                    bins = 100, 
                    position = "identity") +
-    labs(title = "Posterior Probability Distribution",
-         subtitle = "Male candidates live longer",
+    labs(title = "Posterior for Expected Additional Male Years Lived",
+         subtitle = "Male candidates live about 4 years longer",
          x = "Expected Additional Years Lived Post Election",
          y = "Probability") + 
     scale_x_continuous(labels = scales::number_format(accuracy = 1)) +
@@ -816,8 +826,8 @@ pp %>%
                    alpha = 0.5, 
                    bins = 100, 
                    position = "identity") +
-    labs(title = "Posterior Predictive Distribution",
-         subtitle = "For a male and female candidate",
+    labs(title = "Posterior for a Candidate's Years Lived Post-Election",
+         subtitle = "Individual lifespans have a great deal of variation",
          x = "Years Lived Post Election",
          y = "Probability") + 
     scale_x_continuous(labels = scales::number_format()) +
@@ -840,8 +850,8 @@ pp %>%
                    alpha = 0.5, 
                    bins = 100, 
                    position = "identity") +
-    labs(title = "Posterior Predictive Distribution", 
-         subtitle = "How much longer will the male candidate live?",
+    labs(title = "Posterior for a Male Candidate's Extra Years Lived", 
+         subtitle = "Any random male candidate may die before a random female candidate",
          x = "Years",
          y = "Probability") + 
     scale_x_continuous(labels = scales::number_format()) +
@@ -897,8 +907,8 @@ tibble(Expectation = pe$diff,
                    alpha = 0.5, 
                    bins = 100, 
                    position = "identity") +
-    labs(title = "Posterior Probability Distributions",
-         subtitle = "For 62 years-old male and female candidates",
+    labs(title = "Posterior for Expected and Individual Male Advantage",
+         subtitle = "Expected male advantage is much more precisely estimated",
          x = "Additional Years Lived Post Election",
          y = "Probability") + 
     scale_x_continuous(labels = scales::number_format()) +
