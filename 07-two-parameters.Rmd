@@ -359,15 +359,20 @@ fit_obj %>%
   ggplot(aes(x = mu)) +
     geom_histogram(aes(y = after_stat(count/sum(count))), 
                    bins = 100) +
-    labs(title = "Posterior Probability Distribution",
-         subtitle = "Average height among American adult men",
+    labs(title = "Posterior for Average Male Height",
+         subtitle = "American men average around 176 cm in height",
          x = "Height in Centimeters",
-         y = "Probability") +
+         y = "Probability",
+         caption = "Data source: NHANES") +
     scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
     theme_classic()
 ```
 
 Although it is possible to have variable names like "(Intercept)", it is not recommended. Avoid weird names! When you are stuck with them, place them in backticks. Even better, rename them, as we do above.
+
+Note that the title includes the word "Posterior" and not the complete term "Posterior Probability Distribution." This will be our practice going forward. "Posterior" means "Posterior Distribution" and, any posterior distribution in which the sum of the range is 1 is a "posterior probability distribution." In most or our plots, "posterior" implies "posterior probability distribution."
+
+Always go back to first principles. There is some "*truth*, an unknown number, a fact about the world. If we knew everything, if we had the ideal Preceptor Table, inference would not be necessary. Algebra would suffice. Alas, in this imperfect world, we have no choice but to be data scientist. We are always uncertain. We summarize our knowledge of unknown numbers with posterior probability distributions, or "posteriors" for short.
 
 <!-- DK: Add more discussion about what this plot means. -->
 
@@ -377,10 +382,11 @@ fit_obj %>%
   ggplot(aes(x = sigma)) +
     geom_histogram(aes(y = after_stat(count/sum(count))), 
                    bins = 100) +
-    labs(title = "Posterior Probability Distribution",
-         subtitle = "Height standard deviation among American adult men",
+    labs(title = "Posterior for Standard Deviation of Male Height",
+         subtitle = "The standard deviation of height is around 7 to 11 cm",
          x = "Sigma in Centimeters",
-         y = "Probability") +
+         y = "Probability",
+         caption = "Data source: NHANES") +
     scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
     theme_classic()
 ```
@@ -483,8 +489,8 @@ pe %>%
   ggplot(aes(x = `1`)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    bins = 100) +
-    labs(title = "Posterior Probability Distribution",
-         subtitle = "For average adult male height",
+    labs(title = "Posterior for Average Adult Male Height",
+         subtitle = "Note that the plot is very similar to the one created with the parameters",
          x = "Average Height in Centimeters",
          y = "Probability",
          caption = "Data source: NHANES") + 
@@ -527,8 +533,8 @@ pp %>%
   ggplot(aes(x = `1`)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    bins = 100) +
-    labs(title = "Posterior Probability Distribution",
-         subtitle = "For the height of a random adult male",
+    labs(title = "Posterior for Height of Random Male",
+         subtitle = "Uncertainty for a single individual is much greater than for the expected value",
          x = "Height in Centimeters",
          y = "Probability",
          caption = "Data source: NHANES") + 
@@ -616,8 +622,8 @@ pp %>%
   ggplot(aes(x = diff)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    bins = 100) +
-    labs(title = "Posterior Probability Distribution",
-         subtitle = "Max difference in height among four men",
+    labs(title = "Posterior for Max Height Difference Among Four Men",
+         subtitle = "The expected value for this difference would be much more narrow",
          x = "Height Difference in Centimeters",
          y = "Probability",
          caption = "Data source: NHANES") + 
@@ -659,8 +665,8 @@ Explore the `pp` object. It has `r ncol(pp)` columns: one hundred for the 100 in
 pp %>% 
   ggplot(aes(x = third_tallest, y = after_stat(count / sum(count)))) +
     geom_histogram(bins = 100) +
-    labs(title = "Posterior Probability Distribution",
-         subtitle = "Height of 3rd tallest from one hundred men",
+    labs(title = "Posterior for Height of 3rd Tallest Man from Next 100",
+         subtitle = "Should we have more or less certainty about behavior in the tails?",
          x = "Height in Centimeters",
          y = "Probability",
          caption = "Data source: NHANES") + 
@@ -670,7 +676,7 @@ pp %>%
 ```
 
 
-<!-- DK: Need more text. Explain all the things that could be wrong with the model. Explain what is going on in different columns. Explain all the cool R code tricks.  -->
+<!-- DK: Need more text. Explain all the things that could be wrong with the model. Explain what is going on in different columns. Explain all the cool R code tricks. Discuss difference between predict and epred.  -->
 
 
 ## Coverage {#coverage}
@@ -884,8 +890,8 @@ pe %>%
   ggplot(aes(x = `1`)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    bins = 100) +
-    labs(title = "Posterior Probability Distribution",
-         subtitle = "For the probability that a 180 cm tall person is female",
+    labs(title = "Posterior for p(female | height = 180 cm)",
+         subtitle = "There is a 5-6% chance that a person this tall is female",
          x = "Probability",
          y = "Probability",
          caption = "Data source: NHANES") + 
@@ -930,8 +936,8 @@ pp %>%
   ggplot(aes(x = total)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    bins = 100) +
-    labs(title = "Posterior Probability Distribution",
-         subtitle = "Number of women among 100 people 180 cm tall",
+    labs(title = "Posterior for Number of Women among 100 People 180 cm Tall",
+         subtitle = "Consistent with probability estimate above",
          x = "Number of Women",
          y = "Probability",
          caption = "Data source: NHANES") + 
@@ -944,9 +950,11 @@ That 5 or 6 women is the most likely number is very consistent with the answer t
 
 ## Summary
 
+<!-- DK: Discuss meaning of "Posterior" in all plot titles. Show the key code examples. -->
+
 The next five chapters will follow the same process we have just completed here. We start with a decision we have to make. With luck, we will have some data to guide us. (Without data, even the best data scientist will struggle to make progress.) *Wisdom* asks us: "Is the data we have close enough to the decision we face to make using that data helpful?" Often times, the answer is "No." Even if we do have data, and the ability to make a model, Wisdom will tap us on the shoulder and say, "Even if you can make a model, don't forget to ask yourself if you should." Ethics matter.
 
-Once we start to build the model, *Justice* will guide us. Is the model descriptive or causal? What is the mathematical relationship between the dependent variable we are trying to explain and the independent variables we can use to explain it? What assumptions are we making about distributions, especially with regard to the error term?
+Once we start to build the model, *Justice* will guide us. Is the model descriptive or causal? What is the mathematical relationship between the dependent variable we are trying to explain and the independent variables we can use to explain it? What assumptions are we making about distribution of the error term?
 
 Having set up the model framework, we need *Courage* to implement the model in code. Without code, all the math in the world is useless. Once we have created the model, we need to understand it. What are the posterior distributions of the unknown parameters? Do they seem sensible? How should we interpret them?
 
