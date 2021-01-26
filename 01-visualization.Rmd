@@ -49,32 +49,32 @@ library(tidyverse)
 
 That one line of code loads all the packages associated with the **tidyverse**, packages which you will use in almost every data analysis. It also tells you which functions from the tidyverse conflict with functions in base R or with other packages you might have loaded. (We hide these and other messages in this book because they are ugly.)
 
-If you run this code and get the error message “there is no package called ‘tidyverse’”, you’ll need to install the package first using the code below. Then, run `library(tidyverse)` once again.
+You might get this error message:
+
+````
+Error in library(tidyverse) : there is no package called ‘tidyverse’
+````
+
+If that happens, you need to install the package first using the code below. 
 
 
 ```{r, eval = FALSE}
 install.packages("tidyverse")
 ```
 
-If we need to be explicit about where a function (or dataset) comes from, we’ll use double colon operator (::) like this: `package::function()`. For example, `ggplot2::ggplot()` tells you explicitly that we are using the `ggplot()` function from the **ggplot2** package.
+Then, run `library(tidyverse)` once again.
+
 
 ### How do I code in R?
 
 Unlike other statistical software programs like Excel, SPSS, or Minitab that provide [point-and-click](https://en.wikipedia.org/wiki/Point_and_click) interfaces, R is an [interpreted language](https://en.wikipedia.org/wiki/Interpreted_language). This means you have to type in commands written in *R code*. In other words, you have to code/program in R. Note that we'll use the terms "coding" and "programming" interchangeably.
 
+<!-- DK: This is awkward. When are we teaching about R Markdown? -->
 
-If you want a slower introduction than we are providing here, check out the short book, [*Getting Used to R, RStudio, and R Markdown*](https://rbasics.netlify.com/). @usedtor2016 includes screencast recordings that you can follow along and pause as you learn. They include an introduction to R Markdown, a tool used for reproducible research in R.
-
-
-### Tips
+If you want a slower introduction than we are providing here, check out the short book, [*Getting Used to R, RStudio, and R Markdown*](https://rbasics.netlify.com/). @usedtor2016 include screencast recordings that you can follow along and pause as you learn. They include an introduction to R Markdown, a tool used for reproducible research in R.
 
 
-
-* **Remember that computers are not actually that smart.** You have to tell a computer everything it needs to do. The instructions you give your computer can not have any mistakes in them.
-
-* **Take the "copy, paste, and tweak" approach.** Take existing code that you know works and modify it to suit your need. With more experience, you move away from this approach and write code from scratch.
-
-* **You need to practice every day.** Learning to code/program is like learning a foreign language. Daily practice is the *sine qua non* for excellence.
+**Remember:** *You need to practice every day.* Learning to code/program is like learning a foreign language. Daily practice is the *sine qua non* for progress.
 
 
 ### Terminology
@@ -95,16 +95,16 @@ For example we can save the result of `4 + 3` to an object named `x`.
 x <- 4 + 3
 ```
 
-Now, whenever we type `x`, the value of 4 + 3 will show:
+Now, whenever we type `x`, the value of 4 + 3 will appear:
 
 ```{r}
 x
 ```
 
 
-* *Data types*: integers, doubles/numerics, logicals, and characters. Integers are values like -1, 0, 2, 4092. Doubles or numerics are a larger set of values containing both the integers but also fractions and decimal values like -24.932 and 0.8. Logicals are either `TRUE` or `FALSE`. Characters are text like "cabbage" or "Hamilton", "The Wire is the greatest TV show ever". Characters are often denoted with the quotation marks around them.
+* *Data types*: integers, doubles/numerics, logicals, and characters. Integers are values like -1, 0, 2, 4092. Doubles or numerics are a larger set of values containing both the integers but also fractions and decimal values like -24.932 and 0.8. Logicals are either `TRUE` or `FALSE`. Characters are text like "cabbage", "Hamilton", or "The Wire is the greatest TV show ever." Characters are often denoted with the quotation marks around them.
 
-* *Vectors*: a collection of values. These are created using the `c()` function, where `c` stands for "combine". 
+* *Vectors*: a collection of values. These are created using the `c()` function, where the `c` stands for **c**ombine. 
 
 For example, `c(2, 4, 6, 8)` creates a four element vector of numeric values.
 
@@ -123,7 +123,7 @@ c(1, 2, 3, 4)
 
 * *Equality*: Tested for using `==`. For example, `2 + 1 == 3` compares `2 + 1` to `3` and is legal R code, returning `TRUE`. On the other hand, `2 + 1 = 3` will return an error because we can not assign one number to another. 
 
-* *Logical operators*: `&` representing "and" as well as `|` representing "or." For example, `(2 + 1 == 3) & (2 + 1 == 4)` returns `FALSE` since both clauses are not `TRUE` (only the first clause is `TRUE`). On the other hand, `(2 + 1 == 3) | (2 + 1 == 4)` returns `TRUE` since at least one of the two clauses is `TRUE`. 
+* *Logical operators*: `&` representing "and" as well as `|` representing "or." For example, `(2 + 1 == 3) & (2 + 1 == 4)` returns `FALSE` since at least one of the parts is not `TRUE`. On the other hand, `(2 + 1 == 3) | (2 + 1 == 4)` returns `TRUE` since at least one of the two parts is `TRUE`. 
 
 * *Functions*: perform tasks, and are also called *commands*. They take in inputs called *arguments* and return outputs. You can either manually specify a function's arguments or use the function's *default values*. 
 
@@ -137,11 +137,20 @@ sqrt(64)
 
 * *Code comments*: are text placed after a `#` symbol. Nothing will be run after a `#` symbol, which is useful when you include human readable comments in your code, as you always should.
 
-* *Errors, warnings, and messages*: generally reported in a red font. When there is an error, the code will not run. Read (and/or google) the message and try fix it. Warnings don't prevent code from completing. For example, if you create a scatterplot based on data with two missing values, you will see this warning: `Warning: Removed 2 rows containing missing values (geom_point)`. Messages are similar. In both cases, you should fix the underlying issue until the warning/message goes away.    
+* *Errors, warnings, and messages*: generally reported in a red font. When there is an error, the code will not run. Read (and/or google) the message and try fix it. Warnings don't prevent code from completing. For example, if you create a scatterplot based on data with two missing values, you will see this warning: 
+
+````
+Warning message:
+Removed 2 rows containing missing values (geom_point).  
+````
+
+<!-- DK: Indent this so that it is connected to the bullet point above. -->
+
+Messages are similar. In both cases, you should fix the underlying issue until the warning/message goes away.    
 
 ### Examining `trains`
 
-Most data comes to us in "spreadsheet"-type format.  These "spreadsheet"-type datasets are called *data frames* or *tibbles* in R. Let's explore the `trains` tibble in the **primer.data** package. This data comes from @enos2014, which investigated attitudes toward immigration among Boston commuters.
+Most data comes to us in "spreadsheet"-type format.  These datasets are called *data frames* or *tibbles* in R. Let's explore the `trains` tibble from the **primer.data** package. This data comes from @enos2014, which investigated attitudes toward immigration among Boston commuters.
 
 
 ```{r}
@@ -155,29 +164,34 @@ Let's unpack this output:
 
 * The tibble also has `r ncol(trains)` columns corresponding to *variables* which describe each observation. 
 
-* We see, by default, the top 10 rows. R is only showing the first 10 rows, since that is all that you probably want to see at first. You can see more (or fewer) rows with scrolling or using the `print()` command:
+* We see, by default, the top 10 rows and some of the columns. You can see more (or fewer) rows and columns by using the `print()` command:
 
 ```{r}
-print(trains, n = 15)
+print(trains, n = 15, width = 100)
 ```
 
-The `n` argument to `print()` tells R the number of rows you want to see. 
+The `n` argument to `print()` tells R the number of rows you want to see. `width` refers to the number of characters to print across the screen. Want to see every row and every column? Try:
+
+```{r, eval = FALSE}
+print(trains, n = Inf, width = Inf)
+```
+
 
 ### Exploring data frames
 
-There are many ways to get a feel for the data contained in a data frame such as `trains`. 
+There are many ways to get a feel for the data contained in a tibble like `trains`. 
 
 
 #### `view()`
 
 Run `view(trains)` in the Console in RStudio, either by typing it or cutting-and-pasting it into the Console pane. Explore this data frame in the resulting pop up viewer. 
 
-`view()` allows us to explore the different *variables* listed in the columns. Observe that there are many different types of variables.  Some of the variables are *quantitative*. These variables are numerical in nature.  Other variables here, including `gender` and  `treatment` are *categorical*.
+`view()` allows us to explore the different *variables* listed in the columns. Observe that there are many different types of variables.  Some of the variables are *quantitative*. These variables are numerical in nature.  Other variables here, including `gender` and  `treatment`, are *categorical*.
 
 
 #### `glimpse()`
 
-We can also explore a data frame using the `glimpse()`function. 
+We can also explore a tibble by using `glimpse()`. 
 
 ```{r}
 glimpse(trains)
@@ -185,18 +199,18 @@ glimpse(trains)
 
 Observe that `glimpse()` will give you the first few entries of each variable in a row after the variable name.  In addition, the *data type* of the variable is given immediately after each variable's name, inside `< >`. 
 
-`dbl` refers to "double", which is computer coding terminology for quantitative/numerical variables. `int` refers to "integer" and is another data type that also represents quantitative/numerical variables.`fct` refers to "factor" and describes a variable that is nominal, meaning a member of a smallish number of categories. `chr` is for character data.
+`dbl` refers to "double", which is computer coding terminology for quantitative/numerical variables. `int` refers to "integer" and is another data type that also represents quantitative/numerical variables. `fct` refers to "factor" and describes a variable that is nominal, meaning a member of a smallish number of categories. `chr` is for character data.
 
 
 #### `$` operator
 
-The `$` operator allows us to extract and then explore a single variable within a data frame.
+The `$` operator allows us to extract a single variable from a tibble and return it as a vector.
 
 ```{r}
 trains$age
 ```
 
-We used the `$` operator to extract only the `age` variable and return it as a vector. 
+
 
 <!-- DK: Other stuff? Or save $ for elsewhere? -->
 
@@ -209,7 +223,7 @@ There are three essential components to a plot:
 * `geom`: the geometric object to display, e.g., scatterplot, line, bar.
 * `aes`: aesthetic attributes of the geometric object. The most important are the names of the variables that should be on the x and y axes. Additional attributes include color and size. Aesthetic attributes are *mapped* to variables in the dataset.
 
-Let's look at an example of a basic scatterplot using data from @enos2014 for `r nrow(trains)` Boston commuters.
+Consider a basic scatterplot using data from @enos2014 for `r nrow(trains)` Boston commuters.
 
 ```{r}
 ggplot(data = trains, 
@@ -218,13 +232,11 @@ ggplot(data = trains,
   geom_point()
 ```
 
-Notice how the three components( i.e.`data`, `geom`, and `aes`) are specified in the `ggplot()` function.
+Notice how `data` and `aes` are specified in the call to `ggplot()`, followed by our choice of geom.
 
-Once we've specified these components, we then add *layers* to the plot using the `+` sign. The most essential layer to add to a plot is the layer that specifies which type of `geom`etric object we want the plot to involve: points, lines, bars, and others. In our graph above, the geom we used is `geom_point()`. This tells R we want our graph to include points (i.e. a scatterplot). 
+Plots are composed of *layers*, combined using the `+` sign. The most essential layer specifies which type of `geom`etric object we want the plot to involve: points, lines, bars, and others. In our graph above, the geom we used is `geom_point()`.  
 
 If you look at the code above, you will notice the `+` sign comes at the end of the code line and not at the beginning. When adding layers to a plot, start a new line after the `+` so that the code for each layer is on a new line.
-
-Let's now dive deeper into `geom_point()`.  
 
 ### `geom_point()`
 
@@ -243,11 +255,11 @@ Let's break down this code, piece-by-piece.
 
 * The `data` argument is set to `trains` via `data = trains`.
 
-* The `aes`thetic `mapping` is set via `mapping = aes(x = age, y = income)`. Here, we map `age` to the `x` axis and `income` maps to the `y` axis.
+* The `aes`thetic `mapping` is set via `mapping = aes(x = age, y = income)`. Here, we map `age` to the `x` axis and `income` to the `y` axis.
 
-* The `geom`etric object is specified to `geom_point()`, telling R we want a scatterplot. We added a layer using the `+` sign.
+* The `geom`etric object is specified using `geom_point()`, telling R we want a scatterplot. We added a layer using the `+` sign.
 
-If we do not specify the `geom`etric object, we have a blank plot like such:
+If we do not specify the `geom`etric object, we have a blank plot:
 
 ```{r}
 ggplot(data = trains, 
@@ -268,7 +280,7 @@ ggplot(data = trains,
 
 <!-- Size here? -->
 
-We use the function `labs()` to add a plot title, axis labels, subtitles, and captions to our graph. By default, R simply uses the names of variables for axes and legends. Let's now add better titles and labels.
+We use the function `labs()` to add a plot title, axis labels, subtitles, and captions to our graph. By default, R simply uses the names of variables for axes and legends. Add better titles and labels.
 
 ```{r}
 ggplot(data = trains, 
@@ -306,9 +318,9 @@ The problem with this display is "overplotting." Because attitudes are measured 
 
 **Method 1: Changing the transparency**
 
-We can change the transparency/opacity of the points by using the `alpha` argument within `geom_point()`. The `alpha` argument can be set to any value between `0` and `1`, where `0` sets the points to be 100% transparent and `1` sets the points to be 100% opaque. By default, `alpha` is set to `1`. In other words, if we don't explicitly set an `alpha` value, R will use `alpha = 1`.
+We can change the transparency/opacity of the points by using the `alpha` argument within `geom_point()`. The `alpha` argument can be set to any value between `0` and `1`, where `0` sets the points to be 100% transparent and `1` sets the points to be 100% opaque. By default, `alpha` is set to `1`. 
 
-Let's now add an `alpha` argument to our scatterplot. 
+Use a new `alpha` value to the scatterplot. 
 
 ```{r}
 ggplot(data = trains, 
@@ -322,7 +334,7 @@ ggplot(data = trains,
        caption = "Data source: Enos (2014)")
 ```
 
-Note that there is no `aes()` surrounding `alpha = 0.2`. This is because we are not mapping a variable to an aesthetic attribute, but rather only changing the default setting of `alpha`. In fact, you'll receive an error if you try to change the second line to read `geom_point(aes(alpha = 0.2))`.
+Note that there is no `aes()` surrounding `alpha = 0.2`. This is because we are not mapping a variable to an aesthetic attribute, but only changing the default setting of `alpha`. 
 
 **Method 2: Jittering the points**
 
@@ -346,7 +358,7 @@ When deciding whether to jitter a scatterplot or use the `alpha` argument to `ge
 
 ### `geom_line()`
 
-Linegraphs show the relationship between two numerical variables when the variable on the x-axis, also called the *explanatory* variable, is of a sequential nature. In other words, there is an inherent ordering to the variable. 
+Linegraphs show the relationship between two numerical variables when the variable on the x-axis, also called the *explanatory* or *predictive* variable, is of a sequential nature. In other words, there is an inherent ordering to the variable. 
 
 ```{r, echo = FALSE}
 knitr::include_graphics("https://imgs.xkcd.com/comics/decline.png")
@@ -356,7 +368,6 @@ The most common examples of linegraphs have some notion of time on the x-axis: h
 
 Let's plot the median duration of unemployment in the United States over the last 50 years.
 
-<!-- BG: need data set to show graph here.  -->
 
 ```{r}
 ggplot(data = economics,
@@ -365,7 +376,8 @@ ggplot(data = economics,
   labs(title = "Unemployment Duration in the United States: 1965 -- 2015",
        subtitle = "Dramatic increase in duration after the Great Recesssion",
        x = "Date",
-       y = "Median Duration in Weeks")
+       y = "Median Duration in Weeks",
+       caption = "Source: FRED Economic Data")
 ```
 
 Almost every aspect of the code used to create this plot is identical to our scatter plots, except for the geom we used.
@@ -373,13 +385,15 @@ Almost every aspect of the code used to create this plot is identical to our sca
 
 ### `geom_histogram()`
 
-A histogram is a plot that visualizes the *distribution* of a numerical value as follows:
+<!-- DK: All awk. Rewrite. Passing by position is important! -->
+
+A histogram is a plot that visualizes the *distribution* of a numerical value.
 
 1. We first cut up the x-axis into a series of *bins*, where each bin represents a range of values. 
 1. For each bin, we count the number of observations that fall in the range corresponding to that bin.
-1. Then for each bin, we draw a bar whose height marks the corresponding count.
+1. We draw a bar whose height indicates the corresponding count.
 
-Let's consider the `income` variable of the the `trains` data frame. Pay attention to how we have changed the two arguments to `ggplot()`. We have removed `data = ` and `mapping = `. The code still works because R functions allow for passing in arguments by *position*. The first argument to `ggplot()` is the data. So, we don't need to tell R that `trains` is the value for `data`. R assumes that it is because we passed it in first. Similarly, the second argument to `ggplot()` is `mapping`, so R assumes that `aes(x = income)` is the value we want for mapping because it is the second item passed in.
+Let's consider the `income` variable from the the `trains` tibble. Pay attention to how we have changed the two arguments to `ggplot()`. We have removed `data = ` and `mapping = `. The code still works because R functions allow for passing in arguments by *position*. The first argument to `ggplot()` is the `data`. We don't need to tell R that `trains` is the value for `data`. R assumes that it is because we passed it in as the first argument. Similarly, the second argument to `ggplot()` is `mapping`, so R assumes that `aes(x = income)` is the value we want for `mapping` because it is the second item passed in.
 
 ```{r}
 ggplot(trains, 
@@ -393,7 +407,7 @@ Note the message printed above:
 
 You would get the same message if you ran this code yourself. Try it!
 
-The message is telling us that the histogram was constructed using `bins = 30` for 30 equally spaced bins. This is the default value; unless you override this default number of bins with a number you specify, R will choose 30 by default. Because this is an important aspect of making a histogram, R insists on informing you with this message. You make this message go away by specifying the `bin` number yourself, as you should always do.
+The message is telling us that the histogram was constructed using `bins = 30` for 30 equally spaced bins. This is the default value. Unless you override this default number of bins with a number you specify, R will choose 30 by default. Because this is an important aspect of making a histogram, R insists on informing you with this message. You make this message go away by specifying the `bin` number yourself, as you should always do.
 
 Let's specify `bins` and also add some labels.
 
@@ -437,7 +451,7 @@ In this data, however, there are not many unique values for `income`, so neither
 
 ### `geom_bar()` 
 
-Similarly to histograms, `geom_bar()` visualizes the distribution of a categorical variable. This is a simpler task, as we are simply counting different categories within a categorical variable, also known as the *levels* of the categorical variable. Often the best way to visualize these different counts, also known as *frequencies*, is with barplots.
+`geom_bar()` visualizes the distribution of a categorical variable. This is a simpler task that creating a histogram, as we are simply counting different categories within a categorical variable, also known as the *levels* of the categorical variable. Often the best way to visualize these different counts, also known as *frequencies*, is with a barplot.
 
 
 ```{r}
@@ -452,14 +466,12 @@ ggplot(data = trains,
 
 #### No pie charts!
 
-One of the most common plots used to visualize the distribution of categorical data is the pie chart. While they may seem harmless enough, pie charts actually present a problem in that humans are unable to judge angles well. @robbins2013 argues that we overestimate angles greater than 90 degrees and we underestimate angles less than 90 degrees. In other words, it is difficult for us to determine the relative size of one piece of the pie compared to another.  
-
-While pie charts present information in a way such that comparisons must be made by comparing angles, barplots are more effective because they present the information in a way such that comparisons between categories can be made with single horizontal lines.
+One of the most common plots used to visualize the distribution of categorical data is the pie chart. While they may seem harmless enough, pie charts actually present a problem in that humans are unable to judge angles well. @robbins2013 argues that we overestimate angles greater than 90 degrees and we underestimate angles less than 90 degrees. In other words, it is difficult for us to determine the relative size of one piece of the pie compared to another. *Do not use pie charts.*
 
 
 #### Two categorical variables
 
-Barplots are a very common way to visualize the frequency of different categories, or levels, of a single categorical variable. Another use of barplots is to visualize the *joint* distribution of two categorical variables at the same time. Let's look at `race`, as well as `region`, in the `trains` data by using the `fill` argument inside the `aes()` aesthetic mapping. Recall the `fill` aesthetic corresponds to the color used to fill the bars.
+Another use of barplots is to visualize the *joint* distribution of two categorical variables. Let's look at `race`, as well as `treatment`, in the `trains` data by using the `fill` argument inside the `aes()` aesthetic mapping. Recall the `fill` aesthetic corresponds to the color used to fill the bars.
 
 ```{r}
 ggplot(trains, 
@@ -515,9 +527,9 @@ ggplot(trains,
   geom_smooth()
 ```
 
-Do you see the message R gives us? R is telling us that we need to specify the `method` and `formula` argument, just the way it told us to provide `bins` argument when we used `geom_histogram()` before.
+Note the message. R is telling us that we need to specify the `method` and `formula` argument, just the way it told us to provide the `bins` argument when we used `geom_histogram()` before.
 
-Let's add the argument `method = "lm"`, where `lm` stands for linear model. This causes the fitted line to be straight rather than curved. Let's also add the argument `formula = y ~ x`. This makes both messages go away. Again, R was not giving us an error before. It was simply telling us what options it was using since we did not specify the options ourselves.
+Let's add the argument `method = "lm"`, where "lm" stands for **l**inear **m**odel. This causes the fitted line to be straight rather than curved. Let's also add the argument `formula = y ~ x`. This makes both messages go away. Again, R was not giving us an error before. It was simply telling us what options it was using since we did not specify the options ourselves.
 
 *Always include enough detail in your code to make those messages disappear.*
 
@@ -535,11 +547,11 @@ ggplot(trains,
               formula = y ~ x)
 ```
 
-Notice the gray section surrounding both sides of both of the lines we plotted. This area is called the confidence interval, which is set to a 95% confidence interval by default. We will learn about confidence intervals in Chapter \@ref(probability). You can make the shaded disappear by adding `se = FALSE` as another argument to `geom_smooth()`.
+Notice the gray section surrounding the line we plotted. This area is called the confidence interval, which is set to 95% by default. We will learn about confidence intervals in Chapter \@ref(probability). You can make the shaded are disappear by adding `se = FALSE` as another argument to `geom_smooth()`.
 
 ### `geom_density()`
 
-Recall the histogram we plotted in the `geom_histogram()` section.
+Recall our plot from the `geom_histogram()` section.
 
 ```{r}
 ggplot(trains, 
@@ -552,7 +564,7 @@ ggplot(trains,
        caption = "Data source: Enos (2014)")
 ```
 
-We can change `geom_histogram()` to `geom_density()` to make a density plot, which is a smoothed version of the histogram. 
+Change `geom_histogram()` to `geom_density()` to make a density plot, which is a smoothed version of the histogram. 
 
 ```{r}
 ggplot(trains, 
@@ -564,6 +576,8 @@ ggplot(trains,
        y = NULL,
        caption = "Data source: Enos (2014)")
 ```
+
+The values on the y-axis are scaled so that the total area under the curve equals one. 
 
 <!-- DK: Other stuff to finish this section with? -->
 
@@ -1249,6 +1263,12 @@ Great. Now our graph is easier to visualize. In addition, note that the `theme()
 
 
 ## Summary
+
+*You need to practice every day.* 
+
+*Do not use pie charts.*
+
+*Shield my eyes from your ugly messages and warning.*
 
 In this chapter, we first looked at basic coding terminology and concepts that we deal with when programming with R. We then learned about the three basic components that make up each plot: data, mapping, and one or more geoms. The **ggplot2** package offers a wide range of geoms that we can use to create different types of plots. Next, we examined the "super package" **tidyverse**, which includes helpful tools for visualization. It also offers features for importing and manipulating data, which is the main topic of Chapter @\ref(wrangling). Lastly, we explored advanced plotting features such as axis scaling, faceting, and themes. 
 
