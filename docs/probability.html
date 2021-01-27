@@ -181,7 +181,7 @@ FIGURE 5.3: Bruno de Finetti, an Italian statistician who wrote a famous treatis
 </p>
 </div>
 <p>A probability distribution is not always easy to work with. It is a complex object. And, in many contexts, we don’t really care about all that complexity. So, instead of providing the full probability distribution, we often just use a summary measure, a number or two or three which captures those aspects of the entire distribution which are relevant to the matter at hand. Let’s explore these issues using the 538 posterior probability distribution, as of August 13, 2020, for the number of electoral votes which will be won by Joe Biden. Here is a tibble with 1,000,000 draws from that distribution:</p>
-<div class="sourceCode" id="cb521"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb523"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">draws</span></code></pre></div>
 <pre><code>## # A tibble: 1,000,000 x 2
 ##       ID electoral_votes
@@ -199,14 +199,14 @@ FIGURE 5.3: Bruno de Finetti, an Italian statistician who wrote a famous treatis
 ## # … with 999,990 more rows</code></pre>
 <p><em>A distribution and a sample of draws from that distribution are different things.</em> But, if you squint, they are sort of the same thing, at least for our purposes. For example, if you want to know the mean of the distribution, then the mean of the draws will be a fairly good estimate, especially if the number of draws is large enough.</p>
 <p>Recall from Chapter <a href="wrangling.html#wrangling">2</a> how we can draw randomly from specified probability distributions:</p>
-<div class="sourceCode" id="cb523"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb525"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></code></pre></div>
 <pre><code>##  [1] -0.061 -0.191  1.073  0.217  1.185 -0.742 -2.412  0.175 -0.152 -0.273</code></pre>
-<div class="sourceCode" id="cb525"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb527"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></code></pre></div>
 <pre><code>##  [1] 0.178 0.038 0.911 0.860 0.206 0.330 0.041 0.138 0.853 0.907</code></pre>
 <p>The elements of these vectors are all “draws” from the specified probability distributions. In most applied situations, our tools will produce draws rather than summary objects. Fortunately, a vector of draws is very easy to work with. Start with summary statistics:</p>
-<div class="sourceCode" id="cb527"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb529"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">key_stats</span> <span class="op">&lt;-</span> <span class="va">draws</span> <span class="op">%&gt;%</span> 
   <span class="fu">summarize</span><span class="op">(</span>mn <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">electoral_votes</span><span class="op">)</span>,
             md <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html">median</a></span><span class="op">(</span><span class="va">electoral_votes</span><span class="op">)</span>,
@@ -219,16 +219,16 @@ FIGURE 5.3: Bruno de Finetti, an Italian statistician who wrote a famous treatis
 ##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
 ## 1  325.   326  86.9  101.</code></pre>
 <p>Calculate a 95% interval directly:</p>
-<div class="sourceCode" id="cb529"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb531"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/quantile.html">quantile</a></span><span class="op">(</span><span class="va">draws</span><span class="op">$</span><span class="va">electoral_votes</span>, probs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.975</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## 2.5%  98% 
 ##  172  483</code></pre>
 <p>Approximate the 95% interval in two ways:</p>
-<div class="sourceCode" id="cb531"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb533"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">key_stats</span><span class="op">$</span><span class="va">mn</span> <span class="op">-</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">key_stats</span><span class="op">$</span><span class="va">sd</span>, 
   <span class="va">key_stats</span><span class="op">$</span><span class="va">mn</span> <span class="op">+</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">key_stats</span><span class="op">$</span><span class="va">sd</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 152 499</code></pre>
-<div class="sourceCode" id="cb533"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb535"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">key_stats</span><span class="op">$</span><span class="va">md</span> <span class="op">-</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">key_stats</span><span class="op">$</span><span class="va">mad</span>, 
   <span class="va">key_stats</span><span class="op">$</span><span class="va">md</span> <span class="op">+</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">key_stats</span><span class="op">$</span><span class="va">mad</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 124 528</code></pre>
@@ -351,7 +351,7 @@ FIGURE 5.3: Bruno de Finetti, an Italian statistician who wrote a famous treatis
 <div class="inline-figure"><img src="05-probability/images/marble.jpg" width="100%"></div>
 <p>Imagine that your friend gives you a bag with two marbles. There could either be two white marbles, two black marbles, or one of each color. Thus, the bag could contain 0% white marbles, 50% white marbles, or 100% white marbles. The proportion, <span class="math inline">\(p\)</span>, of white marbles could be 0, 0.5, or 1.</p>
 <p>Let’s say you take a marble out of the bag, record whether it’s black or white, then return it to the bag. You repeat this three times, observing the number of white marbles you see out of three trials. You could get three whites, two whites, one white, or zero whites as a result of this trial. Let’s make what we call a Bayes scatterplot out of this. We have three models (three different proportions of white marbles in the bag) and four possible experimental results. Let’s create 3,000 draws from this joint distribution:</p>
-<div class="sourceCode" id="cb535"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb537"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Create the joint distribution of the number of white marbles in the bag</span>
 <span class="co"># (in_bag) and the number of white marbles pulled out in the sample (in_sample),</span>
 <span class="co"># one-by-one. in_bag takes three possible values: 0, 1 and 2, corresponding to</span>
@@ -379,7 +379,7 @@ FIGURE 5.3: Bruno de Finetti, an Italian statistician who wrote a famous treatis
 ## # … with 2,990 more rows</code></pre>
 <p>Plot the joint distribution:</p>
 <!-- DK: More clean up. Work with in_bag and in_sample -->
-<div class="sourceCode" id="cb537"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb539"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># The distribution is unnormalized. All we see is the number of simulations in</span>
 <span class="co"># each "bucket."</span>
 
@@ -397,7 +397,7 @@ FIGURE 5.3: Bruno de Finetti, an Italian statistician who wrote a famous treatis
 <div class="inline-figure"><img src="05-probability/images/three_models.png" width="100%"></div>
 <p>The y-axes of both the scatterplot and the 3D visualization are labeled “Number of White Marbles in the Bag.” Each value on the y-axis is a model, a belief about the world. For instance, when the model is 0, we have no white marbles in the bag, meaning that none of the marbles we pull out in the sample will be white.</p>
 <p>Let’s say draw out three white marbles. We isolate the slice where the result of the simulation involves three white marbles and zero black ones. Here is the unnormalized probability distribution.</p>
-<div class="sourceCode" id="cb538"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb540"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># The key step is the filter. Creating a conditional distribution from a joint</span>
 <span class="co"># distribution is the same thing as filtering that joint distribution for a</span>
 <span class="co"># specific value. A conditional distribution is a "slice" of the joint</span>
@@ -415,7 +415,7 @@ FIGURE 5.3: Bruno de Finetti, an Italian statistician who wrote a famous treatis
     <span class="fu">theme_classic</span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-386-1.png" width="100%"></div>
 <p>Next, let’s normalize the distribution.</p>
-<div class="sourceCode" id="cb539"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb541"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">joint_dist</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">in_sample</span> <span class="op">==</span> <span class="fl">3</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span><span class="va">in_bag</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
@@ -466,7 +466,7 @@ FIGURE 5.3: Bruno de Finetti, an Italian statistician who wrote a famous treatis
 <p>You might be wondering: what is the use of a model? Well, let’s say we toss the coin 20 times and get 8 heads again. Given this result, what is the probability that future samples of 20 flips will result in 10 or more heads?</p>
 <p>There are three main ways you could go about solving this problem with simulations.</p>
 <p>The first <em>wrong</em> way to do this is assuming that <span class="math inline">\(\rho_h\)</span> is certain because we observed 8 heads after 20 tosses. We would conclude that 8/20 gives us 0.4. The big problem with this is that you are ignoring your uncertainty when estimating <span class="math inline">\(\rho_h\)</span>. This would lead us to the following code.</p>
-<div class="sourceCode" id="cb540"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb542"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">sims</span> <span class="op">&lt;-</span> <span class="fl">10000000</span>
 
 <span class="va">odds</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>sim_ID <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">sims</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -480,7 +480,7 @@ FIGURE 5.3: Bruno de Finetti, an Italian statistician who wrote a famous treatis
 ##     &lt;dbl&gt;
 ## 1   0.245</code></pre>
 <p>The second method involves sampling the whole posterior distribution vector we previously created. This would lead to the following correct code.</p>
-<div class="sourceCode" id="cb542"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb544"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">p_draws</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>p <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0.1</span><span class="op">)</span>, <span class="fl">1000</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>heads <span class="op">=</span> <span class="fu">map_int</span><span class="op">(</span><span class="va">p</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1</span>, size <span class="op">=</span> <span class="fl">20</span>, p <span class="op">=</span> <span class="va">.</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">heads</span> <span class="op">==</span> <span class="fl">8</span><span class="op">)</span>
@@ -496,7 +496,7 @@ FIGURE 5.3: Bruno de Finetti, an Italian statistician who wrote a famous treatis
 ##     &lt;dbl&gt;
 ## 1   0.328</code></pre>
 <p>Third way is to sample from the actual distribution, which is a small dataset with just a few rows, but it includes both <span class="math inline">\(\rho_h\)</span> and the probability of each <span class="math inline">\(\rho_h\)</span>. This also gives the correct answer.</p>
-<div class="sourceCode" id="cb544"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb546"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">p_posterior</span> <span class="op">&lt;-</span> <span class="va">x</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">heads</span> <span class="op">==</span> <span class="fl">8</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span> <span class="op">%&gt;%</span> 
