@@ -897,7 +897,7 @@ pe %>%
          x = "Probability",
          y = "Probability",
          caption = "Data source: NHANES") + 
-    scale_x_continuous(labels = scales::percent_format()) +
+    scale_x_continuous(labels = scales::percent_format(accuracy = 1)) +
     scale_y_continuous(labels = scales::percent_format()) 
 
 ```
@@ -916,7 +916,7 @@ newobs <- tibble(height = rep(180, 100))
 
 pp <- posterior_predict(fit_2, newdata = newobs) %>% 
   as_tibble() %>% 
-  mutate_all(as.numeric)
+  mutate_all(as.numeric) 
 
 pp[, 1:4]
 ```
@@ -928,13 +928,24 @@ We show just the first 4 columns for convenience. Each column is 4,000 draws fro
 
 We can manipulate this object on a row-by-row basis.
 
-<!-- DK: More detail! -->
+```{r}
+pp <- posterior_predict(fit_2, newdata = newobs) %>% 
+  as_tibble() %>% 
+  mutate_all(as.numeric) %>% 
+  rowwise() %>% 
+  mutate(total = sum(c_across(everything())))
+
+pp[, c("1", "2", "100", "total")]
+```
+
+
+`total` is the number of women in each row. Manipulating draws on a row-by-row basis is very common.
+
+<!-- DK: Add more here. -->
 
 
 ```{r}
 pp %>% 
-  rowwise() %>% 
-  mutate(total = sum(c_across(everything()))) %>% 
   ggplot(aes(x = total)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    bins = 100) +
