@@ -584,67 +584,38 @@ The values on the y-axis are scaled so that the total area under the curve equal
 
 ## The Tidyverse
 
-Going forward, most `ggplot()` code will omit the `data = ` and `mapping = ` explicit naming of arguments while relying on the default ordering of those arguments. Most of the time, we include argument names and, as a rule, you should to. But we create so many plots in *The Primer* that these omissions are unlikely to cause problems.
+Going forward, most `ggplot()` code will omit the `data = ` and `mapping = ` explicit naming of arguments while relying on the default ordering. Most of the time, we include argument names and, as a rule, you should to. But we create so many plots in *The Primer* that these omissions are unlikely to cause problems.
 
 
 ### Data wrangling 
 
-We can't use all the beautiful plots that we learned in the previous chapter until we have "wrangled" the data into a convenient shape. In this chapter, we'll introduce a series of functions from the **tidyverse** collection of packages which help with wrangling, and everything else we need to do to work with data. Such functions include:
+We can't use all the beautiful plots that we learned in the previous chapter until we have "wrangled" the data into a convenient shape. Key wrangling functions include:
 
-* `filter()` to pick out the *rows* we want to keep from a tibble.
+* `filter()`: to pick out the *rows* we want to keep from a tibble.
 
-* `select()` to pick out the *columns* we want to keep from a tibble.
+* `select()`: to pick out the *columns* we want to keep from a tibble.
 
-* `arrange()` the rows in a tibble, in either ascending or descending order. 
+* `arrange()`: to sort the rows in a tibble, in either ascending or descending order. 
 
-* `mutate()` to create new columns.
+* `mutate()`: to create new columns.
 
-* `group_by()` the rows of a tibble. This function assigns different rows to be part of the same *group*. This allows statistics to be calculated for each group *separately*. You will usually use `group_by` with `summarize()`.
+* `group_by()`: to assign each row in a tibble to a "group." This allows statistics to be calculated for each group *separately*. You will usually use `group_by()` with `summarize()`.
 
-* `summarize()` the data. It creates a new data frame comprised of summary statistics for one (or more) rows for each grouped variable, or for the tibble as a whole if it is ungrouped. 
+* `summarize()`: to create a new tibble comprised of summary statistics for one (or more) rows for each grouped variable, or for the tibble as a whole if it is ungrouped. 
 
 ### The pipe operator: `%>%`
 
-Before we start data wrangling, let's first introduce a nifty tool that gets loaded with the **dplyr** package included in the tidyverse: the pipe operator `%>%`. The pipe operator allows us to combine multiple operations in R into a single sequential *chain* of actions.
+The pipe operator (`%>%`) allows us to combine multiple operations in R into a single sequential *chain* of actions. Much like how the `+` sign has to come at the end of the line when constructing plots --- because we are building the plot layer-by-layer --- the pipe operator `%>%` has to come at the end of the line because we are building a data wrangling pipeline step-by-step.
 
-Recall the (modified) code for one of our graphics above.
-
-```{r}
-ggplot(trains, 
-       aes(x = att_start, 
-           y = att_end)) + 
-  geom_point() +
-  geom_smooth(method = "lm", 
-              formula = y ~ x) +
-  labs(title = "Immigration Attitudes Among Boston Commuters",
-       subtitle = "Attitudes did not change much after the experiment",
-       x = "Attitude Before Experiment",
-       y = "Attitude After Experiment",
-       caption = "Data source: Enos (2014)")
-
-```
-
-Much like how the `+` sign has to come at the end of lines when constructing plots --- because we are building the plot layer-by-layer --- the pipe operator `%>%` has to come at the end of lines because we are building a data wrangling pipeline step-by-step.
-
-
-The code below filters the `trains` dataset to only row for men.
-
-```{r}
-trains %>% 
-  filter(gender == "Male")
-```
-
-A single *chain* of data wrangling operations is formed here by combining verb-named functions into a single sequence using the pipe operator `%>%`. 
 
 ### `filter()` rows
 
-```{r, echo = FALSE, fig.cap = "Diagram of filter() rows operation."}
+```{r, echo = FALSE, fig.cap = "filter() reduces the rows in a tibble."}
 knitr::include_graphics("01-visualization/images/filter.png")
 ```
 
-The `filter()` function here works much like the "Filter" option in Microsoft Excel; it allows you to specify criteria about the values of a variable in your dataset and then filters out only the rows that match that criteria.
+The `filter()` function works much like the "Filter" option in Microsoft Excel. It allows you to specify criteria about the values of a variable in your dataset and then selects only the rows that match that criteria.
 
-Let's revisit the code from the previous section.
 
 ```{r}
 trains %>% 
@@ -658,24 +629,22 @@ trains_men <- trains %>%
   filter(gender == "Male")
 ```
 
-Let's break down the code here: 
+Let's break down the code. We assigned our new data to an object named `trains_men` via `trains_men <-`. Because we assigned this modified data frame to `trains_men`, it is a separate entity from the initial `trains` data frame. If, however, we had written the code as `trains <- trains` we would have overwritten the already-existing tibble. 
 
-Here we assigned our new data to an object named `trains_men` via `trains_men <-`. Because we assigned this modified data frame to `trains_men`, it is a separate entity from the initial `trains` data frame. If, however, we had written the code as `trains <- trains` we would have overwritten the already-existing tibble. 
-
-We take the `trains` tibble and  *then* `filter()` so that only those observations where the `gender` equals "Male" are included. We test for equality using the double equal sign `==` and not a single equal sign `=`. In other words, `filter(gender = "Male")` will produce an error. This is a convention across many programming languages. If you are new to coding, you'll probably forget to use the double equal sign `==` a few times before you get the hang of it.
+We start with the `trains` tibble and  *then* `filter()` so that only those observations where the `gender` equals "Male" are included. We test for equality using the double equal sign `==` and not a single equal sign `=`. In other words, `filter(gender = "Male")` will produce an error. This is a convention across many programming languages. 
 
 You can use other operators beyond just the `==` operator.
 
-- `>` corresponds to "greater than"
-- `<` corresponds to "less than"
-- `>=` corresponds to "greater than or equal to"
-- `<=` corresponds to "less than or equal to"
-- `!=` corresponds to "not equal to." The `!` is used in many programming languages to indicate "not."
+- `>` for  "greater than"
+- `<` for  "less than"
+- `>=` for  "greater than or equal to"
+- `<=` for  "less than or equal to"
+- `!=` for  "not equal to." The `!` indicates "not."
 
 Furthermore, you can combine multiple criteria using operators that make comparisons:
 
-- `|` corresponds to "or"
-- `&` corresponds to "and"
+- `|` for  "or"
+- `&` for  "and"
 
 For example, let's `filter()` the `trains` tibble to include only women who are Republicans and younger than 40.
 
@@ -686,17 +655,24 @@ trains %>%
            age < 40)
 ```
 
-`filter()` should often be among the first verbs you consider applying to your data. This cleans your dataset to only those rows you care about.
+Instead of create a single criteria with many parts, liked with an `&`, you can just separate the parts with a comma. The resulting tibble is the same.
+
+```{r}
+trains %>% 
+  filter(gender == "Female",
+         party == "Republican",
+         age < 40)
+```
 
 <!-- DK: More examples? -->
 
 ### `select` variables
 
-```{r, echo = FALSE, fig.cap = "Diagram of select() columns."}
+```{r, echo = FALSE, fig.cap = "select() reduces the number of columns in a tibble."}
 knitr::include_graphics("01-visualization/images/select.png")
 ```
 
-Using the `filter()` function we were able to pick out specific *rows* from the dataset. The `select()` function allows us to pick specific *columns* (variables) instead.
+Using the `filter()` function we were able to pick out specific *rows* (observations) from the tibble. The `select()` function allows us to pick specific *columns* (variables) instead.
 
 Use `glimpse()` to see the names of the variables in `trains`:
 
@@ -711,14 +687,14 @@ trains %>%
   select(gender, treatment)
 ```
 
-Let's say instead you want to drop, or de-select, certain variables. Do that with the minus (`-`) sign:
+You can drop, or "de-select," certain variables by using the minus (`-`) sign:
 
 ```{r}
 trains %>% 
   select(-gender, -liberal, -party, -age)
 ```
 
-Another way of selecting columns/variables is by specifying a range of columns using the `:` operator. 
+You can specify a range of columns by using the `:` operator. 
 
 ```{r}
 trains %>% 
@@ -726,7 +702,7 @@ trains %>%
 ```
 
 This will `select()` all columns between the two specified variables. 
-The `select()` function can also be used to rearrange columns when used with the `everything()` helper function. We can out the `treatment` and `gender` variables first with:  
+The `select()` function can also be used to rearrange columns when used with the `everything()` helper function. We can put the `treatment` and `gender` variables first with:  
 
 ```{r}
 trains %>% 
@@ -1138,6 +1114,8 @@ As can be seen, `lifeExp` is now on the x-axis and `gdpPercap` on the y-axis. Co
 ### Axis Limits and Scales
 
 We can also manipulate the limits of the axes by using `xlim()` and `ylim()`. For example, assume that we are only interested in countries with a GDP per capita from 0 to 30000. We can tell R as follows that we only want to see this range. Note that, because `data` is the first argument and `mapping` is the second to `ggplot()`, we don't actually have to name the arguments. We can just provide them, as long as they are in the correct order.
+
+<!-- DK: xlim should be in coord_something -->
 
 ```{r warning = FALSE}
 ggplot(gapminder_filt, 
