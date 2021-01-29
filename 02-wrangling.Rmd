@@ -3,9 +3,11 @@
 
 <!-- Replace flights with fec16? airlines are boring. Git rid of 538?  -->
 
+<!-- Rewrite the whole data gather section when rvest 1.0 comes out. -->
+
 <!-- Add in other join diagrams, like the one used for for inner join. -->
 
-<!-- Start joins with left_join, since it is most popular. -->
+<!-- Start joins with left_join, since it is most important. -->
 
 *Data science is data cleaning.*
 
@@ -22,15 +24,15 @@ library(gapminder)
 library(fivethirtyeight)
 ```
 
-The **tidyverse** package will be used in every chapter. **primer.data** is the data package created specifically for this *Primer*. **lubridate** is a package for working with dates and times. **janitor** offers functions for cleaning up dirty data. **skimr** contains functions that are useful for providing summary statistics. **nycflights** includes data associated with flights out of New York City's three major airports. **gapminder** has annual data for countries going back more than 50 years. **fivethirtyeight** cleans up data from the [FiveThirtyEight](https://fivethirtyeight.com/) team.
+The **tidyverse** package will be used in every chapter. Loading it makes the 8 packages from the "Tidyverse" available. **primer.data** is the data package created specifically for this *Primer*. **lubridate** is a package for working with dates and times. **janitor** offers functions for cleaning up dirty data, the most important of which is `clean_names()`.  **skimr** contains functions that are useful for providing summary statistics, especially `skim()`.  **nycflights13** includes data associated with flights out of New York City's three major airports. **gapminder** has annual data for countries going back more than 50 years. We used this data in Chapter \@ref(visualization). **fivethirtyeight** cleans up data from the [FiveThirtyEight](https://fivethirtyeight.com/) team.
 
 ## Data Gathering
 
-The `read_csv()` function turns flat files into data frames. More specifically, it turns files whose values are separated by commas. Let’s import a **c**omma **s**eparated **v**alues (hence "csv") file from the internet. The `read_csv()` function included in the **readr** package, which is one of the packages in the Tidyverse, is different than the `read.csv()` function that comes installed with R. Always use Tidyverse functions, if possible. 
+The `read_csv()` function turns flat files into tibbles. More specifically, it converts files whose values are separated by commas. Let’s import a **c**omma **s**eparated **v**alues (hence "csv") file from the internet. The `read_csv()` function included in the **readr** package, which is one of the packages in the Tidyverse, is different than the `read.csv()` function that comes installed with R. Always use Tidyverse functions, if possible. 
 
 Each comma from the csv file corresponds to a column, and the column names are taken from the first line of the file. Then, the function "guesses" an appropriate data type for each of the columns it creates. Sometimes csv files are a lot dirtier and require significant wrangling before you can explore the data and create usable graphics. 
 
-The link below is for a file containing faculty gender data across departments at Harvard University. Note, the `file` argument of the `read_csv()` function is very flexible. Below, it takes a url. `file` can also be the absolute or relative paths for a file saved locally on your computer. 
+The link below is for a file containing faculty gender data across departments at Harvard University. Note, the `file` argument of the `read_csv()` function is very flexible. Below, it takes a url. `file` can also be the absolute or relative path for a file saved locally on your computer. 
 
 ```{r}
 url <- "https://raw.githubusercontent.com/PPBDS/primer/master/02-wrangling/data/faculty.csv"
@@ -48,9 +50,11 @@ Run the `summary()` function on the `fac` tibble.
 summary(fac)
 ```
 
-Don't confuse `summary()`, which is a built-in --- generally termed "Base" --- R function for providing a summary of an object, with `summarize()`, which is one of the most important functions from **dplyr**.
+Don't confuse `summary()`, which is a built-in --- generally termed "base" --- R function for providing a summary of an object, with `summarize()`, which is one of the most important functions from **dplyr**.
 
 You may notice that something appears to be wrong with this dataset. Which department could have employed 644 male professors? We will explore this mystery later in the chapter.
+
+<!-- DK: Mention other read in functions, and packages like readxl. Connect it better to the tutorials. -->
 
 
 ### HTML
@@ -73,7 +77,7 @@ knitr::include_graphics("02-wrangling/images/murders-data-wiki-page.png")
 
 To get this data, we need to do some web scraping. 
 
-Web scraping, or web harvesting, is the term we use to describe the process of extracting data from a website. The reason we can do this is because the information used by a browser to render webpages is received as a text file from a server. The text is code written in hyper text markup language (HTML). Every browser has a way to show the html source code for a page, each one different. On Chrome, you can use Control-U on a PC and command+option+U on a Mac. You will see something like this:
+Web scraping, or web harvesting, is the process of extracting data from a website. The information used by a browser to render web pages is received as a text file from a server. The text is code written in **H**yper **T**ext **M**arkup **L**anguage (HTML). Every browser has a way to show the html source code for a page. On Chrome, you can use Control-U on a PC and command+option+U on a Mac. You will see something like this:
 
 ```{r, echo = FALSE}
 knitr::include_graphics("02-wrangling/images/html-code.png")
@@ -119,14 +123,11 @@ title="List of U.S. states and territories by population">Population</a><br />
 
 You can actually see the data, except data values are surrounded by html code such as `<td>`. We can also see a pattern of how it is stored. If you know HTML, you can write programs that leverage knowledge of these patterns to extract what we want. We also take advantage of a language widely used to make webpages look "pretty" called Cascading Style Sheets (CSS).
 
-Although we provide tools that make it possible to scrape data without knowing HTML, as a data scientist it is quite useful to learn some HTML and CSS. Not only does this improve your scraping skills, but it might come in handy if you are creating a webpage to showcase your work. 
-
 ### The rvest package
 
-The tidyverse contains a web harvesting package called rvest. The first step using this package is to import the webpage into R. The package makes this quite simple:
+**rvest**, maintained by [the team at RStudio](https://rvest.tidyverse.org/), is the best package for getting data from the web. Although there are a bewildering array of R packages for every task, you should always start with one maintained by high quality people/organizations. [RStudio maintained packages](https://www.tidyverse.org/packages/) are always good. A new version, 1.0, of **rvest** is imminent. Upgrade once it comes out. 
 
 ```{r, message=FALSE, warning=FALSE}
-library(tidyverse)
 library(rvest)
 h <- read_html(url)
 ```
@@ -138,7 +139,7 @@ Note that the entire Murders in the US Wikipedia webpage is now contained in `h`
 class(h)
 ```
 
-The rvest package is actually more general; it handles XML documents. XML is a general markup language (that's what the ML stands for) that can be used to represent any kind of data. HTML is a specific type of XML specifically developed for representing webpages. Here we focus on HTML documents.
+The **rvest** package is actually more general; it handles XML documents. XML is a general markup language (that's what the ML stands for) that can be used to represent any kind of data. HTML is a specific type of XML specifically developed for representing webpages. Here we focus on HTML documents.
 
 Now, how do we extract the table from the object `h`? If we print `h`, we don't really see much:
 
@@ -152,7 +153,7 @@ We can see all the code that defines the downloaded webpage using the `html_text
 html_text(h)
 ```
 
-We don't show the output here because it includes thousands of characters, but if we look at it, we can see the data we are after is stored in an HTML table: you can see this in this line of the HTML code above `<table class="wikitable sortable">`. The different parts of an HTML document, often defined with a message in between  `<` and `>`  are referred to as nodes. The rvest package includes functions to extract nodes of an HTML document: `html_nodes` extracts all nodes of different types and `html_node` extracts the first one. To extract the tables from the html code we use:
+We don't show the output here because it includes thousands of characters, but if we look at it, we can see the data we are after is stored in an HTML table: you can see this in this line of the HTML code above `<table class="wikitable sortable">`. The different parts of an HTML document, often defined with a message in between  `<` and `>`  are referred to as nodes. The **rvest** package includes functions to extract nodes of an HTML document: `html_nodes` extracts all nodes of different types and `html_node` extracts the first one. To extract the tables from the html code we use:
 
 ```{r} 
 tab <- h %>% html_nodes("table")
@@ -170,7 +171,7 @@ The table we are interested is the first one:
 tab[[1]]
 ```
 
-This is clearly not a tidy dataset, not even a data frame. In the code above, you can definitely see a pattern and writing code to extract just the data is very doable. In fact, rvest includes a function just for converting HTML tables into data frames:
+This is clearly not a tidy dataset, not even a data frame. In the code above, you can definitely see a pattern and writing code to extract just the data is very doable. In fact, **rvest** includes a function just for converting HTML tables into data frames:
 
 
 ```{r}
@@ -197,12 +198,12 @@ The default look of a webpage made with the most basic HTML is quite unattractiv
 If we want to grab data from a webpage and we happen to know a selector that is unique to the part of the page containing this data, we can use the `html_nodes` function. However, knowing which selector can be quite complicated. 
 In fact, the complexity of webpages has been increasing as they become more sophisticated. For some of the more advanced ones, it seems almost impossible to find the nodes that define a particular piece of data. However, selector gadgets actually make this possible.
 
-SelectorGadget^[http://selectorgadget.com/] is piece of software that allows you to interactively determine what CSS selector you need to extract specific components from the webpage. If you plan on scraping data other than tables from html pages, we highly recommend you install it. A Chrome extension is available which permits you to turn on the gadget and then, as you click through the page, it highlights parts and shows you the selector you need to extract these parts. There are various demos of how to do this including rvest author Hadley Wickham's
+SelectorGadget^[http://selectorgadget.com/] is piece of software that allows you to interactively determine what CSS selector you need to extract specific components from the webpage. If you plan on scraping data other than tables from html pages, we highly recommend you install it. A Chrome extension is available which permits you to turn on the gadget and then, as you click through the page, it highlights parts and shows you the selector you need to extract these parts. There are various demos of how to do this including **rvest** author Hadley Wickham's
 vignette^[https://cran.r-project.org/web/packages/rvest/vignettes/selectorgadget.html] and other tutorials based on the vignette^[https://stat4701.github.io/edav/2015/04/02/rvest_tutorial/] ^[https://www.analyticsvidhya.com/blog/2017/03/beginners-guide-on-web-scraping-in-r-using-rvest-with-hands-on-knowledge/].
 
 ### JSON
 
-Sharing data on the internet has become more and more common. Unfortunately, providers use different formats, which makes it harder for data scientists to wrangle data into R. Yet there are some standards that are also becoming more common. Currently, a format that is widely being adopted is the JavaScript Object Notation or JSON. Because this format is very general, it is nothing like a spreadsheet. This JSON file looks more like the code you use to define a list. Here is an example of information stored in a JSON format:
+An increasingly common format for sharing data is JavaScript Object Notation or JSON. Because this format is very general, it is nothing like a spreadsheet. Consider an example of information stored in a JSON format:
 
 ```{r, echo = FALSE}
 library(jsonlite)
@@ -211,12 +212,12 @@ json <- toJSON(example, pretty = TRUE)
 json
 ```
 
-The file above actually represents a data frame. To read it, we can use the function `fromJSON` from the **jsonlite** package. Note that JSON files are often made available via the internet. Several organizations provide a JSON API or a web service that you can connect directly to and from which you can obtain data. 
+The file above actually represents a tibble. To read it, we can use the function `fromJSON` from the **jsonlite** package. Note that JSON files are often made available via the internet. Several organizations provide a JSON API or a web service that you can connect directly to and from which you can obtain data. 
 
 
 ## Tibbles
 
-Tibbles are a kind of data frame, useful for storing data in which we have the same number of observations for each variable. We can use the `tibble()` function to create data frames. Tibbles are composed of columns, each of which is a variable, and rows, each of which are the values for those variables for a single "unit" or "observation." Each column (i.e., each variable) can be of a different type: character, numeric, factor, date and so on.
+Tibbles are a kind of data frame, useful for storing data in which we have the same number of observations for each variable. We can use the `tibble()` function to create tibbles, which are composed of columns, each of which is a variable, and rows, each of which are a "unit" or "observation." Each column (i.e., each variable) can be of a different type: character, integer, factor, double, date and so on.
 
 
 ### `tibble()`
@@ -225,10 +226,10 @@ Tibbles are a kind of data frame, useful for storing data in which we have the s
 tibble(a = 2.1, b = "Hello", c = TRUE, d = 9L)
 ```
 
-In our code, we specify the variable names (or the names of columns) as , `a`, `b`, and `c`. Under each variable, we give a different numerical value. Under each variable name, the data type is specified for the data within that column. A tibble can consist of one or more atomic vectors, the most important types of which are double, character, logical, and integer. The tibble above includes a variable of each type. (The "L" in "9L" tells R that we want `d` to be an integer rather than the default, which would be a double.)  When you print out a tibble, the variable type is shown below the variable name.
+In our code, we specify the variable names (or the names of columns) as , `a`, `b`, and `c`. Under each variable, we give a different value. Under each variable name, the data type is specified for the data within that column. A tibble can consist of one or more atomic vectors, the most important types of which are double, character, logical, and integer. The tibble above includes a variable of each type. (The "L" in "9L" tells R that we want `d` to be an integer rather than the default, which would be a double.)  When you print out a tibble, the variable type is shown below the variable name.
 
 
-Variables should not begin with a number (like `54abc`) or include spaces (like `my var`). If you insist on using variable names like that, you must include backticks around each name when you reference them.
+Variables should not begin with a number (like `54abc`) or include spaces (like `my var`). If you insist on using variable names like that, you must include backticks around each name when you reference it.
 
 ```{r}
 tibble(`54abc` = 1, `my var` = 2, c = 3)
@@ -250,7 +251,7 @@ tribble(
 )
 ```
 
-The tildes specifies which rows have the column names. The formatting makes it easier, relative to specifying raw vectors, to see which values are from the same observation.
+The tildes --- as in `~ var1` --- specify which row has the column names. The formatting makes it easier, relative to specifying raw vectors, to see which values are from the same observation.
 
 
 ### `clean_names()`
@@ -275,7 +276,7 @@ fac %>%
   filter(`Professors M` == 644)
 ```
 
-There is not a department called "total." And backticks are annoying. So we run the `clean_names()` function, from the **janitor** package.  
+There is not a department called "Total." And backticks are annoying. So we run the `clean_names()` function, from the **janitor** package.  
 
 ```{r, message = FALSE}
 library(janitor)
@@ -304,13 +305,13 @@ fac %>%
 
 ### `skim()`
 
-The `skim()` function from the **skimr** package is a useful summary of a tibble  
+The `skim()` function from the **skimr** package provides a useful summary of a tibble  
 
 ```{r}
 skim(fac)
 ```
 
-Take a quick look at the section containing numeric variables. This is of particular interest because the right-most column offers insight into the potential distribution of the data. 
+Take a quick look at the section containing numeric variables. This is of particular interest because the right-most column offers insight into the distribution of the data. 
 
 
 ## Characters 
@@ -319,7 +320,7 @@ Take a quick look at the section containing numeric variables. This is of partic
 knitr::include_graphics("02-wrangling/images/nasty.gif")
 ```
 
-So far, our tibbles have been clean and wholesome, like the `gapminder` and `trains`. **Real life datasets will be much nastier.** You will bring data into R from the outside world and discover there are problems. We will now discuss common remedial tasks for cleaning and transforming character data, also known as strings. A *string* is one or more characters that are enclosed inside a pair of matching 'single' or "double quotes".
+So far, our tibbles have been clean and wholesome, like `gapminder` and `trains`. **Real data is nasty.** You will bring data into R from the outside world and discover there are problems. We will now discuss common remedial tasks for cleaning and transforming character data, also known as strings. A *string* is one or more characters that are enclosed inside a pair of matching 'single' or "double quotes".
 
 
 This lesson deals with things you can do with vectors of class `character`. `fruit`, `words`, and `sentences` are Tidyverse character vectors which we will use. Although we can manipulate character vectors directly, it is much more common, in real world situations, to work with vectors which are in a tibble.
@@ -1805,6 +1806,12 @@ tbl %>%
 
 
 ## Summary
+
+<!-- DK: Discuss base versus Tidyverse -->
+
+*Data science is data cleaning.*
+
+*Real data is nasty.*
 
 This chapter covered many, many commands. You should have them all memorized by now.
 

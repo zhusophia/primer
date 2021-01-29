@@ -1,32 +1,24 @@
 # Probability {#probability}
 
-<!-- Here, or earlier, need to explain discrete versus continuous distributions. -->
-
 <!-- Add 3D distribution for Two Models case. Old picture is wrong because of change in percentages. Need regular plot at end as well. -->
 
 <!-- Add 3D distribution for Three Models case? -->
 
-<!-- Consider plot the rayshaders live. Key command may be  rgl::rglwidget(). -->
+<!-- Consider plotting the rayshaders live. Key command may be  rgl::rglwidget(). -->
+
+<!-- More animations. Create a movie which swoops into the joint distribution, takes a slice, remove the other slices, and then normalizes. Cool new package ggral (sp?) -->
 
 <!-- Need more of a parallel structure to 2 models, 3 models and N models. They should all be much more like each other. Three models is currently the best of them. Also, each needs to use the posterior distribution to forecast something. Structure for all three: Create joint distribution. Create conditional (unnormalized) distribution. Create posterior. Use posterior. Show code for all steps. -->
 
-<!-- Greek letters or for parameters which we can never observe. Latin letters are for observables. -->
+<!-- Greek letters are for parameters which we can never observe. Latin letters are for observables. -->
 
 
 <!-- Also good to get into the *scaling* of distributions, and the arbitrariness thereof. For example, trains$age is a distribution. Fine. What about rep(trains$age, 2)? What about rep(trains$age, 100)? Well, if any vector is a distribution, then all three of these are distributions. In fact, they are the same distribution, just scaled differently.  -->
-
-<!-- We also have the issue of continuous distributions.  -->
-
 
 <!-- Need more discussion about quintiles and area under the curve. -->
 
 
 <!-- When discussing a parameter $p$ and a probability distribution p() in the absence of a specific context, then those simple terms are OK. But, whenever you are talking about specific parameters or specific probability distributions, you should have either subscripts or items in the parentheses, respectively.  -->
-
-<!-- More animations. Create a movie which swoops into the joint distribution, takes a slice, remove the other slices, and then normalizes. Cool new package ggral (sp?) -->
-
-
-<!-- We need a single example of a continuous distribution after Electoral Votes. It will also have math. And empirical. And posterior. Maybe $p$ as a continuous proportion?  -->
 
 <!-- Revisit these references and see if there is other stuff we should include:   -->
 
@@ -381,6 +373,45 @@ There are many political science questions you could explore with posterior dist
 * Past: How many electoral votes would Hilary Clinton have won if she had picked a different VP?
 * Present: What are the total campaign donations from Harvard faculty?
 * Future: How many electoral votes will the Democratic candidate for president win in 2024?
+
+
+### Continuous distributions
+
+<!-- DK: More details? -->
+
+The three examples above are all *discrete* probability distributions, meaning that the outcome variable can only take on a limited set of values. A coin flip has two outcomes. The sum of a pair of dice has 11 outcomes. The total electoral votes for the Democratic candidate has 539 possible outcomes. In the limit, we can also create *continuous* probability distributions which have an *infinite* number of possible outcomes. For example, the percentage of Americans who "approve" of the job that President Biden is doing is a continuous variable, meaning it can take on any value between 0 and 1.
+
+All the characteristics for discrete probability distributions which we reviewed above apply just as much to continuous probability distributions. For example, we can create mathematical, empirical and posterior probability distributions for continuous outcomes just as we did for discrete outcomes. For example, a posterior probability distribution for $p$, the percentage of US citizens who approve of Biden, might look like:
+
+
+```{r, echo = FALSE}
+tibble(p = rbeta(1000000, 200, 180)) %>% 
+  ggplot(aes(x = p)) +
+    geom_histogram(aes(y = after_stat(count/sum(count))), 
+                   bins = 500) +
+    labs(title = "Posterior Probability Distribution",
+         subtitle = "Percentage of Americans who approve of President Biden",
+         x = "Outcome\nPresidential Approval",
+         y = "Probability") +
+    scale_y_continuous(labels = 
+                         scales::percent_format()) +
+    theme_classic()
+```
+
+Comments:
+
+<!-- DK: Need X Files poster -->
+
+* *The truth is out there.* If we asked all 300+ million Americans whether or not they approve of President Biden, we could know $p$ exactly. Alas, we can't do that. We use a posterior probability distribution to summarize are beliefs about the true value of $p$, a truth we can never confirm.
+
+* *Continuous variables are a myth.* Nothing that can be represented on a computer is [truly continuous](https://cs.stackexchange.com/questions/71648/why-is-data-in-computer-science-considered-to-be-discrete). Even something which appears continuous, like $p$, actually can only take on a (very large) set of discrete variables. In this case, there are approximately 300 million possible true values of $p$, one for each total number of people who approve of President Biden.
+
+* The math of continuous probability distributions can be tricky. Read [a book](https://drive.google.com/file/d/1VmkAAGOYCTORq1wxSQqy255qLJjTNvBI/view) on  mathematical probability for all the messy details. Little of that matters in applied work.
+
+* The most important difference is that, with discrete distributions, it makes sense to estimate the probability of a specific outcome. What is the probability of rolling a 9? With continuous distributions, this makes no sense because there are an infinite number of possible outcomes. *With continuous variables, we only estimate intervals.* What is the probabilty that Biden's true approval percentage is between 50% and 55%? 
+
+Don't worry about the distinctions between discrete and continuous outcomes, or between the discrete and continuous probability distributions which we will use to summarize our beliefs about those outcomes. The basic intuition is the same in both cases.
+
 
 ### Working with probability distributions
 

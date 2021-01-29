@@ -612,7 +612,7 @@ tibble(ID = 1:1000) %>%
 Once you have a pipe which does what you want, creating a function is relatively easy. Just place the code within a function definition and "pull out" specific variables as arguments.
 
 ```{r}
-prop_red <- function(x, shovel_size, reps){
+make_prop_red <- function(x, shovel_size, reps){
   tibble(ID = 1:reps) %>% 
     mutate(shovel = map(ID, ~ sample_n(x, size = shovel_size))) %>% 
     mutate(numb_red = map_int(shovel, ~ sum(.$color == "red"))) %>% 
@@ -625,9 +625,9 @@ prop_red <- function(x, shovel_size, reps){
 See how this just uses the code we had before to create `virtual_prop_red_25`, but generalizes it.  Now we can create the same tibbles we did before, ready to plot the histograms, with only three lines of code:
 
 ```{r}
-virtual_prop_red_25  <- prop_red(x = urn, shovel_size = 25,  reps = 1000)
-virtual_prop_red_50  <- prop_red(x = urn, shovel_size = 50,  reps = 1000)
-virtual_prop_red_100 <- prop_red(x = urn, shovel_size = 100, reps = 1000)
+virtual_prop_red_25  <- make_prop_red(x = urn, shovel_size = 25,  reps = 1000)
+virtual_prop_red_50  <- make_prop_red(x = urn, shovel_size = 50,  reps = 1000)
+virtual_prop_red_100 <- make_prop_red(x = urn, shovel_size = 100, reps = 1000)
 ```
 
 But this still isn't the best way.  Note that we have three objects we need to deal with, `virtual_prop_red_25`, `virtual_prop_red_50`, and `virtual_prop_red_100`. Instead, let's store our results in a single tibble.  How can we do this?  By using `map()` to create a list column!
@@ -640,12 +640,12 @@ First, we'll create a tibble that has a variable named `shovel_size` with our va
 tibble(shovel_size = c(25, 50, 100))
 ```
 
-Next, we'll create list column called `prop_red_results` that is the output of `prop_red()`.
+Next, we'll create list column called `prop_red_results` that is the output of `make_prop_red()`.
 
 ```{r}
 tibble(shovel_size = c(25, 50, 100)) %>%
   mutate(prop_red_results = map(shovel_size,
-                                ~ prop_red(x = urn, 
+                                ~ make_prop_red(x = urn, 
                                            shovel_size = .x, 
                                            reps = 1000)))
 
@@ -656,7 +656,7 @@ Adding another `map_*` function will let us get the standard deviations of our e
 ```{r}
 shovels <- tibble(shovel_size = c(25, 50, 100)) %>%
   mutate(prop_red_results = map(shovel_size,
-                                ~ prop_red(x = urn, 
+                                ~ make_prop_red(x = urn, 
                                            shovel_size = .x, 
                                            reps = 1000))) %>% 
   
@@ -678,7 +678,7 @@ Now that we have this framework, there's no need to limit ourselves to the sizes
 ```{r, cache=TRUE}
 shovels_100 <- tibble(shovel_size = 1:100) %>%
   mutate(prop_red_results = map(shovel_size,
-                                ~ prop_red(x = urn, 
+                                ~ make_prop_red(x = urn, 
                                            shovel_size = .x, 
                                            reps = 1000))) %>% 
   mutate(prop_red_sd = map_dbl(prop_red_results, 
