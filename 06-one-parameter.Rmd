@@ -6,7 +6,7 @@
 
 <!-- All references to estimating the number of red beads should be change to estimating p, the proportion of red beads.  -->
 
-<!-- MF: References to code chunks not working. I'm troubleshooting now. Create a simple example (three line Rmd file) and then ask on RStudio Community.  -->
+<!-- Could not get figure references to work. They have been removed. But we ought to figure that out and add them back!  Should create a simple example (three line Rmd file) and then ask on RStudio Community.  -->
 
 <!-- Add to Maslow something like 95% confidence interval squiggly mean plus/minus 2 standard errors -->
 
@@ -54,18 +54,10 @@ Who cares! Rejecting or not rejecting hypotheses never helps us to answer real q
 knitr::include_app("https://www.youtube.com/embed/e3PJ3Du_zDc")
 ```
 
-<!--
-```{r, echo = FALSE}
-knitr::include_graphics("06-one-parameter/images/Reaping_ball.webp")
-```
--->
-<!-- DK: Get the video to work. Cut half these words. -->
-
-
 This scene is from  *The Hunger Games*, a dystopian novel in which children are selected via lottery to fight to the death. Primrose Everdeen is selected from the urn. Why does she have the misfortune of being selected? Or, as we will refer to it henceforth, sampled?
 
 
-```{r, echo = FALSE, fig.cap = "Mr. DeVito is correct: sampling *is* badass.", out.width="80%", fig.align='center'}
+```{r, echo = FALSE, fig.cap = "Mr. DeVito is correct: sampling *is* badass."}
 knitr::include_graphics("06-one-parameter/images/danny_sampling.png")
 ```
 
@@ -74,9 +66,9 @@ knitr::include_graphics("06-one-parameter/images/danny_sampling.png")
 
 Last chapter, we learned about probability, the act of quantifying uncertainty. This chapter, we will learn about *sampling*, the beginning of our journey toward inference. When we sample, we take a *portion* of a total population and attempt to draw a conclusion about the portion, a conclusion which we can then *generalize* to the entire population. 
 
-Observe the urn in Figure \@ref(fig:urn_pic_one). It has a certain number of red and a certain number of white beads all of equal size, mixed well together. What proportion of this urn's beads are red? That is, what is the value of $p$?
+The urn has a certain number of red and a certain number of white beads all of equal size, mixed well together. What proportion of this urn's beads are red? That is, what is the value of $p$?
 
-```{r urn_pic_one, echo = FALSE, fig.cap = "An urn with red and white beads."}
+```{r, echo = FALSE, fig.cap = "An urn with red and white beads."}
 knitr::include_graphics("06-one-parameter/images/sampling_bowl_1.jpg")
 ```
 
@@ -104,14 +96,14 @@ knitr::include_graphics("06-one-parameter/images/sampling_bowl_1.jpg")
 
 ### Using the shovel method once 
 
-Instead of performing an exhaustive count, let's insert a shovel into the urn as seen in Figure \@ref(fig:urn_pic_two). Using the shovel, let's remove $5 \cdot 10 = 50$ beads, as seen in Figure \@ref(fig:urn_pic_3). Here, we are taking a *sample* of the total population of beads. 
+Instead of performing an exhaustive count, let's insert a shovel into the urn and remove $5 \cdot 10 = 50$ beads. We are taking a *sample* of the total population of beads. 
 
-```{r urn_pic_two, echo = FALSE, fig.cap = "Inserting a shovel into the urn."}
+```{r, echo = FALSE, fig.cap = "Inserting a shovel into the urn."}
 knitr::include_graphics("06-one-parameter/images/sampling_bowl_2.jpg")
 ```
 
 
-```{r urn_pic_3, echo = FALSE, fig.cap = "Removing 50 beads from the urn."}
+```{r, echo = FALSE, fig.cap = "Removing 50 beads from the urn."}
 knitr::include_graphics("06-one-parameter/images/sampling_bowl_3_cropped.jpg")
 ```
 
@@ -233,7 +225,7 @@ Let's start by performing the virtual analog of the tactile sampling exercise we
 
 For reference, `sample_frac()` merely re-arranges the rows of the tibble. We use `set.seed()` to ensure that the beads in our virtual urn are always in the same order. This ensures that the figures in the book match their written descriptions.
 
-```{r, echo=TRUE}
+```{r}
 set.seed(10)
 urn <- tibble(color = c(rep("red", 400), rep("white", 600))) %>%
   sample_frac() %>% 
@@ -325,11 +317,9 @@ virtual_samples
 ```
 
 
-Let's visualize this variation in a histogram in Figure \@ref(fig:histogram).
+Let's visualize this variation in a histogram:
 
-Note that we add 'binwidth = 0.05' and 'boundary = 0.4' arguments as well. Recall that setting 'boundary = 0.4' ensures a binning scheme with one of the bins' boundaries at 0.4. Since the 'binwidth = 0.05' is also set, this will create bins with boundaries at 0.30, 0.35, 0.45, 0.5, etc. as well. Recall that $\hat{p}$ is equal to the proportions red in our samples. 
-
-```{r histogram}
+```{r}
 virtual_samples %>% 
 ggplot(aes(x = prop_red)) +
   geom_histogram(binwidth = 0.05, 
@@ -345,6 +335,8 @@ ggplot(aes(x = prop_red)) +
   
   scale_y_continuous(breaks = seq(2, 10, 2))
 ```
+
+Note that we add `binwidth = 0.05` and `boundary = 0.4` arguments as well. Setting `boundary = 0.4` ensures a binning scheme with one of the bins' boundaries at 0.4. Since `binwidth = 0.05` is also set, this will create bins with boundaries at 0.30, 0.35, 0.45, and so on. Recall that $\hat{p}$ is equal to the proportions red in our samples. 
 
 Observe that we occasionally obtained proportions red that are less than 30%. On the other hand, we occasionally obtained proportions that are greater than 45%. However, the most frequently occurring proportions were between 35% and 40%. Why do we have these differences in proportions red? Because of *sampling variation*. 
 
@@ -399,7 +391,7 @@ facet_compare
 
 ### Using the virtual shovel 1,000 times {#shovel-1000-times}
 
-```{r, echo = FALSE, out.width="60%", fig.align='center', fig.cap = "So much sampling, so little time."}
+```{r, echo = FALSE, fig.cap = "So much sampling, so little time."}
 knitr::include_graphics("06-one-parameter/images/sample_bernie.png")
 ```
 
@@ -417,9 +409,9 @@ virtual_samples <- tibble(ID = 1:1000) %>%
 virtual_samples
 ```
 
-Observe that we now have 1,000 replicates of `prop_red`, the proportion of 50 beads that are red. Using the same code as earlier, let's now visualize the distribution of these 1,000 replicates of `prop_red` in a histogram in Figure \@ref(fig:hist_distribution).
+Observe that we now have 1,000 replicates of `prop_red`, the proportion of 50 beads that are red. Using the same code as earlier, let's now visualize the distribution of these 1,000 replicates of `prop_red` in a histogram:
 
-```{r hist_distribution}
+```{r}
 virtual_samples %>% 
   ggplot(aes(x = prop_red)) +
     geom_histogram(binwidth = 0.01, 
@@ -503,9 +495,9 @@ virtual_samples_100 %>%
        title = "100") 
 ```
 
-For easy comparison, we present the three resulting histograms in a single row with matching x and y axes in Figure \@ref(fig:multiple_hist).
+For easy comparison, we present the three resulting histograms in a single row with matching x and y axes:
 
-```{r multiple_hist, fig.cap = "Comparing the distributions of proportion red for different sample sizes (25, 50, 100). The important takeaway is that our center becomes more concentrated as our sample size increases, indicating a smaller standard deviation between our guesses."}
+```{r, fig.cap = "Comparing the distributions of proportion red for different sample sizes (25, 50, 100). The important takeaway is that our center becomes more concentrated as our sample size increases, indicating a smaller standard deviation between our guesses."}
 
 # Use bind_rows to combine the data from our three saved virtual sampling
 # objects. Use mutate() in each to clarify the n as the necessary number
@@ -675,7 +667,7 @@ glimpse(shovels)
 
 Now that we have this framework, there's no need to limit ourselves to the sizes 25, 50, and 100.  Why not try all integers from 1 to 100? We can use the same code, except we'll now set `shovel_size = 1:100` when initializing the tibble.
 
-```{r, cache=TRUE}
+```{r, cache = TRUE}
 shovels_100 <- tibble(shovel_size = 1:100) %>%
   mutate(prop_red_results = map(shovel_size,
                                 ~ make_prop_red(x = urn, 
@@ -705,7 +697,7 @@ shovels_100 %>%
 
 The red line here represents an important statistical concept: standard error (SE). The mathematical definition of SE for our purposes is the standard deviation divided by the square root of the sample size. As the shovel size increases, and thus our sample size increases, we find that the standard error decreases.  If this is confusing right now, fear not! We will delve into this explanation in our next section. 
 
-```{r, echo = FALSE, out.width="80%", fig.align='center', fig.cap = "To any poets and philosophers confused about this: don't worry! It won't be on a problem set."}
+```{r, echo = FALSE, fig.cap = "To any poets and philosophers confused about this: don't worry! It won't be on a problem set."}
 knitr::include_graphics("06-one-parameter/images/meme_math.png")
 ```
 
@@ -730,7 +722,7 @@ If this sounds confusing, don't worry! It should. Before we can explain this in 
 
 ### Terminology and notation {#terminology-and-notation}
 
-```{r, echo = FALSE, out.width="70%", fig.align='center', fig.cap = "Let Yoda's wisdom dull the pain of this terminology section."}
+```{r, echo = FALSE, fig.cap = "Let Yoda's wisdom dull the pain of this terminology section."}
 knitr::include_graphics("06-one-parameter/images/yoda.png")
 ```
 
@@ -781,7 +773,7 @@ Note that last word we wrote in bold: **infer**. The act of "inferring" means to
 
 ### Statistical definitions {#sampling-definitions}
 
-```{r, echo = FALSE, out.width="70%", fig.align='center', fig.cap = "We are almost done! Hang in there."}
+```{r, echo = FALSE, fig.cap = "We are almost done! Hang in there."}
 knitr::include_graphics("06-one-parameter/images/really_more.png")
 ```
 
@@ -817,9 +809,9 @@ Many students struggle to differentiate the standard error from the standard dev
 
 The more data points involved in the calculations of the mean, the smaller the standard error tends to be. When the standard error is small, the data is said to be more representative of the true mean. In cases where the standard error is large, the data may have some notable irregularities. Thus, larger sample size = smaller standard error = more representative of the truth. 
 
-To help reinforce these concepts, let's re-display Figure \@ref(fig:compare_p_hat) but using our new terminology, notation, and definitions relating to sampling in the figure below.
+To help reinforce these concepts, let's re-display our previous figure but using our new sampling terminology, notation, and definitions:
 
-```{r compare_p_hat, echo = FALSE, fig.cap = "Three sampling distributions of the sample proportion $\\hat{p}$. Note the increased concentration on the bins around .4 as our sample size increases."}
+```{r, echo = FALSE, fig.cap = "Three sampling distributions of the sample proportion $\\hat{p}$. Note the increased concentration on the bins around .4 as our sample size increases."}
 p_hat_compare <- virtual_prop %>% 
   mutate(
     n = str_c("n = ", n),
@@ -1223,7 +1215,7 @@ In order to investigate this concept, let's revisit our Preceptor Tables.
 
 Recall that a Preceptor Table is a table with rows and columns for all the data we would (reasonably) like to have. There are two different types of Preceptor Tables that are applicable to our urn example: actual and ideal.
 
-```{r, echo = FALSE, out.width="60%", fig.align='center', fig.cap = "When you see another Precetor Table section.", fig.margin = TRUE}
+```{r, echo = FALSE, fig.cap = "When you see another Precetor Table section."}
 knitr::include_graphics("06-one-parameter/images/here_we_go.png")
 ```
 
@@ -1293,7 +1285,7 @@ We saw in a previous section that as our sample size $n$ increases, our point es
 
 So random sampling ensures our point estimates are *accurate*, while on the other hand having a large sample size ensures our point estimates are *precise*. While the terms "accuracy" and "precision" may sound like they mean the same thing, there is a subtle difference. Accuracy describes how "on target" our estimates are, whereas precision describes how "consistent" our estimates are. The image below illustrates the difference.
 
-```{r, echo = FALSE, out.width="80%", fig.align='center', fig.cap = "Comparing accuracy and precision."}
+```{r, echo = FALSE, fig.cap = "Comparing accuracy and precision."}
 knitr::include_graphics("06-one-parameter/images/accuracy_vs_precision.jpg")
 ```
 
@@ -1303,11 +1295,11 @@ What if we had the option to use a shovel with **200** slots, but it had a minor
 
 ### El Jefe's or Felipe's?
 
-```{r, echo = FALSE, out.width="60%", fig.align='center', fig.cap = "El Jefe's, a Harvard Square staple, is known for its large portions and delicious horchata."}
+```{r, echo = FALSE, fig.cap = "El Jefe's, a Harvard Square staple, is known for its large portions and delicious horchata."}
 knitr::include_graphics("06-one-parameter/images/el_jefes.png")
 ```
 
-```{r, echo = FALSE, out.width="60%", fig.align='center', fig.cap = "Felipe's, another staple, is said to have a more authentic experience and addicting churros."}
+```{r, echo = FALSE, fig.cap = "Felipe's, another staple, is said to have a more authentic experience and addicting churros."}
 knitr::include_graphics("06-one-parameter/images/felipes.png")
 ```
 
