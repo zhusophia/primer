@@ -67,7 +67,7 @@
 <!-- Priorities:  -->
 <!-- Need some discussion of the Cardinal Virtues, even just a brief reminder in the Discussion section. -->
 <!-- All references to estimating the number of red beads should be change to estimating p, the proportion of red beads.  -->
-<!-- MF: References to code chunks not working. I'm troubleshooting now. Create a simple example (three line Rmd file) and then ask on RStudio Community.  -->
+<!-- Could not get figure references to work. They have been removed. But we ought to figure that out and add them back!  Should create a simple example (three line Rmd file) and then ask on RStudio Community.  -->
 <!-- Add to Maslow something like 95% confidence interval squiggly mean plus/minus 2 standard errors -->
 <!-- Make the stan_glm graphic look like the Using the posterior graphic. -->
 <!-- Find a place to include these useful sentences: -->
@@ -90,23 +90,20 @@ Who cares! Rejecting or not rejecting hypotheses never helps us to answer real q
 <!-- Within what range would you offer 50/50 odds that the true percentage lies? Discuss posterior_interval() -->
 <iframe src="https://www.youtube.com/embed/e3PJ3Du_zDc?showcase=0" width="100%" height="400px">
 </iframe>
-<!--
-<img src="06-one-parameter/images/Reaping_ball.webp" width="100%" />
--->
-<!-- DK: Get the video to work. Cut half these words. -->
 <p>This scene is from <em>The Hunger Games</em>, a dystopian novel in which children are selected via lottery to fight to the death. Primrose Everdeen is selected from the urn. Why does she have the misfortune of being selected? Or, as we will refer to it henceforth, sampled?</p>
-<div class="figure" style="text-align: center">
-<span id="fig:unnamed-chunk-408"></span>
-<img src="06-one-parameter/images/danny_sampling.png" alt="Mr. DeVito is correct: sampling *is* badass." width="80%"><p class="caption">
+<div class="figure">
+<span id="fig:unnamed-chunk-407"></span>
+<img src="06-one-parameter/images/danny_sampling.png" alt="Mr. DeVito is correct: sampling *is* badass." width="100%"><p class="caption">
 FIGURE 6.1: Mr. DeVito is correct: sampling <em>is</em> badass.
 </p>
 </div>
 <!-- DK: Clean up this text. Give a better sense of the whole chapter. -->
 <p>Last chapter, we learned about probability, the act of quantifying uncertainty. This chapter, we will learn about <em>sampling</em>, the beginning of our journey toward inference. When we sample, we take a <em>portion</em> of a total population and attempt to draw a conclusion about the portion, a conclusion which we can then <em>generalize</em> to the entire population.</p>
-<p>Observe the urn in Figure @ref(fig:urn_pic_one). It has a certain number of red and a certain number of white beads all of equal size, mixed well together. What proportion of this urn’s beads are red? That is, what is the value of <span class="math inline">\(p\)</span>?</p>
+<p>The urn has a certain number of red and a certain number of white beads all of equal size, mixed well together. What proportion of this urn’s beads are red? That is, what is the value of <span class="math inline">\(p\)</span>?</p>
 <div class="figure">
+<span id="fig:unnamed-chunk-408"></span>
 <img src="06-one-parameter/images/sampling_bowl_1.jpg" alt="An urn with red and white beads." width="100%"><p class="caption">
-(#fig:urn_pic_one)An urn with red and white beads.
+FIGURE 6.2: An urn with red and white beads.
 </p>
 </div>
 <p>One way to answer this question would be to perform an exhaustive count: remove each bead individually, count the number of red beads, count the number of white beads, and divide the number of red beads by the total number of beads. Call that ratio <span class="math inline">\(p\)</span>, the proportion of red beads in the urn. However, this would be a long and tedious process. Therefore, we will use sampling! Consider two questions:</p>
@@ -123,22 +120,24 @@ FIGURE 6.1: Mr. DeVito is correct: sampling <em>is</em> badass.
 <div class="figure">
 <span id="fig:unnamed-chunk-410"></span>
 <img src="06-one-parameter/images/sampling_bowl_1.jpg" alt="An urn with red and white beads." width="100%"><p class="caption">
-FIGURE 6.2: An urn with red and white beads.
+FIGURE 6.3: An urn with red and white beads.
 </p>
 </div>
 <div id="using-the-shovel-method-once" class="section level3" number="6.1.1">
 <h3>
 <span class="header-section-number">6.1.1</span> Using the shovel method once<a class="anchor" aria-label="anchor" href="#using-the-shovel-method-once"><i class="fas fa-link"></i></a>
 </h3>
-<p>Instead of performing an exhaustive count, let’s insert a shovel into the urn as seen in Figure @ref(fig:urn_pic_two). Using the shovel, let’s remove <span class="math inline">\(5 \cdot 10 = 50\)</span> beads, as seen in Figure @ref(fig:urn_pic_3). Here, we are taking a <em>sample</em> of the total population of beads.</p>
+<p>Instead of performing an exhaustive count, let’s insert a shovel into the urn and remove <span class="math inline">\(5 \cdot 10 = 50\)</span> beads. We are taking a <em>sample</em> of the total population of beads.</p>
 <div class="figure">
+<span id="fig:unnamed-chunk-411"></span>
 <img src="06-one-parameter/images/sampling_bowl_2.jpg" alt="Inserting a shovel into the urn." width="100%"><p class="caption">
-(#fig:urn_pic_two)Inserting a shovel into the urn.
+FIGURE 6.4: Inserting a shovel into the urn.
 </p>
 </div>
 <div class="figure">
+<span id="fig:unnamed-chunk-412"></span>
 <img src="06-one-parameter/images/sampling_bowl_3_cropped.jpg" alt="Removing 50 beads from the urn." width="100%"><p class="caption">
-(#fig:urn_pic_3)Removing 50 beads from the urn.
+FIGURE 6.5: Removing 50 beads from the urn.
 </p>
 </div>
 <p>Observe that 17 of the 50 sampled beads are red and thus 17/50 = 0.34 = 34% of the shovel’s beads are red. We can view the proportion of beads that are red in this shovel as a guess of the proportion of beads that are red in the entire urn. While not as exact as doing an exhaustive count of all the beads in the urn, our guess of 34% took much less time and energy to make.</p>
@@ -160,16 +159,16 @@ FIGURE 6.2: An urn with red and white beads.
 </ul>
 <p>Each of our 33 groups of friends make note of their proportion of red beads from their sample collected. Each group then marks their proportion of their 50 beads that were red in the appropriate bin in a hand-drawn histogram as seen below.</p>
 <div class="figure">
-<span id="fig:unnamed-chunk-411"></span>
+<span id="fig:unnamed-chunk-413"></span>
 <img src="06-one-parameter/images/tactile_3_a.jpg" alt="Constructing a histogram of proportions." width="100%"><p class="caption">
-FIGURE 6.3: Constructing a histogram of proportions.
+FIGURE 6.6: Constructing a histogram of proportions.
 </p>
 </div>
 <p>Histograms allow us to visualize the <em>distribution</em> of a numerical variable. In particular, where the center of the values falls and how the values vary. A partially completed histogram of the first 10 out of 33 groups of friends’ results can be seen in the figure below.</p>
 <div class="figure">
-<span id="fig:unnamed-chunk-412"></span>
+<span id="fig:unnamed-chunk-414"></span>
 <img src="06-one-parameter/images/tactile_3_c.jpg" alt="Hand-drawn histogram of first 10 out of 33 proportions." width="100%"><p class="caption">
-FIGURE 6.4: Hand-drawn histogram of first 10 out of 33 proportions.
+FIGURE 6.7: Hand-drawn histogram of first 10 out of 33 proportions.
 </p>
 </div>
 <p>Observe the following details in the histogram:</p>
@@ -218,7 +217,7 @@ FIGURE 6.4: Hand-drawn histogram of first 10 out of 33 proportions.
   <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"Proportion of 50 beads that were red "</span>, <span class="fu"><a href="https://rdrr.io/r/grDevices/plotmath.html">hat</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
        y <span class="op">=</span> <span class="st">"Count"</span>,
        title <span class="op">=</span> <span class="st">"Proportions Red in 33 Samples"</span><span class="op">)</span> </code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-414-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-416-1.png" width="100%"></div>
 </div>
 <div id="what-did-we-just-do" class="section level3" number="6.1.3">
 <h3>
@@ -349,8 +348,7 @@ FIGURE 6.4: Hand-drawn histogram of first 10 out of 33 proportions.
 ##  9     9 &lt;tibble [50 × 2]&gt;       16         50     0.32
 ## 10    10 &lt;tibble [50 × 2]&gt;       20         50     0.4 
 ## # … with 23 more rows</code></pre>
-<p>Let’s visualize this variation in a histogram in Figure <a href="#fig:histogram"><strong>??</strong></a>.</p>
-<p>Note that we add ‘binwidth = 0.05’ and ‘boundary = 0.4’ arguments as well. Recall that setting ‘boundary = 0.4’ ensures a binning scheme with one of the bins’ boundaries at 0.4. Since the ‘binwidth = 0.05’ is also set, this will create bins with boundaries at 0.30, 0.35, 0.45, 0.5, etc. as well. Recall that <span class="math inline">\(\hat{p}\)</span> is equal to the proportions red in our samples.</p>
+<p>Let’s visualize this variation in a histogram:</p>
 <div class="sourceCode" id="cb559"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">virtual_samples</span> <span class="op">%&gt;%</span> 
 <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">prop_red</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
@@ -366,7 +364,8 @@ FIGURE 6.4: Hand-drawn histogram of first 10 out of 33 proportions.
   <span class="co"># all the values are integers.</span>
   
   <span class="fu">scale_y_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">10</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/histogram-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-423-1.png" width="100%"></div>
+<p>Note that we add <code>binwidth = 0.05</code> and <code>boundary = 0.4</code> arguments as well. Setting <code>boundary = 0.4</code> ensures a binning scheme with one of the bins’ boundaries at 0.4. Since <code>binwidth = 0.05</code> is also set, this will create bins with boundaries at 0.30, 0.35, 0.45, and so on. Recall that <span class="math inline">\(\hat{p}\)</span> is equal to the proportions red in our samples.</p>
 <p>Observe that we occasionally obtained proportions red that are less than 30%. On the other hand, we occasionally obtained proportions that are greater than 45%. However, the most frequently occurring proportions were between 35% and 40%. Why do we have these differences in proportions red? Because of <em>sampling variation</em>.</p>
 <p>Compare our virtual results with our tactile results from the previous section. Observe that both histograms are somewhat similar in their center and variation, although not identical. These slight differences are again due to random sampling variation. Furthermore, observe that both distributions are somewhat bell-shaped.</p>
 <!-- DK: Clean up this code. Discuss more? -->
@@ -412,9 +411,9 @@ FIGURE 6.4: Hand-drawn histogram of first 10 out of 33 proportions.
 
 <span class="va">facet_compare</span></code></pre></div>
 <div class="figure">
-<span id="fig:unnamed-chunk-421"></span>
-<img src="book_temp_files/figure-html/unnamed-chunk-421-1.png" alt="Comparing 33 virtual and 33 tactile proportions red. Note that, though the figures differ slightly, both are centered around .35 to .40. This shows that, in both sampling distributions, the most frequently occuring proportion red is between 35 and 40%." width="100%"><p class="caption">
-FIGURE 6.5: Comparing 33 virtual and 33 tactile proportions red. Note that, though the figures differ slightly, both are centered around .35 to .40. This shows that, in both sampling distributions, the most frequently occuring proportion red is between 35 and 40%.
+<span id="fig:unnamed-chunk-424"></span>
+<img src="book_temp_files/figure-html/unnamed-chunk-424-1.png" alt="Comparing 33 virtual and 33 tactile proportions red. Note that, though the figures differ slightly, both are centered around .35 to .40. This shows that, in both sampling distributions, the most frequently occuring proportion red is between 35 and 40%." width="100%"><p class="caption">
+FIGURE 6.8: Comparing 33 virtual and 33 tactile proportions red. Note that, though the figures differ slightly, both are centered around .35 to .40. This shows that, in both sampling distributions, the most frequently occuring proportion red is between 35 and 40%.
 </p>
 </div>
 </div>
@@ -422,10 +421,10 @@ FIGURE 6.5: Comparing 33 virtual and 33 tactile proportions red. Note that, thou
 <h3>
 <span class="header-section-number">6.2.3</span> Using the virtual shovel 1,000 times<a class="anchor" aria-label="anchor" href="#shovel-1000-times"><i class="fas fa-link"></i></a>
 </h3>
-<div class="figure" style="text-align: center">
-<span id="fig:unnamed-chunk-422"></span>
-<img src="06-one-parameter/images/sample_bernie.png" alt="So much sampling, so little time." width="60%"><p class="caption">
-FIGURE 6.6: So much sampling, so little time.
+<div class="figure">
+<span id="fig:unnamed-chunk-425"></span>
+<img src="06-one-parameter/images/sample_bernie.png" alt="So much sampling, so little time." width="100%"><p class="caption">
+FIGURE 6.9: So much sampling, so little time.
 </p>
 </div>
 <p>Now say we want to study the effects of sampling variation not for 33 samples, but for a larger number of samples (1000). We have two choices at this point. We could have our groups of friends manually take 1,000 samples of 50 beads and compute the corresponding 1,000 proportions. However, this would be time-consuming. This is where computers excel: automating long and repetitive tasks while performing them quickly. At this point, we will abandon tactile sampling in favor of virtual sampling.</p>
@@ -453,7 +452,7 @@ FIGURE 6.6: So much sampling, so little time.
 ##  9     9 &lt;tibble [50 × 2]&gt;       16         50     0.32
 ## 10    10 &lt;tibble [50 × 2]&gt;       20         50     0.4 
 ## # … with 990 more rows</code></pre>
-<p>Observe that we now have 1,000 replicates of <code>prop_red</code>, the proportion of 50 beads that are red. Using the same code as earlier, let’s now visualize the distribution of these 1,000 replicates of <code>prop_red</code> in a histogram in Figure @ref(fig:hist_distribution).</p>
+<p>Observe that we now have 1,000 replicates of <code>prop_red</code>, the proportion of 50 beads that are red. Using the same code as earlier, let’s now visualize the distribution of these 1,000 replicates of <code>prop_red</code> in a histogram:</p>
 <div class="sourceCode" id="cb563"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">virtual_samples</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">prop_red</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
@@ -463,7 +462,7 @@ FIGURE 6.6: So much sampling, so little time.
     <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/grDevices/plotmath.html">hat</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span><span class="op">)</span>, 
          y <span class="op">=</span> <span class="st">"Count"</span>,
          title <span class="op">=</span> <span class="st">"Distribution of 1,000 proportions red"</span><span class="op">)</span> </code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/hist_distribution-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-427-1.png" width="100%"></div>
 <p>Once again, the most frequently occurring proportions of red beads occur between 35% and 45%. Every now and then, we obtain proportions as low as between 20% and 25%, and others as high as between 55% and 60%. These are rare, however. Furthermore, observe that we now have a much more symmetric and smoother bell-shaped distribution. This distribution is, in fact, approximated well by a normal distribution.</p>
 <!-- DK: Discuss why we have missing buckets. -->
 </div>
@@ -495,7 +494,7 @@ Using our newly developed tools for virtual sampling, let’s unpack the effect 
                  color <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Proportion of 25 beads that were red"</span>, 
        title <span class="op">=</span> <span class="st">"25"</span><span class="op">)</span> </code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-424-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-428-1.png" width="100%"></div>
 <p>We will repeat this process with a shovel size of <strong>50</strong>.</p>
 <div class="sourceCode" id="cb565"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">virtual_samples_50</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>ID <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">1000</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -512,7 +511,7 @@ Using our newly developed tools for virtual sampling, let’s unpack the effect 
                  color <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Proportion of 50 beads that were red"</span>, 
        title <span class="op">=</span> <span class="st">"50"</span><span class="op">)</span>  </code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-425-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-429-1.png" width="100%"></div>
 <p>Finally, we will perform the same process with 1000 replicates to map the histogram using a shovel size of <strong>100</strong>.</p>
 <div class="sourceCode" id="cb566"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">virtual_samples_100</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>ID <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">1000</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -529,8 +528,8 @@ Using our newly developed tools for virtual sampling, let’s unpack the effect 
                  color <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Proportion of 100 beads that were red"</span>, 
        title <span class="op">=</span> <span class="st">"100"</span><span class="op">)</span> </code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-426-1.png" width="100%"></div>
-<p>For easy comparison, we present the three resulting histograms in a single row with matching x and y axes in Figure @ref(fig:multiple_hist).</p>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-430-1.png" width="100%"></div>
+<p>For easy comparison, we present the three resulting histograms in a single row with matching x and y axes:</p>
 <div class="sourceCode" id="cb567"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Use bind_rows to combine the data from our three saved virtual sampling</span>
 <span class="co"># objects. Use mutate() in each to clarify the n as the necessary number</span>
@@ -559,8 +558,9 @@ Using our newly developed tools for virtual sampling, let’s unpack the effect 
 
 <span class="va">comparing_sampling_distributions</span></code></pre></div>
 <div class="figure">
-<img src="book_temp_files/figure-html/multiple_hist-1.png" alt="Comparing the distributions of proportion red for different sample sizes (25, 50, 100). The important takeaway is that our center becomes more concentrated as our sample size increases, indicating a smaller standard deviation between our guesses." width="100%"><p class="caption">
-(#fig:multiple_hist)Comparing the distributions of proportion red for different sample sizes (25, 50, 100). The important takeaway is that our center becomes more concentrated as our sample size increases, indicating a smaller standard deviation between our guesses.
+<span id="fig:unnamed-chunk-431"></span>
+<img src="book_temp_files/figure-html/unnamed-chunk-431-1.png" alt="Comparing the distributions of proportion red for different sample sizes (25, 50, 100). The important takeaway is that our center becomes more concentrated as our sample size increases, indicating a smaller standard deviation between our guesses." width="100%"><p class="caption">
+FIGURE 6.10: Comparing the distributions of proportion red for different sample sizes (25, 50, 100). The important takeaway is that our center becomes more concentrated as our sample size increases, indicating a smaller standard deviation between our guesses.
 </p>
 </div>
 <p>Observe that as the sample size increases, the variation of the 1,000 replicates of the proportion of red decreases. In other words, as the sample size increases, there are fewer differences due to sampling variation and the distribution centers more tightly around the same value. Eyeballing Figure 6.12, all three histograms appear to center around roughly 40%.</p>
@@ -1102,16 +1102,16 @@ Using our newly developed tools for virtual sampling, let’s unpack the effect 
 <p>Now, we have the standard deviation of <code>prop_red</code> for all shovel sizes from 1 to 100. Let’s plot that value to see how it changes as the shovel gets larger:</p>
 <!-- MF: Still researching the below problem. -->
 <div class="figure">
-<span id="fig:unnamed-chunk-436"></span>
-<img src="book_temp_files/figure-html/unnamed-chunk-436-1.png" alt="Comparing standard deviations of proportions red for 100 different shovels. The standard deviation decreases at the same rate as the square root of shovel size. The red line shows the standard error." width="100%"><p class="caption">
-FIGURE 6.7: Comparing standard deviations of proportions red for 100 different shovels. The standard deviation decreases at the same rate as the square root of shovel size. The red line shows the standard error.
+<span id="fig:unnamed-chunk-441"></span>
+<img src="book_temp_files/figure-html/unnamed-chunk-441-1.png" alt="Comparing standard deviations of proportions red for 100 different shovels. The standard deviation decreases at the same rate as the square root of shovel size. The red line shows the standard error." width="100%"><p class="caption">
+FIGURE 6.11: Comparing standard deviations of proportions red for 100 different shovels. The standard deviation decreases at the same rate as the square root of shovel size. The red line shows the standard error.
 </p>
 </div>
 <p>The red line here represents an important statistical concept: standard error (SE). The mathematical definition of SE for our purposes is the standard deviation divided by the square root of the sample size. As the shovel size increases, and thus our sample size increases, we find that the standard error decreases. If this is confusing right now, fear not! We will delve into this explanation in our next section.</p>
-<div class="figure" style="text-align: center">
-<span id="fig:unnamed-chunk-437"></span>
-<img src="06-one-parameter/images/meme_math.png" alt="To any poets and philosophers confused about this: don't worry! It won't be on a problem set." width="80%"><p class="caption">
-FIGURE 6.8: To any poets and philosophers confused about this: don’t worry! It won’t be on a problem set.
+<div class="figure">
+<span id="fig:unnamed-chunk-442"></span>
+<img src="06-one-parameter/images/meme_math.png" alt="To any poets and philosophers confused about this: don't worry! It won't be on a problem set." width="100%"><p class="caption">
+FIGURE 6.12: To any poets and philosophers confused about this: don’t worry! It won’t be on a problem set.
 </p>
 </div>
 <p>This is the power of running many analyses at once using <code>map_*</code> functions and list columns: before, we could tell that the standard deviation was decreasing as the shovel size increased, but when only looking at shovel sizes of 25, 50, and 100, it wasn’t clear <em>how quickly</em> it was decreasing.</p>
@@ -1122,9 +1122,9 @@ FIGURE 6.8: To any poets and philosophers confused about this: don’t worry! It
 <span class="header-section-number">6.3</span> Standard error<a class="anchor" aria-label="anchor" href="#standard-errors"><i class="fas fa-link"></i></a>
 </h2>
 <div class="figure" style="text-align: center">
-<span id="fig:unnamed-chunk-438"></span>
+<span id="fig:unnamed-chunk-443"></span>
 <img src="06-one-parameter/images/old_man_SE.png" alt="Standard errors are just the way old people talk about confidence intervals." width="100%"><p class="caption">
-FIGURE 6.9: Standard errors are just the way old people talk about confidence intervals.
+FIGURE 6.13: Standard errors are just the way old people talk about confidence intervals.
 </p>
 </div>
 <p>Standard errors quantify the effect of sampling variation induced on our estimates. In other words, they quantify how much we can expect different proportions of a shovel’s beads that are red <em>to vary</em> from one sample to another sample to another sample, and so on. As a general rule, as sample size increases, the standard error decreases.</p>
@@ -1136,10 +1136,10 @@ FIGURE 6.9: Standard errors are just the way old people talk about confidence in
 <h3>
 <span class="header-section-number">6.3.1</span> Terminology and notation<a class="anchor" aria-label="anchor" href="#terminology-and-notation"><i class="fas fa-link"></i></a>
 </h3>
-<div class="figure" style="text-align: center">
-<span id="fig:unnamed-chunk-439"></span>
-<img src="06-one-parameter/images/yoda.png" alt="Let Yoda's wisdom dull the pain of this terminology section." width="70%"><p class="caption">
-FIGURE 6.10: Let Yoda’s wisdom dull the pain of this terminology section.
+<div class="figure">
+<span id="fig:unnamed-chunk-444"></span>
+<img src="06-one-parameter/images/yoda.png" alt="Let Yoda's wisdom dull the pain of this terminology section." width="100%"><p class="caption">
+FIGURE 6.14: Let Yoda’s wisdom dull the pain of this terminology section.
 </p>
 </div>
 <p>Let’s now introduce some terminology and notation as well as statistical definitions related to sampling. You will likely want to read this section a few times. Keep in mind, however, that all of the concepts underlying these terminology, notation, and definitions tie directly to the concepts underlying our tactile and virtual sampling activities. It will simply take time and practice to master them.</p>
@@ -1153,9 +1153,9 @@ FIGURE 6.10: Let Yoda’s wisdom dull the pain of this terminology section.
 <p>Eighth, we say <strong>biased sampling</strong> occurs if certain individuals or observations in a population have a higher chance of being included in a sample than others. We say a sampling procedure is <em>unbiased</em> if every observation in a population had an equal chance of being sampled. Had the red beads been much smaller than the white beads, and therefore more prone to falling through the shovel, our sample would have been <em>biased</em>. In our sampling activities, since we mixed all <span class="math inline">\(N = 1000\)</span> beads prior to each group’s sampling and since each of the equally sized beads had an equal chance of being sampled, our samples were <em>unbiased</em>.</p>
 <p>Ninth and lastly, the idea of <strong>random sampling</strong>. We say a sampling procedure is <em>random</em> if we sample randomly from the population in an unbiased fashion. In our sampling activities, this would correspond to sufficiently mixing the urn before each use of the shovel.</p>
 <div class="figure" style="text-align: center">
-<span id="fig:unnamed-chunk-440"></span>
+<span id="fig:unnamed-chunk-445"></span>
 <img src="06-one-parameter/images/cant_breathe_sponge.png" alt="Fear not if you look like Spongebob after reading this section. We will re-cap right now!" width="100%"><p class="caption">
-FIGURE 6.11: Fear not if you look like Spongebob after reading this section. We will re-cap right now!
+FIGURE 6.15: Fear not if you look like Spongebob after reading this section. We will re-cap right now!
 </p>
 </div>
 <p>Phew, that’s a lot of new terminology and notation to learn! Let’s put them all together to describe the paradigm of sampling.</p>
@@ -1181,25 +1181,25 @@ FIGURE 6.11: Fear not if you look like Spongebob after reading this section. We 
 <h3>
 <span class="header-section-number">6.3.2</span> Statistical definitions<a class="anchor" aria-label="anchor" href="#sampling-definitions"><i class="fas fa-link"></i></a>
 </h3>
-<div class="figure" style="text-align: center">
-<span id="fig:unnamed-chunk-441"></span>
-<img src="06-one-parameter/images/really_more.png" alt="We are almost done! Hang in there." width="70%"><p class="caption">
-FIGURE 6.12: We are almost done! Hang in there.
+<div class="figure">
+<span id="fig:unnamed-chunk-446"></span>
+<img src="06-one-parameter/images/really_more.png" alt="We are almost done! Hang in there." width="100%"><p class="caption">
+FIGURE 6.16: We are almost done! Hang in there.
 </p>
 </div>
 <p>Now, for some important statistical definitions related to sampling. As a refresher of our 1,000 repeated/replicated virtual samples of size <span class="math inline">\(n\)</span> = 25, <span class="math inline">\(n\)</span> = 50, and <span class="math inline">\(n\)</span> = 100 in Section <a href="one-parameter.html#virtual-sampling">6.2</a>, let’s display our figure showing the difference in proportions red according to different shovel sizes.</p>
 <div class="figure">
-<span id="fig:unnamed-chunk-442"></span>
-<img src="book_temp_files/figure-html/unnamed-chunk-442-1.png" alt="Previously seen three distributions of the sample proportion $\hat{p}$." width="100%"><p class="caption">
-FIGURE 6.13: Previously seen three distributions of the sample proportion <span class="math inline">\(\hat{p}\)</span>.
+<span id="fig:unnamed-chunk-447"></span>
+<img src="book_temp_files/figure-html/unnamed-chunk-447-1.png" alt="Previously seen three distributions of the sample proportion $\hat{p}$." width="100%"><p class="caption">
+FIGURE 6.17: Previously seen three distributions of the sample proportion <span class="math inline">\(\hat{p}\)</span>.
 </p>
 </div>
 <p>These types of distributions have a special name: <strong>sampling distributions</strong>; their visualization displays the effect of sampling variation on the distribution of a point estimate; in this case, the sample proportion <span class="math inline">\(\hat{p}\)</span>. Using these sampling distributions, for a given sample size <span class="math inline">\(n\)</span>, we can make statements about what values we typically expect.</p>
 <p>For example, observe the centers of all three sampling distributions: they are all roughly centered around <span class="math inline">\(0.4 = 40\%\)</span>. Furthermore, observe that while we are somewhat likely to observe sample proportions of red beads of <span class="math inline">\(0.2 = 20\%\)</span> when using the shovel with 25 slots, we will almost never observe a proportion of 20% when using the shovel with 100 slots. Observe also the effect of sample size on the sampling variation. As the sample size <span class="math inline">\(n\)</span> increases from 25 to 50 to 100, the variation of the sampling distribution decreases and thus the values cluster more and more tightly around the same center of around 40%. We quantified this variation using the standard deviation of our sample proportions, seeing that the standard deviation decreases with the square root of the sample size:</p>
 <div class="figure">
-<span id="fig:unnamed-chunk-443"></span>
-<img src="book_temp_files/figure-html/unnamed-chunk-443-1.png" alt="Previously seen comparing standard deviations of proportions red for 100 different shovels" width="100%"><p class="caption">
-FIGURE 6.14: Previously seen comparing standard deviations of proportions red for 100 different shovels
+<span id="fig:unnamed-chunk-448"></span>
+<img src="book_temp_files/figure-html/unnamed-chunk-448-1.png" alt="Previously seen comparing standard deviations of proportions red for 100 different shovels" width="100%"><p class="caption">
+FIGURE 6.18: Previously seen comparing standard deviations of proportions red for 100 different shovels
 </p>
 </div>
 <p>So as the sample size increases, the standard deviation of the proportion of red beads decreases. This type of standard deviation has another special name: <strong>standard error</strong></p>
@@ -1215,17 +1215,18 @@ FIGURE 6.14: Previously seen comparing standard deviations of proportions red fo
 <p>Many students struggle to differentiate the standard error from the standard deviation. The relationship between the standard error and the standard deviation is such that, for a given sample size, the standard error equals the standard deviation divided by the square root of the sample size. Accordingly, the standard error is inversely proportional to the sample size; the larger the sample size, the smaller the standard error because the statistic will approach the actual value.</p>
 <!-- Insert visual aid for students who are not mathematically inclined showing that larger sample sizes = closer to actual value -->
 <p>The more data points involved in the calculations of the mean, the smaller the standard error tends to be. When the standard error is small, the data is said to be more representative of the true mean. In cases where the standard error is large, the data may have some notable irregularities. Thus, larger sample size = smaller standard error = more representative of the truth.</p>
-<p>To help reinforce these concepts, let’s re-display Figure @ref(fig:compare_p_hat) but using our new terminology, notation, and definitions relating to sampling in the figure below.</p>
+<p>To help reinforce these concepts, let’s re-display our previous figure but using our new sampling terminology, notation, and definitions:</p>
 <div class="figure">
-<img src="book_temp_files/figure-html/compare_p_hat-1.png" alt="Three sampling distributions of the sample proportion $\hat{p}$. Note the increased concentration on the bins around .4 as our sample size increases." width="100%"><p class="caption">
-(#fig:compare_p_hat)Three sampling distributions of the sample proportion <span class="math inline">\(\hat{p}\)</span>. Note the increased concentration on the bins around .4 as our sample size increases.
+<span id="fig:unnamed-chunk-449"></span>
+<img src="book_temp_files/figure-html/unnamed-chunk-449-1.png" alt="Three sampling distributions of the sample proportion $\hat{p}$. Note the increased concentration on the bins around .4 as our sample size increases." width="100%"><p class="caption">
+FIGURE 6.19: Three sampling distributions of the sample proportion <span class="math inline">\(\hat{p}\)</span>. Note the increased concentration on the bins around .4 as our sample size increases.
 </p>
 </div>
 <p>Furthermore, let’s display the graph of standard errors for <span class="math inline">\(n = 1\)</span> to <span class="math inline">\(n = 100\)</span> using our new terminology, notation, and definitions relating to sampling.</p>
 <div class="figure">
-<span id="fig:unnamed-chunk-444"></span>
-<img src="book_temp_files/figure-html/unnamed-chunk-444-1.png" alt="Standard errors of the sample proportion based on sample sizes of 1 to 100" width="100%"><p class="caption">
-FIGURE 6.15: Standard errors of the sample proportion based on sample sizes of 1 to 100
+<span id="fig:unnamed-chunk-450"></span>
+<img src="book_temp_files/figure-html/unnamed-chunk-450-1.png" alt="Standard errors of the sample proportion based on sample sizes of 1 to 100" width="100%"><p class="caption">
+FIGURE 6.20: Standard errors of the sample proportion based on sample sizes of 1 to 100
 </p>
 </div>
 <p>Remember the key message of this last table: that as the sample size <span class="math inline">\(n\)</span> goes up, the “typical” error of your point estimate will go down, as quantified by the <em>standard error</em>.</p>
@@ -1241,9 +1242,9 @@ FIGURE 6.15: Standard errors of the sample proportion based on sample sizes of 1
 <p>The standard error measures the accuracy of a sample distribution as compared to the population by using the standard deviation. Specifically, the standard deviation of our data points divided by the square root of the sample size. As such, we find that larger sample sizes = lower standard errors = more accurate and representative guesses.</p>
 <p>To really drive home our point: standard error is just a fancy term for your uncertainty about something you don’t know. Standard error == our (uncertain) beliefs.</p>
 <div class="figure" style="text-align: center">
-<span id="fig:unnamed-chunk-445"></span>
+<span id="fig:unnamed-chunk-451"></span>
 <img src="06-one-parameter/images/preceptor_hierarchy.png" alt="If you are wondering how much you need to know, follow this helpful guide of the information we have learned this chapter!" width="100%"><p class="caption">
-FIGURE 6.16: If you are wondering how much you need to know, follow this helpful guide of the information we have learned this chapter!
+FIGURE 6.21: If you are wondering how much you need to know, follow this helpful guide of the information we have learned this chapter!
 </p>
 </div>
 <!-- DK: Does the student have the main lessons? Standard error is a measure of how close you expect your guess to be to the truth. There are many other measures like mean absolute deviation and MAD SD (where this is the median absolute deviation). I am confused about this! -->
@@ -1323,7 +1324,7 @@ FIGURE 6.16: If you are wondering how much you need to know, follow this helpful
     <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Joint Distribution of Red Beads in Paddle and in Urn"</span>,
          x <span class="op">=</span> <span class="st">"Number of Red Beads in Paddle"</span>,
          y <span class="op">=</span> <span class="st">"Number of Red Beads in Urn"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-447-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-453-1.png" width="100%"></div>
 <p>It is easier to define our “model” in this joint distribution in terms of the unknown parameter <span class="math inline">\(p\)</span> rather than, as above, in terms of the unknown number of red beads in the urn.</p>
 <div class="sourceCode" id="cb590"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">joint_dist</span> <span class="op">%&gt;%</span>
@@ -1332,12 +1333,12 @@ FIGURE 6.16: If you are wondering how much you need to know, follow this helpful
     <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Joint Distribution of Red Beads in Paddle and Proportion Red Beads in Urn"</span>,
          x <span class="op">=</span> <span class="st">"Number of Red Beads in Paddle"</span>,
          y <span class="op">=</span> <span class="st">"Proportion of Red Beads in Urn"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-448-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-454-1.png" width="100%"></div>
 <p>To better visualize this distribution, take a look at the 3D version of this plot. Note the U shape of the graph. By this, we mean to note the peaks at the areas where the number of red beads in the paddle is 0 out of 50 and 50 out of 50. This is due to the fact that, when we draw 0 red beads in a sample of 50 beads, the possibilities for the number of red beads in the urn is consistently close to 0. Similarly, when our sample of 50 beads comes out with 50 red beads, the possibilities for the number of red beads in the urn is consistently closer to 1000.</p>
 <div class="figure">
-<span id="fig:unnamed-chunk-449"></span>
+<span id="fig:unnamed-chunk-455"></span>
 <img src="06-one-parameter/images/rayshader_full.png" alt="A 3D image of our joint distribution created with Rayshader." width="100%"><p class="caption">
-FIGURE 6.17: A 3D image of our joint distribution created with Rayshader.
+FIGURE 6.22: A 3D image of our joint distribution created with Rayshader.
 </p>
 </div>
 <p>Now, we have explored the most likely possibilities according to all possible models of this scenario. Let’s pivot to a posterior distribution, which will take a <em>slice</em> of our joint distribution that is more specific to our question.</p>
@@ -1372,7 +1373,7 @@ FIGURE 6.17: A 3D image of our joint distribution created with Rayshader.
     <span class="fu">scale_x_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org//reference/label_number.html">number_format</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_y_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org//reference/label_percent.html">percent_format</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">theme_classic</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-450-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-456-1.png" width="100%"></div>
 <p>To visualize this in a 3D plot, see the slice in the figure below. There are a few things to note. First, the x-axis only extends to 600 (rather than the total 1000) due to the fact that, when the paddle only draws 17/50 = .34 = 34% red beads, it is almost impossible for the total number red beads in the total urn to exceed 600. The most likely number of red beads in the total urn, when the paddle draws 17/50 red beads, is somewhere in the 290-350 range. This is signified by the peak between these points. The probability is lower below 280 and above 350 because it is less likely that this is the number of red beads in the urn, conditional on the fact that the paddle drew 17/50 red beads. This is our posterior distribution.</p>
 <p>For any value of red beads found in the paddle (from 0 to 50), there is a posterior distribution of possible values of red beads in the total urn. This distribution is meant to illustrate that, though our sample gives an estimate of the total proportion of red beads in the entire urn, there is much variation in what the actual proportion might be.</p>
 <p>Recall the first question from the start of the Chapter:</p>
@@ -1381,9 +1382,9 @@ FIGURE 6.17: A 3D image of our joint distribution created with Rayshader.
 <p>This means that, while we can provide a range of possibilities (and we can estimate which of those possibilities occur most frequently), we can never say that we know the total number of red beads with certainty.</p>
 <p>The key issue with the urn paradigm is that, unlike real world data science, we <em>can</em> technically find the true proportion. We just have to perform that exhaustive count that we’ve been so desperately avoiding. In the real world, the “true” solution can never be known. This is why we require inference, and why tools like sampling are so helpful for making assumptions about the world around us.</p>
 <div class="figure">
-<span id="fig:unnamed-chunk-451"></span>
+<span id="fig:unnamed-chunk-457"></span>
 <img src="06-one-parameter/images/slice_rayshader.png" alt="A 3D image of our joint distribution created with Rayshader." width="100%"><p class="caption">
-FIGURE 6.18: A 3D image of our joint distribution created with Rayshader.
+FIGURE 6.23: A 3D image of our joint distribution created with Rayshader.
 </p>
 </div>
 </div>
@@ -1435,7 +1436,7 @@ FIGURE 6.18: A 3D image of our joint distribution created with Rayshader.
     <span class="fu">scale_x_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org//reference/label_number.html">number_format</a></span><span class="op">(</span>accuracy <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_y_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org//reference/label_percent.html">percent_format</a></span><span class="op">(</span>accuracy <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">theme_classic</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-453-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-459-1.png" width="100%"></div>
 <p>To calculate the exact probability of drawing more than 8 reds, we can work directly with the unnormalized distribution.</p>
 <div class="sourceCode" id="cb595"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">post_dist</span><span class="op">$</span><span class="va">new_reds</span> <span class="op">&gt;</span> <span class="fl">8</span><span class="op">)</span> <span class="op">/</span>  <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">post_dist</span><span class="op">$</span><span class="va">new_reds</span><span class="op">)</span></code></pre></div>
@@ -1480,7 +1481,7 @@ FIGURE 6.18: A 3D image of our joint distribution created with Rayshader.
     <span class="fu">scale_x_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org//reference/label_number.html">number_format</a></span><span class="op">(</span>accuracy <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_y_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org//reference/label_percent.html">percent_format</a></span><span class="op">(</span>accuracy <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">theme_classic</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-456-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-462-1.png" width="100%"></div>
 <p>This posterior is similar to the one we created, much more laboriously, above.</p>
 <!-- DK: But they are still different! Why is that? -->
 </div>
@@ -1583,10 +1584,10 @@ FIGURE 6.18: A 3D image of our joint distribution created with Rayshader.
 <span class="header-section-number">6.5.3.1</span> Preceptor Tables<a class="anchor" aria-label="anchor" href="#preceptor-tables-1"><i class="fas fa-link"></i></a>
 </h4>
 <p>Recall that a Preceptor Table is a table with rows and columns for all the data we would (reasonably) like to have. There are two different types of Preceptor Tables that are applicable to our urn example: actual and ideal.</p>
-<div class="figure" style="text-align: center">
-<span id="fig:unnamed-chunk-457"></span>
-<img src="06-one-parameter/images/here_we_go.png" alt="When you see another Precetor Table section." width="60%"><p class="caption">
-FIGURE 6.19: When you see another Precetor Table section.
+<div class="figure">
+<span id="fig:unnamed-chunk-463"></span>
+<img src="06-one-parameter/images/here_we_go.png" alt="When you see another Precetor Table section." width="100%"><p class="caption">
+FIGURE 6.24: When you see another Precetor Table section.
 </p>
 </div>
 <p>An actual Preceptor Table shows what we <em>actually</em> know. Accordingly, the table is riddled with question marks that the real world saddles us with. The ideal Preceptor Table is the Preceptor Table with no question marks, and a reasonable number of rows and columns. With an ideal Preceptor Table, there is no need for inference; the estimand is a simple matter of arithmetic.</p>
@@ -2365,10 +2366,10 @@ FIGURE 6.19: When you see another Precetor Table section.
 </h3>
 <p>We saw in a previous section that as our sample size <span class="math inline">\(n\)</span> increases, our point estimates will vary less and less and be more and more concentrated around the true population parameter. This variation is quantified by the decreasing <em>standard error</em>. In other words, the typical error of your point estimates will decrease. In our sampling exercise, as the sample size increased, the variation of our sample proportions <span class="math inline">\(\hat{p}\)</span> decreased. This is also known as having a <em>precise</em> estimate.</p>
 <p>So random sampling ensures our point estimates are <em>accurate</em>, while on the other hand having a large sample size ensures our point estimates are <em>precise</em>. While the terms “accuracy” and “precision” may sound like they mean the same thing, there is a subtle difference. Accuracy describes how “on target” our estimates are, whereas precision describes how “consistent” our estimates are. The image below illustrates the difference.</p>
-<div class="figure" style="text-align: center">
-<span id="fig:unnamed-chunk-460"></span>
-<img src="06-one-parameter/images/accuracy_vs_precision.jpg" alt="Comparing accuracy and precision." width="80%"><p class="caption">
-FIGURE 6.20: Comparing accuracy and precision.
+<div class="figure">
+<span id="fig:unnamed-chunk-466"></span>
+<img src="06-one-parameter/images/accuracy_vs_precision.jpg" alt="Comparing accuracy and precision." width="100%"><p class="caption">
+FIGURE 6.25: Comparing accuracy and precision.
 </p>
 </div>
 <p>Now, it’s obvious that the best case scenario is the most precise and the most accurate option. However, real life sampling isn’t so easy!</p>
@@ -2378,16 +2379,16 @@ FIGURE 6.20: Comparing accuracy and precision.
 <h3>
 <span class="header-section-number">6.5.5</span> El Jefe’s or Felipe’s?<a class="anchor" aria-label="anchor" href="#el-jefes-or-felipes"><i class="fas fa-link"></i></a>
 </h3>
-<div class="figure" style="text-align: center">
-<span id="fig:unnamed-chunk-461"></span>
-<img src="06-one-parameter/images/el_jefes.png" alt="El Jefe's, a Harvard Square staple, is known for its large portions and delicious horchata." width="60%"><p class="caption">
-FIGURE 6.21: El Jefe’s, a Harvard Square staple, is known for its large portions and delicious horchata.
+<div class="figure">
+<span id="fig:unnamed-chunk-467"></span>
+<img src="06-one-parameter/images/el_jefes.png" alt="El Jefe's, a Harvard Square staple, is known for its large portions and delicious horchata." width="100%"><p class="caption">
+FIGURE 6.26: El Jefe’s, a Harvard Square staple, is known for its large portions and delicious horchata.
 </p>
 </div>
-<div class="figure" style="text-align: center">
-<span id="fig:unnamed-chunk-462"></span>
-<img src="06-one-parameter/images/felipes.png" alt="Felipe's, another staple, is said to have a more authentic experience and addicting churros." width="60%"><p class="caption">
-FIGURE 6.22: Felipe’s, another staple, is said to have a more authentic experience and addicting churros.
+<div class="figure">
+<span id="fig:unnamed-chunk-468"></span>
+<img src="06-one-parameter/images/felipes.png" alt="Felipe's, another staple, is said to have a more authentic experience and addicting churros." width="100%"><p class="caption">
+FIGURE 6.27: Felipe’s, another staple, is said to have a more authentic experience and addicting churros.
 </p>
 </div>
 <p>To apply this to a more complex example than an urn, imagine we are conducting a poll to gather information on whether Harvard students prefer El Jefe’s Taqueria or Felipe’s Taqueria. We are given two options: 1) we can conduct the poll on 50 students walking out of Lamont Library or 2) we can conduct the poll on 300 students walking outside of El Jefe’s Taqueria.</p>

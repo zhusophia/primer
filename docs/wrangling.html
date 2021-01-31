@@ -543,46 +543,47 @@ FIGURE 2.1: Real data is nasty.
 </p>
 </div>
 <p>So far, our tibbles have been clean and wholesome, like <code>gapminder</code> and <code>trains</code>. <strong>Real data is nasty.</strong> You will bring data into R from the outside world and discover there are problems. We will now discuss common remedial tasks for cleaning and transforming character data, also known as strings. A <em>string</em> is one or more characters that are enclosed inside a pair of matching ‘single’ or “double quotes.”</p>
-<p>This lesson deals with things you can do with vectors of class <code>character</code>. <code>fruit</code>, <code>words</code>, and <code>sentences</code> are Tidyverse character vectors which we will use. Although we can manipulate character vectors directly, it is much more common, in real world situations, to work with vectors which are in a tibble.</p>
-<p>We will use the <code>fruit</code> data, a vector with the names of different fruits, from the <strong>stringr</strong> package, which is automatically loaded when we issue <code><a href="http://tidyverse.tidyverse.org">library(tidyverse)</a></code>.</p>
+<p>We will use the <code>fruit</code> data, a vector with the names of different fruits, from the <strong>stringr</strong> package, which is automatically loaded when we issue <code><a href="http://tidyverse.tidyverse.org">library(tidyverse)</a></code>. Although we can manipulate character vectors directly, it is much more common, in real world situations, to work with vectors which are in a tibble.</p>
 <div class="sourceCode" id="cb171"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">tbl_fruit</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>fruit <span class="op">=</span> <span class="va">fruit</span><span class="op">)</span></code></pre></div>
-<div id="studying-a-single-character-vector" class="section level3" number="2.3.1">
+<div id="character-vectors" class="section level3" number="2.3.1">
 <h3>
-<span class="header-section-number">2.3.1</span> Studying a single character vector<a class="anchor" aria-label="anchor" href="#studying-a-single-character-vector"><i class="fas fa-link"></i></a>
+<span class="header-section-number">2.3.1</span> Character vectors<a class="anchor" aria-label="anchor" href="#character-vectors"><i class="fas fa-link"></i></a>
 </h3>
 <div class="sourceCode" id="cb172"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">tbl_fruit</span> <span class="op">%&gt;%</span> 
   <span class="fu">sample_n</span><span class="op">(</span>size <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 8 x 1
-##   fruit       
-##   &lt;chr&gt;       
-## 1 jujube      
-## 2 breadfruit  
-## 3 cucumber    
-## 4 blackcurrant
-## 5 pomelo      
-## 6 olive       
-## 7 pamelo      
-## 8 elderberry</code></pre>
+##   fruit      
+##   &lt;chr&gt;      
+## 1 quince     
+## 2 feijoa     
+## 3 mulberry   
+## 4 jambul     
+## 5 coconut    
+## 6 dragonfruit
+## 7 mango      
+## 8 cantaloupe</code></pre>
 <p>Note that <code>sample_n()</code> selects a random set of rows from the tibble.</p>
 <p><code>str_detect()</code> determines if a character vector matches a pattern. It returns a logical vector that is the same length as the input. Recall logicals are either <code>TRUE</code> or <code>FALSE</code>.</p>
-<p>Which fruits actually use the word “fruit?”</p>
+<p>Which fruit names actually include the letter “c?”</p>
 <div class="sourceCode" id="cb174"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">tbl_fruit</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>fruit_in_name <span class="op">=</span> <span class="fu">str_detect</span><span class="op">(</span><span class="va">fruit</span>, pattern <span class="op">=</span> <span class="st">"fruit"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">fruit_in_name</span><span class="op">)</span></code></pre></div>
-<pre><code>## # A tibble: 8 x 2
-##   fruit        fruit_in_name
-##   &lt;chr&gt;        &lt;lgl&gt;        
-## 1 breadfruit   TRUE         
-## 2 dragonfruit  TRUE         
-## 3 grapefruit   TRUE         
-## 4 jackfruit    TRUE         
-## 5 kiwi fruit   TRUE         
-## 6 passionfruit TRUE         
-## 7 star fruit   TRUE         
-## 8 ugli fruit   TRUE</code></pre>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>fruit_in_name <span class="op">=</span> <span class="fu">str_detect</span><span class="op">(</span><span class="va">fruit</span>, pattern <span class="op">=</span> <span class="st">"c"</span><span class="op">)</span><span class="op">)</span> </code></pre></div>
+<pre><code>## # A tibble: 80 x 2
+##    fruit        fruit_in_name
+##    &lt;chr&gt;        &lt;lgl&gt;        
+##  1 apple        FALSE        
+##  2 apricot      TRUE         
+##  3 avocado      TRUE         
+##  4 banana       FALSE        
+##  5 bell pepper  FALSE        
+##  6 bilberry     FALSE        
+##  7 blackberry   TRUE         
+##  8 blackcurrant TRUE         
+##  9 blood orange FALSE        
+## 10 blueberry    FALSE        
+## # … with 70 more rows</code></pre>
 <p><code>str_length()</code> counts characters in your strings. Note this is different from the <code><a href="https://rdrr.io/r/base/length.html">length()</a></code> of the character vector itself.</p>
 <div class="sourceCode" id="cb176"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">tbl_fruit</span> <span class="op">%&gt;%</span> 
@@ -674,7 +675,7 @@ FIGURE 2.1: Real data is nasty.
 ## 2 kiwi fruit
 ## 3 strawberry
 ## 4 watermelon</code></pre>
-<p>In the code below, the first metacharacter is the period <code>.</code> , which stands for any single character, except a newline (which by the way, is represented by <code>\n</code>). The regex <code>b.r</code> will match all fruits that have an “b,” followed by any single character, followed by “r.” Regexes are case sensitive.</p>
+<p>In the code below, the first metacharacter is the period <code>.</code> , which stands for any single character, except a newline (which, by the way, is represented by <code>\n</code>). The regex <code>b.r</code> will match all fruits that have an “b,” followed by any single character, followed by “r.” Regexes are case sensitive.</p>
 <div class="sourceCode" id="cb186"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">tbl_fruit</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="fu">str_detect</span><span class="op">(</span><span class="va">fruit</span>, pattern <span class="op">=</span> <span class="st">"b.r"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
@@ -722,8 +723,8 @@ FIGURE 2.1: Real data is nasty.
 <h3>
 <span class="header-section-number">2.3.3</span> Raw strings<a class="anchor" aria-label="anchor" href="#raw-strings"><i class="fas fa-link"></i></a>
 </h3>
-<p>There are certain characters with special meaning in regexes, including <code>$ * + . ? [ ] ^ { } | ( ) \</code>. This makes things difficult when we want to use these characters within the strings instead of as regexes. Patters which want to search for these character, rather than use them as metacharacters, should make use of <code>r"()"</code>, the raw string constant in R. Consider:</p>
-<!-- DK: This is not very clear. -->
+<p>There are certain characters with special meaning in regexes, including <code>$ * + . ? [ ] ^ { } | ( ) \</code>. This makes things difficult when we want to use these characters within the strings instead of as regexes. Patterns which seek to match these characters, rather than use them as metacharacters, should make use of <code>r"()"</code>, the raw string constant in R. Consider:</p>
+<!-- DK: Very unclear, both string constants and bacl slashes. -->
 <div class="sourceCode" id="cb192"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="st">r"(Do you use "airquotes" much?)"</span></code></pre></div>
 <pre><code>## [1] "Do you use \"airquotes\" much?"</code></pre>
@@ -739,7 +740,7 @@ FIGURE 2.1: Real data is nasty.
 <h2>
 <span class="header-section-number">2.4</span> Factors<a class="anchor" aria-label="anchor" href="#factors"><i class="fas fa-link"></i></a>
 </h2>
-<p>Factors are categorical variables that may only take on a specified set of values. Thus, they are known as categorical variables, as they can be separated into categories. To manipulate factors we will use the <strong>forcats</strong> package, a core package in the tidyverse.</p>
+<p>Factors are <em>categorical</em> variables that only take on a specified set of values. To manipulate factors we will use the <strong>forcats</strong> package, a core package in the Tidyverse.</p>
 <p>It is easy to make factors with either <code><a href="https://rdrr.io/r/base/factor.html">factor()</a></code>, <code><a href="https://rdrr.io/r/base/factor.html">as.factor()</a></code> or <code>parse_factor()</code>.</p>
 <div class="sourceCode" id="cb196"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">tibble</span><span class="op">(</span>X <span class="op">=</span> <span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -753,7 +754,8 @@ FIGURE 2.1: Real data is nasty.
 ## 2 b     b     b     b    
 ## 3 c     c     c     c</code></pre>
 <p>Which of those three options is best depends on the situation. <code><a href="https://rdrr.io/r/base/factor.html">factor()</a></code> is useful when you are creating a factor from nothing. <code><a href="https://rdrr.io/r/base/factor.html">as.factor()</a></code> is best for simple transformations, especially of character variables, as in this example. <code>parse_factor()</code> is the most modern and powerful of the three.</p>
-<p>Let’s use <code>gapminder$continent</code> as an example.</p>
+<!-- DK: Too awkward! -->
+<p>Let’s use <code>gapminder$continent</code> as an example. Note that <code><a href="https://rdrr.io/r/utils/str.html">str()</a></code> is a useful function for getting detailed information about an object.</p>
 <div class="sourceCode" id="cb198"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="va">gapminder</span><span class="op">$</span><span class="va">continent</span><span class="op">)</span></code></pre></div>
 <pre><code>##  Factor w/ 5 levels "Africa","Americas",..: 3 3 3 3 3 3 3 3 3 3 ...</code></pre>
@@ -792,7 +794,7 @@ FIGURE 2.1: Real data is nasty.
 <h3>
 <span class="header-section-number">2.4.1</span> Dropping unused levels<a class="anchor" aria-label="anchor" href="#dropping-unused-levels"><i class="fas fa-link"></i></a>
 </h3>
-<p>Just because you drop all the rows corresponding to a specific factor level, the levels of the factor itself do not change. Sometimes all these unused levels can come back to haunt you later, e.g., in figure legends.</p>
+<p>Removing all the rows corresponding to a specific factor level does not remove the level itself. These unused levels can come back to haunt you later, e.g., in figure legends.</p>
 <p>Watch what happens to the levels of <code>country</code> when we filter <code>gapminder</code> to a handful of countries.</p>
 <div class="sourceCode" id="cb210"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/nlevels.html">nlevels</a></span><span class="op">(</span><span class="va">gapminder</span><span class="op">$</span><span class="va">country</span><span class="op">)</span></code></pre></div>
@@ -805,7 +807,7 @@ FIGURE 2.1: Real data is nasty.
 <span class="fu"><a href="https://rdrr.io/r/base/nlevels.html">nlevels</a></span><span class="op">(</span><span class="va">h_gap</span><span class="op">$</span><span class="va">country</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 142</code></pre>
 <p>Even though <code>h_gap</code> only has data for a handful of countries, we are still schlepping around all levels from the original <code>gapminder</code> tibble.</p>
-<p>How can you get rid of them? The base function <code><a href="https://rdrr.io/r/base/droplevels.html">droplevels()</a></code> operates on all the factors in a data frame or on a single factor. The function <code>fct_drop()</code> operates on a factor.</p>
+<p>How can you get rid of them? The base function <code><a href="https://rdrr.io/r/base/droplevels.html">droplevels()</a></code> operates on all the factors in a data frame or on a single factor. The function <code>fct_drop()</code> operates on a single factor variable.</p>
 <div class="sourceCode" id="cb214"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">h_gap_dropped</span> <span class="op">&lt;-</span> <span class="va">h_gap</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://rdrr.io/r/base/droplevels.html">droplevels</a></span><span class="op">(</span><span class="op">)</span>
@@ -819,9 +821,9 @@ FIGURE 2.1: Real data is nasty.
   <span class="fu"><a href="https://rdrr.io/r/base/levels.html">levels</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "Egypt"     "Haiti"     "Romania"   "Thailand"  "Venezuela"</code></pre>
 </div>
-<div id="change-order-of-the-levels" class="section level3" number="2.4.2">
+<div id="change-the-order-of-the-levels" class="section level3" number="2.4.2">
 <h3>
-<span class="header-section-number">2.4.2</span> Change order of the levels<a class="anchor" aria-label="anchor" href="#change-order-of-the-levels"><i class="fas fa-link"></i></a>
+<span class="header-section-number">2.4.2</span> Change the order of the levels<a class="anchor" aria-label="anchor" href="#change-the-order-of-the-levels"><i class="fas fa-link"></i></a>
 </h3>
 <p>By default, factor levels are ordered alphabetically.</p>
 <div class="sourceCode" id="cb218"><pre class="downlit sourceCode r">
@@ -885,8 +887,8 @@ FIGURE 2.1: Real data is nasty.
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "Iceland"     "Japan"       "Sweden"      "Switzerland" "Netherlands"
 ## [6] "Norway"</code></pre>
-<p>Why do we reorder factor levels? It often makes plots much better! When a factor is mapped to x or y, it should almost always be reordered by the quantitative variable you are mapping to the other one.</p>
-<p>Compare the interpretability of these two plots of life expectancy in North and South American countries in 2007. The only difference is the order of the <code>country</code> factor. Which one do you find easier to learn from?</p>
+<p>Why do we reorder factor levels? It often makes plots much better! When plotting a factor against a numeric variable, it is generally a good idea to order the factors by some function of the numeric variable. Alphabetic ordering is rarely best.</p>
+<p>Compare the interpretability of these two plots of life expectancy in the Aericas in 2007. The only difference is the order of the <code>country</code> factor. Which is better?</p>
 <div class="sourceCode" id="cb231"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">gapminder</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">year</span> <span class="op">==</span> <span class="fl">2007</span>, 
@@ -929,7 +931,7 @@ FIGURE 2.1: Real data is nasty.
 <h3>
 <span class="header-section-number">2.4.3</span> Recode the levels<a class="anchor" aria-label="anchor" href="#recode-the-levels"><i class="fas fa-link"></i></a>
 </h3>
-<p>Sometimes you have better ideas about what certain levels should be. This is called recoding.</p>
+<p>Use <code>fct_recode()</code> to change the order of the levels for a factor.</p>
 <div class="sourceCode" id="cb233"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">i_gap</span> <span class="op">&lt;-</span> <span class="va">gapminder</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">country</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"United States"</span>, <span class="st">"Sweden"</span>, 
@@ -1107,10 +1109,10 @@ as <code>&lt;dttm&gt;</code>.</p></li>
 <p>To get the current date or date-time you can use <code><a href="http://lubridate.tidyverse.org/reference/now.html">today()</a></code> or <code><a href="http://lubridate.tidyverse.org/reference/now.html">now()</a></code>:</p>
 <div class="sourceCode" id="cb270"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="http://lubridate.tidyverse.org/reference/now.html">today</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] "2021-01-29"</code></pre>
+<pre><code>## [1] "2021-01-31"</code></pre>
 <div class="sourceCode" id="cb272"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="http://lubridate.tidyverse.org/reference/now.html">now</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] "2021-01-29 17:44:00 EST"</code></pre>
+<pre><code>## [1] "2021-01-31 15:10:42 EST"</code></pre>
 <p>Otherwise, there are three ways you’re likely to create a date/time:</p>
 <ol style="list-style-type: decimal">
 <li>From a string.</li>
@@ -1197,10 +1199,10 @@ as <code>&lt;dttm&gt;</code>.</p></li>
 <p>You may want to switch between a date-time and a date. That’s the job of <code><a href="http://lubridate.tidyverse.org/reference/as_date.html">as_datetime()</a></code> and <code><a href="http://lubridate.tidyverse.org/reference/as_date.html">as_date()</a></code>:</p>
 <div class="sourceCode" id="cb292"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="http://lubridate.tidyverse.org/reference/as_date.html">as_datetime</a></span><span class="op">(</span><span class="fu"><a href="http://lubridate.tidyverse.org/reference/now.html">today</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] "2021-01-29 UTC"</code></pre>
+<pre><code>## [1] "2021-01-31 UTC"</code></pre>
 <div class="sourceCode" id="cb294"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="http://lubridate.tidyverse.org/reference/as_date.html">as_date</a></span><span class="op">(</span><span class="fu"><a href="http://lubridate.tidyverse.org/reference/now.html">now</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] "2021-01-29"</code></pre>
+<pre><code>## [1] "2021-01-31"</code></pre>
 <p>Sometimes you’ll get date/times as numeric offsets from the “Unix Epoch,” 1970-01-01. If the offset is in seconds, use <code><a href="http://lubridate.tidyverse.org/reference/as_date.html">as_datetime()</a></code>; if it’s in days, use <code><a href="http://lubridate.tidyverse.org/reference/as_date.html">as_date()</a></code>.</p>
 <div class="sourceCode" id="cb296"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="http://lubridate.tidyverse.org/reference/as_date.html">as_datetime</a></span><span class="op">(</span><span class="fl">60</span> <span class="op">*</span> <span class="fl">60</span> <span class="op">*</span> <span class="fl">10</span><span class="op">)</span></code></pre></div>
@@ -1715,12 +1717,12 @@ FIGURE 2.5: Relationships among nycflights tables
 <code class="sourceCode R"><span class="va">die</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">6</span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">die</span>, size <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] 1</code></pre>
+<pre><code>## [1] 2</code></pre>
 <p>This produces one “draw” from the distribution of the possible values of one roll of fair six-sided die.</p>
 <p>Now, suppose we wanted to roll this die 10 times. One of the arguments of the <code><a href="https://rdrr.io/r/base/sample.html">sample()</a></code> function is <code>replace</code>. We must specify it as <code>TRUE</code> if values can appear more than once. Since, when rolling a die 10 times, we expect that a value like 3 can appear more than once, we need to set <code>replace = TRUE</code>.</p>
 <div class="sourceCode" id="cb374"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">die</span>, size <span class="op">=</span> <span class="fl">10</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<pre><code>##  [1] 3 4 5 4 1 4 1 5 2 1</code></pre>
+<pre><code>##  [1] 3 6 1 1 3 6 6 4 5 1</code></pre>
 <p>In other words, rolling a 1 on the first roll should not preclude you from rolling a 1 on a later roll.</p>
 <p>What if the die is not “fair,” meaning that some sides are more likely to appear than others? The final argument of the <code><a href="https://rdrr.io/r/base/sample.html">sample()</a></code> function is the <code>prob</code> argument. It takes a vector (of the same length as the initial vector <code>x</code>) that contains all of the probabilities of selecting each one of the elements of <code>x</code>. Suppose that the probability of rolling a 1 was 0.5, and the probability of rolling any other value is 0.1. (These probabilities should sum to 1. If they don’t <code><a href="https://rdrr.io/r/base/sample.html">sample()</a></code> will automatically re-scale them.)</p>
 <div class="sourceCode" id="cb376"><pre class="downlit sourceCode r">
@@ -1728,7 +1730,7 @@ FIGURE 2.5: Relationships among nycflights tables
        size <span class="op">=</span> <span class="fl">10</span>, 
        replace <span class="op">=</span> <span class="cn">TRUE</span>, 
        prob <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>##  [1] 2 5 1 1 1 3 6 1 1 4</code></pre>
+<pre><code>##  [1] 2 1 2 1 1 1 1 1 6 1</code></pre>
 <p><strong>Remember: There is no real data here.</strong> We have not actually rolled a die. We have just made some assumptions about what would happen if we were to roll a die. With those assumptions we have built an urn — a <em>data generating mechanism</em> — from which we can draw as many values as we like. Let’s roll the unfair die 10,000 times.</p>
 <div class="sourceCode" id="cb378"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">tibble</span><span class="op">(</span>result <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">die</span>, 
@@ -1755,7 +1757,7 @@ FIGURE 2.5: Relationships among nycflights tables
 <p>Consider a “uniform” distribution. This is the case in which every outcome in the range of possible outcomes has the same chance of occurring. The function <code><a href="https://rdrr.io/r/stats/Uniform.html">runif()</a></code> (spoken as “r-unif”) enables us to draw from a uniform contribution. <code><a href="https://rdrr.io/r/stats/Uniform.html">runif()</a></code> has three arguments: <code>n</code>, <code>min</code>, and <code>max</code>. <code><a href="https://rdrr.io/r/stats/Uniform.html">runif()</a></code> will produce <code>n</code> draws from between <code>min</code> and <code>max</code>, with each value having an equal chance of occurring.</p>
 <div class="sourceCode" id="cb379"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10</span>, min <span class="op">=</span> <span class="fl">4</span>, max <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></code></pre></div>
-<pre><code>##  [1] 4.3 4.6 4.9 5.9 4.1 5.0 4.7 4.6 5.2 5.2</code></pre>
+<pre><code>##  [1] 5.4 4.3 4.0 5.8 5.1 4.6 4.1 5.4 5.4 4.0</code></pre>
 <p>Mathematically, we would write:</p>
 <p><span class="math display">\[y_i \sim U(4, 6)\]</span>,</p>
 <p>This means that the each value for <span class="math inline">\(y\)</span> is drawn from a uniform distribution between four and six.</p>
@@ -1771,7 +1773,7 @@ FIGURE 2.5: Relationships among nycflights tables
 <p>Suppose we wanted to flip a fair coin one time, and let landing on heads represent success.</p>
 <div class="sourceCode" id="cb381"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1</span> , size <span class="op">=</span> <span class="fl">1</span>, prob <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] 1</code></pre>
+<pre><code>## [1] 0</code></pre>
 <p>Do the same thing 100 times:</p>
 <div class="sourceCode" id="cb383"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">tibble</span><span class="op">(</span>heads <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">100</span>, size <span class="op">=</span> <span class="fl">1</span>, prob <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -2157,7 +2159,7 @@ FIGURE 2.7: Rules of thumb about areas under normal curves.
 </li>
 <li>
 <a class="nav-link" href="#characters"><span class="header-section-number">2.3</span> Characters</a><ul class="nav navbar-nav">
-<li><a class="nav-link" href="#studying-a-single-character-vector"><span class="header-section-number">2.3.1</span> Studying a single character vector</a></li>
+<li><a class="nav-link" href="#character-vectors"><span class="header-section-number">2.3.1</span> Character vectors</a></li>
 <li><a class="nav-link" href="#regular-expressions-with-stringr"><span class="header-section-number">2.3.2</span> Regular expressions with stringr</a></li>
 <li><a class="nav-link" href="#raw-strings"><span class="header-section-number">2.3.3</span> Raw strings</a></li>
 </ul>
@@ -2165,7 +2167,7 @@ FIGURE 2.7: Rules of thumb about areas under normal curves.
 <li>
 <a class="nav-link" href="#factors"><span class="header-section-number">2.4</span> Factors</a><ul class="nav navbar-nav">
 <li><a class="nav-link" href="#dropping-unused-levels"><span class="header-section-number">2.4.1</span> Dropping unused levels</a></li>
-<li><a class="nav-link" href="#change-order-of-the-levels"><span class="header-section-number">2.4.2</span> Change order of the levels</a></li>
+<li><a class="nav-link" href="#change-the-order-of-the-levels"><span class="header-section-number">2.4.2</span> Change the order of the levels</a></li>
 <li><a class="nav-link" href="#recode-the-levels"><span class="header-section-number">2.4.3</span> Recode the levels</a></li>
 <li><a class="nav-link" href="#grow-a-factor"><span class="header-section-number">2.4.4</span> Grow a factor</a></li>
 </ul>
