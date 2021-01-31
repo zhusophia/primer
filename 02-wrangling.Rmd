@@ -323,16 +323,14 @@ knitr::include_graphics("02-wrangling/images/nasty.gif")
 So far, our tibbles have been clean and wholesome, like `gapminder` and `trains`. **Real data is nasty.** You will bring data into R from the outside world and discover there are problems. We will now discuss common remedial tasks for cleaning and transforming character data, also known as strings. A *string* is one or more characters that are enclosed inside a pair of matching 'single' or "double quotes".
 
 
-This lesson deals with things you can do with vectors of class `character`. `fruit`, `words`, and `sentences` are Tidyverse character vectors which we will use. Although we can manipulate character vectors directly, it is much more common, in real world situations, to work with vectors which are in a tibble.
-
-We will use the `fruit` data, a vector with the names of different fruits, from the **stringr** package, which is automatically loaded when we issue `library(tidyverse)`.
+We will use the `fruit` data, a vector with the names of different fruits, from the **stringr** package, which is automatically loaded when we issue `library(tidyverse)`. Although we can manipulate character vectors directly, it is much more common, in real world situations, to work with vectors which are in a tibble.
 
 ```{r}
 tbl_fruit <- tibble(fruit = fruit)
 ```
 
 
-### Studying a single character vector
+### Character vectors
 
 ```{r}
 tbl_fruit %>% 
@@ -343,12 +341,11 @@ Note that `sample_n()` selects a random set of rows from the tibble.
 
 `str_detect()` determines if a character vector matches a pattern.  It returns a logical vector that is the same length as the input. Recall logicals are either `TRUE` or `FALSE`.
 
-Which fruits actually use the word "fruit"?
+Which fruit names actually include the letter "c?"
 
 ```{r}
 tbl_fruit %>% 
-  mutate(fruit_in_name = str_detect(fruit, pattern = "fruit")) %>% 
-  filter(fruit_in_name)
+  mutate(fruit_in_name = str_detect(fruit, pattern = "c")) 
 
 ```
 
@@ -396,7 +393,7 @@ tbl_fruit %>%
 ```
 
 
-In the code below, the first metacharacter is the period `.` , which stands for any single character, except a newline (which by the way, is represented by `\n`). The regex `b.r` will match all fruits that have an "b", followed by any single character, followed by "r". Regexes are case sensitive.
+In the code below, the first metacharacter is the period `.` , which stands for any single character, except a newline (which, by the way, is represented by `\n`). The regex `b.r` will match all fruits that have an "b", followed by any single character, followed by "r". Regexes are case sensitive.
 
 ```{r}
 tbl_fruit %>%
@@ -421,9 +418,9 @@ tbl_fruit %>%
 
 ### Raw strings
 
-There are certain characters with special meaning in regexes, including `$ * + . ? [ ] ^ { } | ( ) \`. This makes things difficult when we want to use these characters within the strings instead of as regexes. Patters which want to search for these character, rather than use them as metacharacters, should make use of `r"()"`, the raw string constant in R. Consider:
+There are certain characters with special meaning in regexes, including `$ * + . ? [ ] ^ { } | ( ) \`. This makes things difficult when we want to use these characters within the strings instead of as regexes. Patterns which seek to match these characters, rather than use them as metacharacters, should make use of `r"()"`, the raw string constant in R. Consider:
 
-<!-- DK: This is not very clear. -->
+<!-- DK: Very unclear, both string constants and bacl slashes. -->
 
 ```{r}
 r"(Do you use "airquotes" much?)"
@@ -443,7 +440,7 @@ As you can see, a backslash is used to escape the initial backslash.
 
 ## Factors
 
-Factors are categorical variables that may only take on a specified set of values. Thus, they are known as categorical variables, as they can be separated into categories. To manipulate factors we will use the **forcats** package, a core package in the tidyverse. 
+Factors are *categorical* variables that only take on a specified set of values. To manipulate factors we will use the **forcats** package, a core package in the Tidyverse. 
 
 It is easy to make factors with either `factor()`, `as.factor()` or `parse_factor()`.
 
@@ -456,7 +453,9 @@ tibble(X = letters[1:3]) %>%
 
 Which of those three options is best depends on the situation. `factor()` is useful when you are creating a factor from nothing. `as.factor()` is best for simple transformations, especially of character variables, as in this example. `parse_factor()` is the most modern and powerful of the three. 
 
-Let's use `gapminder$continent` as an example.
+<!-- DK: Too awkward! -->
+
+Let's use `gapminder$continent` as an example. Note that `str()` is a useful function for getting detailed information about an object.
 
 ```{r}
 str(gapminder$continent)
@@ -476,7 +475,7 @@ fct_count(gapminder$continent)
 
 ### Dropping unused levels
 
-Just because you drop all the rows corresponding to a specific factor level, the levels of the factor itself do not change. Sometimes all these unused levels can come back to haunt you later, e.g., in figure legends.
+Removing all the rows corresponding to a specific factor level does not remove the level itself. These unused levels can come back to haunt you later, e.g., in figure legends.
 
 Watch what happens to the levels of `country` when we filter `gapminder` to a handful of countries.
 
@@ -491,7 +490,7 @@ nlevels(h_gap$country)
 
 Even though `h_gap` only has data for a handful of countries, we are still schlepping around all levels from the original `gapminder` tibble.
 
-How can you get rid of them? The base function `droplevels()` operates on all the factors in a data frame or on a single factor. The function `fct_drop()` operates on a factor.
+How can you get rid of them? The base function `droplevels()` operates on all the factors in a data frame or on a single factor. The function `fct_drop()` operates on a single factor variable.
 
 ```{r}
 h_gap_dropped <- h_gap %>% 
@@ -505,7 +504,7 @@ h_gap$country %>%
   levels()
 ```
 
-### Change order of the levels
+### Change the order of the levels
 
 By default, factor levels are ordered alphabetically. 
 
@@ -582,9 +581,9 @@ fct_reorder(gapminder$country,
   head()
 ```
 
-Why do we reorder factor levels? It often makes plots much better! When a factor is mapped to x or y, it should almost always be reordered by the quantitative variable you are mapping to the other one. 
+Why do we reorder factor levels? It often makes plots much better! When plotting a factor against a numeric variable, it is generally a good idea to order the factors by some function of the numeric variable. Alphabetic ordering is rarely best.
 
-Compare the interpretability of these two plots of life expectancy in North and South American countries in 2007. The only difference is the order of the `country` factor. Which one do you find easier to learn from?
+Compare the interpretability of these two plots of life expectancy in the Aericas in 2007. The only difference is the order of the `country` factor. Which is better?
 
 ```{r}
 gapminder %>% 
@@ -634,7 +633,7 @@ gapminder %>%
 
 ### Recode the levels
 
-Sometimes you have better ideas about what certain levels should be. This is called recoding.
+Use `fct_recode()` to change the order of the levels for a factor.
 
 ```{r}
 i_gap <- gapminder %>% 
