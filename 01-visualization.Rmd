@@ -993,6 +993,45 @@ If you have a tibble which has been grouped, you can remove the grouping variabl
 
 Good visualizations teach. When you construct a plot, decide what message you want to convey. Here are some functions which may be helpful. 
 
+### Plot objects
+
+Plots are R objects, just like tibbles. We can create them, print them and save them. Up until now, we have just "spat" them out in an R code chunk. Nothing wrong with that! Indeed, this is the most common approach to plotting in R. Sometimes, however, it is handy to work with a plot object. Consider:
+
+```{r}
+train_plot <- ggplot(data = trains, 
+       mapping = aes(x = age, 
+                     y = income)) + 
+  geom_point()
+```
+
+This is the same code as our first example with `geom_point()`. `train_plot` is an R object. This code does not print anything out. In order to make this plot appear, we need to print it out explicitly:
+
+```{r}
+train_plot
+```
+
+Recall that typing the name of an object is the same thing as using `print()`. Now that we have this object, we can display it whenever we want. 
+
+But, sometimes, we want a permanent copy of the plot, saved to our computer. That is the purpose of `ggsave()`:
+
+```{r, eval = FALSE}
+ggsave(filename = "enos_trains.jpg", 
+       plot = train_plot)
+```
+
+`ggsave()` uses the suffix of the provided `filename` to determine the type of image to save. Because we use "enos_trains.jpg", the file is saved in JPEG format. If we had used "enos_trains.png", the file would have been saved as a PNG. We can display a saved file by using `knitr::include_graphics()`. For example:
+
+
+````markdown
+`r ''````{r}
+knitr::include_graphics("enos_trains.jpg")
+```
+````
+
+This code displays the image in an Rmd, assuming that the file "enos_trains.jpg" is located in the current working directory. A common scenario is that we create an image and store it in a directory named `figures/` and then use that figure in more than one Rmd. 
+
+
+
 ### Faceting
 
 Faceting splits a visualization into parts, one for each value of another variable.. This will create multiple copies of the same type of plot with matching x and y axes, but whose contents will differ. 
