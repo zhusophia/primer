@@ -620,9 +620,10 @@ sims <- 100000
 
 # Pipes generally start with tibbles, so we start with a tibble which just
 # includes an ID variable. We don't really use ID. It is just handy for getting
-# organized.
+# organized. We call this object `jd_disease`, where the `jd` standds for
+# *j*oint *d*istribution.
 
-joint_dist <- tibble(ID = 1:sims) %>% 
+jd_disease <- tibble(ID = 1:sims) %>% 
   
   # For each ID, we (randomly!) determine whether or not the person has
   # Probophobia. In the population, the rate is only 1%, thus explaining the
@@ -650,7 +651,7 @@ joint_dist <- tibble(ID = 1:sims) %>%
                                           .,
                                           ! .)))
 
-joint_dist
+jd_disease
 ```
 
 Most values for `have_diseases` are zero since 99% of the population does not suffer from Probophobia. Most of those will have a negative test result, meaning `test_positive = 0`. However, because the test is not perfect, some of those, like `ID = 8`,  will have a "false positive" result. Other individuals, like `ID = 10`, will have the diseases, and 95% of those will have a "true positive" result, as `10` does.
@@ -658,7 +659,7 @@ Most values for `have_diseases` are zero since 99% of the population does not su
 Plot the joint distribution:
 
 ```{r}
-joint_dist %>% 
+jd_disease %>% 
   ggplot(aes(x = as.factor(test_positive), 
              y = as.factor(have_disease))) +
   geom_point() +
@@ -693,14 +694,14 @@ We want to analyze these plots by looking at different slices. For instance, let
 
 
 ```{r}
-joint_dist %>% 
+jd_disease %>% 
   filter(test_positive == 1)
 ```
 
 **Most people who test positive do not have the disease!** This is a common result for rare diseases. We can easily create an unnormalized conditional distribution with:
 
 ```{r}
-joint_dist %>% 
+jd_disease %>% 
   filter(test_positive == 1) %>% 
   ggplot(aes(have_disease)) +
     geom_bar() +
@@ -719,7 +720,7 @@ Turn this unnormalized distribution into a posterior probability distribution:
 
 
 ```{r}
-joint_dist %>% 
+jd_disease %>% 
   filter(test_positive == 1) %>% 
   ggplot(aes(have_disease)) +
     geom_histogram(aes(y = after_stat(count/sum(count))), 
@@ -764,24 +765,40 @@ Let's say you take a marble out of the bag, record whether it's black or white, 
 # one-by-one. in_bag takes three possible values: 0, 1 and 2, corresponding to
 # zero, one and two white marbles potentially in the bag.
 
-joint_dist <- tibble(in_bag = rep(c(0, 1, 2), 1000)) %>%
+sims <- 10000
+
+# We also start off with a tibble. It just makes things easier
+
+jd_marbles <- tibble(ID = 1:sims) %>% 
+  
+  # For each row, we (randomly!) determine the number of white marbles in the
+  # bag. We do not know why the `as.integer()` hack is necessary. Shouldn't
+  # `map_int()` automatically coerce the result of `sample()` into an integer?
+  
+  mutate(in_bag = map_int(ID, ~ as.integer(sample(c(0, 1, 2), 
+                                                  size = 1)))) %>%
+  
+  # Depending on the number of white marbles in the bag, we randomly draw out 0,
+  # 1, 2, or 3 white marbles in our experiment. We need `p = ./2` to transform
+  # the number of white marbles into the probability of drawing out a white
+  # marble in a single draw. That probability is either 0%, 50% or 100%.
+  
   mutate(in_sample = map_int(in_bag, ~ rbinom(n = 1, 
                                               size = 3, 
                                               p = ./2))) 
 
-joint_dist
+jd_marbles
 ```
 
 
 Plot the joint distribution:
 
-<!-- DK: More clean up. Work with in_bag and in_sample -->
-
 ```{r}
-# The distribution is unnormalized. All we see is the number of simulations in
-# each "bucket."
+# The distribution is unnormalized. All we see is the number of outcomes in each
+# "bucket." Although it is never stated clearly, we are assuming that there is
+# an equal likelihood of 0, 1 or 2 white marbles in the bag.
 
-joint_dist %>%
+jd_marbles %>%
   ggplot(aes(x = in_sample, y = in_bag)) +
     geom_jitter(alpha = 0.5) +
     labs(title = "Black and White Marbles",
@@ -801,9 +818,9 @@ knitr::include_graphics("05-probability/images/three_models.png")
 
 
 
-The y-axes of both the scatterplot and the 3D visualization are labeled "Number of White Marbles in the Bag." Each value on the y-axis is a model, a belief about the world. For instance, when the model is 0, we have no white marbles in the bag, meaning that none of the marbles we pull out in the sample will be white.
+The y-axes of both the scatterplot and the 3D visualization are labeled "Number of White Marbles in the Bag." *Each value on the y-axis is a model, a belief about the world.* For instance, when the model is 0, we have no white marbles in the bag, meaning that none of the marbles we pull out in the sample will be white.
 
-Let's say draw out three white marbles. We isolate the slice where the result of the simulation involves three white marbles and zero black ones. Here is the unnormalized probability distribution.
+Let's say we draw out three white marbles. We isolate the slice where the result of the simulation involves three white marbles and zero black ones. Here is the unnormalized probability distribution.
 
 ```{r}
 # The key step is the filter. Creating a conditional distribution from a joint
@@ -811,15 +828,16 @@ Let's say draw out three white marbles. We isolate the slice where the result of
 # specific value. A conditional distribution is a "slice" of the joint
 # distribution, and we take that slice with filter().
 
-joint_dist %>% 
+jd_marbles %>% 
   filter(in_sample == 3) %>% 
   ggplot(aes(in_bag)) +
-    geom_histogram(binwidth = 0.25, color = "white") +
+    geom_histogram(binwidth = 0.5, color = "white") +
     labs(title = "Unnormalized Conditional Distribution",
          subtitle = "Number of white marbles in bag given that three were selected in the sample",
          x = "Number of White Marbles in the Bag",
          y = "Count") +
-    scale_x_continuous(breaks = seq(1, 2)) +
+    coord_cartesian(xlim = c(0, 2)) +
+    scale_x_continuous(breaks = c(0, 1, 2)) +
     theme_classic()
 
 ```
@@ -827,26 +845,27 @@ joint_dist %>%
 Next, let's normalize the distribution.
 
 ```{r}
-joint_dist %>% 
+jd_marbles %>% 
   filter(in_sample == 3) %>% 
   ggplot(aes(in_bag)) +
     geom_histogram(aes(y = after_stat(count/sum(count))), 
-                   binwidth = 0.25, 
+                   binwidth = 0.5, 
                    color = "white") +
     labs(title = "Posterior Probability Distribution",
          subtitle = "Number of white marbles in bag given that three were selected in the sample",
          x = "Number of White Marbles in the Bag",
          y = "Probability") +
-    scale_x_continuous(breaks = c(1, 2)) +
+    coord_cartesian(xlim = c(0, 2)) +
+    scale_x_continuous(breaks = c(0, 1, 2)) +
     scale_y_continuous(labels = 
                          scales::percent_format(accuracy = 1)) +
     theme_classic()
 
 ```
 
-This plot makes sense because when all three marbles you draw out of the bag are  white, there is a pretty good chance that there are no black marbles in the bag. But you can't be certain! It is possible to draw three white even if the bag contains one white and one black. Yes, about 10%. However, it is impossible that there are no white marbles in the bag.
+This plot makes sense because when all three marbles you draw out of the bag arewhite, there is a pretty good chance that there are no black marbles in the bag. But you can't be certain! It is possible to draw three white even if the bag contains one white and one black. However, it is impossible that there are zero white marbles in the bag.
 
-<!-- DK: Maybe we should plot 0% over 0 white marbles. -->
+
 
 ## N models
 
