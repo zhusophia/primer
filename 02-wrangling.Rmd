@@ -28,11 +28,9 @@ The **tidyverse** package will be used in every chapter. Loading it makes the 8 
 
 ## Data Gathering
 
-The `read_csv()` function turns flat files into tibbles. More specifically, it converts files whose values are separated by commas. Let’s import a **c**omma **s**eparated **v**alues (hence "csv") file from the internet. The `read_csv()` function included in the **readr** package, which is one of the packages in the Tidyverse, is different than the `read.csv()` function that comes installed with R. Always use Tidyverse functions, if possible. 
+The `read_csv()` function turns text files into tibbles. More specifically, it converts files whose values are separated by commas. Let’s import a **c**omma **s**eparated **v**alues (hence "csv") file from the internet. The `read_csv()` function included in the **readr** package, which is one of the packages in the Tidyverse, is different than the `read.csv()` function that comes installed with R. Always use Tidyverse functions, if possible. 
 
-Each comma from the csv file corresponds to a column, and the column names are taken from the first line of the file. Then, the function "guesses" an appropriate data type for each of the columns it creates. Sometimes csv files are a lot dirtier and require significant wrangling before you can explore the data and create usable graphics. 
-
-The link below is for a file containing faculty gender data across departments at Harvard University. Note, the `file` argument of the `read_csv()` function is very flexible. Below, it takes a url. `file` can also be the absolute or relative path for a file saved locally on your computer. 
+Each comma from the csv file corresponds to a column, and the column names are taken from the first line of the file. The function then "guesses" an appropriate data type for each of the columns. The link below is for a file containing faculty gender data across departments at Harvard University. Note, the `file` argument of the `read_csv()` function is very flexible. Below, it takes a url. `file` can also be the absolute or relative path for a file saved locally on your computer. 
 
 ```{r}
 url <- "https://raw.githubusercontent.com/PPBDS/primer/master/02-wrangling/data/faculty.csv"
@@ -44,15 +42,13 @@ fac
 
 We need to "skip" the first row of the file because there is a code comment at the top, which has nothing to do with the actual data.
 
-Run the `summary()` function on the `fac` tibble.
-
 ```{r}
 summary(fac)
 ```
 
-Don't confuse `summary()`, which is a built-in --- generally termed "base" --- R function for providing a summary of an object, with `summarize()`, which is one of the most important functions from **dplyr**.
+Don't confuse `summary()`, which is a built-in --- generally termed "base" --- R function for providing a summary of an object, with `summarize()`, which is one of the more important functions from **dplyr**, one of the Tidyverse packages.
 
-You may notice that something appears to be wrong with this dataset. Which department could have employed 644 male professors? We will explore this mystery later in the chapter.
+You may notice that something appears to be wrong with this dataset. Which department could have employed 644 male professors? We will explore this mystery later in the Chapter.
 
 <!-- DK: Mention other read in functions, and packages like readxl. Connect it better to the tutorials. -->
 
@@ -61,7 +57,14 @@ You may notice that something appears to be wrong with this dataset. Which depar
 
 <!-- DK: Rewrite these sections. -->
 
-The data we need to answer a question is not always in a handy spreadsheet. For example, we can find interesting data about murders in the US in [this Wikipedia page](https://en.wikipedia.org/w/index.php?title=Gun_violence_in_the_United_States_by_state): 
+The data we need to answer a question is not always in a handy csv file. For example, we can find interesting data about murders in the US in [this Wikipedia page](https://en.wikipedia.org/w/index.php?title=Gun_violence_in_the_United_States_by_state): 
+
+
+```{r, echo = FALSE}
+knitr::include_graphics("02-wrangling/images/murders-data-wiki-page.png")
+```
+
+To get this data, we need to do some web scraping, a process which begins with a URL, a **u**niform **r**esource **l**ocator. 
 
 ```{r}
 url <- paste0("https://en.wikipedia.org/w/index.php?title=",
@@ -69,21 +72,14 @@ url <- paste0("https://en.wikipedia.org/w/index.php?title=",
               "&direction=prev&oldid=810166167")
 ```
 
-You can see the data table when you visit the webpage:
 
-```{r, echo = FALSE}
-knitr::include_graphics("02-wrangling/images/murders-data-wiki-page.png")
-```
-
-To get this data, we need to do some web scraping. 
-
-Web scraping, or web harvesting, is the process of extracting data from a website. The information used by a browser to render web pages is received as a text file from a server. The text is code written in **H**yper **T**ext **M**arkup **L**anguage (HTML). Every browser has a way to show the html source code for a page. On Chrome, you can use Control-U on a PC and command+option+U on a Mac. You will see something like this:
+Web scraping, or web harvesting, is the process of extracting data from a website. The information used by a browser to render web pages is received as a text file from a server. The text is code written in **H**yper **T**ext **M**arkup **L**anguage (HTML). Every browser has a way to show the html source code for a page. 
 
 ```{r, echo = FALSE}
 knitr::include_graphics("02-wrangling/images/html-code.png")
 ```
 
-Because this code is accessible, we can download the HTML file, import it into R, and then write programs to extract the information we need from the page. However, once we look at HTML code, this might seem like a daunting task. But we will show you some convenient tools to facilitate the process. To get an idea of how it works, here are a few lines of code from the Wikipedia page that provides the US murders data:
+Here are a few lines of code from the Wikipedia page that provides the US murders data:
 
 ```
 <table class="wikitable sortable">
@@ -121,7 +117,6 @@ title="List of U.S. states and territories by population">Population</a><br />
 <tr>
 ```
 
-You can actually see the data, except data values are surrounded by html code such as `<td>`. We can also see a pattern of how it is stored. If you know HTML, you can write programs that leverage knowledge of these patterns to extract what we want. We also take advantage of a language widely used to make webpages look "pretty" called Cascading Style Sheets (CSS).
 
 ### The rvest package
 
@@ -139,7 +134,7 @@ Note that the entire Murders in the US Wikipedia webpage is now contained in `h`
 class(h)
 ```
 
-The **rvest** package is actually more general; it handles XML documents. XML is a general markup language (that's what the ML stands for) that can be used to represent any kind of data. HTML is a specific type of XML specifically developed for representing webpages. Here we focus on HTML documents.
+The **rvest** package is actually more general; it handles XML documents. XML is a general markup language used to represent any kind of data. HTML is a specific type of XML developed for representing webpages. Here we focus on HTML documents.
 
 Now, how do we extract the table from the object `h`? If we print `h`, we don't really see much:
 
@@ -153,7 +148,7 @@ We can see all the code that defines the downloaded webpage using the `html_text
 html_text(h)
 ```
 
-We don't show the output here because it includes thousands of characters, but if we look at it, we can see the data we are after is stored in an HTML table: you can see this in this line of the HTML code above `<table class="wikitable sortable">`. The different parts of an HTML document, often defined with a message in between  `<` and `>`  are referred to as nodes. The **rvest** package includes functions to extract nodes of an HTML document: `html_nodes` extracts all nodes of different types and `html_node` extracts the first one. To extract the tables from the html code we use:
+We don't show the output here because it includes thousands of characters, but if we look at it, we can see that the data is stored in an HTML table -- note the line of the HTML code above `<table class="wikitable sortable">`. The different parts of an HTML document, often defined with a message in between  `<` and `>`  are referred to as nodes. The **rvest** package includes functions to extract nodes of an HTML document: `html_nodes` extracts all nodes of different types and `html_node` extracts the first one. To extract the tables from the html code we use:
 
 ```{r} 
 tab <- h %>% html_nodes("table")
