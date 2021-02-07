@@ -2,27 +2,25 @@
 
 <!-- Priorities:  --> 
 
-<!-- Need some discussion of the Cardinal Virtues, even just a brief reminder in the Discussion section. -->
+<!-- Need some discussion of the Cardinal Virtues, even just a brief reminder in the Discussion section. MF: Should this go through each virtue and apply it to the urn? Or should we only mention the virtues?  -->
 
 <!-- All references to estimating the number of red beads should be change to estimating p, the proportion of red beads.  -->
 
 <!-- Could not get figure references to work. They have been removed. But we ought to figure that out and add them back!  Should create a simple example (three line Rmd file) and then ask on RStudio Community.  -->
 
-<!-- Add to Maslow something like 95% confidence interval squiggly mean plus/minus 2 standard errors -->
+<!-- Add to Maslow something like 95% confidence interval squiggly mean plus/minus 2 standard errors MF: Done. -->
 
-<!-- Make the stan_glm graphic look like the Using the posterior graphic. -->
-
+<!-- Make the stan_glm graphic look like the Using the posterior graphic. MF: This seems to be done already. -->
 
 <!-- Find a place to include these useful sentences: -->
 
-<!-- $\hat{p}$ is the estimated value of p which comes from taking a sample. There can be billions and billions of $\hat{p}$'s.  -->
-
+<!-- $\hat{p}$ is the estimated value of p which comes from taking a sample. There can be billions and billions of $\hat{p}$'s. MF: Done. -->
 
 <!-- p -> to $\hat{p}$ to the standard error of $\hat{p}$ to our posterior probability distribution for p. Yellow brick road? Wizard of Posterior? -->
 
 <!-- You must understand what the standard error of $\hat{p}$ means. You do not need to understand why. -->
 
-<!-- Drop Mean of proportions red part of table. -->
+<!-- Drop Mean of proportions red part of table. MF: Done.-->
 
 <!-- In the Functions are your friend! section -->
 
@@ -30,17 +28,17 @@
 
 <!-- Maybe make it a gganimation? -->
 
-<!-- Make the last portion of The moral of the story better. Delete old stuff! After the Maslow graphic, you have two paragraphs to make the key point. Use similar stuff in Chapter summary, especially the key sentence. -->
+<!-- Make the last portion of The moral of the story better. Delete old stuff! After the Maslow graphic, you have two paragraphs to make the key point. Use similar stuff in Chapter summary, especially the key sentence. MF: Done. -->
 
 <!-- Does this belong in the Summary? There is a truth! There is a true value for p which we do not know! We want to create a posterior probability distribution which summarizes our knowledge. We care about the posterior probability distribution of p.  The center of that distribution is around the mean or median of the proportion in your sample. The sd (or mad) of that posterior is this formula! Give standard error formula. Note that this is the same thing as the standard deviation of the repeated samples! -->
 
 <!-- Explain in a comment the reason for  fun = function(.x) 1/(2 * sqrt(.x)) in the plot. I don't know why we need the 2. -->
 
-<!-- Use this quote: "May the odds be ever in your favor!" Or, better, "May the posterior be ever in your favor!" -->
+<!-- Use this quote: "May the odds be ever in your favor!" Or, better, "May the posterior be ever in your favor!" MF: Done. -->
 
 <!-- in Discussion, discuss hypothesis tests and why we hate them. New section. After stan_glm().  Cover most of the points here: https://ppbds.github.io/primer/five-parameters.html#testing. One hypothesis: There are equal number of red and white beads in the urn. Can we reject that hypothesis? Convention: if the 95% confidence interval excludes the null hypthesis, then we reject it. Otherwise, we don't reject it. (Not we accept it.)
 
-Who cares! Rejecting or not rejecting hypotheses never helps us to answer real questions. In general, null hypthoses are never true. A big enough will always reject the null hypothesis. So, it is not that interesting. -->
+Who cares! Rejecting or not rejecting hypotheses never helps us to answer real questions. In general, null hypthoses are never true. A big enough will always reject the null hypothesis. So, it is not that interesting. MF: Done. -->
 
 <!-- 1) Make a 15 second video, put it on YouTube. "We don't estimate parameters because we care about parameters. Parameters are imaginary! Like unicorns! [Put finger on forehead and imitate unicorn.] We estimate parameters to build Data Generating Mechanisms. And with a DGM, you can move the world!" NOTE: will do when I can get access to better internet. -->
 
@@ -554,16 +552,14 @@ comparing_n_table <- virtual_prop %>%
   # Take the standard deviation and mean of prop_red
   # using summarize. 
   
-  summarize(sd = sd(prop_red), .groups = 'drop_last',
-            mean = mean(prop_red)) %>% 
+  summarize(sd = sd(prop_red), .groups = 'drop_last') %>% 
   
   # Rename using backslashes (with the desired) text
   # on the left and the existing column on the right.
   # This is for clarity once we create our table. 
   
   rename(`Number of slots in shovel` = n, 
-         `Standard deviation of proportions red` = sd,
-         `Mean of proportions red` = mean) 
+         `Standard deviation of proportions red` = sd)
 
 # Create a table using gt().
 
@@ -856,9 +852,14 @@ The standard error measures the accuracy of a sample distribution as compared to
 To really drive home our point: standard error is just a fancy term for your uncertainty about something you don't know. Standard error == our (uncertain) beliefs. 
 
 ```{r, echo = FALSE, fig.cap= "If you are wondering how much you need to know, follow this helpful guide of the information we have learned this chapter!", fig.align= 'center'}
-knitr::include_graphics("06-one-parameter/images/preceptor_hierarchy.png")
+knitr::include_graphics("06-one-parameter/images/new_maslow.png")
 ```
 
+This hierarchy represents the knowledge we need to understand standard error (SE). At the bottom, we have math. It's the foundation for our understanding, but it doesn't need to be what we take away from this lesson. As we go up, we simplify the topic. The top of the pyramid are the basic levels of understanding that will help you to remember in the future. 
+
+If I know your estimate plus or minus *two* standard errors, I know your 95% confidence interval. This is valuable information. Standard error is really just a measure for how uncertain we are about something we do not know, the thing we are estimating. When we recall SE, we should remember that, all in all, it's a complicated concept that can be distilled into: the way old people talk about confidence intervals. 
+
+Recall that $\hat{p}$ is the estimated value of p which comes from taking a sample. There can be billions and billions of $\hat{p}$'s. We look at a large group of $\hat{p}$'s, create a distribution of results to represent the possible values of p based on our findings, and then we compute a standard error to account for our own uncertainty about our predictions. Our 95% confidence interval for our prediction == our estimate plus or minus **two** standard errors. 
 
 <!-- DK: Does the student have the main lessons? Standard error is a measure of how close you expect your guess to be to the truth. There are many other measures like mean absolute deviation and MAD SD (where this is the median absolute deviation). I am confused about this! -->
 
@@ -875,6 +876,8 @@ Recall the questions we asked at the beginning of our chapter:
 We have looked at a number of different models and their accuracy and precision. To delve into our primary questions, we must return to our discussion of distributions: posterior, joint, and marginal. 
 
 ### Joint distribution
+
+Let's start with our first question: **If we get 17 red beads in a random sample of size 50 taken from an urn with 1000 (white or red) beads, how many red beads are in the urn?**
 
 In Chapter \@ref(probability) we outlined the key intuition behind all inference: there is a joint distribution of data-which-we-might-see-from-our-experiment and models-which-we-are-considering. We take this joint distribution, combine it with the actual results of the experiment, and calculate a posterior distribution over the set of possible models. In other words, we start with 
 
@@ -928,7 +931,7 @@ joint_dist %>%
   sample_n(10)
 ```
 
-After looking at our joint distribution, let's plot it. Call the `red_in_urn` for our y-axis, to indicate the number of red beads in the urn. Call `red_in_paddle` for our x-axis, to indicate the number of red beads in each paddle. This allows us to see which possible values of red beads in our samples correspond with the total number of red beads in the urn.
+After looking at our joint distribution, let's plot it. Call the `red_in_urn` for our y-axis, to indicate the number of red beads in the urn. Call `red_in_paddle` for our x-axis, to indicate the number of red beads in each paddle. This allows us to see which possible values of red beads in our samples correspond with $p$, the proportion of red beads in the urn.
 
 ```{r, cache = TRUE}
 joint_dist %>%
@@ -1107,6 +1110,14 @@ posterior_predict(fit_1,
 This posterior is similar to the one we created, much more laboriously, above. 
 
 <!-- DK: But they are still different! Why is that? -->
+
+### Hypothesis tests
+
+Recall our view on hypothesis tests: **Amateurs test. Professionals summarize.**
+
+Let's look at a possible hypothesis in our urn paradigm: there are equal number of red and white beads in the urn. Can we reject that hypothesis? Convention: if the 95% confidence interval excludes the null hypothesis, then we reject it. Otherwise, we don't reject it. However, this does not mean that we accept it. 
+
+More to the point: who cares! Rejecting or not rejecting hypotheses never helps us to answer real questions. A Yes/No question throws away too much information to (almost) ever be useful. There is no reason to test when you can summarize by providing the full posterior probability distribution. 
 
 
 ### Case study: Polls {#sampling-case-study}
@@ -1337,7 +1348,9 @@ Other highlights:
 - SE refers to the standard deviation of a sample statistic (aka point estimate), such as the mean or median. Therefore, the "standard error of the mean" refers to the standard deviation of the distribution of sample means taken from a population. 
 
 ### Answering the questions
-<!-- MF: ADD SUMMARY FOR ANSWERING THE QUESTIONS AFTER RE-READING AND EDITING. -->
+- A joint distribution allows us to explore the most likely possibilities according to all possible models of this scenario. 
+- The posterior distribution takes a *slice* of our joint distribution that is more specific to our question. 
+- Both models are valuable for answering questions about our model. 
 
 ### Discussion
 
@@ -1348,5 +1361,5 @@ Other highlights:
 
 In this chapter, we performed both tactile and virtual sampling exercises to infer about an unknown parameter We also presented a case study of sampling in real life with polls. In each case, we used the sample proportion $\hat{p}$ to estimate the population proportion $p$. However, we are not just limited to scenarios related to proportions. In other words, we can use sampling to estimate other population parameters using other point estimates as well.
 
-As we continue our journey, recall the case of Primrose Everdeen and what she represents: no matter how realistic is our model is, our predictions are **never certain**.  
+As we continue our journey, recall the case of Primrose Everdeen and what she represents: no matter how realistic is our model is, our predictions are **never certain**.  "May the posterior be ever in your favor!"
 
