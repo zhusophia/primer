@@ -5,7 +5,7 @@
 
 *This chapter is still a DRAFT. Check back in a few weeks.*
 
-Having created models with one parameter in Chapter \@ref(one-parameter), two parameters in Chapter \@ref(two-parameters), three parameters in Chapter \@ref(three-parameters), and five parameters in Chapter \@ref(five-parameters), you are now ready to make the jump to $N$ parameters. 
+Having created models with one parameter in Chapter \@ref(one-parameter), two parameters in Chapter \@ref(two-parameters), three parameters in Chapter \@ref(three-parameters), four parameters in Chapter \@ref(four-parameters) and five parameters in Chapter \@ref(five-parameters), you are now ready to make the jump to $N$ parameters. 
 
 In this chapter, we will consider models with many parameters and the complexities that arise therefrom. 
 
@@ -21,12 +21,82 @@ library(rstanarm)
 
 ch11 <- governors %>% 
   select(last_name, year, state, sex, lived_after, election_age) %>% 
-  mutate(election_age_c = election_age - mean(election_age))
+  drop_na()
 ```
+
+<!-- DK: Might discover that people who ran more than once are listed more than once. Or save that for Chapter 12. -->
 
 ### state
 
-<!-- DK: Start with a model with just state. -->
+Consider a model in which years lived after the election is a function of the state in which the candidate lives. This assumption generates a model with 51 parameters, an average for each state and the residual variance. Mathematics:
+
+
+$$ lived\_after_i =  \beta_1 x_{AL,i} + \beta_2 x_{AK,i} + ... + \beta_{49} x_{WI,i}  + \beta_{50} x_{WY,i} + \epsilon_i$$
+As usual, $\epsilon_i \sim N(0, \sigma^2)$. Conceptually, this model is identical to several of the three parameter models we explored in Chapter \@ref(three-parameters). For an individual candidate, the years to live after the election are function of the average for her state and of an error term. None of the other coefficients matter because the indicator variables are zero for all the other states. For example, the model for a candidate from Alaska simplifies to:
+
+<!-- DK: Make these all line up nicer? -->
+
+$$ lived\_after_i =  \beta_1 x_{AL,i} + \beta_2 x_{AK,i} + ... + \beta_{49} x_{WI,i}  + \beta_{50} x_{WY,i} + \epsilon_i $$
+$$ lived\_after_i =  \beta_1 x 0 + \beta_2 1 + ... + \beta_{49} 0  + \beta_{50} 0 + \epsilon_i $$
+$$ lived\_after_i =   \beta_2  + \epsilon_i $$
+The interpretation is the same as when we modeled `age` as a function of `party` or `att_end` as a function of `treatment`. In all these cases, an individual can only be in one category. She can be a Democrat or a Republican. She can received the treatment or not. She can live in Alabama or Alaska or . . . . The only wrinkle we have added is that there are 50 categories under consideration, not just two.
+
+The code is exactly the same as in those Chapter \@ref(three-parameters) exmaples.
+
+```{r}
+fit_1 <- stan_glm(formula = lived_after ~ state - 1,
+                  data = ch11,
+                  refresh = 0,
+                  seed = 76)
+```
+
+We do not need to, explicitly, tell R that there are 50 categories. It determines that from `state`, just as it determined that there were two possibilities for `treatment`. The difficulty arises, however, when we try to examine the parameter values:
+
+```{r}
+fit_1
+```
+
+That is a lot to take in! Examining and comparing two parameters --- the average attitude toward immigration of the treated and control, for example, is easy. Doing the same for 50 parameters is hard. Use `tidy()` from the **broom.mixed** package to create a tibble with all the parameters.
+
+```{r}
+library(broom.mixed)
+
+fit_1_params <- tidy(fit_1)
+
+fit_1_params
+```
+
+Putting all the parameters into a tibble makes everything much easier. For example, we can look at the states with the longest and shortest lived candidates:
+
+```{r}
+fit_1_params %>% 
+  arrange(desc(estimate)) %>% 
+  slice(1:5, 46:50)
+```
+ 
+ <!-- DK: Going forward, would you expect candidates from Delaware to live 14 years longer than candidates from Wyoming? Discuss what these terms mean. -->
+ 
+A graphical display is the best way to examine numerous parameters at the same time.  
+
+
+```{r, fig.height = 8}
+fit_1_params %>% 
+  mutate(state = str_replace(term, "state", "")) %>% 
+  ggplot(aes(x = fct_reorder(state, estimate),
+             y = estimate)) +
+    geom_pointrange(aes(ymin = estimate - 2 * std.error,
+                        ymax = estimate + 2 * std.error)) +
+    coord_flip() +
+    labs(title = "Expected Years Lived Post Election",
+         y = "Years",
+         x = NULL)
+
+
+```
+
+
+There are 51 parameters.
+
 
 ### state, election_age, sex and election_age*sex
 
