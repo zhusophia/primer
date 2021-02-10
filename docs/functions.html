@@ -85,7 +85,7 @@
 <code class="sourceCode R"><span class="va">rnorm</span></code></pre></div>
 <pre><code>## function (n, mean = 0, sd = 1) 
 ## .Call(C_rnorm, n, mean, sd)
-## &lt;bytecode: 0x7fc87ff16eb0&gt;
+## &lt;bytecode: 0x7f833ae55cf8&gt;
 ## &lt;environment: namespace:stats&gt;</code></pre>
 <p>Functions can do all sorts of things. <code><a href="https://rdrr.io/r/base/sample.html">sample()</a></code> takes a vector of values and returns a number of values randomly selected from that vector. You can specify the number of random values with the argument <code>size</code>. This call is the equivalent of rolling a die.</p>
 <div class="sourceCode" id="cb443"><pre class="downlit sourceCode r">
@@ -158,7 +158,7 @@
 <li>
 <code>map_df()</code>: data frame</li>
 </ul>
-<p>Since our example produces numeric output, we use <code>map_dbl()</code> instead of <code>map()</code>.</p>
+<p>Since our example returns numeric output, we use <code>map_dbl()</code> instead of <code>map()</code>.</p>
 <p>The key difference between using <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> and <code>map_*</code> functions is that <code>map_*</code> functions are designed to work well with lists, both as inputs and as outputs. <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> is designed for vectors.</p>
 </div>
 <div id="list-columns-and-map-functions" class="section level2" number="3.2">
@@ -291,6 +291,7 @@
 ## 2     2 &lt;dbl [10]&gt;  2.50 &lt;dbl [2]&gt;
 ## 3     3 &lt;dbl [10]&gt;  1.09 &lt;dbl [2]&gt;</code></pre>
 <p>This flexibility is only possible via the use of list-columns and <code>map_*</code> functions. This workflow is extremely common. We start with an empty tibble, using ID to specify the number of rows. With that skeleton, each step of the pipe adds a new column, working off a column which already exists.</p>
+<!-- DK: Lots of awkward. -->
 <p>Until now, we have practiced using <code>map_*</code> functions with built-in R functions. Sometimes, however, there is not an R function which does what we want. When that happens, we need to create our own function.</p>
 </div>
 <div id="custom-functions" class="section level2" number="3.3">
@@ -301,7 +302,7 @@
 <h3>
 <span class="header-section-number">3.3.1</span> Creating your own functions<a class="anchor" aria-label="anchor" href="#creating-your-own-functions"><i class="fas fa-link"></i></a>
 </h3>
-<p>There are plenty of built-in functions in R, such as the ones mentioned above. You can also create your own custom functions, which may look something like this:</p>
+<p>There are many built-in functions in R. You can also create your own custom functions, which may look something like this:</p>
 <div class="sourceCode" id="cb479"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">add_one_and_one</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span><span class="op">{</span>
   <span class="fl">1</span> <span class="op">+</span> <span class="fl">1</span>
@@ -309,8 +310,8 @@
 
 <span class="fu">add_one_and_one</span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 2</code></pre>
-<p>You just created a function! This function will return <code>1 + 1</code> whenever called.
-What if we wanted to leave some mystery in the function? That is to say, we want to add the number 6 to a value <code>x</code>, that the user provides for us.</p>
+<p>You just created a function! This function will return <code>1 + 1</code> whenever called.</p>
+<p>Consider a function which adds the number 6 to a value <code>x</code>, a value which we want to allow the user provide.</p>
 <div class="sourceCode" id="cb481"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">add_six_to_something</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span>
   <span class="va">x</span> <span class="op">+</span> <span class="fl">6</span>
@@ -318,7 +319,7 @@ What if we wanted to leave some mystery in the function? That is to say, we want
 
 <span class="fu">add_six_to_something</span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 7</code></pre>
-<p>Congratulations! You have incorporated your first <strong>formal argument</strong>. Formal arguments in functions are additional parameters that allow the user to customize the use of your function. Instead of adding <code>1 + 1</code> over and over again, your function takes in a number <code>x</code> that the user defines and adds 6. Now let’s drive it home and make a function with <em>two</em> formal arguments.</p>
+<p>You have incorporated your first <strong>formal argument</strong>. Formal arguments in functions are additional parameters that allow the user to customize the use of the function. Instead of adding <code>1 + 1</code> over and over again, your function takes in a number <code>x</code> that the user defines and adds 6. Consider a function with <em>two</em> formal arguments.</p>
 <div class="sourceCode" id="cb483"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">add_x_to_y</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span> <span class="op">{</span>
   <span class="va">x</span> <span class="op">+</span> <span class="va">y</span>
@@ -334,8 +335,8 @@ What if we wanted to leave some mystery in the function? That is to say, we want
 <h3>
 <span class="header-section-number">3.3.2</span> Anonymous functions with <code>map_*</code> functions<a class="anchor" aria-label="anchor" href="#anonymous-functions-with-map_-functions"><i class="fas fa-link"></i></a>
 </h3>
-<p>We can create functions that do operations “on the fly” without bothering to give them a name. These nameless functions are called <a href="https://coolbutuseless.github.io/2019/03/13/anonymous-functions-in-r-part-1/">anonymous functions.</a></p>
-<p>You can use anonymous functions in conjunction with the <code>map_*</code> family of functions. They’re commonly used to conduct mathematical operations repeatedly.</p>
+<p>We can create functions that perform operations “on the fly,” without bothering to give them a name. These nameless functions are called <a href="https://coolbutuseless.github.io/2019/03/13/anonymous-functions-in-r-part-1/">anonymous functions.</a></p>
+<p>You can use anonymous functions in conjunction with the <code>map_*</code> family of functions. They are commonly used to conduct the same operations repeatedly.</p>
 <p>You can call an anonymous function using a <code><a href="https://rdrr.io/r/base/tilde.html">~</a></code> operator and then using a <code>.</code> to represent the current element. Consider these three approaches:</p>
 <div class="sourceCode" id="cb487"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">tibble</span><span class="op">(</span>old <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">16</span>, <span class="fl">9</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -455,12 +456,12 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
     <span class="fu">pull</span><span class="op">(</span><span class="op">{</span><span class="op">{</span><span class="va">var</span><span class="op">}</span><span class="op">}</span><span class="op">)</span>
 <span class="op">}</span>
 
-<span class="fu">no_NA_sampler</span><span class="op">(</span><span class="va">nhanes</span>, <span class="va">height</span>, n <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
+<span class="fu">no_NA_sampler</span><span class="op">(</span>tbl <span class="op">=</span> <span class="va">nhanes</span>, var <span class="op">=</span> <span class="va">height</span>, n <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 169 160</code></pre>
+<p>R does not know how to interpret something like <code>age</code> when it is passed in an argument. The double curly braces around <code>var</code> tell R, in essence, that <code>var</code> is a variable in the tibble created from sampling from our input tibble (<code>tbl</code>). We use the order of the arguments, without naming them, with <code>no_NA_sampler()</code>, just as with any other R function:</p>
 <div class="sourceCode" id="cb509"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">no_NA_sampler</span><span class="op">(</span><span class="va">trains</span>, <span class="va">age</span>, n <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu">no_NA_sampler</span><span class="op">(</span><span class="va">trains</span>, <span class="va">age</span>, <span class="fl">5</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 54 36 43 61 27</code></pre>
-<p>R does not know how to interpret something like <code>age</code> when it is passed in an argument. The double curly braces around <code>var</code> tell R, in essence, that <code>var</code> is a variable in the tibble created from sampling from our imputed data set (<code>tbl</code>).</p>
 <!-- DK: I realize that the above is a lousy explanation. Feel free to change it completely. -->
 <p>Now that we have the function doing what we want, we should add some comments and some error checking.</p>
 <div class="sourceCode" id="cb511"><pre class="downlit sourceCode r">
@@ -521,8 +522,8 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
 <span class="kw">if</span><span class="op">(</span><span class="va">your_error</span> <span class="op">&lt;</span> <span class="va">my_error</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="st">"You win!"</span><span class="op">)</span>
 <span class="kw">if</span><span class="op">(</span><span class="va">your_error</span> <span class="op">&gt;</span> <span class="va">my_error</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="st">"I win!"</span><span class="op">)</span></code></pre></div>
 <pre><code>## I win!</code></pre>
-<p>Run this code in your R Console to try it out. It works! It is also sloppy and disorganized. <em>But the first step in writing good code is to write bad code</em>.</p>
-<p>We don’t want to play the Prediction Game just once. We want to do it thousands of times. Copy/pasting this code a thousand times would be stupid. Instead, we need a function. Just place the working code within a function definition, and Voila!</p>
+<p>Run this code in your R Console to try it out. It works! It is also sloppy and disorganized. <em>The first step in writing good code is to write bad code</em>.</p>
+<p>We don’t want to play the Prediction Game just once. We want to play it thousands of times. Copy/pasting this code a thousand times would be stupid. Instead, we need a function. Just place the working code within a function definition, and Voila!</p>
 <div class="sourceCode" id="cb516"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">prediction_game</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span><span class="op">{</span>
   <span class="va">your_guess</span> <span class="op">&lt;-</span> <span class="fl">500</span>
@@ -536,7 +537,7 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
   <span class="kw">if</span><span class="op">(</span><span class="va">your_error</span> <span class="op">&lt;</span> <span class="va">my_error</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="st">"You win!"</span><span class="op">)</span>
   <span class="kw">if</span><span class="op">(</span><span class="va">your_error</span> <span class="op">&gt;</span> <span class="va">my_error</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="st">"I win!"</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
-<p>Other than the function definition itself, there are no changes. Yet, by creating a function, we can now easily run this multiple times.</p>
+<p>Other than the function definition itself, there are no changes. Yet, by creating a function, we can now easily run this many times.</p>
 <div class="sourceCode" id="cb517"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/lapply.html">replicate</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fu">prediction_game</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## You win!You win!You win!</code></pre>
@@ -548,13 +549,12 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
 ## 
 ## [[3]]
 ## NULL</code></pre>
-<p>The problem with this version is that we want <code>prediction_game()</code> to <em>return</em> a message about the winner. Right now, it returns nothing. It just prints the winner. Let’s change that, and also allow for guesses to be passed in as an argument, along with the tibble and variable. We can leave <code>n</code> hard coded as 1 since, by definition, the Prediction Game is an attempt to guess one number, at least for now.</p>
+<p>The problem with this version is that we want <code>prediction_game()</code> to <em>return</em> a message about the winner. Right now, it returns nothing. It just prints the winner. Let’s change that, and also allow for guesses to be passed in as an argument, along with the tibble and variable. We can leave <code>n</code> hard coded as 1 since, by definition, the Prediction Game is an attempt to guess one number, at least for now. To do this, we need to use the <code><a href="https://rdrr.io/r/base/function.html">return()</a></code> function which, when executed, causes the function to finish and return whatever value is within the paratheses.</p>
 <!-- DK: Add some code comments, especially {{var}} -->
 <div class="sourceCode" id="cb520"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">prediction_game</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">guesses</span>, <span class="va">tbl</span>, <span class="va">var</span><span class="op">)</span><span class="op">{</span>
   
-  <span class="co"># This is telling our function to stop if we do not select two guesses </span>
-  <span class="co"># in the format of c(guess 1, guess 2).</span>
+  <span class="co"># Check to make sure that guesses is a vector of doubles of length 2.</span>
   
   <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.html">all</a></span><span class="op">(</span><span class="fu">is_double</span><span class="op">(</span><span class="va">guesses</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
   <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">guesses</span><span class="op">)</span> <span class="op">==</span> <span class="fl">2</span><span class="op">)</span>
@@ -627,7 +627,7 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
                                             <span class="va">rv13</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span><span class="va">result</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">geom_bar</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-311-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-312-1.png" width="100%"></div>
 <p>It is hardly surprising that 500 wins more often than 600 since the mean of <code>rv13</code> is 539.23. The mean seems like a pretty good guess! But it is not the best guess.</p>
 <p>To test whether the mean or the median is a better guess, we will use our created <code>prediction_game</code> function with the guesses of 442 (the median) and 539 (the mean) and plot the results.</p>
 <div class="sourceCode" id="cb526"><pre class="downlit sourceCode r">
@@ -638,7 +638,7 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
                                             <span class="va">rv13</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span><span class="va">result</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">geom_bar</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-312-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-313-1.png" width="100%"></div>
 <p>The mean is not a bad prediction. But the best prediction is (surprisingly?) the median, which is 442.</p>
 <div id="playing-within-a-tibble" class="section level4" number="3.5.0.1">
 <h4>
@@ -682,40 +682,40 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
                             <span class="cn">TRUE</span> <span class="op">~</span> <span class="st">"A tie!"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span><span class="va">winner</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">geom_bar</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-315-1.png" width="100%"></div>
-<p>Empirically, we see than 900 is a much better guess than 800.</p>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-316-1.png" width="100%"></div>
+<p>Empirically, we see than 900 is a much better guess than 800. Instead of calling a function to be run 1,000 times, we just performed each step within each row of a tibble with 1,000 rows. Both approaches work. The best choice depends on the context of your problem.</p>
 </div>
 </div>
 <div id="summary-3" class="section level2" number="3.6">
 <h2>
 <span class="header-section-number">3.6</span> Summary<a class="anchor" aria-label="anchor" href="#summary-3"><i class="fas fa-link"></i></a>
 </h2>
+<p><em>The first step in writing good code is to write bad code</em>.</p>
 <div id="lists-and-list-columns" class="section level3" number="3.6.1">
 <h3>
 <span class="header-section-number">3.6.1</span> Lists and list-columns<a class="anchor" aria-label="anchor" href="#lists-and-list-columns"><i class="fas fa-link"></i></a>
 </h3>
-<p>The introduction of the chapter was centered on a discussion of lists and list-columns. Key points from this section include:</p>
 <ul>
-<li>A list is different from an atomic vector. Atomic vectors are familiar to us: each element of the vector has one value, and thus if an atomic vector is a column in your data set, each observation gets a single value. Lists, however, can contain vectors as elements.</li>
-<li>There are various ways to create lists. We can directly input values inside <code><a href="https://rdrr.io/r/base/list.html">list()</a></code>, or wrap the values in <code><a href="https://rdrr.io/r/base/c.html">c()</a></code> first to create a vector element.</li>
-<li>Any function that returns multiple values can be used to create a list output. To turn the output into a list, simply wrap the line of code with <code><a href="https://rdrr.io/r/base/list.html">list()</a></code>.</li>
-<li>We can take a list column and, by applying an anonymous function to it with <code>map()</code>, create another list column. This is similar to taking a tibble and piping it into a <code>dplyr</code> function (such as <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code>) which gives you a new tibble that you can work with.</li>
+<li>A list is different from an atomic vector. Atomic vectors are familiar to us: each element of the vector has one value, and thus if an atomic vector is a column in your data set, each observation gets a single value. Lists, however, can contain vectors, and other more complex objects, as elements.</li>
+<li>There are various ways to create lists. The most common is to use the <code><a href="https://rdrr.io/r/base/list.html">list()</a></code> function to “wrap” some object. <code>map()</code> always returns a list.</li>
+<li>We can take a list column and, by applying an anonymous function to it with <code>map()</code>, create another list column. This is similar to taking a tibble and piping it into a function, like <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code>, which returns a new tibble to work with.</li>
 <li>You can also use <code>map_*</code> functions to take a list column as an input and return an atomic vector – a column with a single value per observation – as an output.</li>
 </ul>
 <p><em>If a function returns multiple values as a vector, you must use <code><a href="https://rdrr.io/r/base/list.html">list()</a></code> as a wrapper if you want to create a list-column.</em></p>
 </div>
-<div id="custom-functions-1" class="section level3" number="3.6.2">
+<div id="writing-functions" class="section level3" number="3.6.2">
 <h3>
-<span class="header-section-number">3.6.2</span> Custom functions<a class="anchor" aria-label="anchor" href="#custom-functions-1"><i class="fas fa-link"></i></a>
+<span class="header-section-number">3.6.2</span> Writing functions<a class="anchor" aria-label="anchor" href="#writing-functions"><i class="fas fa-link"></i></a>
 </h3>
-<p>This chapter, we focused on functions.</p>
-<p>In particular, when building a function, you want to remember these key lessons:
-- Optimize usefulness by adding more formal arguments when needed. A function that only gives an option for <code>n</code> may not be as helpful as a function that allows us to enter options for a data set, variable, and n value.
-- As there is no <em>structural</em> relationship between our argument names (<code>n</code>) and that of <code><a href="https://rdrr.io/r/base/sample.html">sample()</a></code> (which also includes <code>n</code>), ensure that argument names are sensible. This helps not only your readers, but also you. In short: using “bob_ross” to denote the number of samples you want… is a bad idea.
-- Make sure we account for possible values of NA in our functions. This can be accomplished by placing something like <code>drop_na()</code> as another line of code within the function’s body, or by adding an <code>na.rm =</code> argument to our function. We might even enforce our preferred default – but at least we’re giving the user a way to control the behavior around <code>NA</code>s.
-- By default, a function returns the result of the last line of the body.
-- When starting a function, remember that smaller steps are easier than trying to build everything in one motion. In general: start by writing the body, test the body in a basic function, and then add formal arguments.<br>
-- Use double curly braces around <code>var</code>s, since R does not know how to interpret variables when passed in an argument. The double curly braces tell R that <code>var</code> is a variable in the tibble created by our function.</p>
+<ul>
+<li>Optimize usefulness by adding more formal arguments when needed. A function that only gives an option for <code>n</code> may not be as helpful as a function that allows us to enter options for a data set, variable, and n value.</li>
+<li>Give your arguments sensible names.<br>
+</li>
+<li>By default, a function returns the result of the last line of the body. Use <code><a href="https://rdrr.io/r/base/function.html">return()</a></code> to override this default.</li>
+<li>When starting a function, remember that smaller steps are easier than trying to build everything in one motion. In general: start by writing the body, test the body in a basic function, and then add formal arguments.<br>
+</li>
+<li>Use double curly braces around <code>var</code>s, since R does not know how to interpret variable names when they are passed in an argument. The double curly braces tell R that <code>var</code> is a variable in a tibble.</li>
+</ul>
 </div>
 <div id="distributions-1" class="section level3" number="3.6.3">
 <h3>
@@ -727,17 +727,6 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
 <li>The two most important aspects of a distribution are its <em>center</em> and its <em>variability</em>.</li>
 <li>The median is often a more stable measure of the center than the mean. The mad (scaled median absolute deviation) is often a more stable measure of variation than the standard deviation.</li>
 <li>Outliers cause a lack a stability. In a distribution without outliers, the mean/median and mad/sd are so close in value that it does not matter much which ones you use.</li>
-</ul>
-</div>
-<div id="other-important-information" class="section level3" number="3.6.4">
-<h3>
-<span class="header-section-number">3.6.4</span> Other important information<a class="anchor" aria-label="anchor" href="#other-important-information"><i class="fas fa-link"></i></a>
-</h3>
-<ul>
-<li>The median is often a more stable measure than the mean.</li>
-<li>When starting a function, remember that smaller steps are easier than trying to build everything in one motion. In general: start by writing the body, test the body in a basic function, and then add formal arguments.</li>
-<li>Use double curly braces around <code>var</code>s, since R does not know how to interpret variables when passed in an argument. The double curly braces tell R that <code>var</code> is a variable in the tibble created by our function.</li>
-<li>Sensible names for formal arguments will not only help you, but also anyone who is reading your code.</li>
 </ul>
 </div>
 </div>
@@ -763,9 +752,8 @@ FIGURE 3.1: From <a href="https://blog.fastmonkeys.com/2014/06/18/minimum-viable
 <li>
 <a class="nav-link" href="#summary-3"><span class="header-section-number">3.6</span> Summary</a><ul class="nav navbar-nav">
 <li><a class="nav-link" href="#lists-and-list-columns"><span class="header-section-number">3.6.1</span> Lists and list-columns</a></li>
-<li><a class="nav-link" href="#custom-functions-1"><span class="header-section-number">3.6.2</span> Custom functions</a></li>
+<li><a class="nav-link" href="#writing-functions"><span class="header-section-number">3.6.2</span> Writing functions</a></li>
 <li><a class="nav-link" href="#distributions-1"><span class="header-section-number">3.6.3</span> Distributions</a></li>
-<li><a class="nav-link" href="#other-important-information"><span class="header-section-number">3.6.4</span> Other important information</a></li>
 </ul>
 </li>
 </ul>
