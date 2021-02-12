@@ -1,5 +1,9 @@
 # Functions {#functions}
 
+<!-- Get rid of nhanes example as too confusing? -->
+
+<!-- Get rid of anonymous function section as too confusing? Or save it for final section of Advanced stuff? -->
+
 <!-- The functions created here should be more tightly connected to the functions created in the tutorial. Recall that we will be merging the tutorial into the chapter this summer, I hope! -->
 
 <!-- And we also want to lay the groundwork for the problem set (and exam) which require writing a function. And, finally, all these exercises should be teaching something which is then referenced in probability and in stan_glm. Yet it is not clear what those would be. Maybe some simulations? -->
@@ -17,7 +21,7 @@
 
 A function is a piece of code that is packaged in a way that makes it easy to reuse. Functions make it easy for you to `filter()`, `arrange()`, `select()`, and create a `tibble()`, as you have seen in Chapters \@ref(visualization) and \@ref(wrangling). Functions also allow you to transform variables and perform mathematical calculations. We use functions like `rnorm()` and `runif()` to generate random draws from a distribution.
 
-every time we reference a function, we include the parentheses. You call a function by including its parentheses and any necessary arguments within those parentheses. This is a correct call of `rnorm()`:
+Every time we reference a function in this *Primer*, we include the parentheses. You call a function by including its parentheses and any necessary arguments within those parentheses. This is a correct call of `rnorm()`:
 
 ```{r}
 rnorm(n = 1)
@@ -60,7 +64,7 @@ tibble(x = c(4, 16, 9)) %>%
   mutate(sq_root = sqrt((x)))
 ```
 
-`map_*` functions provide another approach. A `map_*` function takes two required arguments. First is the object over which you want to iterate. This will generally be a column in the tibble you are working in. Second is the function which you want to run for each row in the tibble.
+`map_*` functions provide another approach. A `map_*` function takes two required arguments. First is the object over which you want to iterate. This will generally be a column in the tibble in which you are working. Second is the function which you want to run for each row in the tibble.
 
 ```{r}
 tibble(x = c(4, 16, 9)) %>% 
@@ -81,9 +85,9 @@ tibble(x = c(4, 16, 9)) %>%
   mutate(sq_root = map_dbl(x, ~ sqrt(x)))
 ```
 
-Tilde and dot --- that is, `~` and `.` --- are easy to forget.
+*Tilde and dot (`~` and `.`) are easy to forget.*
 
-We called these `map_*` functions (plural) before.  If you know the expected output of your function, you can specify that kind of vector:
+If you know the expected output of your function, you can specify that kind of vector:
 
 - `map()`: list  
 - `map_lgl()`: logical
@@ -94,27 +98,26 @@ We called these `map_*` functions (plural) before.  If you know the expected out
 
 Since our example returns numeric output, we use `map_dbl()` instead of `map()`.
 
-The key difference between using `mutate()` and `map_*` functions is that `map_*` functions are designed to work well with lists, both as inputs and as outputs.  `mutate()` is designed for vectors.
+The key difference between using `mutate()` and `map_*` functions is that `map_*` functions are designed to work well with lists, both as inputs and as outputs.  `mutate()` is designed for atomic vectors, meaning vectors in which element is a single value.
 
 ## List-columns and map functions
 
 Recall that a list is different from an atomic vector. In atomic vectors, each element of the vector has one value.  Lists, however, can contain vectors, and even more complex objects, as elements.
 
 ```{r}
-x <- list(c(4, 16, 9))
+x <- list(c(4, 16, 9), c("A", "Z"))
 x
 ```
 
-`x` is a list with one element. That element is a numeric vector of length 3. We use `[[]]` to extract specific elements. Example:
+`x` is a list with two elements. That element is a numeric vector of length 3. The second element is a character vector of length 2. We use `[[]]` to extract specific elements. Example:
 
 ```{r}
 x[[1]][3]
 ```
 
-The first `[[]]` extracts the first (and only, in this case) element form the list `x`. The second `[[]]`` extracts the 3rd element from the vector which is that first element.
+The first `[[]]` extracts the first element form the list `x`. The second `[[]]`` extracts the 3rd element from the vector which is that first element.
 
-
-There are a number of built-in R functions that output lists. For example, the ***ggplot*** objects you have been making store all of the plot information in lists. Any function that returns multiple values can be used to create a list output by wrapping those values with `list()`.
+There are a number of built-in R functions that output lists. For example, the ***ggplot*** objects you have been making store all of the plot information in lists. Any function that returns multiple values can be used to create a list output by wrapping that returned object with `list()`.
 
 ```{r}
 x <- rnorm(10)
@@ -130,14 +133,54 @@ Notice this is a 1x1 tibble with one observation, which is a list of one element
 
 *If a function returns multiple values as a vector, like `range()` does, you must use `list()` as a wrapper if you want to create a list-column.*
 
-A list column is a column of your data which is a [list](https://adv-r.hadley.nz/vectors-chap.html#lists) rather than an atomic vector.  Like with lists, you can pipe to `str()` to examine the column more easily.
+A list column is a column of your data which is a [list](https://adv-r.hadley.nz/vectors-chap.html#lists) rather than an atomic vector.  Like with lists, you can pipe to `str()` to examine the column.
 
 ```{r message=FALSE}
 tibble(col_1 = list(range(x))) %>%
   str()
 ```
 
-<!-- DK: This goes way to fast. We need several simple examples, more or less the same as in the tutorials. -->
+
+We can use `map_*` functions to both create a list-column and then, much more importantly, work with that list-column afterwards. Example:
+
+<!-- DK: This is a good example. Needs to go slower, or be repeated several times. -->
+
+```{r}
+# This simple example demonstrates the workflow which we will often follow.
+# Start by creating a tibble which will be used to store the results. (Or start
+# with a tibble which already exists and to which you will be adding more
+# columns.) It is often convenient to get all the code working with just a few
+# rows. Once it is working, we increase the number of rows to a thousand or
+# million or whatever we need.
+
+tibble(ID = 1:3) %>% 
+  
+  # The big convenience is being able to store a list in each row of the tibble.
+  # Note that we are not using the value of ID in the call to rnorm(). (That is
+  # why we don't have a "." anywhere.) But we are still using ID as a way of
+  # iterating through each row; ID is keeping count for us, in a sense.
+  
+  mutate(draws = map(ID, ~ rnorm(10))) %>% 
+  
+  # Each succeeding step of the pipe works with columns already in the tibble
+  # while, in general, adding more columns. The next step calculates the max
+  # value in each of the draw vectors. We use map_dbl() because we know that
+  # max() will returns a single number.
+  
+  mutate(max = map_dbl(draws, ~ max(.))) %>% 
+  
+  # We will often need to calculate more than one item from a given column like
+  # draws. For example, in addition to knowing the max value, we would like to
+  # know the range. Because the range is a vector, we need to store the result
+  # in a list column. map() does that for us automatically.
+  
+  mutate(min_max = map(draws, ~ range(.)))
+
+```
+
+This flexibility is only possible via the use of list-columns and  `map_*` functions. This workflow is extremely common. We start with an empty tibble, using ID to specify the number of rows. With that skeleton, each step of the pipe adds a new column, working off a column which already exists. 
+
+<!-- DK: Is this a good example? A good transition? Whole thing should go slower, with more examples. Need to be redone along with a redo of Functions A tutorial. -->
 
 Let's practice with the `nhanes` dataset from the **primer.data** package. How could we add a column to the dataset that included the quantiles of the `height` variable for each `gender`?
 
@@ -180,7 +223,7 @@ nhanes %>%
 
 Men are taller than women throughout the distribution, but the smallest individual (child) in the data, see the 0% quantile, happens to be male.
 
-The second case involves a scenario in which we do not want to "lose" any rows in our tibble. We want a `q_height` column for all the rows, even if the values included are repetitive.  A common scenario is that we want to use `q_height` to perform a calculate for each individual. To do this, we need a `map_*` function.
+The second case involves a scenario in which we do not want to "lose" any rows in our tibble. We want a `q_height` column for all the rows, even if the values included are repetitive.  A common scenario is that we want to use `q_height` to perform a calculation for each individual. To do this, we need a `map_*` function.
 
 ```{r}
 nhanes %>%
@@ -193,29 +236,28 @@ nhanes %>%
 
 The first four lines of the pipe are the same in both cases. The only difference is the use of `list(quantile(height))` in the first and `map(height, ~ quantile(.)` in the second.
 
-We can use `map_*` functions to both create a list-column and then, much more importantly, work with that list-column afterwards. Example:
-
-<!-- DK: This is a good example. Needs to go slower, or be repeated several times. -->
-
-```{r}
-tibble(ID = 1:3) %>% 
-  mutate(draws = map(ID, ~ rnorm(10))) %>% 
-  mutate(max = map_dbl(draws, ~ max(.))) %>% 
-  mutate(range = map(draws, ~ range(.)))
-```
-
-This flexibility is only possible via the use of list-columns and  `map_*` functions. This workflow is extremely common. We start with an empty tibble, using ID to specify the number of rows. With that skeleton, each step of the pipe adds a new column, working off a column which already exists. 
-
-<!-- DK: Lots of awkward. -->
-
 Until now, we have practiced using `map_*` functions with built-in R functions. Sometimes, however, there is not an R function which does what we want. When that happens, we need to create our own function.
 
 
 ## Custom Functions
 
+There are many built-in functions in R. A function is composed of a name, a list of arguments and a body. We create our own functions with the `function()` function. 
+
 ### Creating your own functions
 
-There are many built-in functions in R. You can also create your own custom functions, which may look something like this:
+Assume we want to create a function which adds 1 and 1 together. The first step is to write some R code which does that.
+
+```{r}
+1 + 1
+```
+
+This code will become the "body" of the function, the part in between the curly braces. We also need to a function definition, which is composed of the name of the function, a call to the `function()` function, and a pair of curly braces.
+
+```{r}
+add_one_and_one <- function(){}
+```
+
+Combining the function definition and the body of the function completes the process.
 
 ```{r}
 add_one_and_one <- function(){
@@ -254,7 +296,7 @@ add_x_to_y(4, 3)
 
 We can create functions that perform operations "on the fly," without bothering to give them a name. These nameless functions are called [anonymous functions.](https://coolbutuseless.github.io/2019/03/13/anonymous-functions-in-r-part-1/)
 
-You can use anonymous functions in conjunction with the `map_*` family of functions. They are commonly used to conduct the same operations repeatedly.
+You can use anonymous functions in conjunction with the `map_*` family of functions. This is probably the most common use of anonymous functions, at least in this *Primer*.
 
 You can call an anonymous function using a `~` operator and then using a `.` to represent the current element. Consider these three approaches: 
 
@@ -269,12 +311,20 @@ tibble(old = c(4, 16, 9)) %>%
 
 All three produce the same answer, as we would expect. Just using `mutate()` is best, as long as it accomplishes your goal. In complex situations, especially those involving simulation, it often won't. Example:
 
+```{r, echo = FALSE}
+set.seed(999)
+```
+
 ```{r}
 tibble(ID = 1:3) %>% 
   mutate(x = rnorm(1))
 ```
 
-Calling `rnorm()`, or any function with a randon component, does not have the effect which you probably want if you do it in the context of a simple `mutate()`. Instead, R runs `rnorm(1)` once, and then copies the value generated to the remaining two rows of the tibble. To get a different value in each row, you need to explicitly tell R to do that:
+Calling `rnorm()`, or any function with a random component, does not have the effect which you probably want if you do it in the context of a simple `mutate()`. Instead, R runs `rnorm(1)` once, and then copies the value generated to the remaining two rows of the tibble. To get a different value in each row, you need to explicitly tell R to do that by using a `map_*` function:
+
+```{r, echo = FALSE}
+set.seed(999)
+```
 
 ```{r}
 tibble(ID = 1:3) %>% 
@@ -283,7 +333,7 @@ tibble(ID = 1:3) %>%
 ```
 
 
-Note that the parentheses in the anonymous function are not necessary. As long as everything after the `~` works as R code, the anonymous function should work, each time replace the `.` with the value of the relevant value of the `.x` variable --- which is `old` in this case --- with its value in that row.
+Note that the parentheses in the anonymous function are not necessary. As long as everything after the `~` works as R code, the anonymous function should work, each time replacing the `.` with the value in the relevant row from the `.x` variable --- which is `old` in this case.
 
 ```{r}
 tibble(old = c(4, 16, 9)) %>% 
@@ -293,6 +343,8 @@ tibble(old = c(4, 16, 9)) %>%
 
 ### Skateboard >> perfectly formed rear-view mirror
 
+<!-- DK: Cut this or explain it. Too confusing/useless for beginners. -->
+
 This image --- widely attributed to the Spotify development team --- conveys an important point.
 
 ```{r echo = FALSE, out.width = "60%", fig.align='center', fig.cap = "From [Your ultimate guide to Minimum Viable Product (+great examples)](https://blog.fastmonkeys.com/2014/06/18/minimum-viable-product-your-ultimate-guide-to-mvp-great-examples/)"}
@@ -301,7 +353,7 @@ knitr::include_graphics("03-functions/images/mvp.jpg")
 
 Build that skateboard before you build the car or some fancy car part. A limited-but-functioning thing is very useful. It also keeps spirits high.
 
-This is related to the valuable Telescope Rule:
+This is related to the Telescope Rule:
 
 > It is faster to make a four-inch mirror and then a six-inch mirror than it is to make a six-inch mirror.
 
@@ -343,7 +395,7 @@ no_NA_sampler <- function(){
 no_NA_sampler()
 ```
 
-Voila! A function just executes the code within its body. The first step in building a function is not to write the function. It is to write the code which you want the function to execute.
+Voila! A function just executes the code within its body. *The first step in building a function is not to write the function. It is to write the code which you want the function to execute.*
 
 The first version, however, "hard codes" a lot of options which we might want to change. What if we want to sample 5 values of height or 500? In that case, we could hard code a new number in place of "10". A better option would be to add an argument so that we can pass in whatever value we want.
 
@@ -372,7 +424,7 @@ no_NA_sampler <- function(tbl, var, n){
 no_NA_sampler(tbl = nhanes, var = height, n = 2)
 ```
 
-R does not know how to interpret something like `age` when it is passed in an argument. The double curly braces around `var` tell R, in essence, that `var` is a variable in the tibble created from sampling from our input tibble (`tbl`). We use the order of the arguments, without naming them, with `no_NA_sampler()`, just as with any other R function:
+R does not know how to interpret something like `age` when it is passed in an argument. The double curly braces around `var` tell R, in essence, that `var` is a variable in the tibble created from sampling from our input tibble `tbl`. We can use the order of the arguments, without naming them, with `no_NA_sampler()`, just as with any other R function:
 
 ```{r}
 no_NA_sampler(trains, age, 5)
@@ -389,9 +441,9 @@ no_NA_sampler <- function(tbl, var, n){
   # Function for grabbing `n` samples from a variable `var` which lives in a
   # tibble `tbl`. 
   
-  # I could not figure out how to check to see if `var` actually lives in tibble
-  # in my error checking. Also, I don't like that I need to use is_double() as
-  # the check on `n` even though I want `n` to be an integer.
+  # I could not figure out how to check to see if `var` actually lives in the
+  # tibble in my error checking. Also, I don't like that I need to use
+  # is_double() as the check on `n` even though I want `n` to be an integer.
   
   stopifnot(is_tibble(tbl))
   stopifnot(is_double(n))
@@ -407,6 +459,8 @@ no_NA_sampler <- function(tbl, var, n){
     pull({{var}})
 }
 ```
+
+Do the comments in the above code seem weird? Perhaps. But they are good comments! First, there about as many lines of comments as there are lines of code. That is a good rule of thumb. Second, the comments do not simple report what the code is doing. That is redundant! *The code itself tells us what the code is doing.* The comments, instead, are a discussion of issues related to the code, to things we don't understand, to topics which we should revisit. They are like a diary. Good programmers keep good diaries.
 
 ## Prediction Game
 
@@ -605,6 +659,10 @@ Empirically, we see than 900 is a much better guess than 800. Instead of calling
 ## Summary
 
 *The first step in writing good code is to write bad code*.
+
+*Tilde and dot (`~` and `.`) are easy to forget.*
+
+*The first step in building a function is not to write the function. It is to write the code which you want the function to execute.*
 
 ### Lists and list-columns
 
