@@ -4,6 +4,14 @@
 library(tidyverse)
 ```
 
+<!-- Stick in the formula for estimating ATE. See DK comment in text. -->
+
+<!-- Replace Sliding Doors in Summary with something from Wonderful Life that references "An angel gets his wings."  Every time a predictive model is interpreted causally, a devil gets his pitchfork. -->
+
+<!-- Confounding is done twice in Complications, once with noise and once with parties. Needs to be unified. -->
+
+<!-- The entire Complications sections is filled with good stuff. But it all needs to be re-organized and rewritten. Key idea: What are the 3 or 4 key items that we want students to get out of this? What are the key lessons/concerns? What themes do we expect to revisit in the Temperance sections of later chapters? These key points should also go in the Summary. -->
+
 <!-- Introduce the concept of the "population" throughout. It is important, especially in understanding the Preceptor Table. -->
 
 <!-- Remove Estimand column from Preceptor Tables almost everywhere? -->
@@ -15,6 +23,8 @@ library(tidyverse)
 <!-- Consider adding permutation tests, if only to practice list-columns. -->
 
 <!-- Does RCM connect to concepts like regression to the mean and the garden of forking paths? If so, we should add sections to those appendices. -->
+
+<!-- Should Fundamental Problem of Causal Inference always be italized? -->
 
 <!-- Lots of useful material here: https://chabefer.github.io/STCI/. Raises the possibility of using $Y^{t}_i to indicate potential outcome under treatment for unit i. -->
 
@@ -293,7 +303,7 @@ From this ideal Preceptor Table, there are many possible estimands we might be i
 
 And so on. There are a lot of things one might care about!
 
-All of the variables we calculated above are examples of estimands we might be interested in. One estimand is important enough that it has its own name: the **average treatment effect**, often abbreviated as **ATE**. The average treatment effect is the mean of all the causal effects. Here, the mean is $+0.8$.
+All of the variables we calculated above are examples of estimands we might be interested in. One estimand is important enough that it has its own name: the **average treatment effect**, often abbreviated as **ATE**. The average treatment effect is the mean of all the individual causal effects. Here, the mean is $+0.8$.
 
 Remember what an actual Preceptor Table riddled, as it always is, with question marks, looks like:
 
@@ -336,7 +346,7 @@ knitr::include_app("https://www.youtube.com/embed/gyRZSzCtU_o")
 
 ## Simple models
 
-How can we fill in the question marks?  Because of the fundamental problem of causal inference, we can never *know* the missing values. Because we can never know the missing values, we must make assumptions. "Assumption" just means that we need a "model," and all models have parameters.
+How can we fill in the question marks?  Because of the Fundamental Problem of Causal Inference, we can never *know* the missing values. Because we can never know the missing values, we must make assumptions. "Assumption" just means that we need a "model," and all models have parameters.
 
 ### A single value for tau
 
@@ -474,9 +484,9 @@ tibble(subject = c("Yao", "Emma", "Cassidy", "Tahmid", "Diego"),
 
 ### Two values for tau
 
-A second model might assume that the causal effect is different between levels of a category but constant within those levels. Perhaps there is a $\tau_F$ for females and $\tau_M$ for males where $\tau_F != \tau_M$. We are making this assumption to give us a different model with which we can fill in the missing values in our Preceptor Table. The key concept is that we can't make any progress unless we make some assumptions. That is an inescapable result of the Fundamental Problem of Causal Inference.
+A second model might assume that the causal effect is different between levels of a category but the same within those levels. For example, perhaps there is a $\tau_F$ for females and $\tau_M$ for males where $\tau_F != \tau_M$. We are making this assumption to give us a different model with which we can fill in the missing values in our Preceptor Table. The key concept is that we can't make any progress unless we make some assumptions. That is an inescapable result of the Fundamental Problem of Causal Inference.
 
-Let's look at this particular model in which we think sex has an impact on treatment effect:
+Consider a model in which causal effects differ based on sex:
 
 ```{r, echo = FALSE}
 # First, we create a tibble with the values we want for the table
@@ -580,7 +590,7 @@ We now have two different estimates for Emma (and for everyone else in the table
 
 ### Heterogenous treatment effects
 
-Is the assumption of a constant treatment effect, $\tau$, usually true. No! It is never true. People vary. The effect of a pill on me will always be different from the effect of a pill on you, at least if we measure outcomes accurately enough. Treatment effects are always *heterogeneous*, meaning that they vary across individuals. 
+Is the assumption of a constant treatment effect, $\tau$, usually true. No! It is never true. People vary. The effect of a pill on you will always be different from the effect of a pill on your friend, at least if we measure outcomes accurately enough. Treatment effects are always *heterogeneous*, meaning that they vary across individuals. 
 
 Reality looks like this: 
 
@@ -613,15 +623,12 @@ tibble(subject = c("Yao", "Emma", "Cassidy", "Tahmid", "Diego"),
 
 &nbsp;
 
-Can we solve for $\tau_{yao}$. No! That is the *Fundamental Problem of Causal Inference*. So how can we make any progress from here if we are unwilling to assume there is at least some structure to the causal effect across different individuals?
-
-We might not be able to solve each individual's value for $\tau$, but we are not completely stuck. 
-
+Can we solve for $\tau_{yao}$. No! That is the Fundamental Problem of Causal Inference. So how can we make any progress from here if we are unwilling to assume there is at least some structure to the causal effect across different individuals? Instead of worrying about the causal effect for specific individuals, we might, instead, focus on the causal effect for the entire population.
 
 
 ### Average treatment effect
 
-The average treatment effect is the **average** difference in *potential* outcomes between the treated group and the control group. The difference between this estimand and estimands like $\tau$, $\tau_M$ and $\tau_F$, is that, in this case, we do not care about using the average treatment effect to fill in missing values in each row. The average treatment effect is useful because we don't have to assume anything about each individuals' $\tau$, like $\tau_{yao}$, but can still understand something about the average causal effect across the whole sample. 
+The average treatment effect is the **average** difference in *potential* outcomes between the treated group and the control groups. Because averaging is a linear operator, the average difference is the same as the difference between the averages. The distinction between this estimand and estimands like $\tau$, $\tau_M$ and $\tau_F$, is that, in this case, we do not care about using the average treatment effect to fill in missing values in each row. The average treatment effect is useful because we don't have to assume anything about each individuals' $\tau$, like $\tau_{yao}$, but can still understand something about the average causal effect across the whole population. 
 
 As we did before, the simplest way to estimate the ATE is to take the mean of the treated group ($10$) and the mean of the control group ($11$) and then take the difference in those means ($-1$). We'll call this estimate of the average treatment effect, $\widehat{ATE}$, pronounced "ATE-hat."
 
@@ -639,11 +646,13 @@ As we noted before, this is a popular estimand. Why?
 
 Just because the ATE is often a useful estimand doesn't mean that it *always* is. 
 
-Consider point #3. For example, let's say the treatment effect does vary dependent on sex. For males there is a strong negative effect (-3), but for females there is a smaller positive effect (+1). However, the average treatment effect for the whole sample, even if you estimate it correctly, will be a single negative number (-1) (since the negative effect for males is larger than the positive effect for females).  So while our model to estimate the ATE is simple and thus alluring, don't assume that it's always the right model for your problem.
+<!-- DK: Would be nice if the numbers here were calculated from the actual data, and not hard coded. -->
+
+Consider point #3. For example, let's say the treatment effect does vary dependent on sex. For males there is a strong negative effect (-3.5), but for females there is a smaller positive effect (+1). However, the average treatment effect for the whole sample, even if you estimate it correctly, will be a single negative number (-1) -- since the negative effect for males is larger than the positive effect for females.  
 
 <!-- DK: Stick in the formula for estimating ATE. -->
 
-So estimating the ATE is easy.  But is our $\widehat{ATE}$ a good estimate of the actual ATE?  After all, if we knew all the missing values in the Preceptor Table, we could calculate the ATE perfectly.  But those missing values may be wildly different from the observed values.  Consider this unobservable ideal Preceptor Table:
+Estimating the average treatment effect, by calculating $\widehat{ATE}$, is easy.  But is our $\widehat{ATE}$ a good estimate of the actual ATE?  After all, if we knew all the missing values in the Preceptor Table, we could calculate the ATE perfectly.  But those missing values may be wildly different from the observed values.  Consider this unobservable ideal Preceptor Table:
 
 ```{r, echo = FALSE}
 # First, we create a tibble with the values we want for the table
@@ -768,7 +777,7 @@ By surveying 1,000 people on their attitudes towards immigrants we now have some
 1. For the units in our sample, we only see *one* potential outcome.
 2. For the units outside our sample, we see *no* potential outcomes.
 
-There are in fact many other potential sources of missing data, like we saw in our infinite Preceptor Table! This missing data problem is what creates the need for statistical inferences. If the data were not missing, inference would not be needed.
+There are in fact many other potential sources of missing data, as we will explore below in the discussion about the infinite Preceptor Table. This missing data problem is what creates the need for statistical inferences. If the data were not missing, inference would not be needed.
 
 
 ```{r echo = FALSE, fig.cap = "This study was conducted by Barfort, Klemmensen and  Larsen.", out.width="70%", fig.align='center'}
@@ -814,7 +823,7 @@ Once we have a defined problem and a reasonable actual Preceptor Table, we can b
 
 ### Causal and predictive models
 
-
+<!-- DK: Good stuff but very awkward. Rewrite? Note that this needs to lead directly to the virtue of Justice. -->
 
 Causal inference is often compared with prediction.  In prediction, we want to know an outcome, $Y(u)$.  In causal inference, we want to know a function of *potential* outcomes, such as a the treatment effect: $Y_t(u) - Y_c(u)$.
 
@@ -842,7 +851,7 @@ This already comes up in non-causal context when considering *sampling*. If we a
 
 Whenever the assignment mechanism is correlated with the potential outcomes, we say that there is **confounding**. Confounding is a problem, since it means that our simple estimate of the $ATE$ is, potentially, biased.
 
-Assignment mechanisms can also intentionally be biased in order to manufacture desired outcomes. Let's consider a scenario where once again an entire platform is either treated or a control. In this case the assignment mechanism is the choice of the Spanish-speakers; they are allowed to choose which platform they want to stand on. Let's also say that they can *perfectly* predict the attitude of people on each platform. The Spanish-speakers know that a platform with more liberal attitudes towards immigrants will be more friendly, and therefore always choose to stand on those platforms. In this case, the assignment mechanism of platforms is not random. The Spanish-speakers know these averages for the various platforms in the experiment: 
+Assignment mechanisms can also intentionally be biased in order to manufacture desired outcomes. Let's consider a scenario where once again an entire platform is either treated or a control. In this case the assignment mechanism is the choice of the Spanish-speakers; they are allowed to choose which platform they want to stand on. Let's also say that they can *perfectly* predict the attitude of people on each platform. The Spanish-speakers know that a platform with more liberal attitudes towards immigrants will be more friendly, and therefore always choose to stand on those platforms. In this case, the assignment mechanism of platforms is not random. The Spanish-speakers know these values for the platforms in the experiment: 
 
 ```{r, echo = FALSE}
 # First, we create a tibble with the values we want for the table
@@ -907,7 +916,7 @@ The assignment mechanism used distorts the averages of both $Y_t(u)$ and $Y_c(u)
 Therefore, the difference in means is no longer a good estimate of the ATE. In fact, in this case it has the wrong sign! This is not merely a consequence of our small sample: even if there were a million platforms in the experiment, we could not get a good estimate of the ATE.
 
 
-This is an extreme example of a problem called **selection bias**. Selection bias is when the person who is assigning treatment chooses on the basis of potential outcomes. The Spanish-speakers are not choosing platforms to stand on randomly. Rather, they are making treatment decisions based directly on the potential outcomes of each platform. Remember, whenever the assignment mechanism is correlated with the potential outcomes there is confounding, which is a problem because it means that our estimand is biased. Not all examples of confounding are caused by selection bias, but when there is selection bias there is *always* confounding
+This is an extreme example of a problem called **selection bias**. Selection bias is when the person who is assigning treatment chooses on the basis of potential outcomes. The Spanish-speakers are not choosing platforms to stand on randomly. Rather, they are making treatment decisions based directly on the potential outcomes of each platform. Remember, whenever the assignment mechanism is correlated with the potential outcomes there is confounding, which is a problem because it means that our estimate is biased. Not all examples of confounding are caused by selection bias, but when there is selection bias there is *always* confounding
 
 Much like how the best way to avoid making poor inferences from a sample to a population is to take a random sample of the population, the best assignment mechanism for avoiding confounding is **randomization**. For each platform we could flip a coin to determine if it is in the treatment or control group.
 
@@ -1054,7 +1063,7 @@ tibble(subject = c("Yao", "Emma", "Cassidy", "Tahmid", "Diego"),
              ytreat = md("$$Y_{\\text{58 dB}}(u)$$"),
              ytreat1001 = md("$$Y_{\\text{59 dB}}(u)$$"),
              ytreat1002 = md("$$Y_{\\text{60 dB}}(u)$$"),
-             yellipsis = md("$$Y_{\\text{61 dB}(u)$$"),
+             yellipsis = md("$$Y_{\\text{61 dB}}(u)$$"),
              ycontrol = md("$$Y_c(u)$$")) %>%
   tab_style(cell_borders(sides = "right"),
             location = cells_body(columns = vars(subject))) %>%
@@ -1104,7 +1113,7 @@ Recall the two main sources of missing data:
 
 If we have randomized assignment and a large sample, we can be confident that we have a good estimate of the average treatment effect *in that sample*.  We say that the experiment has high **internal validity**: the inferences we are making are likely to reflect the truth about that sample.  
 
-However, we may be interested in a population beyond our particular sample, the second main source of missing data.  For example, let's look at the broader context of the train experiment. You likely are not exclusively concerned about the attitudes of people who ride trains, but rather the attitudes of a larger population. Train platforms, however, are a valuable setting in which to run the experiment.  Let's say that we ran a randomized experiment with 10,000 people in Boston, and found an $\widehat{ATE} = -1$. Should we assume this estimate would be accurate for a larger general population?
+However, we may be interested in a population beyond our particular sample, the second main source of missing data.  For example, let's look at the broader context of the train experiment. You likely are not exclusively concerned about the attitudes of people who ride trains, but rather the attitudes of a larger population. Train platforms, however, are a convenient setting in which to run the experiment.  Let's say that we ran a randomized experiment with 10,000 people in Boston, and found an $\widehat{ATE} = -1$. Should we assume this estimate would be accurate for a larger general population?
 
 The answer to that question depends in part on the **external validity** of the study. Are the 10,000 people in the study similar to the people who we want to generalize the findings to? Perhaps we want to generalize to train commuters in other cities. Let's say that the 10,000 people in Boston all choose to ride trains for environmental reasons. That's another form of **selection bias**. The sample is not randomly selected from the population in which we are interested.  Why is that a problem?  Those people differ systematically from other people in a way that may affect their response to the experiment. For example, their preference of public transportation for environmental reasons may be correlated to other political beliefs.
 
@@ -1121,7 +1130,7 @@ In this example, the Hawthorne effect can impact attitudes expressed on surveys.
 
 ### Correlation with potential outcomes
 
-<!-- DK: Replace with a shorter statement that causation is only easy to determine with random assignment. Otherwise, you can't be sure. Second semester course for those interested in learning those techniques. -->
+<!-- DK: Replace with a shorter statement that causation is only easy to determine with random assignment. Otherwise, you can't be sure. Second semester course for those interested in learning those techniques. This duplicated, perhaps better, the noise discussion above. Only need to do this once. Need a clear list of things to be concerned about. If confounding is the biggest category, what are the three types of confounding we should understand and worry about? -->
 
 When considering the relationship between a treatment and an outcome, one of the most important assumptions is a lack of correlation between treatment assignment and the potential outcomes. Consider a version of the train experiment. Assume that, if a Republican is not on the platform with Spanish-speakers, they will have an attitude value of 9. If they were on a platform where they could hear Spanish, their attitude would have been 11. A Democrat would have an attitude 9 regardless of whether or not they are on the platform with Spanish-speakers. In other words, the causal effect of being in the treatment group is +2 for Republicans, and 0 for Democrats. If we could run an experiment with random assignment, we would discover that the average causal effect is somewhere between 0 and 2, depending on the relative proportion of the Republicans and Democrats.
 
@@ -1198,7 +1207,7 @@ knitr::include_app("https://www.youtube.com/embed/BvUbv4iwbDs")
 ```
 
 
-The causal effect of a treatment on a single unit at a point in time is the difference between the value of the outcome variable with the treatment and without the treatment. The fundamental problem of causal inference is that it is impossible to observe the causal effect on a single unit. We must make assumptions --- i.e, we must make models ---  in order to estimate causal effects.
+The causal effect of a treatment on a single unit at a point in time is the difference between the value of the outcome variable with the treatment and without the treatment. The Fundamental Problem of Causal Inference is that it is impossible to observe the causal effect on a single unit. We must make assumptions --- i.e, we must make models ---  in order to estimate causal effects.
 
 
 <!-- DK: More meat? Check the first few questions in the tutorial. -->
