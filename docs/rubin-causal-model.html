@@ -65,34 +65,31 @@
 <h1>
 <span class="header-section-number">4</span> Rubin Causal Model<a class="anchor" aria-label="anchor" href="#rubin-causal-model"><i class="fas fa-link"></i></a>
 </h1>
+<!-- Stick in the formula for estimating ATE. See DK comment in text. -->
+<!-- Replace Sliding Doors in Summary with something from Wonderful Life that references "An angel gets his wings."  Every time a predictive model is interpreted causally, a devil gets his pitchfork. -->
+<!-- Confounding is done twice in Complications, once with noise and once with parties. Needs to be unified. -->
+<!-- The entire Complications sections is filled with good stuff. But it all needs to be re-organized and rewritten. Key idea: What are the 3 or 4 key items that we want students to get out of this? What are the key lessons/concerns? What themes do we expect to revisit in the Temperance sections of later chapters? These key points should also go in the Summary. -->
 <!-- Introduce the concept of the "population" throughout. It is important, especially in understanding the Preceptor Table. -->
 <!-- Remove Estimand column from Preceptor Tables almost everywhere? -->
-<!-- New definition: A PT is a table with enough rows and columns such that we can include all our data and so that, if there is no missing value, we can answer our questions with arithmetic. -->
 <!-- Get rid of estimands. They certainly don't deserve a column in any Preceptor Table. In fact, I don't think we should mention them at all, except in a one-off sentence or two. -->
 <!-- Make the math in the examples here and in the tutorial easy enough to do in our heads. In particular, the average value for any column should be easy to calculate. -->
-<!-- 1) Deal with references. Can't have a References section. Figure out the right bibtex entry for reference you (!) want to keep. Place them in bib/references.bib. Call them with @entry somewhere in your chapter. -->
 <!-- Consider adding permutation tests, if only to practice list-columns. -->
 <!-- Does RCM connect to concepts like regression to the mean and the garden of forking paths? If so, we should add sections to those appendices. -->
+<!-- Should Fundamental Problem of Causal Inference always be italized? -->
 <!-- Lots of useful material here: https://chabefer.github.io/STCI/. Raises the possibility of using $Y^{t}_i to indicate potential outcome under treatment for unit i. -->
 <!-- unit/item nonresponse as an example of another mechanism. Where do question marks come from? -->
 <p>Have you ever wondered what the world would be like without you?</p>
 <iframe src="https://www.youtube.com/embed/cR7p-IB6INM?showcase=0" width="100%" height="400px">
 </iframe>
-<p>So did George Bailey in the movie “It’s a Wonderful Life.” The movie follows George as he explores a world in which he was never born. It is clear that he had a profound impact on the lives of many people in his community.</p>
-<p>By showing what the world would have been like without George, we get an idea of the <em>causal effect</em> of his life on his town and the people who live there. We will be looking at causal effects in this chapter using the framework of <em>potential outcomes</em> and the Rubin Causal Model (RCM).</p>
-<div class="figure" style="text-align: center">
-<span id="fig:unnamed-chunk-325"></span>
-<img src="04-rubin-causal-model/images/don_rubin.jpg" alt="Don Rubin was a professor of Statistics at  Harvard." width="80%"><p class="caption">
-FIGURE 4.1: Don Rubin was a professor of Statistics at Harvard.
-</p>
-</div>
+<p>George Bailey, in the movie “It’s a Wonderful Life,” believes that his life has served no purpose. The movie follows George as he explores a world in which he was never born. It is clear that he had a profound impact on the lives of many people in his community. His actions mattered, more than he ever realized.</p>
+<p>By showing what the world would have been like without George, we get an idea of the <em>causal effect</em> of his life on his town and the people who live there. This chapter covers causal effects using the framework of <em>potential outcomes</em> and the <em>Rubin Causal Model</em> (RCM).</p>
 <div id="preceptor-tables" class="section level2" number="4.1">
 <h2>
 <span class="header-section-number">4.1</span> Preceptor Tables<a class="anchor" aria-label="anchor" href="#preceptor-tables"><i class="fas fa-link"></i></a>
 </h2>
-<p>A <strong>Preceptor Table</strong> is a table with rows and columns for all the data that we have and all the data we would (reasonably) like to have, such that, if none of the data is missing, the thing we want to know is trivial to calculate. Preceptor Tables can vary depending on the number of rows and columns they have, as well as the amount of data that is missing from them. We use question marks as placeholders for the data we are missing in a Preceptor Table.</p>
+<p>A <strong>Preceptor Table</strong> is a table with rows and columns for all the data that we have and all the data we would (reasonably) like to have, such that, if none of the data is missing, the thing we want to know is trivial to calculate. Preceptor Tables vary in the number of their rows and columns, as well as in the amount of missing data. We use question marks to indicate missing data in a Preceptor Table.</p>
 <!-- DK: Instead, should we look for the height of the missing brother? -->
-<p>Assume that there are five adult brothers and you are given four of their heights. What is the average height of all five brothers? Because we are not given it, we can use statistics to make a best guess. Let’s look at a Preceptor Table for our problem:</p>
+<p>Assume that there are five adult brothers and you are given four of their heights. What is the average height of all five brothers? Because we are not given it, we can use statistics to estimate this unknown value. Consider a Preceptor Table for this problem:</p>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
@@ -465,9 +462,10 @@ FIGURE 4.1: Don Rubin was a professor of Statistics at Harvard.
 </tbody>
 </table></div></div>
 <p> </p>
-<p>In this case, we have a row for each brother and a column for their height. We will always have an ID column in Preceptor Tables so that we can identify different units. It is always furthest to the left. In addition to the ID column, we call the column with the brother’s heights an <em>outcome</em> column. Outcomes columns are always next to the ID column.</p>
-<p>We are interested in predicting Andy’s height. One guess is just the average of the other four brothers: <span class="math display">\[\frac{(178 + 165 + 172 + 173)}{4} = 172\]</span> How realistic do we think that best guess is? We should consider things like why we know the four other brothers’ heights. Were they sampled randomly? Or do we know their heights because they are the tallest in the family? In that case would it make sense to use an average to estimate Andy’s height? Probably not!</p>
-<p>Now let’s think about a slightly more complex problem. Say we have the heights of 100 Harvard students, and from that we want to know the average height of students in the school.</p>
+<p>In this case, we have a row for each brother and a column for their height. We will always have an ID column in Preceptor Tables so that we can identify different units. It is always furthest to the left. In addition to the ID column, we call the column with the brothers’ heights an <em>outcome</em> column.</p>
+<p>To estimate average height, we need to estimate Andy’s height. One guess is just the average of the other four brothers: <span class="math display">\[\frac{(178 + 165 + 172 + 173)}{4} = 172\]</span> Is that realistic? We should consider things like why we know the four other brothers’ heights. Were they sampled randomly? Or do we know their heights because they are the tallest in the family? In that case would it make sense to use an average to estimate Andy’s height? Probably not!</p>
+<p>Keep in mind that there is a <em>truth</em> out there, a state of the world independent of our knowledge of it. Andy is a specific height. If we had a complete Preceptor Table, with no missing values, we could calculate the average height of the brothers exactly. No fancy statistics would be needed. Just arithmetic.</p>
+<p>Consider a more complex problem. We have the heights of 100 Harvard students, and from that we want to know the average height of students in the school.</p>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
@@ -1287,15 +1285,15 @@ FIGURE 4.1: Don Rubin was a professor of Statistics at Harvard.
 </h2>
 <!-- DK: Better caption? -->
 <div class="figure">
-<span id="fig:unnamed-chunk-329"></span>
+<span id="fig:unnamed-chunk-328"></span>
 <img src="04-rubin-causal-model/images/enos_seal.png" alt="This study was conducted by Ryan Enos." width="100%"><p class="caption">
-FIGURE 4.2: This study was conducted by Ryan Enos.
+FIGURE 4.1: This study was conducted by Ryan Enos.
 </p>
 </div>
-<p>The Rubin Causal Model (RCM) is based on the idea of <strong>potential outcomes.</strong> <span class="citation"><a href="references.html#ref-enos2014" role="doc-biblioref">Enos</a> (<a href="references.html#ref-enos2014" role="doc-biblioref">2014</a>)</span> measured attitudes toward immigration among Boston commuters. Individuals were exposed to one of two possible conditions, and then their attitudes towards immigrants were recorded. One condition was being on a train platform near individuals speaking Spanish. The other was being on a train platform without Spanish-speakers. To calculate the causal effect of having Spanish-speakers nearby, we need to compare the outcome for an individual in one possible state of the world (with Spanish-speakers) to another (without Spanish-speakers). It is impossible to observe both potential outcomes at once. One of the potential outcomes is always missing. This dilemma is the <em>Fundamental Problem of Causal Inference</em>.</p>
-<p>In most circumstances, we are interested in comparing two experimental manipulations, one generally termed “treatment” and the other “control.” The difference between the potential outcome under treatment and the potential outcome under control is called a “causal effect” or a “treatment effect.” The scenario that didn’t actually happen, and thus that we didn’t observe, is called a “counterfactual.” According to the RCM, the <strong>causal effect</strong> of being on the platform with Spanish-speakers is the <em>difference</em> between what your attitude would have been under “treatment” (with Spanish-speakers) and under “control” (no Spanish-speakers).</p>
+<p>The Rubin Causal Model (RCM) is based on the idea of <strong>potential outcomes.</strong> For example, <span class="citation"><a href="references.html#ref-enos2014" role="doc-biblioref">Enos</a> (<a href="references.html#ref-enos2014" role="doc-biblioref">2014</a>)</span> measured attitudes toward immigration among Boston commuters. Individuals were exposed to one of two possible conditions, and then their attitudes towards immigrants were recorded. One condition was being on a train platform near individuals speaking Spanish. The other was being on a train platform without Spanish-speakers. To calculate the causal effect of having Spanish-speakers nearby, we need to compare the outcome for an individual in one possible state of the world (with Spanish-speakers) to another (without Spanish-speakers). It is impossible to observe both potential outcomes at once. One of the potential outcomes is always missing. This dilemma is the <em>Fundamental Problem of Causal Inference</em>.</p>
+<p>In most circumstances, we are interested in comparing two experimental manipulations, one generally termed “treatment” and the other “control.” The difference between the potential outcome under treatment and the potential outcome under control is a “causal effect” or a “treatment effect.” The scenario that didn’t actually happen, and thus that we didn’t observe, is a “counterfactual.” According to the RCM, the <strong>causal effect</strong> of being on the platform with Spanish-speakers is the <em>difference</em> between what your attitude would have been under “treatment” (with Spanish-speakers) and under “control” (no Spanish-speakers).</p>
 <p>The commuter survey consisted of three questions, each measuring agreement on a 1 to 5 integer scale, with 1 being liberal and 5 being conservative. For each person, the three answers were summed, generating an overall measure of attitude toward immigration which ranged from 3 to 15. If your attitude towards immigrants would have been a 13 with Spanish-speakers and a 9 without Spanish-speakers, then the causal effect of being on a platform with Spanish-speakers is a 4-point increase in your score.</p>
-<p>We will use the variable <span class="math inline">\(Y\)</span> to represent potential outcomes, the variable we are interested in understanding and modeling. <span class="math inline">\(Y\)</span> is called the <em>response variable</em> because it is the variable we want to “explain.” In our case this would be the attitude score. If we are trying to understand a causal effect, we need two variables: so that control and treated values can be represented separately. We will use the variables <span class="math inline">\(Y_t\)</span> and <span class="math inline">\(Y_c\)</span>.</p>
+<p>We will use the symbol <span class="math inline">\(Y\)</span> to represent potential outcomes, the variable we are interested in understanding and modeling. <span class="math inline">\(Y\)</span> is called the <em>response</em> or <em>outcome</em> variable. It is the variable we want to “explain.” In our case this would be the attitude score. If we are trying to understand a causal effect, we need two symbols: so that control and treated values can be represented separately. We will use the symbols <span class="math inline">\(Y_t\)</span> and <span class="math inline">\(Y_c\)</span>.</p>
 <div id="potential-outcomes" class="section level3" number="4.2.1">
 <h3>
 <span class="header-section-number">4.2.1</span> Potential outcomes<a class="anchor" aria-label="anchor" href="#potential-outcomes"><i class="fas fa-link"></i></a>
@@ -2392,6 +2390,12 @@ FIGURE 4.2: This study was conducted by Ryan Enos.
 </table></div></div>
 <p> </p>
 <p>Remember that in an <em>actual</em> Preceptor Table we will have a bunch of missing data! We can not use simple arithmetic to calculate the causal effect on Yao’s attitude toward immigration. Instead, we will be required to estimate it. An <strong>estimand</strong> is some variable in the real world that we are trying to measure. In this case, it is <span class="math inline">\(Y_{t}-Y_{c}\)</span>, not <span class="math inline">\(+4\)</span>. An estimand is not the <em>value</em> you calculated, but is rather the <em>unknown variable</em> you want to estimate.</p>
+<div class="figure">
+<span id="fig:unnamed-chunk-332"></span>
+<img src="04-rubin-causal-model/images/don_rubin.jpg" alt="Don Rubin was a professor of Statistics at  Harvard." width="100%"><p class="caption">
+FIGURE 4.2: Don Rubin was a professor of Statistics at Harvard.
+</p>
+</div>
 </div>
 <div id="multiple-units" class="section level3" number="4.2.2">
 <h3>
@@ -2399,8 +2403,8 @@ FIGURE 4.2: This study was conducted by Ryan Enos.
 </h3>
 <!-- DK: Make clear units, treatments and outcomes. -->
 <p>Generally a study has many individuals (or, more broadly, “units”) who each have their own potential outcomes. More notation is needed to allow us to differentiate between different units.</p>
-<p>In other words, there needs to be a distinction between <span class="math inline">\(Y_t\)</span> for Yao, and <span class="math inline">\(Y_t\)</span> for Emma. We could do something like <span class="math inline">\(Y_t(Yao)\)</span> and <span class="math inline">\(Y_t(Emma)\)</span>, but that would be an ineffective approach if we wanted to fill out a full Preceptor Table. Instead, we use the variable <span class="math inline">\(u\)</span> (<span class="math inline">\(u\)</span> for “unit”) to indicate that the outcome under control and the outcome under treatment might be different for each individual unit (person).</p>
-<p>Now, instead of <span class="math inline">\(Y_t\)</span>, we will use <span class="math inline">\(Y_t(u)\)</span> to represent ‘Attitude if Treated.’ If you want to talk about only Emma, you could say “Emma’s Attitude if Treated” or “<span class="math inline">\(Y_t(u = Emma)\)</span>” or “the <span class="math inline">\(Y_t(u)\)</span> for Emma,” but not just <span class="math inline">\(Y_t\)</span>. That notation is too ambiguous when there is more than one subject.</p>
+<p>In other words, there needs to be a distinction between <span class="math inline">\(Y_t\)</span> for Yao, and <span class="math inline">\(Y_t\)</span> for Emma. We use the variable <span class="math inline">\(u\)</span> (<span class="math inline">\(u\)</span> for “unit”) to indicate that the outcome under control and the outcome under treatment can differ for each individual unit (person).</p>
+<p>Instead of <span class="math inline">\(Y_t\)</span>, we will use <span class="math inline">\(Y_t(u)\)</span> to represent “Attitude if Treated.” If you want to talk about only Emma, you could say “Emma’s Attitude if Treated” or “<span class="math inline">\(Y_t(u = Emma)\)</span>” or “the <span class="math inline">\(Y_t(u)\)</span> for Emma,” but not just <span class="math inline">\(Y_t\)</span>. That notation is too ambiguous when there is more than one subject.</p>
 <p>Let’s look at an ideal Preceptor Table with more subjects using our new notation:</p>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
@@ -2839,11 +2843,10 @@ FIGURE 4.2: This study was conducted by Ryan Enos.
 <li>The most negative causal effect: <span class="math inline">\(-3\)</span>, for Tahmid.</li>
 <li>The median causal effect: <span class="math inline">\(+1\)</span>.</li>
 <li>The median percentage change: <span class="math inline">\(+10.0\%\)</span>. To see this, calculate the percentage change for each person. You’ll get 5 percentages: <span class="math inline">\(+44.4\%\)</span>, <span class="math inline">\(0.0\%\)</span>, <span class="math inline">\(+10.0\%\)</span>, <span class="math inline">\(-25.0\%\)</span>, and <span class="math inline">\(+25.0\%\)</span>.</li>
-<li>The total number of people for whom the causal effect is positive: <span class="math inline">\(3\)</span>.</li>
-<li>And so on. There are a lot of things one might care about!</li>
 </ul>
 </div>
-<p>All of the variables we calculated above are examples of estimands we might be interested in. One estimand is important enough that it has its own name: the <strong>average treatment effect</strong>, often abbreviated as <strong>ATE</strong>. The average treatment effect is the mean of all the causal effects. Here, the mean is <span class="math inline">\(+0.8\)</span>.</p>
+<p>And so on. There are a lot of things one might care about!</p>
+<p>All of the variables we calculated above are examples of estimands we might be interested in. One estimand is important enough that it has its own name: the <strong>average treatment effect</strong>, often abbreviated as <strong>ATE</strong>. The average treatment effect is the mean of all the individual causal effects. Here, the mean is <span class="math inline">\(+0.8\)</span>.</p>
 <p>Remember what an actual Preceptor Table riddled, as it always is, with question marks, looks like:</p>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
@@ -3281,7 +3284,7 @@ FIGURE 4.2: This study was conducted by Ryan Enos.
 <h2>
 <span class="header-section-number">4.3</span> Simple models<a class="anchor" aria-label="anchor" href="#simple-models"><i class="fas fa-link"></i></a>
 </h2>
-<p>How can we fill in the question marks? Because of the fundamental problem of causal inference, we can never <em>know</em> the missing values. Because we can never know the missing values, we must make assumptions. “Assumption” just means that we need a “model,” and all models have parameters.</p>
+<p>How can we fill in the question marks? Because of the Fundamental Problem of Causal Inference, we can never <em>know</em> the missing values. Because we can never know the missing values, we must make assumptions. “Assumption” just means that we need a “model,” and all models have parameters.</p>
 <div id="a-single-value-for-tau" class="section level3" number="4.3.1">
 <h3>
 <span class="header-section-number">4.3.1</span> A single value for tau<a class="anchor" aria-label="anchor" href="#a-single-value-for-tau"><i class="fas fa-link"></i></a>
@@ -5007,8 +5010,8 @@ FIGURE 4.2: This study was conducted by Ryan Enos.
 <h3>
 <span class="header-section-number">4.3.2</span> Two values for tau<a class="anchor" aria-label="anchor" href="#two-values-for-tau"><i class="fas fa-link"></i></a>
 </h3>
-<p>A second model might assume that the causal effect is different between levels of a category but constant within those levels. Perhaps there is a <span class="math inline">\(\tau_F\)</span> for females and <span class="math inline">\(\tau_M\)</span> for males where <span class="math inline">\(\tau_F != \tau_M\)</span>. We are making this assumption to give us a different model with which we can fill in the missing values in our Preceptor Table. The key concept is that we can’t make any progress unless we make some assumptions. That is an inescapable result of the Fundamental Problem of Causal Inference.</p>
-<p>Let’s look at this particular model in which we think sex has an impact on treatment effect:</p>
+<p>A second model might assume that the causal effect is different between levels of a category but the same within those levels. For example, perhaps there is a <span class="math inline">\(\tau_F\)</span> for females and <span class="math inline">\(\tau_M\)</span> for males where <span class="math inline">\(\tau_F != \tau_M\)</span>. We are making this assumption to give us a different model with which we can fill in the missing values in our Preceptor Table. The key concept is that we can’t make any progress unless we make some assumptions. That is an inescapable result of the Fundamental Problem of Causal Inference.</p>
+<p>Consider a model in which causal effects differ based on sex:</p>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
@@ -6301,7 +6304,7 @@ FIGURE 4.2: This study was conducted by Ryan Enos.
 <h3>
 <span class="header-section-number">4.3.3</span> Heterogenous treatment effects<a class="anchor" aria-label="anchor" href="#heterogenous-treatment-effects"><i class="fas fa-link"></i></a>
 </h3>
-<p>Is the assumption of a constant treatment effect, <span class="math inline">\(\tau\)</span>, usually true. No! It is never true. People vary. The effect of a pill on me will always be different from the effect of a pill on you, at least if we measure outcomes accurately enough. Treatment effects are always <em>heterogeneous</em>, meaning that they vary across individuals.</p>
+<p>Is the assumption of a constant treatment effect, <span class="math inline">\(\tau\)</span>, usually true. No! It is never true. People vary. The effect of a pill on you will always be different from the effect of a pill on your friend, at least if we measure outcomes accurately enough. Treatment effects are always <em>heterogeneous</em>, meaning that they vary across individuals.</p>
 <p>Reality looks like this:</p>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
@@ -6730,14 +6733,13 @@ FIGURE 4.2: This study was conducted by Ryan Enos.
 </tbody>
 </table></div></div>
 <p> </p>
-<p>Can we solve for <span class="math inline">\(\tau_{yao}\)</span>. No! That is the <em>Fundamental Problem of Causal Inference</em>. So how can we make any progress from here if we are unwilling to assume there is at least some structure to the causal effect across different individuals?</p>
-<p>We might not be able to solve each individual’s value for <span class="math inline">\(\tau\)</span>, but we are not completely stuck.</p>
+<p>Can we solve for <span class="math inline">\(\tau_{yao}\)</span>. No! That is the Fundamental Problem of Causal Inference. So how can we make any progress from here if we are unwilling to assume there is at least some structure to the causal effect across different individuals? Instead of worrying about the causal effect for specific individuals, we might, instead, focus on the causal effect for the entire population.</p>
 </div>
 <div id="average-treatment-effect" class="section level3" number="4.3.4">
 <h3>
 <span class="header-section-number">4.3.4</span> Average treatment effect<a class="anchor" aria-label="anchor" href="#average-treatment-effect"><i class="fas fa-link"></i></a>
 </h3>
-<p>The average treatment effect is the <strong>average</strong> difference in <em>potential</em> outcomes between the treated group and the control group. The difference between this estimand and estimands like <span class="math inline">\(\tau\)</span>, <span class="math inline">\(\tau_M\)</span> and <span class="math inline">\(\tau_F\)</span>, is that, in this case, we do not care about using the average treatment effect to fill in missing values in each row. The average treatment effect is useful because we don’t have to assume anything about each individuals’ <span class="math inline">\(\tau\)</span>, like <span class="math inline">\(\tau_{yao}\)</span>, but can still understand something about the average causal effect across the whole sample.</p>
+<p>The average treatment effect is the <strong>average</strong> difference in <em>potential</em> outcomes between the treated group and the control groups. Because averaging is a linear operator, the average difference is the same as the difference between the averages. The distinction between this estimand and estimands like <span class="math inline">\(\tau\)</span>, <span class="math inline">\(\tau_M\)</span> and <span class="math inline">\(\tau_F\)</span>, is that, in this case, we do not care about using the average treatment effect to fill in missing values in each row. The average treatment effect is useful because we don’t have to assume anything about each individuals’ <span class="math inline">\(\tau\)</span>, like <span class="math inline">\(\tau_{yao}\)</span>, but can still understand something about the average causal effect across the whole population.</p>
 <p>As we did before, the simplest way to estimate the ATE is to take the mean of the treated group (<span class="math inline">\(10\)</span>) and the mean of the control group (<span class="math inline">\(11\)</span>) and then take the difference in those means (<span class="math inline">\(-1\)</span>). We’ll call this estimate of the average treatment effect, <span class="math inline">\(\widehat{ATE}\)</span>, pronounced “ATE-hat.”</p>
 <p>If we already did this exact same calculation above, why are we talking about it again? Remember that we unwilling to assume treatment effect is constant in our study population, and we cannot solve for <span class="math inline">\(\tau\)</span> if <span class="math inline">\(\tau\)</span> is different for different individuals. This is where <span class="math inline">\(\widehat{ATE}\)</span> is helpful.</p>
 <p><em>Some</em> estimands may not require filling in all the question marks in the Preceptor Table. We can get a good estimate of the <em>average</em> treatment effect without filling in every question mark — the average treatment effect is just a single number. Rarely in a study do we care about what happens to individuals. In our case, we don’t care about what specifically would happen to Cassidy’s attitude if treated. Instead, we care generally about how our experiment impacts people’s attitudes towards immigrants. This is why an average estimate, like <span class="math inline">\(\widehat{ATE}\)</span> can be helpful.</p>
@@ -6748,9 +6750,10 @@ FIGURE 4.2: This study was conducted by Ryan Enos.
 <li><p>As we did earlier, if you are willing to assume that the causal effect is the same for everyone (a big assumption!), you can use your estimate of the ATE, <span class="math inline">\(\widehat{ATE}\)</span>, to fill in the missing individual values in your Preceptor Table.</p></li>
 </ol>
 <p>Just because the ATE is often a useful estimand doesn’t mean that it <em>always</em> is.</p>
-<p>Consider point #3. For example, let’s say the treatment effect does vary dependent on sex. For males there is a strong negative effect (-3), but for females there is a smaller positive effect (+1). However, the average treatment effect for the whole sample, even if you estimate it correctly, will be a single negative number (-1) (since the negative effect for males is larger than the positive effect for females). So while our model to estimate the ATE is simple and thus alluring, don’t assume that it’s always the right model for your problem.</p>
+<!-- DK: Would be nice if the numbers here were calculated from the actual data, and not hard coded. -->
+<p>Consider point #3. For example, let’s say the treatment effect does vary dependent on sex. For males there is a strong negative effect (-3.5), but for females there is a smaller positive effect (+1). However, the average treatment effect for the whole sample, even if you estimate it correctly, will be a single negative number (-1) – since the negative effect for males is larger than the positive effect for females.</p>
 <!-- DK: Stick in the formula for estimating ATE. -->
-<p>So estimating the ATE is easy. But is our <span class="math inline">\(\widehat{ATE}\)</span> a good estimate of the actual ATE? After all, if we knew all the missing values in the Preceptor Table, we could calculate the ATE perfectly. But those missing values may be wildly different from the observed values. Consider this unobservable ideal Preceptor Table:</p>
+<p>Estimating the average treatment effect, by calculating <span class="math inline">\(\widehat{ATE}\)</span>, is easy. But is our <span class="math inline">\(\widehat{ATE}\)</span> a good estimate of the actual ATE? After all, if we knew all the missing values in the Preceptor Table, we could calculate the ATE perfectly. But those missing values may be wildly different from the observed values. Consider this unobservable ideal Preceptor Table:</p>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
@@ -8320,7 +8323,7 @@ FIGURE 4.2: This study was conducted by Ryan Enos.
 <li>For the units in our sample, we only see <em>one</em> potential outcome.</li>
 <li>For the units outside our sample, we see <em>no</em> potential outcomes.</li>
 </ol>
-<p>There are in fact many other potential sources of missing data, like we saw in our infinite Preceptor Table! This missing data problem is what creates the need for statistical inferences. If the data were not missing, inference would not be needed.</p>
+<p>There are in fact many other potential sources of missing data, as we will explore below in the discussion about the infinite Preceptor Table. This missing data problem is what creates the need for statistical inferences. If the data were not missing, inference would not be needed.</p>
 <div class="figure" style="text-align: center">
 <span id="fig:unnamed-chunk-349"></span>
 <img src="04-rubin-causal-model/images/governors.png" alt="This study was conducted by Barfort, Klemmensen and  Larsen." width="70%"><p class="caption">
@@ -8740,6 +8743,7 @@ FIGURE 4.3: This study was conducted by Barfort, Klemmensen and Larsen.
 <h3>
 <span class="header-section-number">4.4.2</span> Causal and predictive models<a class="anchor" aria-label="anchor" href="#causal-and-predictive-models"><i class="fas fa-link"></i></a>
 </h3>
+<!-- DK: Good stuff but very awkward. Rewrite? Note that this needs to lead directly to the virtue of Justice. -->
 <p>Causal inference is often compared with prediction. In prediction, we want to know an outcome, <span class="math inline">\(Y(u)\)</span>. In causal inference, we want to know a function of <em>potential</em> outcomes, such as a the treatment effect: <span class="math inline">\(Y_t(u) - Y_c(u)\)</span>.</p>
 <p>These are both missing data problems. Prediction involves getting an estimate for an outcome variable that we don’t have, and thus is missing, whether because it is in the future or because it is from data that we are unable to collect. Thus, prediction is the term for using statistical inference to fill in missing data for individual outcomes, for situations om which the concept of potential outcomes does not apply.</p>
 <p>Causal inference, however, is the term for filling in missing data for potential outcomes. This is unlike prediction, where only one potential outcome can <em>ever</em> be observed, even in principle.</p>
@@ -8756,7 +8760,7 @@ FIGURE 4.3: This study was conducted by Barfort, Klemmensen and Larsen.
 <p>We sidestepped the following question before: Is the difference in sample means between treated units and control units, <span class="math inline">\(\widehat{ATE}\)</span>, a good estimate of the <span class="math inline">\(ATE\)</span>? That depends entirely on the method by which units are assigned treatment, which is called the <em>assignment mechanism</em>. That is the mechanism whereby some potential outcomes are missing and some potential outcomes are observed.</p>
 <p>This already comes up in non-causal context when considering <em>sampling</em>. If we are trying to estimate the average attitude towards immigrants in the US, we usually do so by taking a sample. The process by which people enter our sample is called the <em>sampling mechanism</em>. If the process by which people enter our sample is related to their attitude, even indirectly, then estimates from our sample will not be good estimates for the population.</p>
 <p>Whenever the assignment mechanism is correlated with the potential outcomes, we say that there is <strong>confounding</strong>. Confounding is a problem, since it means that our simple estimate of the <span class="math inline">\(ATE\)</span> is, potentially, biased.</p>
-<p>Assignment mechanisms can also intentionally be biased in order to manufacture desired outcomes. Let’s consider a scenario where once again an entire platform is either treated or a control. In this case the assignment mechanism is the choice of the Spanish-speakers; they are allowed to choose which platform they want to stand on. Let’s also say that they can <em>perfectly</em> predict the attitude of people on each platform. The Spanish-speakers know that a platform with more liberal attitudes towards immigrants will be more friendly, and therefore always choose to stand on those platforms. In this case, the assignment mechanism of platforms is not random. The Spanish-speakers know these averages for the various platforms in the experiment:</p>
+<p>Assignment mechanisms can also intentionally be biased in order to manufacture desired outcomes. Let’s consider a scenario where once again an entire platform is either treated or a control. In this case the assignment mechanism is the choice of the Spanish-speakers; they are allowed to choose which platform they want to stand on. Let’s also say that they can <em>perfectly</em> predict the attitude of people on each platform. The Spanish-speakers know that a platform with more liberal attitudes towards immigrants will be more friendly, and therefore always choose to stand on those platforms. In this case, the assignment mechanism of platforms is not random. The Spanish-speakers know these values for the platforms in the experiment:</p>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
@@ -9546,7 +9550,7 @@ FIGURE 4.3: This study was conducted by Barfort, Klemmensen and Larsen.
 <p> </p>
 <p>The assignment mechanism used distorts the averages of both <span class="math inline">\(Y_t(u)\)</span> and <span class="math inline">\(Y_c(u)\)</span>, which in turn distorts the difference in means. The average of the treated group is shifted lower (more liberal), while the average of the control group is shifted higher (more conservative). This gives the illusion that the average treatment effect <span class="math inline">\(\widehat{ATE}\)</span> is negative. The true positive causal effect is masked by this non-random assignment mechanism.</p>
 <p>Therefore, the difference in means is no longer a good estimate of the ATE. In fact, in this case it has the wrong sign! This is not merely a consequence of our small sample: even if there were a million platforms in the experiment, we could not get a good estimate of the ATE.</p>
-<p>This is an extreme example of a problem called <strong>selection bias</strong>. Selection bias is when the person who is assigning treatment chooses on the basis of potential outcomes. The Spanish-speakers are not choosing platforms to stand on randomly. Rather, they are making treatment decisions based directly on the potential outcomes of each platform. Remember, whenever the assignment mechanism is correlated with the potential outcomes there is confounding, which is a problem because it means that our estimand is biased. Not all examples of confounding are caused by selection bias, but when there is selection bias there is <em>always</em> confounding</p>
+<p>This is an extreme example of a problem called <strong>selection bias</strong>. Selection bias is when the person who is assigning treatment chooses on the basis of potential outcomes. The Spanish-speakers are not choosing platforms to stand on randomly. Rather, they are making treatment decisions based directly on the potential outcomes of each platform. Remember, whenever the assignment mechanism is correlated with the potential outcomes there is confounding, which is a problem because it means that our estimate is biased. Not all examples of confounding are caused by selection bias, but when there is selection bias there is <em>always</em> confounding</p>
 <p>Much like how the best way to avoid making poor inferences from a sample to a population is to take a random sample of the population, the best assignment mechanism for avoiding confounding is <strong>randomization</strong>. For each platform we could flip a coin to determine if it is in the treatment or control group.</p>
 <p>Random assignment guarantees that, on average, there is no correlation between treatment assignment and anything else, neither covariates nor potential outcomes.</p>
 <p>In many circumstances, however, randomized trials are not possible due to ethical or practical concerns. In such scenarios there is by necessity a non-random assignment mechanism.</p>
@@ -11217,7 +11221,7 @@ FIGURE 4.3: This study was conducted by Barfort, Klemmensen and Larsen.
 <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">$$Y_{\text{58 dB}}(u)$$</th>
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">$$Y_{\text{59 dB}}(u)$$</th>
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">$$Y_{\text{60 dB}}(u)$$</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">$$Y_{\text{61 dB}(u)$$</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">$$Y_{\text{61 dB}}(u)$$</th>
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">$$Y_c(u)$$</th>
     </tr>
 </thead>
@@ -11351,7 +11355,7 @@ FIGURE 4.3: This study was conducted by Barfort, Klemmensen and Larsen.
 <li>For the units outside our sample, we see <em>no</em> potential outcomes</li>
 </ol>
 <p>If we have randomized assignment and a large sample, we can be confident that we have a good estimate of the average treatment effect <em>in that sample</em>. We say that the experiment has high <strong>internal validity</strong>: the inferences we are making are likely to reflect the truth about that sample.</p>
-<p>However, we may be interested in a population beyond our particular sample, the second main source of missing data. For example, let’s look at the broader context of the train experiment. You likely are not exclusively concerned about the attitudes of people who ride trains, but rather the attitudes of a larger population. Train platforms, however, are a valuable setting in which to run the experiment. Let’s say that we ran a randomized experiment with 10,000 people in Boston, and found an <span class="math inline">\(\widehat{ATE} = -1\)</span>. Should we assume this estimate would be accurate for a larger general population?</p>
+<p>However, we may be interested in a population beyond our particular sample, the second main source of missing data. For example, let’s look at the broader context of the train experiment. You likely are not exclusively concerned about the attitudes of people who ride trains, but rather the attitudes of a larger population. Train platforms, however, are a convenient setting in which to run the experiment. Let’s say that we ran a randomized experiment with 10,000 people in Boston, and found an <span class="math inline">\(\widehat{ATE} = -1\)</span>. Should we assume this estimate would be accurate for a larger general population?</p>
 <p>The answer to that question depends in part on the <strong>external validity</strong> of the study. Are the 10,000 people in the study similar to the people who we want to generalize the findings to? Perhaps we want to generalize to train commuters in other cities. Let’s say that the 10,000 people in Boston all choose to ride trains for environmental reasons. That’s another form of <strong>selection bias</strong>. The sample is not randomly selected from the population in which we are interested. Why is that a problem? Those people differ systematically from other people in a way that may affect their response to the experiment. For example, their preference of public transportation for environmental reasons may be correlated to other political beliefs.</p>
 <p>Note that this concern can be expressed in terms of the assignment mechanism. People who don’t ride the train have a 0% chance of receiving the treatment. Thus, the study <em>can’t</em> directly speak to how the treatment would impact their attitudes towards immigrants. The only way we can make such claims is by making additional assumptions, such as that train-riders reflect the same makeup of political beliefs as people who don’t ride trains.</p>
 <p>The external validity of a study is often directly related to the <em>representativeness</em> of our sample. Representativeness has to do with how well our sample represents the larger population we are interested in generalizing to. Does the train experiment allow us to calculate a causal effect for people who commute by cars? Can we calculate the causal effect for people in New York City? Before we generalize to broader populations we have to consider if our experimental estimates are applicable beyond our experiment. Maybe we think that commuters in Boston and New York are similar enough, that our <span class="math inline">\(\widehat{ATE}\)</span> also is a good estimate for the causal effect of our treatment in NYC. We could also conclude that people who commute by car are fundamentally different than people who commute by train. If that was true, then we could not say our estimate is true for all commuters because our sample does not accurately represent the broader group we want to generalize to.</p>
@@ -11363,7 +11367,7 @@ FIGURE 4.3: This study was conducted by Barfort, Klemmensen and Larsen.
 <h3>
 <span class="header-section-number">4.4.7</span> Correlation with potential outcomes<a class="anchor" aria-label="anchor" href="#correlation-with-potential-outcomes"><i class="fas fa-link"></i></a>
 </h3>
-<!-- DK: Replace with a shorter statement that causation is only easy to determine with random assignment. Otherwise, you can't be sure. Second semester course for those interested in learning those techniques. -->
+<!-- DK: Replace with a shorter statement that causation is only easy to determine with random assignment. Otherwise, you can't be sure. Second semester course for those interested in learning those techniques. This duplicated, perhaps better, the noise discussion above. Only need to do this once. Need a clear list of things to be concerned about. If confounding is the biggest category, what are the three types of confounding we should understand and worry about? -->
 <p>When considering the relationship between a treatment and an outcome, one of the most important assumptions is a lack of correlation between treatment assignment and the potential outcomes. Consider a version of the train experiment. Assume that, if a Republican is not on the platform with Spanish-speakers, they will have an attitude value of 9. If they were on a platform where they could hear Spanish, their attitude would have been 11. A Democrat would have an attitude 9 regardless of whether or not they are on the platform with Spanish-speakers. In other words, the causal effect of being in the treatment group is +2 for Republicans, and 0 for Democrats. If we could run an experiment with random assignment, we would discover that the average causal effect is somewhere between 0 and 2, depending on the relative proportion of the Republicans and Democrats.</p>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
@@ -12227,7 +12231,7 @@ FIGURE 4.3: This study was conducted by Barfort, Klemmensen and Larsen.
 <p>A causal effect is the difference between one potential outcome and another. How different would your life be if you missed the train?</p>
 <iframe src="https://www.youtube.com/embed/BvUbv4iwbDs?showcase=0" width="100%" height="400px">
 </iframe>
-<p>The causal effect of a treatment on a single unit at a point in time is the difference between the value of the outcome variable with the treatment and without the treatment. The fundamental problem of causal inference is that it is impossible to observe the causal effect on a single unit. We must make assumptions — i.e, we must make models — in order to estimate causal effects.</p>
+<p>The causal effect of a treatment on a single unit at a point in time is the difference between the value of the outcome variable with the treatment and without the treatment. The Fundamental Problem of Causal Inference is that it is impossible to observe the causal effect on a single unit. We must make assumptions — i.e, we must make models — in order to estimate causal effects.</p>
 <!-- DK: More meat? Check the first few questions in the tutorial. -->
 <!-- Holland, Paul W. (1986). "Statistics and Causal Inference." *J. Amer. Statist. Assoc.* 81 (396): 945–960. doi:10.1080/01621459.1986.10478354. -->
 <!-- Rubin (2011, page 288), Discussion of “Towards more accessible conceptions of statistical inferences” by C. J. Wild, M. Pfannkuch, M. Regan and N. J. Horton, Journal of the Royal Statistical Society. Series A (Statistics in Society), Vol. 174, No. 2 (APRIL 2011), pp. 247-295. -->
