@@ -66,14 +66,14 @@ For the purposes of this *Primer*, a *probability distribution* is a mathematica
 
 The key difference between a distribution, as we have explored them in earlier chapters, and a *probability* distribution is the requirement that the sum of the probabilities of the individual outcomes must be exactly 1. There is no such requirement in a distribution. But any distribution can be turned into a probability distribution by "normalizing" it, as we will explore.  In this context, we will often refer to a distribution which is not (yet) a probability distribution as an "unnormalized" distribution.  
 
-Pay attention to notation. Whenever we are talking about a specific probability (represented by a single value), we will use $\rho$ (the Greek letter "rho" but spoken aloud as "p" by us) with a *subscript* which specifies the exact outcome of which it is the probability. For instance, $\rho_h = 0.5$ denotes the probability of getting heads on a coin toss when the coin is fair. $\rho_t$ --- spoken as "PT" or "P sub T" or "P tails" --- denotes the probability of getting tails on a coin toss. However, when we are referring to the entire probability distribution over a set of outcomes, we will use $\text{Prob}()$. For example, the probability distribution of a coin toss is $\text{Prob}(\text{coin})$. That is, $\text{Prob}(\text{coin})$ is composed of the two specific probabilities (50% and 50%) mapped from the two values in the domain: Heads and Tails. Similarly, $\text{Prob}(\text{sum of two dice})$ is the probability distribution over the set of 11 outcomes (2 through 12) which are possible when you take the sum of two dice. $\text{Prob}(\text{sum of two dice})$ is made up of 11 numbers --- $\rho_2$,  $\rho_3$, ..., $\rho_{12}$ --- each representing the unknown probability that the sum will equal their value. That is, $\rho_2$ is the probability if rolling a 2.
+Pay attention to notation. Whenever we are talking about a specific probability (represented by a single value), we will use $\rho$ (the Greek letter "rho" but spoken aloud as "p" by us) with a *subscript* which specifies the exact outcome of which it is the probability. For instance, $\rho_h = 0.5$ denotes the probability of getting heads on a coin toss when the coin is fair. $\rho_t$ --- spoken as "PT" or "P sub T" or "P tails" --- denotes the probability of getting tails on a coin toss. However, when we are referring to the entire probability distribution over a set of outcomes, we will use $\text{Prob}()$. For example, the probability distribution of a coin toss is $\text{Prob}(\text{coin})$. That is, $\text{Prob}(\text{coin})$ is composed of the two specific probabilities (50% and 50%) mapped from the two values in the domain (Heads and Tails). Similarly, $\text{Prob}(\text{sum of two dice})$ is the probability distribution over the set of 11 outcomes (2 through 12) which are possible when you take the sum of two dice. $\text{Prob}(\text{sum of two dice})$ is made up of 11 numbers --- $\rho_2$,  $\rho_3$, ..., $\rho_{12}$ --- each representing the unknown probability that the sum will equal their value. That is, $\rho_2$ is the probability of rolling a 2.
 
 <!-- DK: Above is not clear. Explain this better by showing that a distribution is just a vector. A probability distribution is a vector in which each element of the vector is mapped to a 0--1 probability, the sum of which is one. Need to connect this more clearly to joint distribution discussion. -->
 
 
 ### Flipping a coin
 
-A *mathematical distribution* is based on mathematical formulas. Assuming that the coin is perfectly fair, we should, on average, get heads as often as we get tails.
+A *mathematical distribution* is based on a mathematical formula. Assuming that the coin is perfectly fair, we should, on average, get heads as often as we get tails.
 
 ```{r, echo = FALSE}
 
@@ -102,34 +102,28 @@ An *empirical distribution* is based on data. You can think of this as the proba
 
 In this simulation, there are 56 heads and 44 tails. The outcome will vary every time we run the simulation, but the proportion of heads to tails should not be too different if this coin is fair.
 
-```{r, echo = FALSE}
-
-# Flipping one coin 100 times
+```{r}
+# We are flipping one fair coin a hundreds times. We need to get the same result
+# each time we create this graphic because we want the results to match the
+# description in the text. Using set.seed() guarantees that the random results
+# are the same each time. We define 0 as tails and 1 as heads.
 
 set.seed(3)
 
-coin <- c(0, 1)
-
-sims <- 100
-
-results <- sample(coin, sims, replace = TRUE)
-
-mydata <- tibble(results)
-
-ggplot(mydata, aes(x = results)) +
-  geom_histogram(aes(y = after_stat(count/sum(count))), 
-                 binwidth = 0.5, 
-                 color = "white") +
-  labs(title = "Empirical Probability Distribution",
-       subtitle = "Flipping one coin a hundred times",
-       x = "Outcome\nResult of Coin Flip",
-       y = "Probability") +
-  scale_x_continuous(breaks = c(0, 1), 
-                     labels = c("Heads", "Tails")) +
-  scale_y_continuous(labels = 
-                       scales::percent_format(accuracy = 1)) +
-  theme_classic()
-
+tibble(results = sample(c(0, 1), 100, replace = TRUE)) %>% 
+  ggplot(aes(x = results)) +
+    geom_histogram(aes(y = after_stat(count/sum(count))), 
+                   binwidth = 0.5, 
+                   color = "white") +
+    labs(title = "Empirical Probability Distribution",
+         subtitle = "Flipping one coin a hundred times",
+         x = "Outcome\nResult of Coin Flip",
+         y = "Probability") +
+    scale_x_continuous(breaks = c(0, 1), 
+                       labels = c("Heads", "Tails")) +
+    scale_y_continuous(labels = 
+                         scales::percent_format(accuracy = 1)) +
+    theme_classic()
 ```
 
 
@@ -192,28 +186,25 @@ tibble(sum = c(rep(c(2, 12), 1),
 
 We get an *empirical distribution* by running a simulation and rolling two dice a hundred times. The result is not identical to the mathematical distribution because of the inherent randomness of the real world. 
 
-```{r, echo = FALSE}
-
-# Two dice rolled 100 times
+```{r}
+# In the coin example, we create the vector ahead of time, and then assigned
+# that vector to a tibble. There was nothing wrong with that approach. And we
+# could do the same thing here. But the use of map_* functions is more powerful
+# and will be necessary in later chapters. Still need set.seed(), as we almost
+# always will when creating random objects.
 
 set.seed(1)
 
-dice <- c(1:6)
-
-sims <- 100
-
-two_dice <- 
-  tibble(dice_1 = sample(dice, size = sims, replace = TRUE),
-         dice_2 = sample(dice, size = sims, replace = TRUE)) %>% 
-  mutate(sum = (dice_1 + dice_2))
-
-norm_2d <- two_dice %>% 
+emp_dist_dice <- tibble(ID = 1:100) %>% 
+  mutate(die_1 = map_dbl(ID, ~ sample(c(1:6), size = 1))) %>% 
+  mutate(die_2 = map_dbl(ID, ~ sample(c(1:6), size = 1))) %>% 
+  mutate(sum = die_1 + die_2) %>% 
   ggplot(aes(x = sum)) +
     geom_histogram(aes(y = after_stat(count/sum(count))), 
                    binwidth = 1, 
                    color = "white") +
     labs(title = "Empirical Probability Distribution",
-         subtitle = "Sum from rolling two dice one hundred times",
+         subtitle = "Sum from rolling two dice, replicated one hundred times",
          x = "Outcome\nSum of Two Die",
          y = "Probability") +
     scale_x_continuous(breaks = seq(2, 12, 1), labels = 2:12) +
@@ -221,7 +212,7 @@ norm_2d <- two_dice %>%
                          scales::percent_format(accuracy = 1)) +
     theme_classic()
 
-norm_2d
+emp_dist_dice
 ```
 
 We might consider labeling the y-axis in plots of empirical distributions as "Proportion" rather than "Probability" since it is an actual proportion, calculated from real (or simulated) data. We will keep it as "Probability" since we want to emphasize the parallels between mathematical, empirical and posterior probability distributions.
@@ -498,11 +489,15 @@ Remember that *probability distributions are mathematical objects that cover a s
 
 <!-- DK: Do we really need this?  -->
 
-For instance, we can generate the following unnormalized distribution for the sum of rolling two dice. 
+For instance, we can generate the following unnormalized distribution for the sum of rolling two dice. (This uses the same code as above, but without the normalization step.)
 
 ```{r, echo = FALSE}
+set.seed(1)
 
-emp_2d <- two_dice %>% 
+tibble(ID = 1:100) %>% 
+  mutate(die_1 = map_dbl(ID, ~ sample(c(1:6), size = 1))) %>% 
+  mutate(die_2 = map_dbl(ID, ~ sample(c(1:6), size = 1))) %>% 
+  mutate(sum = die_1 + die_2) %>% 
   ggplot(aes(x = sum)) +
     geom_histogram(binwidth = 1, color = "white") +
     labs(title = "Empirical Unnormalized Distribution",
@@ -511,14 +506,12 @@ emp_2d <- two_dice %>%
          y = "Count") +
     scale_x_continuous(breaks = seq(0, 12, 1), labels = 0:12) +
     theme_classic()
-
-emp_2d 
 ```
 
 Notice that the shape of the distribution is the same as the empirical probability distribution we generated earlier, except that the y-axis is labeled differently.
 
 ```{r, echo = FALSE}
-norm_2d
+emp_dist_dice
 ```
 
 
