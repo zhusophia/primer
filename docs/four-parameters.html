@@ -11,7 +11,8 @@
 <script src="libs/bootstrap-4.5.3/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.2.3.9000/tabs.js"></script><script src="libs/bs3compat-0.2.3.9000/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
 <script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script src="libs/htmlwidgets-1.5.2/htmlwidgets.js"></script><script src="libs/plotly-binding-4.9.2.1/plotly.js"></script><script src="libs/typedarray-0.1/typedarray.min.js"></script><link href="libs/crosstalk-1.1.0.1/css/crosstalk.css" rel="stylesheet">
 <script src="libs/crosstalk-1.1.0.1/js/crosstalk.min.js"></script><link href="libs/plotly-htmlwidgets-css-1.52.2/plotly-htmlwidgets.css" rel="stylesheet">
-<script src="libs/plotly-main-1.52.2/plotly-latest.min.js"></script><script src="https://cdn.jsdelivr.net/autocomplete.js/0/autocomplete.jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/mark.js@8.11.1/dist/mark.min.js"></script><!-- CSS -->
+<script src="libs/plotly-main-1.52.2/plotly-latest.min.js"></script><script src="libs/rglWebGL-binding-0.103.5/rglWebGL.js"></script><link href="libs/rglwidgetClass-0.103.5/rgl.css" rel="stylesheet">
+<script src="libs/rglwidgetClass-0.103.5/rglClass.min.js"></script><script src="libs/CanvasMatrix4-0.103.5/CanvasMatrix.min.js"></script><script src="https://cdn.jsdelivr.net/autocomplete.js/0/autocomplete.jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/mark.js@8.11.1/dist/mark.min.js"></script><!-- CSS -->
 </head>
 <body data-spy="scroll" data-target="#toc">
 
@@ -67,6 +68,9 @@
 </h1>
 <!-- Models are often similar. -->
 <!-- Explore causal effects of models following chapter 18/19 in ROAS. Regress ending att on starting attitude and treatment effect. Show parallel lines. That is four parameters! Can also do the same thing with income and treatment. That will be a much worse model. Save interaction for five parameter chapter. -->
+<!-- Add page 217 to selecting variables. Simple version. Can't talk about everything. Can't talk about interactions, for example. Talk about testing and how stupid it is! -->
+<!-- Write out better models make better predictions on new data. Concepts! Cross validation. Leave one out. Blah, blah, blah. -->
+<!-- Going back to att_end models. Then loo() and loo_compare(). -->
 <p><em>This chapter is still a DRAFT. Check back in a few weeks.</em></p>
 <p>In our haste to make progress — to get all the way through the process of building, interpreting and using models — we have given short shrift to some of the messy details of model building and evaluation. This chapter fills in those lacunae. We will also introduce models with four parameters.</p>
 <div id="transforming-variables" class="section level2" number="9.1">
@@ -303,9 +307,9 @@
 </ul>
 <!-- * Creating new variables, especially by combining different ones into one combined variable. -->
 </div>
-<div id="comparing-models" class="section level2" number="9.3">
+<div id="comparing-models-in-theory" class="section level2" number="9.3">
 <h2>
-<span class="header-section-number">9.3</span> Comparing models<a class="anchor" aria-label="anchor" href="#comparing-models"><i class="fas fa-link"></i></a>
+<span class="header-section-number">9.3</span> Comparing models in theory<a class="anchor" aria-label="anchor" href="#comparing-models-in-theory"><i class="fas fa-link"></i></a>
 </h2>
 <p>Deciding which variables to include in a model is a subset of the larger question: How do we decide which model, out of the set of possible models, to choose?</p>
 <p>Consider two models which explain attitudes to immigration among Boston commuters.</p>
@@ -444,21 +448,20 @@
 <span class="header-section-number">9.3.3</span> Better models make better predictions on new data<a class="anchor" aria-label="anchor" href="#better-models-make-better-predictions-on-new-data"><i class="fas fa-link"></i></a>
 </h3>
 </div>
-<div id="selecting-the-rows" class="section level3" number="9.3.4">
-<h3>
-<span class="header-section-number">9.3.4</span> Selecting the rows<a class="anchor" aria-label="anchor" href="#selecting-the-rows"><i class="fas fa-link"></i></a>
-</h3>
 </div>
-</div>
-<div id="testing-is-nonsense" class="section level2" number="9.4">
+<div id="comparing-models-in-practice" class="section level2" number="9.4">
 <h2>
-<span class="header-section-number">9.4</span> Testing is nonsense<a class="anchor" aria-label="anchor" href="#testing-is-nonsense"><i class="fas fa-link"></i></a>
+<span class="header-section-number">9.4</span> Comparing models in practice<a class="anchor" aria-label="anchor" href="#comparing-models-in-practice"><i class="fas fa-link"></i></a>
 </h2>
+<!-- Run loo (on both models from above). Explain each part. Don't use math they don't know. Focus on elpd_loo, since that is what compare_loo does. Then, run compare_loo, explain what it shows. Then, we choose the att_start model. It does much better! -->
+<!-- ### Selecting the rows -->
+<!-- ## Testing is nonsense -->
 </div>
 <div id="parallel-lines" class="section level2" number="9.5">
 <h2>
 <span class="header-section-number">9.5</span> Parallel lines<a class="anchor" aria-label="anchor" href="#parallel-lines"><i class="fas fa-link"></i></a>
 </h2>
+<!-- att_end ~ liberal + att_start. Same thing as chapters before. Show graphic of parallel lines. Cardinal virtues as always. And, extra, at the end we can use loo_compare to see if this model is better than simpler model of att_end ~ att_start. -->
 </div>
 <div id="summary-9" class="section level2" number="9.6">
 <h2>
@@ -486,14 +489,13 @@
 </li>
 <li><a class="nav-link" href="#selecting-variables"><span class="header-section-number">9.2</span> Selecting variables</a></li>
 <li>
-<a class="nav-link" href="#comparing-models"><span class="header-section-number">9.3</span> Comparing models</a><ul class="nav navbar-nav">
+<a class="nav-link" href="#comparing-models-in-theory"><span class="header-section-number">9.3</span> Comparing models in theory</a><ul class="nav navbar-nav">
 <li><a class="nav-link" href="#better-models-make-better-predictions"><span class="header-section-number">9.3.1</span> Better models make better predictions</a></li>
 <li><a class="nav-link" href="#beware-overfitting"><span class="header-section-number">9.3.2</span> Beware overfitting</a></li>
 <li><a class="nav-link" href="#better-models-make-better-predictions-on-new-data"><span class="header-section-number">9.3.3</span> Better models make better predictions on new data</a></li>
-<li><a class="nav-link" href="#selecting-the-rows"><span class="header-section-number">9.3.4</span> Selecting the rows</a></li>
 </ul>
 </li>
-<li><a class="nav-link" href="#testing-is-nonsense"><span class="header-section-number">9.4</span> Testing is nonsense</a></li>
+<li><a class="nav-link" href="#comparing-models-in-practice"><span class="header-section-number">9.4</span> Comparing models in practice</a></li>
 <li><a class="nav-link" href="#parallel-lines"><span class="header-section-number">9.5</span> Parallel lines</a></li>
 <li><a class="nav-link" href="#summary-9"><span class="header-section-number">9.6</span> Summary</a></li>
 </ul>
