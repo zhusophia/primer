@@ -80,7 +80,7 @@
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/walkerke/tidycensus">tidycensus</a></span><span class="op">)</span></code></pre></div>
 <p>Note that to use <strong>tidycensus</strong>, you’ll need a Census API key. You can request a key <a href="https://api.census.gov/data/key_signup.html">here</a>. Once you have a key, use the <code><a href="https://rdrr.io/pkg/tidycensus/man/census_api_key.html">census_api_key()</a></code> function:</p>
 <div class="sourceCode" id="cb880"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/tidycensus/man/census_api_key.html">census_api_key</a></span><span class="op">(</span><span class="st">"API KEY"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/tidycensus/man/census_api_key.html">census_api_key</a></span><span class="op">(</span><span class="st">"API KEY"</span><span class="op">)</span>  <span class="co"># You must replace API KEY with your actual key.</span></code></pre></div>
 <p>where <code>"API KEY"</code> is replaced with your API key. If you run the <code><a href="https://rdrr.io/pkg/tidycensus/man/census_api_key.html">census_api_key()</a></code> function with the option <code>install = TRUE</code>, it will save your API key in your <code>.Renviron</code> so you don’t have to run <code><a href="https://rdrr.io/pkg/tidycensus/man/census_api_key.html">census_api_key()</a></code> every time you want to get data from the Census. However, you should only do this once. You can examine/edit your <code>.Renviron</code> file directly with <code><a href="https://usethis.r-lib.org/reference/edit.html">usethis::edit_r_environ()</a></code>.</p>
 <p>To get data from the decennial census, use <code><a href="https://rdrr.io/pkg/tidycensus/man/get_decennial.html">get_decennial()</a></code>. Key arguments include:</p>
 <ul>
@@ -145,7 +145,7 @@
          caption <span class="op">=</span> <span class="st">"Source: US Census"</span>,
          x <span class="op">=</span> <span class="st">"Rural Population Proportion"</span>,
          y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-759-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-760-1.png" width="100%"></div>
 <p>Maine and Vermont are very rural while Washington D.C. is entirely urban. What if we wanted a sense of how the proportion of rural residents varied geographically? We need a map!</p>
 </div>
 <div id="conceptual-introduction-to-mapping" class="section level2 unnumbered">
@@ -205,7 +205,7 @@
 <code class="sourceCode R"><span class="va">rural</span> <span class="op">%&gt;%</span>
   <span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_sf</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-763-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-764-1.png" width="100%"></div>
 <p>We have the boundaries of each state, including Alaska and Hawaii. But there are some problems. <strong>ggplot2</strong> is doing its best to fit everything on one image, which is taxing on the system. We can’t see any particular state very well, because the map is zoomed far out. Also, there are no colors because we didn’t fill it with our data.</p>
 <p>So, let’s create a new map with <code>geom_sf()</code> and fill it with <code>prop_rural</code>. And we’ll filter out Alaska, Hawaii, and Puerto Rico for now.</p>
 <div class="sourceCode" id="cb889"><pre class="downlit sourceCode r">
@@ -213,7 +213,7 @@
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="op">!</span> <span class="va">NAME</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Alaska"</span>, <span class="st">"Hawaii"</span>, <span class="st">"Puerto Rico"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>fill <span class="op">=</span> <span class="va">P002005</span> <span class="op">/</span> <span class="va">P001001</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_sf</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-764-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-765-1.png" width="100%"></div>
 <p>Now we have something usable! This already has a lot of what we’d want from a map—most notably, the states are shaded based on our variable of interest, helping us to see some patterns in the data. But it could use a bit of a makeover, which we’ll give it in the next section.</p>
 <div id="making-maps-pretty" class="section level3 unnumbered">
 <h3>Making maps pretty<a class="anchor" aria-label="anchor" href="#making-maps-pretty"><i class="fas fa-link"></i></a>
@@ -239,7 +239,7 @@
          caption <span class="op">=</span> <span class="st">"Source: Census 2010"</span>,
          fill <span class="op">=</span> <span class="st">"Percent Rural"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">theme_void</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-765-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-766-1.png" width="100%"></div>
 <p>With this map, it is clear that the more rural states are concentrated in the Great Plains, the South, and parts of New England, while the (South)west and Northeast are less rural.</p>
 </div>
 <div id="adding-back-alaska-and-hawaii" class="section level3 unnumbered">
@@ -265,7 +265,7 @@
        caption <span class="op">=</span> <span class="st">"Source: Census 2010"</span>,
        fill <span class="op">=</span> <span class="st">"Percent Rural"</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">theme_void</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-768-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-769-1.png" width="100%"></div>
 <p>Now, Alaska and Hawaii can be displayed near the lower 48 states. This option removes Puerto Rico from your tibble altogether, so it is not a good choice if you want to show data from Puerto Rico.</p>
 </div>
 </div>
@@ -321,7 +321,7 @@
   <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Racial geography of Harris County, Texas"</span>,
        caption <span class="op">=</span> <span class="st">"Source: American Community Survey 2014-2018"</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">theme_void</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-772-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-773-1.png" width="100%"></div>
 <p>Note how easy it was to create the percentages using <code>summary_est</code>. We also used <code>color = Percent</code> and <code>scale_color_viridis_c()</code> to avoid having annoying borders around each of the census tracts. Otherwise, this doesn’t differ much from our code before, yet it is much easier to make comparisons across variables. Faceting is a powerful tool to use with maps.</p>
 </div>
 </div>
@@ -376,7 +376,7 @@
   <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Percent of People Who are Two or More Races by Census Tract"</span>,
        caption <span class="op">=</span> <span class="st">"Source: American Community Survey 2014-2018"</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">theme_void</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-776-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-777-1.png" width="100%"></div>
 </div>
 <div id="pums" class="section level2 unnumbered">
 <h2>PUMS<a class="anchor" aria-label="anchor" href="#pums"><i class="fas fa-link"></i></a>
@@ -452,7 +452,7 @@
     <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Percentage of population that are Seniors"</span>,
          caption <span class="op">=</span> <span class="st">"Source: American Community Survey 2014-2018"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">theme_void</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-784-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-785-1.png" width="100%"></div>
 </div>
 <div id="want-to-explore-further" class="section level2 unnumbered">
 <h2>Want to explore further?<a class="anchor" aria-label="anchor" href="#want-to-explore-further"><i class="fas fa-link"></i></a>

@@ -66,21 +66,7 @@
 <span class="header-section-number">6</span> One Parameter<a class="anchor" aria-label="anchor" href="#one-parameter"><i class="fas fa-link"></i></a>
 </h1>
 <!-- Priorities:  -->
-<!-- The distribution of the hat things is, more or less, your posterior. -->
-<!-- sqrt from hierarchy should be math symbol, not R function.  -->
-<!-- Add this Q&A below the hierarchy. And clean it up! -->
-<!-- "I thought that MADs were the same thing as standard deviations. Now you say they are the same things as standard errors. Which is it?"  -->
-<!-- MADs and standard deviations are, more or less, the same thing. They are both measures of the variability of a distribution. In most cases, they have very similar values. A *standard error* is also a standard devitaion. It is just the standard deviation of the distribution of the estimates, and that distribution of estimates is, more or less, your posterior. So, we can use MAD to describe that distribution. It just does not have a special name, like standard error.  -->
-<!-- default comment formating is fine. Mostly fixed. -->
-<!-- Show post_dist for n > 8 as whole dist with n > 8 colored red. Not >= 8. -->
-<!-- format of Summary section. Use better math symbols. -->
-<!-- Photo at the end of Evy or . .  -->
-<!-- Purpose of two versions of Joint Distribution graphic. Maybe at least change color of key changes in second one in order to highlight why we are seeing this twice? Certainly add $p$ to the y-axis label, if not also to the tile. -->
-<!-- Hypothesis test section. More detail? More like Khan Academy? Reference Gelman? "Null hyppthesis test." -->
-<!-- Outlier discussion in Temperance not quite right. Model uncertainty generally does not cause us to change our the center of the posterior. It causes us to expand the MAD. Donald Rumsfeld (and Donal Rubin) say: "Get MAD!" Or maybe not. -->
-<!-- Asserting a posterior distribution is, conceptually, the same as opening a casino and allowing people to place wagers on outcomes, with the odds consistent with your posterior. If your posterior is wrong, they will take all your money. That would be bad! -->
 <!-- Another paragraph or two of discussion about the final posterior. How do we use it? Within what range would you offer 50/50 odds that the true percentage lies? (use quantile(0.25, 0.75). Area under the curve? Explain clearly how that 26% is calculated. What is post_dist? What does it mean? How can I use it? Maybe show it sorted? Add some code comments. -->
-<!-- Rule of thumb: The world in the future is always more variable than our models would suggest. The entire point of the virtue of Temperance to be aware of that fact and take account of it. Courage --- that bold bastard --- comes along and says, "Here is the model! Let's calculate the posterior and open the casino!" Temperance --- quite the old woman from the point of view of that idiot Courage --- says, "Hold on, stupid! Yes, I can calculate the posterior, but we need to be cautious." Temerance is concerned with the tails, not the center. Limit the bets on the first few nights. Make sure our posterior is OK. Temperance is about the sensible management of the casino.  -->
 <!-- better rayshader? -->
 <!-- You must understand what the standard error of $\hat{p}$ means. You do not need to understand why. -->
 <!-- In the Functions are your friend! section -->
@@ -93,9 +79,8 @@
 <iframe src="https://www.youtube.com/embed/e3PJ3Du_zDc?showcase=0" width="100%" height="400px">
 </iframe>
 <p>This scene is from <em>The Hunger Games</em>, a dystopian novel in which children are selected via lottery to fight to the death. Primrose Everdeen is selected from the urn. Why does she have the misfortune of being selected? Or, as we will refer to it henceforth, sampled?</p>
-<!-- DK: Clean up this text. Give a better sense of the whole chapter. -->
 <p>Last chapter, we learned about probability, the act of quantifying uncertainty. This chapter, we will learn about <em>sampling</em>, the beginning of our journey toward inference. When we sample, we take a <em>portion</em> of a total population and attempt to draw a conclusion about the portion, a conclusion which we can then <em>generalize</em> to the entire population.</p>
-<p>The urn has a certain number of red and a certain number of white beads all of equal size, mixed well together. What proportion of this urn’s beads are red? That is, what is the value of <span class="math inline">\(p\)</span>?</p>
+<p>The urn below has a certain number of red and a certain number of white beads all of equal size, mixed well together. What proportion of this urn’s beads are red? That is, what is the value of <span class="math inline">\(p\)</span>?</p>
 <div class="figure">
 <span id="fig:unnamed-chunk-424"></span>
 <img src="06-one-parameter/images/sampling_bowl_1.jpg" alt="An urn with red and white beads." width="100%"><p class="caption">
@@ -105,7 +90,9 @@ FIGURE 6.1: An urn with red and white beads.
 <p>One way to answer this question would be to perform an exhaustive count: remove each bead individually, count the number of red beads, count the number of white beads, and divide the number of red beads by the total number of beads. Call that ratio <span class="math inline">\(p\)</span>, the proportion of red beads in the urn. However, this would be a long and tedious process. Therefore, we will use sampling! Consider two questions:</p>
 <p><em>If we get 17 red beads in a random sample of size 50 taken from an urn, what proportion <span class="math inline">\(p\)</span> of the beads in the urn are red?</em></p>
 <p><em>What is the probability, using the same urn, that we will draw more than 8 red beads if we use a shovel of size 20?</em></p>
-<!-- ADD A SECTION BRIEFING THE REST OF THE CHAPTER DK: YES!-->
+<p>To begin this chapter, we will look at a real sampling activity: the urn. We will build important conceptual knowledge that will aid us as we move into more complex examples. Next, we will simulate the urn example using our virtual tools and knowledge. These tools will help us automate the long process of sampling, and better understand the way in which we make predictions.</p>
+<p>After this, we will attempt to understand <em>standard error</em> and the ways in which uncertainty factors into our predictions. In this section, we will also learn some important terminology related to sampling and data science. As we enter the second half of our chapter, we will answer the two questions above using our new understanding.</p>
+<p>Finally, we will have a discussion section to go over important topics such as case studies, our sampling mechanism, and the difference between precision and accuracy. We will end with a summary that includes the most important takeaways from each section of this chapter. Good luck!</p>
 <p>Use the <strong>tidyverse</strong> package.</p>
 <div class="sourceCode" id="cb571"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span></code></pre></div>
@@ -198,17 +185,15 @@ FIGURE 6.6: Hand-drawn histogram of first 10 out of 33 proportions.
                  boundary <span class="op">=</span> <span class="fl">0.4</span>, 
                  color <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span> <span class="op">+</span>
   
-  <span class="co"># Add scale_y_continuous with breaks by </span>
-  <span class="co"># 1, as the default shows the y-axis from</span>
-  <span class="co"># 1 to 10 with breaks at .5. Breaks by 1 </span>
-  <span class="co"># is better for this plot, as all resulting </span>
-  <span class="co"># values are integers. </span>
+  <span class="co"># Add scale_y_continuous with breaks by 1, as the default shows the y-axis</span>
+  <span class="co"># from 1 to 10 with breaks at .5. Breaks by 1 is better for this plot, as all</span>
+  <span class="co"># resulting values are integers.</span>
   
   <span class="fu">scale_y_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span>from <span class="op">=</span> <span class="fl">0</span>, to <span class="op">=</span> <span class="fl">10</span>, by <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   
-  <span class="co"># The call expression() is used to insert a mathematical</span>
-  <span class="co"># expression, like p-hat. The paste after expression allows </span>
-  <span class="co"># us to paste text prior to said expression. </span>
+  <span class="co"># The call expression() is used to insert a mathematical expression, like</span>
+  <span class="co"># p-hat. The paste after expression allows us to paste text prior to said</span>
+  <span class="co"># expression.</span>
   
   <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"Proportion of 50 beads that were red "</span>, <span class="fu"><a href="https://rdrr.io/r/grDevices/plotmath.html">hat</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
        y <span class="op">=</span> <span class="st">"Count"</span>,
@@ -272,10 +257,9 @@ FIGURE 6.7: Mr. DeVito is correct: sampling <em>is</em> badass.
 <p>Now that we have a virtual analog of our urn, we need a virtual analog of the shovel seen in Figure 6.2 to generate virtual samples of 50 beads. We’re going to use <code>sample_n()</code> and list-columns.</p>
 <p>Let’s take a sample of 50 beads from our virtual urn.</p>
 <div class="sourceCode" id="cb576"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Define ID as 1 to look at one example of drawing</span>
-<span class="co"># fifty beads. When ID is called within map(), we</span>
-<span class="co"># are performing sample_n() upon our urn once (ID</span>
-<span class="co"># = 1) and taking a sample of 50 beads.</span>
+<code class="sourceCode R"><span class="co"># Define ID as 1 to look at one example of drawing fifty beads. When ID is</span>
+<span class="co"># called within map(), we are performing sample_n() upon our urn once (ID = 1)</span>
+<span class="co"># and taking a sample of 50 beads.</span>
 
 <span class="fu">tibble</span><span class="op">(</span>ID <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>shovel <span class="op">=</span> <span class="fu">map</span><span class="op">(</span><span class="va">ID</span>, <span class="op">~</span> <span class="fu">sample_n</span><span class="op">(</span><span class="va">urn</span>, size <span class="op">=</span> <span class="fl">50</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
@@ -289,12 +273,16 @@ FIGURE 6.7: Mr. DeVito is correct: sampling <em>is</em> badass.
 <div class="sourceCode" id="cb578"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">tibble</span><span class="op">(</span>ID <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>shovel <span class="op">=</span> <span class="fu">map</span><span class="op">(</span><span class="va">ID</span>, <span class="op">~</span> <span class="fu">sample_n</span><span class="op">(</span><span class="va">urn</span>, size <span class="op">=</span> <span class="fl">50</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  
+  <span class="co"># Using map_int, perform the sum where (within the urn -- denotoed by the</span>
+  <span class="co"># period) the color is equal to red. This counts the number of red beads in</span>
+  <span class="co"># the urn.</span>
+  
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>numb_red <span class="op">=</span> <span class="fu">map_int</span><span class="op">(</span><span class="va">shovel</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">.</span><span class="op">$</span><span class="va">color</span> <span class="op">==</span> <span class="st">"red"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 1 x 3
 ##      ID shovel            numb_red
 ##   &lt;dbl&gt; &lt;list&gt;               &lt;int&gt;
 ## 1     1 &lt;tibble [50 × 2]&gt;       16</code></pre>
-<!-- DK: Explain `.$color == "red"`.  -->
 <p>Why does this work? Because R treats <code>TRUE</code> like the number <code>1</code> and <code>FALSE</code> like the number <code>0</code>. So summing the number of <code>TRUE</code>s and <code>FALSE</code>s is equivalent to summing <code>1</code>’s and <code>0</code>’s. In the end, this operation counts the number of beads where <code>color</code> is <code>red</code>.</p>
 <p>Second, add a column for the total number of beads. (We already “know” that this is 50, but it never hurts to make our code more general.)</p>
 <div class="sourceCode" id="cb580"><pre class="downlit sourceCode r">
@@ -361,22 +349,19 @@ FIGURE 6.7: Mr. DeVito is correct: sampling <em>is</em> badass.
        y <span class="op">=</span> <span class="st">"Count"</span>,
        title <span class="op">=</span> <span class="st">"Distribution of 33 proportions red"</span><span class="op">)</span> <span class="op">+</span>
   
-  <span class="co"># Labels the axes in an attractive fashion. Without this code, </span>
-  <span class="co"># the axes labels would include 2.5, which makes no sense because</span>
-  <span class="co"># all the values are integers.</span>
+  <span class="co"># Labels the axes in an attractive fashion. Without this code, the axes labels</span>
+  <span class="co"># would include 2.5, which makes no sense because all the values are integers.</span>
   
   <span class="fu">scale_y_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">10</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-440-1.png" width="100%"></div>
 <p>Note that we add <code>binwidth = 0.05</code> and <code>boundary = 0.4</code> arguments as well. Setting <code>boundary = 0.4</code> ensures a binning scheme with one of the bins’ boundaries at 0.4. Since <code>binwidth = 0.05</code> is also set, this will create bins with boundaries at 0.30, 0.35, 0.45, and so on. Recall that <span class="math inline">\(\hat{p}\)</span> is equal to the proportions red in our samples.</p>
 <p>Observe that we occasionally obtained proportions red that are less than 30%. On the other hand, we occasionally obtained proportions that are greater than 45%. However, the most frequently occurring proportions were between 35% and 40%. Why do we have these differences in proportions red? Because of <em>sampling variation</em>.</p>
 <p>Compare our virtual results with our tactile results from the previous section. Observe that both histograms are somewhat similar in their center and variation, although not identical. These slight differences are again due to random sampling variation. Furthermore, observe that both distributions are somewhat bell-shaped.</p>
-<!-- DK: Clean up this code. Discuss more? -->
 <div class="sourceCode" id="cb587"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># bind_rows() takes our data from virtual_samples and </span>
-<span class="co"># "binds" it with our data from tactile_sample_urn, resulting</span>
-<span class="co"># in one set of data for us to work with. Mutating to create</span>
-<span class="co"># the "type" column allows us to see which pieces of data come</span>
-<span class="co"># from virtual sampling and which come from tactical sampling.</span>
+<code class="sourceCode R"><span class="co"># bind_rows() takes our data from virtual_samples and "binds" it with our data</span>
+<span class="co"># from tactile_sample_urn, resulting in one set of data for us to work with.</span>
+<span class="co"># Mutating to create the "type" column allows us to see which pieces of data</span>
+<span class="co"># come from virtual sampling and which come from tactical sampling.</span>
 
 <span class="va">facet_compare</span> <span class="op">&lt;-</span> <span class="fu">bind_rows</span><span class="op">(</span><span class="va">virtual_samples</span> <span class="op">%&gt;%</span> 
                               <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"Virtual sampling"</span><span class="op">)</span>, 
@@ -384,11 +369,10 @@ FIGURE 6.7: Mr. DeVito is correct: sampling <em>is</em> badass.
                               <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">ID</span>, red <span class="op">=</span> <span class="va">red_beads</span>, <span class="va">prop_red</span><span class="op">)</span> <span class="op">%&gt;%</span> 
                               <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"Tactile sampling"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   
-  <span class="co"># Use mutate() to alter the column factor into a factor</span>
-  <span class="co"># column, rather than the default character column. Calling</span>
-  <span class="co"># levels() establishes our two "factors". This step is </span>
-  <span class="co"># here to help R interpret this column for when we perform </span>
-  <span class="co"># our facet_wrap(). </span>
+  <span class="co"># Use mutate() to alter the column factor into a factor column, rather than</span>
+  <span class="co"># the default character column. Calling levels() establishes our two</span>
+  <span class="co"># "factors". This step is here to help R interpret this column for when we</span>
+  <span class="co"># perform our facet_wrap().</span>
   
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">type</span>, 
                        levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Virtual sampling"</span>, 
@@ -398,15 +382,13 @@ FIGURE 6.7: Mr. DeVito is correct: sampling <em>is</em> badass.
                    boundary <span class="op">=</span> <span class="fl">0.4</span>, 
                    color <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span> <span class="op">+</span>
   
-  <span class="co"># facet_wrapping by type creates two different graphs</span>
-  <span class="co"># on our plane. The data is separated into two graphs </span>
-  <span class="co"># based upon the column after the ~. </span>
+  <span class="co"># facet_wrapping by type creates two different graphs on our plane. The data</span>
+  <span class="co"># is separated into two graphs based upon the column after the ~.</span>
   
     <span class="fu">facet_wrap</span><span class="op">(</span><span class="op">~</span> <span class="va">type</span><span class="op">)</span> <span class="op">+</span>
   
-  <span class="co"># Add an x axis with p-hat using expression() with paste()</span>
-  <span class="co"># for clarification on p-hat's meaning. Add an appropriate </span>
-  <span class="co"># title and inspect our creation. </span>
+  <span class="co"># Add an x axis with p-hat using expression() with paste() for clarification</span>
+  <span class="co"># on p-hat's meaning. Add an appropriate title and inspect our creation.</span>
   
     <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"Proportion of 50 beads that were red "</span>, <span class="fu"><a href="https://rdrr.io/r/grDevices/plotmath.html">hat</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
          title <span class="op">=</span> <span class="st">"Comparing distributions"</span><span class="op">)</span> 
@@ -418,6 +400,7 @@ FIGURE 6.7: Mr. DeVito is correct: sampling <em>is</em> badass.
 FIGURE 6.8: Comparing 33 virtual and 33 tactile proportions red. Note that, though the figures differ slightly, both are centered around .35 to .40. This shows that, in both sampling distributions, the most frequently occuring proportion red is between 35 and 40%.
 </p>
 </div>
+<p>This visualization allows us to see how our results differed between our tactile and virtual urn results. As we can see, there is some variation between our results. This is not a cause for concern, as there is always expected sampling variation between results.</p>
 </div>
 <div id="shovel-1000-times" class="section level3" number="6.2.3">
 <h3>
@@ -465,8 +448,7 @@ FIGURE 6.9: So much sampling, so little time.
          y <span class="op">=</span> <span class="st">"Count"</span>,
          title <span class="op">=</span> <span class="st">"Distribution of 1,000 proportions red"</span><span class="op">)</span> </code></pre></div>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-444-1.png" width="100%"></div>
-<p>Once again, the most frequently occurring proportions of red beads occur between 35% and 45%. Every now and then, we obtain proportions as low as between 20% and 25%, and others as high as between 55% and 60%. These are rare, however. Furthermore, observe that we now have a much more symmetric and smoother bell-shaped distribution. This distribution is, in fact, approximated well by a normal distribution.</p>
-<!-- DK: Discuss why we have missing buckets. -->
+<p>Once again, the most frequently occurring proportions of red beads occur between 35% and 45%. Every now and then, we obtain proportions as low as between 20% and 25%, and others as high as between 55% and 60%. These are rare, however. The missing buckets at .2 and .65 occur due to the fact that, with our urn, extreme highs and lows are infrequent – occasionally, they do not occur at all. Furthermore, observe that we now have a much more symmetric and smoother bell-shaped distribution. This distribution is, in fact, approximated well by a normal distribution.</p>
 </div>
 <div id="different-shovels" class="section level3" number="6.2.4">
 <h3>
@@ -545,10 +527,10 @@ Using our newly developed tools for virtual sampling, let’s unpack the effect 
                           <span class="va">virtual_samples_100</span> <span class="op">%&gt;%</span> 
                             <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>
 
-<span class="co"># Plot our new object with the x-axis showing prop_red. Add elements</span>
-<span class="co"># binwidth, boundary, and color for stylistic clarity. Use </span>
-<span class="co"># labs() to add an x-axis label and title. Facet_wrap()  </span>
-<span class="co"># splits the graph into multiple plots by the variable (~n). </span>
+<span class="co"># Plot our new object with the x-axis showing prop_red. Add elements binwidth,</span>
+<span class="co"># boundary, and color for stylistic clarity. Use labs() to add an x-axis label</span>
+<span class="co"># and title. Facet_wrap() splits the graph into multiple plots by the variable</span>
+<span class="co"># (~n).</span>
 
 <span class="va">comparing_sampling_distributions</span> <span class="op">&lt;-</span> <span class="fu">ggplot</span><span class="op">(</span><span class="va">virtual_prop</span>, <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">prop_red</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_histogram</span><span class="op">(</span>binwidth <span class="op">=</span> <span class="fl">0.05</span>, boundary <span class="op">=</span> <span class="fl">0.4</span>, color <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span> <span class="op">+</span>
@@ -1062,11 +1044,9 @@ FIGURE 6.10: Comparing the distributions of proportion red for different sample 
                                            shovel_size <span class="op">=</span> <span class="va">.x</span>, 
                                            reps <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   
-  <span class="co"># Use map_dbl() to create a column that draws the </span>
-  <span class="co"># standard deviations of our prop_red values. We </span>
-  <span class="co"># can use pull after our ~ to isolate the prop_red</span>
-  <span class="co"># values and use a pipe (as we normally do) here</span>
-  <span class="co"># to draw the sd() of this column. </span>
+  <span class="co"># Use map_dbl() to create a column that draws the standard deviations of our</span>
+  <span class="co"># prop_red values. We can use pull after our ~ to isolate the prop_red values</span>
+  <span class="co"># and use a pipe (as we normally do) here to draw the sd() of this column.</span>
   
   
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>prop_red_sd <span class="op">=</span> <span class="fu">map_dbl</span><span class="op">(</span><span class="va">prop_red_results</span>, 
@@ -1102,6 +1082,7 @@ FIGURE 6.11: Comparing standard deviations of proportions red for 100 different 
 </p>
 </div>
 <p>The red line here represents an important statistical concept: standard error (SE). The mathematical definition of SE for our purposes is the standard deviation divided by the square root of the sample size. As the shovel size increases, and thus our sample size increases, we find that the standard error decreases. If this is confusing right now, fear not! We will delve into this explanation in our next section.</p>
+<!-- The variation in p-hat (when we do 1,000 reps) decreases as shovel size increases. For each shovel size, you plot 1,000 points. Small shovels have lots of overlap, so, use alpha. Even big shovels only have scores of possible p-hats. Then, say, can we measure the decrease in varition more precisely then just looking at this cloud of points? Yes! Plot the standard deviation of the cloud for each shovel size. -->
 <div class="figure">
 <span id="fig:unnamed-chunk-459"></span>
 <img src="06-one-parameter/images/meme_math.png" alt="To any poets and philosophers confused about this: don't worry! It won't be on a problem set." width="100%"><p class="caption">
@@ -1230,13 +1211,18 @@ FIGURE 6.19: Standard errors of the sample proportion based on sample sizes of 1
 <p>To really drive home our point: standard error is just a fancy term for your uncertainty about something you don’t know. Standard error == our (uncertain) beliefs.</p>
 <div class="figure" style="text-align: center">
 <span id="fig:unnamed-chunk-467"></span>
-<img src="06-one-parameter/images/revised_preceptor.png" alt="If you are wondering how much you need to know, follow this helpful guide of the information we have learned this chapter!" width="100%"><p class="caption">
+<img src="06-one-parameter/images/final_preceptor.png" alt="If you are wondering how much you need to know, follow this helpful guide of the information we have learned this chapter!" width="100%"><p class="caption">
 FIGURE 6.20: If you are wondering how much you need to know, follow this helpful guide of the information we have learned this chapter!
 </p>
 </div>
 <p>This hierarchy represents the knowledge we need to understand standard error (SE). At the bottom, we have math. It’s the foundation for our understanding, but it doesn’t need to be what we take away from this lesson. As we go up, we simplify the topic. The top of the pyramid are the basic levels of understanding that will help you to remember in the future.</p>
 <p>If I know your estimate plus or minus <em>two</em> standard errors, I know your 95% confidence interval. This is valuable information. Standard error is really just a measure for how uncertain we are about something we do not know, the thing we are estimating. When we recall SE, we should remember that, all in all, it’s a complicated concept that can be distilled into: the way old people talk about confidence intervals.</p>
 <p>Recall that <span class="math inline">\(\hat{p}\)</span> is the estimated value of p which comes from taking a sample. There can be billions and billions of <span class="math inline">\(\hat{p}\)</span>’s. We look at a large group of <span class="math inline">\(\hat{p}\)</span>’s, create a distribution of results to represent the possible values of p based on our findings, and then we compute a standard error to account for our own uncertainty about our predictions. Our 95% confidence interval for our prediction == our estimate plus or minus <strong>two</strong> standard errors.</p>
+<p>In regards to the fifth layer of the hierarchy, we may wonder:</p>
+<blockquote>
+<p>“I thought that MADs were the same thing as standard deviations. Now you say they are the same things as standard errors. Which is it?”</p>
+</blockquote>
+<p>MADs and standard deviations are, more or less, the same thing. They are both measures of the <strong>variability</strong> of a distribution. In most cases, they have very similar values. A <em>standard error</em> is also a standard deviation. Specifically, it is the standard deviation of the distribution of the estimates, and that distribution of estimates is, more or less, your posterior. Therefore, we can use MAD, like standard error, to describe that distribution and the variability of that distribution.</p>
 </div>
 </div>
 <div id="answering-the-questions" class="section level2" number="6.4">
@@ -1309,14 +1295,23 @@ FIGURE 6.20: If you are wondering how much you need to know, follow this helpful
          x <span class="op">=</span> <span class="st">"Number of Red Beads in Paddle"</span>,
          y <span class="op">=</span> <span class="st">"Number of Red Beads in Urn"</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-469-1.png" width="100%"></div>
-<p>It is easier to define our “model” in this joint distribution in terms of the unknown parameter <span class="math inline">\(p\)</span> rather than, as above, in terms of the unknown number of red beads in the urn.</p>
+<p>It is easier to define our “model” in this joint distribution in terms of the unknown parameter <span class="math inline">\(p\)</span> rather than, as above, in terms of the unknown number of red beads in the urn. Showing our plot in terms of <span class="math inline">\(p\)</span> and using the term “proportion” rather than “number of red beads” is closer to what we are trying to model. The</p>
 <div class="sourceCode" id="cb617"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">joint_dist</span> <span class="op">%&gt;%</span>
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y <span class="op">=</span> <span class="va">p</span>, x <span class="op">=</span> <span class="va">red_in_paddle</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">geom_point</span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.005</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Joint Distribution of Red Beads in Paddle and Proportion Red Beads in Urn"</span>,
+    <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span>
+      <span class="st">"Joint Distribution of Red Beads in Paddle and Proportion Red Beads in Urn"</span>, 
+      <span class="fu"><a href="https://rdrr.io/r/grDevices/plotmath.html">hat</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, 
          x <span class="op">=</span> <span class="st">"Number of Red Beads in Paddle"</span>,
-         y <span class="op">=</span> <span class="st">"Proportion of Red Beads in Urn"</span><span class="op">)</span></code></pre></div>
+         
+         <span class="co"># Add the symbol for p-hat. </span>
+         
+         y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"Proportion of Red Beads in Urn "</span>, <span class="fu"><a href="https://rdrr.io/r/grDevices/plotmath.html">hat</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  
+  <span class="co"># Highlight y-axis change in red to view change. </span>
+  
+  <span class="fu">theme</span><span class="op">(</span>axis.title.y <span class="op">=</span> <span class="fu">element_text</span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-470-1.png" width="100%"></div>
 <p>To better visualize this distribution, take a look at the 3D version of this plot. Note the U shape of the graph. By this, we mean to note the peaks at the areas where the number of red beads in the paddle is 0 out of 50 and 50 out of 50. This is due to the fact that, when we draw 0 red beads in a sample of 50 beads, the possibilities for the number of red beads in the urn is consistently close to 0. Similarly, when our sample of 50 beads comes out with 50 red beads, the possibilities for the number of red beads in the urn is consistently closer to 1000.</p>
 <div class="figure">
@@ -1357,7 +1352,7 @@ FIGURE 6.21: A 3D image of our joint distribution created with Rayshader.
     <span class="fu">theme_classic</span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-472-1.png" width="100%"></div>
 <p>To visualize this in a 3D plot, see the slice in the figure below. There are a few things to note. First, the x-axis only extends to 600 (rather than the total 1000) due to the fact that, when the paddle only draws 17/50 = .34 = 34% red beads, it is almost impossible for the total number red beads in the total urn to exceed 600. The most likely number of red beads in the total urn, when the paddle draws 17/50 red beads, is somewhere in the 290-350 range. This is signified by the peak between these points. The probability is lower below 280 and above 350 because it is less likely that this is the number of red beads in the urn, conditional on the fact that the paddle drew 17/50 red beads. This is our posterior distribution.</p>
-<p>For any value of red beads found in the paddle (from 0 to 50), there is a posterior distribution of possible values of red beads in the total urn. This distribution is meant to illustrate that, though our sample gives an estimate of the total proportion of red beads in the entire urn, there is much variation in what the actual proportion might be.</p>
+<p>For any value of red beads found in the paddle (from 0 to 50), there is a posterior distribution of possible values of red beads in the total urn. This distribution is meant to illustrate that, though our sample gives an estimate of the total proportion of red beads in the entire urn, there is much variation in what the actual proportion might be. To summarize: the distribution of the hat things (the things we are predicting) is, more or less, your posterior.</p>
 <p>Recall the first question from the start of the Chapter:</p>
 <p><em>If we get 17 red beads in a random sample of size 50 taken from an urn, what proportion <span class="math inline">\(p\)</span> of the beads in the urn are red?</em></p>
 <p>The answer is not a single number. Our posterior distribution is just that: a distribution. From our sample, we have many different results for the proportion of red beads in the entire urn. Certain proportions, like the extremes close to 0% or 100%, are essentially impossible due to our sample value being 32%. Some sample proportions, like 40%, occur far more frequently than other sample proportions.</p>
@@ -1374,8 +1369,11 @@ FIGURE 6.22: A 3D image of our joint distribution created with Rayshader.
 <h3>
 <span class="header-section-number">6.4.3</span> Hypothesis tests<a class="anchor" aria-label="anchor" href="#hypothesis-tests"><i class="fas fa-link"></i></a>
 </h3>
-<p>Recall our view on hypothesis tests: <strong>Amateurs test. Professionals summarize.</strong> Traditionally, most scientific papers are not so much interested in estimating p. They are interested in testing specific hypotheses. But, how useful is that method?</p>
-<p>Let’s look at a possible hypothesis in our urn paradigm: there are equal number of red and white beads in the urn. Can we reject that hypothesis? Convention: if the 95% confidence interval excludes the null hypothesis, then we reject it. Otherwise, we don’t reject it. However, this does not mean that we accept it. More to the point: rejecting or not rejecting hypotheses never helps us to answer real questions. A Yes/No question throws away too much information to (almost) ever be useful. There is no reason to test when you can summarize by providing the full posterior probability distribution, as we will do below.</p>
+<p>Recall our view on hypothesis tests: <strong>Amateurs test. Professionals summarize.</strong> Traditionally, most scientific papers are not so much interested in estimating p. They are interested in testing specific hypotheses. What do we mean by that?</p>
+<p>Let’s look at a possible hypothesis in our urn paradigm: there are equal number of red and white beads in the urn. The null hypothesis is denoted by <span class="math inline">\(H_0\)</span>, while the alternative hypothesis is denoted by <span class="math inline">\(H_a\)</span>. Therefore, our hypothesis is designed as such:</p>
+<p><span class="math inline">\(H_0\)</span>: There are an equal number of red and white beads in the urn.
+<span class="math inline">\(H_a\)</span>: There are <em>not</em> an equal number of red and white beads in the urn.</p>
+<p>Can we reject that hypothesis? Convention: if the 95% confidence interval excludes the null hypothesis, then we reject it. Here, that would mean if our posterior estimate (plus or minus 2 standard errors) <em>excluded</em> the possibility of the red and white beads being equal, translating into a proportion red of 50%, we can reject the null hypothesis. Otherwise, we don’t reject it. However, this does not mean that we accept it. More to the point: rejecting or not rejecting hypotheses doesn’t helps us to answer real questions. There is no reason to <strong>test</strong> when you can summarize by providing the full posterior probability distribution, as we will do below.</p>
 <p>The same arguments apply in the case of “insignificant” results, with p &gt; 0.5, when we can’t “reject” the null hypothesis. The fact that a difference is not “significant” has no relevance to how we use the posterior to make decisions. The same reasoning applies to every parameter we estimate, to every prediction we make. Never test — unless your boss demands a test. <strong>Use your judgment, make your models, summarize your knowledge of the world, and use that summary to make decisions.</strong> In the next section, we will create our posterior distribution and use this posterior to predict outcomes.</p>
 </div>
 <div id="using-the-posterior" class="section level3" number="6.4.4">
@@ -1445,17 +1443,31 @@ FIGURE 6.22: A 3D image of our joint distribution created with Rayshader.
 <div class="sourceCode" id="cb622"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">post_dist</span><span class="op">$</span><span class="va">new_reds</span> <span class="op">&gt;</span> <span class="fl">8</span><span class="op">)</span> <span class="op">/</span>  <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">post_dist</span><span class="op">$</span><span class="va">new_reds</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 0.26</code></pre>
-<p>The answer is about 26%. To observe this visually, take a look at the <code>post_dist</code> object when we filter for where the number of red beads is equal to and greater than 8. The answer above measures the area under <em>this</em> portion of the curve as compared to the <em>entire</em> area under the curve. <em>Each question requires looking at a new area under the curve.</em> When someones asks you a question, they are doing two things. First, they are providing instructions as to the posterior your should create. Here, the results with a shovel of 20 slots. Second, they are asking a question about the area under the curve in a specific region. Here, the region where the number of red beads is greater than 8.</p>
+<p>The answer is about 26%. To observe this visually, take a look at the <code>post_dist</code> object when we filter for where the number of red beads is equal to and greater than 8. The answer above measures the area under <em>this</em> portion of the curve as compared to the <em>entire</em> area under the curve. <em>Each question requires looking at a new area under the curve.</em> When someones asks you a question, they are doing two things. First, they are providing instructions as to the posterior your should create. Here, the results with a shovel of 20 slots. Second, they are asking a question about the area under the curve in a specific region. Here, the region where the number of red beads is greater than 8 is highlighted in red. Therefore, the area below the curve that <strong>is red</strong> is how we get our estimate.</p>
 <div class="sourceCode" id="cb624"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">post_dist</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">new_reds</span> <span class="op">&gt;=</span> <span class="fl">8</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">new_reds</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  
+  <span class="co"># Create a column above_eight to identify True or False for new_reds being</span>
+  <span class="co"># above eight.</span>
+  
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>above_eight <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">new_reds</span> <span class="op">&gt;</span> <span class="fl">8</span>, <span class="st">"True"</span>, <span class="st">"False"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  
+  <span class="co"># Set fill as above_eight.</span>
+  
+  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">new_reds</span>, fill <span class="op">=</span> <span class="va">above_eight</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">geom_histogram</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y <span class="op">=</span> <span class="fu">after_stat</span><span class="op">(</span><span class="va">count</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">count</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
-                   bins <span class="op">=</span> <span class="fl">50</span><span class="op">)</span> <span class="op">+</span> 
+                   bins <span class="op">=</span> <span class="fl">50</span><span class="op">)</span> <span class="op">+</span>
+  
+  <span class="co"># Scale_fill_manual() here is calling grey for the first color and red for the</span>
+  <span class="co"># second color. This is going to highlight the portion of the curve that we</span>
+  <span class="co"># need to isolate in red.</span>
+  
+  <span class="fu">scale_fill_manual</span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'grey50'</span>, <span class="st">'red'</span><span class="op">)</span><span class="op">)</span><span class="op">+</span>
     <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Posterior Probability Distribution"</span>,
          subtitle <span class="op">=</span> <span class="st">"Number of red beads in new draw of 20"</span>,
          x <span class="op">=</span> <span class="st">"Number of Red Beads"</span>,
-         y <span class="op">=</span> <span class="st">"Probability"</span><span class="op">)</span> <span class="op">+</span> 
+         y <span class="op">=</span> <span class="st">"Probability"</span>,
+         fill <span class="op">=</span> <span class="st">"Above Eight Beads?"</span><span class="op">)</span> <span class="op">+</span> 
     <span class="fu">scale_x_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org//reference/label_number.html">number_format</a></span><span class="op">(</span>accuracy <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_y_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org//reference/label_percent.html">percent_format</a></span><span class="op">(</span>accuracy <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">theme_classic</span><span class="op">(</span><span class="op">)</span></code></pre></div>
@@ -1471,7 +1483,7 @@ FIGURE 6.22: A 3D image of our joint distribution created with Rayshader.
 <span class="math display">\[ T_i  \sim B(p_H, n = 20) \]</span>
 The total number <span class="math inline">\(T\)</span> of red beads in experiment <span class="math inline">\(i\)</span> with 20 sampled beads, <span class="math inline">\(T_i\)</span>, is distributed as a binomial with <span class="math inline">\(n = 20\)</span> and an unknown probability <span class="math inline">\(\rho_h\)</span> of the proportion red exceeding 8 out of 20 beads.</p>
 <p>Courage focuses on code – the structure of our model. Code allows us to “fit” a model by estimating the values of the unknown parameters. Though we can never know the true values of these parameters, we can express our uncertain knowledge in the form of posterior probability distributions. With those distributions, we can compare the actual values of the outcome variable with the “fitted” or “predicted” results of the model. We can examine the “residuals,” the difference between the fitted and actual values. To answer our question, we have taken a slice of our posterior distribution to create a joint distribution. To find our final solution, we looked at the area under the curve that includes all values of 8 red beads or above.</p>
-<p>When we think of Temperance, we should think of uncertainty. Our models are never as accurate as we believe them to be. Would we really like to bet on our finding? That 26% of the time, we will get more than 8 red beads from our sample of size 20? The truth is, outliers are <em>much more common</em> than we might think. Unknown unknowns, prediction uncertainty, the ever changing world – all of these factors should be a warning to us: always expect the unexpected.</p>
+<p>When we think of Temperance, we should think of uncertainty. Asserting a posterior distribution is, conceptually, the same as opening a casino and allowing people to place wagers on outcomes, with the odds consistent with your posterior. If your posterior is wrong, they will take all your money. That would be bad! So, what do we do? Rule of thumb: the future is always more variable than our models would suggest. The entire point of the virtue of Temperance to be aware of that fact and take account of it. Courage — that bold bastard — comes along and says, “Here is the model! Let’s calculate the posterior and open the casino!” Temperance says, “Hold on! Yes, I can calculate the posterior, but we need to be cautious.” Temperance is concerned with the tails of our predictions, not the center. What is the best strategy for opening our casino, then? Limit the bets on the first few nights to make sure our posterior is OK. <em>Temperance is concerned with the sensible management of the casino.</em></p>
 </div>
 </div>
 <div id="discussion" class="section level2" number="6.5">
@@ -2430,17 +2442,11 @@ FIGURE 6.26: Felipe’s, another staple, is said to have a more authentic experi
 <span class="header-section-number">6.6</span> Summary<a class="anchor" aria-label="anchor" href="#summary-6"><i class="fas fa-link"></i></a>
 </h2>
 <p>Key lesson:</p>
-<blockquote>
-<p>There is a truth! There is a true value for p which we do not know! We want to create a posterior probability distribution which summarizes our knowledge. We care about the posterior probability distribution of p. The center of that distribution is around the mean or median of the proportion in your sample. The sd (or mad) of that posterior is the standard deviation divided by the square root of our sample size! Note that this is the same thing as the standard deviation of the repeated samples.</p>
-</blockquote>
+<p>There is a truth! There is a true value for <span class="math inline">\(p\)</span> which we do not know! We want to create a posterior probability distribution which summarizes our knowledge. We care about the posterior probability distribution of p. The center of that distribution is around the mean or median of the proportion in your sample. The sd (or mad) of that posterior is the standard deviation divided by the square root of our sample size! Note that this is the same thing as the standard deviation of the repeated samples.</p>
 <p>Key lesson:</p>
-<blockquote>
 <p>We have a journey from reality, to our predictions, to the standard error of our predictions, to the posterior probability distribution for p. This is our sequence:</p>
-</blockquote>
-<p><strong>p (the truth) -&gt; to <span class="math inline">\(\hat{p}\)</span> (my estimate) -&gt; to the standard error of <span class="math inline">\(\hat{p}\)</span> (black box of math mumbo jumbo and computer simulation magic) -&gt; to our posterior probability distribution for p (our beliefs about the truth).</strong></p>
-<blockquote>
+<p><strong>p (the truth) <span class="math inline">\(\Rightarrow\)</span> <span class="math inline">\(\hat{p}\)</span> (my estimate) <span class="math inline">\(\Rightarrow\)</span> the standard error of <span class="math inline">\(\hat{p}\)</span> (black box of math mumbo jumbo and computer simulation magic) <span class="math inline">\(\Rightarrow\)</span> our posterior probability distribution for p (our beliefs about the truth).</strong></p>
 <p>This journey shows how our beliefs about the truth develop through our work. We begin with p; p is the truth, the true but unknown value we are estimating. <span class="math inline">\(\hat{p}\)</span> is our estimate for p. There can be millions and millions of <span class="math inline">\(\hat{p}\)</span>’s. Next, we must take the standard error of our estimates (our <span class="math inline">\(\hat{p}\)</span>’s) to account for our uncertainty with our predictions. Finally – the thing we need most – we create a posterior probability distribution for p. This distribution is used to answer key questions about p. </p>
-</blockquote>
 <p>Other highlights:</p>
 <div id="tactial-sampling" class="section level3" number="6.6.1">
 <h3>
@@ -2498,7 +2504,8 @@ FIGURE 6.26: Felipe’s, another staple, is said to have a more authentic experi
 <li>Real life sampling is <em>extremely</em> prone to error. This cannot be emphasized enough. We are often forced to choose between precision and accuracy during real-life sampling.</li>
 </ul>
 <p>In this chapter, we performed both tactile and virtual sampling exercises to infer about an unknown parameter We also presented a case study of sampling in real life with polls. In each case, we used the sample proportion <span class="math inline">\(\hat{p}\)</span> to estimate the population proportion <span class="math inline">\(p\)</span>. However, we are not just limited to scenarios related to proportions. In other words, we can use sampling to estimate other population parameters using other point estimates as well.</p>
-<p>As we continue our journey, recall the case of Primrose Everdeen and what she represents: no matter how realistic is our model is, our predictions are <strong>never certain</strong>. “May the posterior be ever in your favor!”</p>
+<p>As we continue our journey, recall the case of Primrose Everdeen and what she represents: no matter how realistic is our model is, our predictions are <strong>never certain</strong>.</p>
+<div class="inline-figure"><img src="06-one-parameter/images/posterior_effie.png" width="100%"></div>
 
 </div>
 </div>
