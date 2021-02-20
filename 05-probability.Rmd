@@ -898,30 +898,27 @@ jd_marbles %>%
 
 Here is the 3D visualization:
 
-```{r, echo = FALSE, message=FALSE, warning=FALSE}
+```{r, echo = FALSE}
+jd_marbles_plot <- jd_marbles %>%
+  group_by(in_bag, in_sample) %>%
+  summarize(total = n(),
+            .groups = "drop") %>% 
+  mutate(in_sample = as.factor(in_sample)) %>% 
+  mutate(in_bag = as.factor(in_bag)) %>% 
+  ggplot(aes(in_bag, in_sample, color = total)) +
+    geom_point() +
+    scale_color_continuous() +
+    labs(x = "White Marbles Selected",
+         y = "White Marbles in the Bag",
+         title = "Black and White Marbles",
+         subtitle = "More white marbles in bag mean more are selected",
+         color = "Count") +
+    theme(legend.position = "none",
+          title = element_text(size = 7),
+    axis.text.x = element_text(size = 6),
+    axis.text.y = element_text(size = 6))
 
-x <- tibble(p = rep(seq(0, 1, 0.5), 1000)) %>%
-       mutate(white_marbles = map_int(p, ~ rbinom(n = 1, size = 3, p = .))) %>%
-       group_by(p,white_marbles) %>%
-       summarize(total = n())
-
-p_factor <- as.factor(x$p)
-x_factor <- as.factor(x$white_marbles)
-
-mtplot <-  ggplot(x, aes(x_factor, p_factor, color = total)) +
-              geom_point() +
-              scale_color_continuous() +
-              labs(x = "White Marbles Selected",
-                   y = "White Marbles in the Bag",
-                   title = "Black and White Marbles",
-                   subtitle = "More white marbles in bag mean more are selected",
-                   color = "Count") +
-              theme(legend.position = "none",
-                    title = element_text(size = 7),
-              axis.text.x = element_text(size = 6),
-              axis.text.y = element_text(size = 6))
-
-plot_gg(mtplot,
+plot_gg(jd_marbles_plot,
         width = 3.5,
         zoom = 0.65,
         theta = 25,
@@ -1046,10 +1043,10 @@ We can do the same thing for all 11 possible models, calculating what would happ
 
 set.seed(10)
 
-x <- tibble(p = rep(seq(0, 1, 0.1), 1000)) %>%
+jd_coin <- tibble(p = rep(seq(0, 1, 0.1), 1000)) %>%
   mutate(heads = map_int(p, ~ rbinom(n = 1, size = 20, p = .)))
 
-x %>%
+jd_coin %>%
   ggplot(aes(y = p, x = heads)) +
     geom_jitter(alpha = 0.1) +
     labs(title = "Empirical Distribution of Number of Heads",
@@ -1063,31 +1060,26 @@ x %>%
 
 Here is the 3D version of the same plot.
 
-```{r, echo = FALSE, message=FALSE, warning=FALSE}
+```{r, echo = FALSE}
+jd_coin_plot <- jd_coin %>% 
+  group_by(p, heads) %>%
+  summarize(total = n(), .groups = "drop") %>% 
+  mutate(p = as.factor(p)) %>% 
+  mutate(heads = as.factor(heads)) %>% 
+  ggplot() +
+    geom_point(aes(x = heads, y = p, color = total)) +
+    theme(legend.position = "none") +
+    labs(x = "Number of Heads out of 20 Tosses",
+         y = expression(rho[h]),
+         title = "Empirical Distribution of Number of Heads",
+         subtitle = expression(paste("Based on simulations with various values of ", 
+                                     rho[h]))) +
+    theme(title = element_text(size = 9),
+          axis.text.x = element_text(size = 7),
+          axis.title.y = element_text(size = 7),
+          legend.position = "none")
 
-set.seed(10)
-
-x <- tibble(p = rep(seq(0, 1, 0.1), 1000)) %>%
-        mutate(heads = map_int(p, ~ rbinom(n = 1, size = 20, p = .))) %>%
-        group_by(p,heads) %>%
-        summarize(total = n())
-
-p_factor <- as.factor(x$p)
-x_factor <- as.factor(x$heads)
-
-coinplot <-  ggplot(x) +
-  geom_point(aes(x = x_factor, y = p_factor, color = total)) +
-  theme(legend.position = "none") +
-  labs(x = "Number of Heads out of 20 Tosses",
-       y = expression(rho[h]),
-       title = "Empirical Distribution of Number of Heads",
-       subtitle = expression(paste("Based on simulations with various values of ", rho[h]))) +
-  theme(title = element_text(size = 9),
-        axis.text.x = element_text(size = 7),
-        axis.title.y = element_text(size = 7),
-        legend.position = "none")
-
-plot_gg(coinplot,
+plot_gg(jd_coin_plot,
         width = 3.5,
         zoom = 0.65,
         theta = 25,
@@ -1117,8 +1109,7 @@ This is the only part of the joint distribution that we care about. We aren't in
 As we would expect, most of the time when 8 coin tosses came up heads, the value of $p$ was 0.4. But, on numerous occasions, it was not. It is quite common for a value of $p$ like 0.3 or 0.5 to generate 8 heads. Consider:
 
 ```{r, echo = FALSE}
-
-x %>% 
+jd_coin %>% 
   filter(heads == 8) %>% 
   ggplot(aes(p)) +
     geom_bar() +
@@ -1132,7 +1123,7 @@ x %>%
 Yet this is a distribution of raw counts. It is an unnormalized density. To turn it into a proper probability density (i.e., one in which the sum of the probabilities across possible outcomes sums to one) we just divide everything by the total number of observations.
 
 ```{r, echo = FALSE}
-x %>% 
+jd_coin %>% 
   filter(heads == 8) %>% 
   ggplot(aes(x = p)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
@@ -1188,7 +1179,7 @@ odds
 Third way is to sample from the actual distribution, which is a small dataset with just a few rows, but it includes both $\rho_h$ and the probability of each $\rho_h$. This also gives the correct answer.
 
 ```{r}
-p_posterior <- x %>% 
+p_posterior <- jd_coin %>% 
   filter(heads == 8) %>% 
   group_by(p) %>% 
   summarize(total = n(), .groups = "drop") %>%
