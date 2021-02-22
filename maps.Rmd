@@ -152,9 +152,15 @@ glimpse(rural)
 glimpse(rural)
 ```
 
-This is just like the tibble we had before, except now we have this funky "multipolygon" called `geometry`. This is a list column containing all the information `ggplot()` needs to create a map. 
+This is similar to the tibble we created before. However, there are two key differences. First, we now have this funky "multipolygon" column called `geometry`. This is a list column containing all the information `ggplot()` needs to create a map. Second, rural is no longer a tibble.
 
-In order to create a map using `ggplot()`, we need a new geom: `geom_sf()`.  This works much like the geoms we have seen before, such as `geom_point()` and `geom_line()`, except with spatial data.  Consider:
+```{r}
+class(rural)
+```
+
+`class()` is a function which tells us the, uh, "class" of an object. `rural` is of class "sf", which is a special kind of tibble which includes information for plotting. For this reason, **you should never use `as_tibble()` on an object of class "sf" since doing so strips the object of the key attributes it needs to make plotting easier.**
+
+In order to create a map using `ggplot()`, we need a new geom: `geom_sf()`.  This works much like the geoms we have seen before, such as `geom_point()` and `geom_line()`, except with spatial data.  In particular, it is designed to work with objects of class "sf." Example:
 
 ```{r}
 rural %>%
