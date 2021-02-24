@@ -10,15 +10,50 @@
 
 <!-- Going back to att_end models. Then loo() and loo_compare(). -->
 
+<!-- MF: The order of the chapter that seems most sensible to me is 1) selecting variables, 2) transforming variables, 3) comparing in theory, 4) comparing in practice, and 5) discussion items (including hypothesis tests.) -->
+
+<!-- MF: Where should we cover external validation? At the end of the chapter? Discussion is on pages 171-180 in RAOS. --> 
+
 *This chapter is still a DRAFT. Check back in a few weeks.*
 
 
 In our haste to make progress --- to get all the way through the process of building, interpreting and using models --- we have given short shrift to some of the messy details of model building and evaluation. This chapter fills in those lacunae. We will also introduce models with four parameters. 
 
 
+## Selecting variables
+
+<!-- MF: Discuss indicator & index variables prior to explaining guidelines? -->
+
+How do we decide which variables to include in a model? There is no one right answer to this question. Our advice is to keep a variable X if any of the following circumstances apply:
+
+* The variable has a large and well-estimated coefficient. This means, roughly, that the 95% confidence interval excludes zero.
+
+* Underlying theory/observation suggests that X has a meaningfully connection to the outcome variable.
+
+* If the variable has a small standard error, it is general practice to include it in our model to improve predictions. If the standard error of a coefficient is large and we find no other reason to include it in our model, it may be a signal to remove the variable from your model. 
+
+* If a predictor isn't statistically significant, we would normally consider discarding it. The exception to this rule is if we wanted to compare two indicators (for instance, if we wanted to compare results from the variable `party` -- to look at Democrats versus Republicans -- in the `trains` dataset) in spite of that variable not appearing to be significant. 
+
+* It is standard in your field to include X in such regressions.
+
+* Your boss/client/reviewer/supervisor wants to include X.
+
+<!-- MF: Go through one of the datasets and explain whether we would include variables X, Y, and Z --> 
+
+### Variables in the `trains` dataset
+
+To look at our recommendations in practice, let's focus on the `trains` dataset. The variables in `trains` include `gender`, `liberal`, `party`, `age`, `income`, `att_start`, `treatment`, and `att_end`.Which variables would be best to include in a model? 
+
+
 ## Transforming variables
 
-It is often convenient to transform a predictor variable. 
+<!-- MF: Look at "Scaling of predictors and regression coefficients" in RAOS (pg. 183) 
+
+Do we discuss anything in the "Other transformations section" (pg. 195)? This includes square root transformations, idiosyncratic transformations, & using discrete vs continuous predictors. -->
+
+Another question for us data scientists: what happens when our assumptions break down? The first option is to extend our model, perhaps by addressing our concerns with validity by including error models. The second option, which we will focus on here, is to modify our data or model so that our assumptions are more reasonable. How do we accomplish this?
+
+It is often convenient to transform a predictor variable so that our model makes more sense. Let's explore exactly what that means. 
 
 ### Centering
 
@@ -44,7 +79,7 @@ fit_1 <- stan_glm(formula = income ~ age,
 print(fit_1, detail = FALSE)
 ```
 
-There is nothing wrong with this model. Yet the interpretation of $\beta_0$, the intercept in the regression, is awkward. It means the average income for people of age zero. Yet that is useless! There are no people of zero age in our data. And, even if there were, it would be weird to think about such people taking the commuter trade into Boston and filling out our survey forms.
+There is nothing wrong with this model. Yet the interpretation of $\beta_0$, the intercept in the regression, is awkward. It means the average income for people of age zero. That is useless! There are no people of zero age in our data. And, even if there were, it would be weird to think about such people taking the commuter trade into Boston and filling out our survey forms.
 
 It is easy, however, to *transform* `age` into a variable which makes the intercept more meaningful. Consider a new variable, `c_age`, which is `age` minus the average age in the sample. Using this **c**entered version of age does not change the predictions or residuals in the model, but it does make the intercept easier to interpret.
 
@@ -140,11 +175,13 @@ Most experienced data scientists would use the log of `rv13` rather than the raw
 
 * We do not know the "true" model. Who is to say that a model using the raw value is right or wrong?
 
-* Check whether or not this choice meaningfully effects the answer to your question. Much of the time, it won't. That is, our inferences are often fairly "robust" to small changes in the model. If you get the same answer with `rv13` as from `log_rv13`, then no one cares which you use.
+* Check whether or not this choice meaningfully affects the answer to your question. Much of the time, it won't. That is, our inferences are often fairly "robust" to small changes in the model. If you get the same answer with `rv13` as from `log_rv13`, then no one cares which you use.
 
 * Follow the conventions in your field. If everyone does X, then you should probably do X, unless you have a good reason not to. If you do have such a reason, explain it prominently.
 
-* Most professionals, when presented with data distributed like `rv13` would take the log. Professionals hate (irrationally?) outliers. Any transformation which makes a distribution look more normal is generally considered a good idea.
+* Most professionals, when presented with data distributed like `rv13`, would take the log. Professionals hate (irrationally?) outliers. Any transformation which makes a distribution look more normal is generally considered a good idea.
+
+
 
 Many of these suggestions apply to every aspect of the modeling process.
 
@@ -245,22 +282,6 @@ Transforming the outcome variable is a much more difficult question. Imagine tha
 See @roas
 
 
-## Selecting variables
-
-
-How do we decide which variables to include in a model? There is no one right answer to this question. Our advice is to keep a variable X if any of the following circumstances apply:
-
-
-* The variable has a large and well-estimated coefficient. This means, roughly, that the 95% confidence interval excludes zero.
-
-* Underlying theory/observation suggests that X has a meaningfully connection to the outcome variable.
-
-* It is standard in your field to include X in such regressions.
-
-* Your boss/client/reviewer/supervisor wants to include X.
-
-
-
 <!-- * Creating new variables, especially by combining different ones into one combined variable. -->
 
 
@@ -292,6 +313,8 @@ print(fit_att_start, detail = FALSE)
 They both seem like good models! The results make sense. People who are liberal have more liberal attitudes about immigration, so we would expect their `att_end` scores to be lower. We would also expect people to provide similar answers in two surveys administered a week or two apart. It makes sense that those with higher (more conservative) values for `att_start` would also have higher values for `att_end`.
 
 How do we choose between these models?
+
+
 
 ### Better models make better predictions
 
@@ -352,7 +375,7 @@ trains %>%
             as_sigma = sqrt(mean(as_err))) 
 ```
 
-There are many different measures of the error which we might calculate. The squared difference is most common for historical reasons: it was the mathemtically most tractable in the pre-computer age. Having calculated a squared difference for each observation, we can sum them or take their average or take the square root of their average. All produce the same relative ranking, but the last is most popular because it (more or less) corresponds to the estimated $\sigma$ for a linear model. Note how these measures are the same as the ones produced by the Bayesian models created above.
+There are many different measures of the error which we might calculate. The squared difference is most common for historical reasons: it was the mathematically most tractable in the pre-computer age. Having calculated a squared difference for each observation, we can sum them or take their average or take the square root of their average. All produce the same relative ranking, but the last is most popular because it (more or less) corresponds to the estimated $\sigma$ for a linear model. Note how these measures are the same as the ones produced by the Bayesian models created above.
 
 <!-- DK: Could make a movie where we get an X value, we calculate a prediction, we plot it, then we plot the truth, then we measure the distance, then we calculate a squared error. Then speed up the movie, doing it for all the points.  -->
 
@@ -454,9 +477,22 @@ ovrftng %>%
 
 <!-- ### Selecting the rows -->
 
-<!-- ## Testing is nonsense -->
+## Testing is nonsense 
+
+As always, it is important to look at the practices of other professionals and the reasons we may choose not to follow those tactics. For instance, our continued problem with hypothesis testing. In hypothesis testing, we assert a null hypothesis $H_0$ about our data and an alternative hypothesis $H_a$. 
+
+When performing hypothesis testing, we either reject the hypothesis or we do not reject it. The qualifications for rejecting are met if the 95% confidence interval excludes the null hypothesis. If the hypothesis *is* included in our 95% confidence interval, we do not reject it. In the case of “insignificant” results, with p > 0.5, we also can’t "reject" the null hypothesis. However, this does not mean that we accept it.
+
+The premise of hypothesis testing is to answer a specific question -- one that may not even be particularly relevant to our understanding of the world -- about our data. So, what are our problems with hypothesis testing? 
+- Rejecting or not rejecting hypotheses doesn't helps us to answer real questions.
+- The fact that a difference is not “significant” has no relevance to how we use the posterior to make decisions.
+- Statistical significance is not equal to *practical* importance. 
+- There is no reason to **test** when you can summarize by providing the full posterior probability distribution.
+
 
 ## Parallel lines
+
+
 
 <!-- att_end ~ liberal + att_start. Same thing as chapters before. Show graphic of parallel lines. Cardinal virtues as always. And, extra, at the end we can use loo_compare to see if this model is better than simpler model of att_end ~ att_start. -->
 
