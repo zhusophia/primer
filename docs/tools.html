@@ -264,7 +264,8 @@ git config --global user.email "your@email.com"</code></pre>
 </h3>
 <p>Include comments in your code. Easy-to-understand chunks of code should not have comments. The code is the comment. But other code will merit many, many lines of comments, more lines than the code itself. In a given file, <em>you should have about as many total lines of comments as you have lines of code</em>.</p>
 <p>Make your comments meaningful. They should not be a simple description of what your code does. The best comments are descriptions about why you did what you did and which other approaches you tried or considered. (The code already tells us what you did.) Good comments often have a “Dear Diary” quality: “I did this. Then I tried that. I finally chose this other thing because of reasons X, Y and Z. If I work on this again, I should look into this other approach.” Because of this, the structure is often a paragraph of comments followed by several lines of code.</p>
-<p>Each line of a comment should begin with the comment symbol (a “hash”) followed by a single space: <code>#</code>. Code comments must be separated from code by one empty line on both sides. Format your code comments neatly. Ctrl-Shift-/ is the easiest way to do that. Name your R code chunks. Spelling matters. Comments should be constructed as sentences, with appropriate capitalization and punctuation.</p>
+<p>Each line of a comment should begin with the comment symbol (a “hash”) followed by a single space: <code>#</code>. Code comments must be separated from code by one empty line on both sides. Format your code comments neatly. Ctrl-Shift-/ is the easiest way to do that. Name your R code chunks, without using weird characters or spaces. <code>download_data</code> is a good R code chunk name. <code>Plot #1</code> is not.</p>
+<p>Spelling matters. Comments should be constructed as sentences, with appropriate capitalization and punctuation.</p>
 </div>
 <div id="graphics" class="section level3 unnumbered">
 <h3>Graphics<a class="anchor" aria-label="anchor" href="#graphics"><i class="fas fa-link"></i></a>
@@ -1636,15 +1637,13 @@ git config --global user.email "your@email.com"</code></pre>
 </tbody>
 </table></div></div>
 <p> </p>
-<p>You can change the column names using <code><a href="https://rdrr.io/pkg/gt/man/cols_label.html">cols_label()</a></code>:</p>
+<p>We can use <code><a href="https://rdrr.io/pkg/gt/man/tab_spanner.html">tab_spanner()</a></code> to add spanner columns. The <code><a href="https://dplyr.tidyverse.org/reference/vars.html">vars()</a></code> argument takes in the variables that the spanner column will cover.</p>
 <div class="sourceCode" id="cb872"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">x</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://rdrr.io/pkg/gt/man/gt.html">gt</a></span><span class="op">(</span><span class="op">)</span><span class="op">%&gt;%</span>
-    <span class="fu"><a href="https://rdrr.io/pkg/gt/man/tab_header.html">tab_header</a></span><span class="op">(</span>title <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/gt/man/md.html">md</a></span><span class="op">(</span><span class="st">"**Enos Data Observations**"</span><span class="op">)</span>, 
-               subtitle <span class="op">=</span> <span class="st">"Gender, Income, and End Attitude from the Trains Data"</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="https://rdrr.io/pkg/gt/man/cols_label.html">cols_label</a></span><span class="op">(</span>gender <span class="op">=</span> <span class="st">"Gender"</span>,
-               income <span class="op">=</span> <span class="st">"Income"</span>, 
-               att_end <span class="op">=</span> <span class="st">"End Attitude"</span><span class="op">)</span></code></pre></div>
+   <span class="fu"><a href="https://rdrr.io/pkg/gt/man/tab_header.html">tab_header</a></span><span class="op">(</span>title <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/gt/man/md.html">md</a></span><span class="op">(</span><span class="st">"**Enos Data Observations**"</span><span class="op">)</span>, 
+              subtitle <span class="op">=</span> <span class="st">"Gender, Income, and End Attitude from the Trains Data"</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+   <span class="fu"><a href="https://rdrr.io/pkg/gt/man/tab_spanner.html">tab_spanner</a></span><span class="op">(</span>label <span class="op">=</span> <span class="st">"Name of Spanner Column Here"</span>, <span class="fu"><a href="https://dplyr.tidyverse.org/reference/vars.html">vars</a></span><span class="op">(</span><span class="va">gender</span>, <span class="va">income</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
@@ -1990,11 +1989,18 @@ git config --global user.email "your@email.com"</code></pre>
 <th colspan="3" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style>Gender, Income, and End Attitude from the Trains Data</th>
     </tr>
 </thead>
-<thead class="gt_col_headings"><tr>
-<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">Gender</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">Income</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">End Attitude</th>
-    </tr></thead>
+<thead class="gt_col_headings">
+<tr>
+<th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2">
+        <span class="gt_column_spanner">Name of Spanner Column Here</span>
+      </th>
+      <th class="gt_col_heading gt_center gt_columns_bottom_border" rowspan="2" colspan="1">att_end</th>
+    </tr>
+<tr>
+<th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">gender</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">income</th>
+    </tr>
+</thead>
 <tbody class="gt_table_body">
 <tr>
 <td class="gt_row gt_left">Female</td>
@@ -2023,17 +2029,17 @@ git config --global user.email "your@email.com"</code></pre>
     </tr>
 </tbody>
 </table></div></div>
+<p>From here on, our current table will not include a spanner column. If you wish to see more examples of spanner columns, go to <a href="https://ppbds.github.io/primer/rubin-causal-model.html#a-single-value-for-tau">Chapter 4</a>.</p>
 <p> </p>
-<p>Use <code><a href="https://rdrr.io/pkg/gt/man/tab_source_note.html">tab_source_note()</a></code> to cite the source of the data or to create a caption. This function is not exclusively for providing a source — though it’s a handy way to do so — and can be used to display any text you’d like:</p>
+<p>You can change the column names using <code><a href="https://rdrr.io/pkg/gt/man/cols_label.html">cols_label()</a></code>:</p>
 <div class="sourceCode" id="cb873"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">x</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://rdrr.io/pkg/gt/man/gt.html">gt</a></span><span class="op">(</span><span class="op">)</span><span class="op">%&gt;%</span>
-   <span class="fu"><a href="https://rdrr.io/pkg/gt/man/tab_header.html">tab_header</a></span><span class="op">(</span>title <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/gt/man/md.html">md</a></span><span class="op">(</span><span class="st">"**Enos Data Observations**"</span><span class="op">)</span>, 
-              subtitle <span class="op">=</span> <span class="st">"Gender, Income, and End Attitude from the Trains Data"</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/pkg/gt/man/cols_label.html">cols_label</a></span><span class="op">(</span>gender <span class="op">=</span> <span class="st">"Gender"</span>,
-             income <span class="op">=</span> <span class="st">"Income"</span>, 
-             att_end <span class="op">=</span> <span class="st">"End Attitude"</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/gt/man/tab_source_note.html">tab_source_note</a></span><span class="op">(</span><span class="st">"Source: Ryan Enos"</span><span class="op">)</span></code></pre></div>
+    <span class="fu"><a href="https://rdrr.io/pkg/gt/man/tab_header.html">tab_header</a></span><span class="op">(</span>title <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/gt/man/md.html">md</a></span><span class="op">(</span><span class="st">"**Enos Data Observations**"</span><span class="op">)</span>, 
+               subtitle <span class="op">=</span> <span class="st">"Gender, Income, and End Attitude from the Trains Data"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+    <span class="fu"><a href="https://rdrr.io/pkg/gt/man/cols_label.html">cols_label</a></span><span class="op">(</span>gender <span class="op">=</span> <span class="st">"Gender"</span>,
+               income <span class="op">=</span> <span class="st">"Income"</span>, 
+               att_end <span class="op">=</span> <span class="st">"End Attitude"</span><span class="op">)</span></code></pre></div>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
@@ -2411,12 +2417,9 @@ git config --global user.email "your@email.com"</code></pre>
       <td class="gt_row gt_right">5</td>
     </tr>
 </tbody>
-<tfoot class="gt_sourcenotes"><tr>
-<td class="gt_sourcenote" colspan="3">Source: Ryan Enos</td>
-    </tr></tfoot>
 </table></div></div>
 <p> </p>
-<p>Using <code><a href="https://rdrr.io/pkg/gt/man/md.html">md()</a></code> again, we can italicize the name of the Enos study in the caption:</p>
+<p>Use <code><a href="https://rdrr.io/pkg/gt/man/tab_source_note.html">tab_source_note()</a></code> to cite the source of the data or to create a caption. This function is not exclusively for providing a source — though it’s a handy way to do so — and can be used to display any text you’d like:</p>
 <div class="sourceCode" id="cb874"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">x</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://rdrr.io/pkg/gt/man/gt.html">gt</a></span><span class="op">(</span><span class="op">)</span><span class="op">%&gt;%</span>
@@ -2425,7 +2428,7 @@ git config --global user.email "your@email.com"</code></pre>
   <span class="fu"><a href="https://rdrr.io/pkg/gt/man/cols_label.html">cols_label</a></span><span class="op">(</span>gender <span class="op">=</span> <span class="st">"Gender"</span>,
              income <span class="op">=</span> <span class="st">"Income"</span>, 
              att_end <span class="op">=</span> <span class="st">"End Attitude"</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/gt/man/tab_source_note.html">tab_source_note</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/gt/man/md.html">md</a></span><span class="op">(</span><span class="st">"Source: Ryan Enos, *Causal Effect of Intergroup Contact on Exclusionary Attitudes*"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+  <span class="fu"><a href="https://rdrr.io/pkg/gt/man/tab_source_note.html">tab_source_note</a></span><span class="op">(</span><span class="st">"Source: Ryan Enos"</span><span class="op">)</span></code></pre></div>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
@@ -2804,24 +2807,20 @@ git config --global user.email "your@email.com"</code></pre>
     </tr>
 </tbody>
 <tfoot class="gt_sourcenotes"><tr>
-<td class="gt_sourcenote" colspan="3">Source: Ryan Enos, <em>Causal Effect of Intergroup Contact on Exclusionary Attitudes</em>
-</td>
+<td class="gt_sourcenote" colspan="3">Source: Ryan Enos</td>
     </tr></tfoot>
 </table></div></div>
 <p> </p>
-<p>Now that the table structure looks good, we want to format the numbers themselves. Let’s add some dollar signs to the income column using <code><a href="https://rdrr.io/pkg/gt/man/fmt_currency.html">fmt_currency()</a></code>. This function also adds commas (if you want commas without dollar signs use <code><a href="https://rdrr.io/pkg/gt/man/fmt_number.html">fmt_number()</a></code>). The <code><a href="https://dplyr.tidyverse.org/reference/vars.html">vars()</a></code> within <code><a href="https://rdrr.io/pkg/gt/man/fmt_currency.html">fmt_currency()</a></code> denotes the variable being formatted as a currency:</p>
+<p>Using <code><a href="https://rdrr.io/pkg/gt/man/md.html">md()</a></code> again, we can italicize the name of the Enos study in the caption:</p>
 <div class="sourceCode" id="cb875"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">x</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/gt/man/gt.html">gt</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="https://rdrr.io/pkg/gt/man/tab_header.html">tab_header</a></span><span class="op">(</span>title <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/gt/man/md.html">md</a></span><span class="op">(</span><span class="st">"**Enos Data Observations**"</span><span class="op">)</span>, 
-               subtitle <span class="op">=</span> <span class="st">"Gender, Income, and End Attitude from the Trains Data"</span><span class="op">)</span><span class="op">%&gt;%</span>
-    <span class="fu"><a href="https://rdrr.io/pkg/gt/man/cols_label.html">cols_label</a></span><span class="op">(</span>gender <span class="op">=</span> <span class="st">"Gender"</span>,
-               income <span class="op">=</span> <span class="st">"Income"</span>, 
-               att_end <span class="op">=</span> <span class="st">"End Attitude"</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-    <span class="fu"><a href="https://rdrr.io/pkg/gt/man/tab_source_note.html">tab_source_note</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/gt/man/md.html">md</a></span><span class="op">(</span><span class="st">"Source: Ryan Enos, *Causal Effect of Intergroup 
-                       Contact on Exclusionary Attitudes*"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="https://rdrr.io/pkg/gt/man/fmt_currency.html">fmt_currency</a></span><span class="op">(</span>columns <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/vars.html">vars</a></span><span class="op">(</span><span class="va">income</span><span class="op">)</span>, 
-                 decimals <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> </code></pre></div>
+  <span class="fu"><a href="https://rdrr.io/pkg/gt/man/gt.html">gt</a></span><span class="op">(</span><span class="op">)</span><span class="op">%&gt;%</span>
+   <span class="fu"><a href="https://rdrr.io/pkg/gt/man/tab_header.html">tab_header</a></span><span class="op">(</span>title <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/gt/man/md.html">md</a></span><span class="op">(</span><span class="st">"**Enos Data Observations**"</span><span class="op">)</span>, 
+              subtitle <span class="op">=</span> <span class="st">"Gender, Income, and End Attitude from the Trains Data"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/gt/man/cols_label.html">cols_label</a></span><span class="op">(</span>gender <span class="op">=</span> <span class="st">"Gender"</span>,
+             income <span class="op">=</span> <span class="st">"Income"</span>, 
+             att_end <span class="op">=</span> <span class="st">"End Attitude"</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/gt/man/tab_source_note.html">tab_source_note</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/gt/man/md.html">md</a></span><span class="op">(</span><span class="st">"Source: Ryan Enos, *Causal Effect of Intergroup Contact on Exclusionary Attitudes*"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
@@ -3175,6 +3174,402 @@ git config --global user.email "your@email.com"</code></pre>
 <tbody class="gt_table_body">
 <tr>
 <td class="gt_row gt_left">Female</td>
+      <td class="gt_row gt_right">135000</td>
+      <td class="gt_row gt_right">11</td>
+    </tr>
+<tr>
+<td class="gt_row gt_left">Female</td>
+      <td class="gt_row gt_right">105000</td>
+      <td class="gt_row gt_right">10</td>
+    </tr>
+<tr>
+<td class="gt_row gt_left">Male</td>
+      <td class="gt_row gt_right">135000</td>
+      <td class="gt_row gt_right">5</td>
+    </tr>
+<tr>
+<td class="gt_row gt_left">Male</td>
+      <td class="gt_row gt_right">300000</td>
+      <td class="gt_row gt_right">11</td>
+    </tr>
+<tr>
+<td class="gt_row gt_left">Male</td>
+      <td class="gt_row gt_right">135000</td>
+      <td class="gt_row gt_right">5</td>
+    </tr>
+</tbody>
+<tfoot class="gt_sourcenotes"><tr>
+<td class="gt_sourcenote" colspan="3">Source: Ryan Enos, <em>Causal Effect of Intergroup Contact on Exclusionary Attitudes</em>
+</td>
+    </tr></tfoot>
+</table></div></div>
+<p> </p>
+<p>Now that the table structure looks good, we want to format the numbers themselves. Let’s add some dollar signs to the income column using <code><a href="https://rdrr.io/pkg/gt/man/fmt_currency.html">fmt_currency()</a></code>. This function also adds commas (if you want commas without dollar signs use <code><a href="https://rdrr.io/pkg/gt/man/fmt_number.html">fmt_number()</a></code>). The <code><a href="https://dplyr.tidyverse.org/reference/vars.html">vars()</a></code> within <code><a href="https://rdrr.io/pkg/gt/man/fmt_currency.html">fmt_currency()</a></code> denotes the variable being formatted as a currency:</p>
+<div class="sourceCode" id="cb876"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">x</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/gt/man/gt.html">gt</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+    <span class="fu"><a href="https://rdrr.io/pkg/gt/man/tab_header.html">tab_header</a></span><span class="op">(</span>title <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/gt/man/md.html">md</a></span><span class="op">(</span><span class="st">"**Enos Data Observations**"</span><span class="op">)</span>, 
+               subtitle <span class="op">=</span> <span class="st">"Gender, Income, and End Attitude from the Trains Data"</span><span class="op">)</span><span class="op">%&gt;%</span>
+    <span class="fu"><a href="https://rdrr.io/pkg/gt/man/cols_label.html">cols_label</a></span><span class="op">(</span>gender <span class="op">=</span> <span class="st">"Gender"</span>,
+               income <span class="op">=</span> <span class="st">"Income"</span>, 
+               att_end <span class="op">=</span> <span class="st">"End Attitude"</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+    <span class="fu"><a href="https://rdrr.io/pkg/gt/man/tab_source_note.html">tab_source_note</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/gt/man/md.html">md</a></span><span class="op">(</span><span class="st">"Source: Ryan Enos, *Causal Effect of Intergroup 
+                       Contact on Exclusionary Attitudes*"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+    <span class="fu"><a href="https://rdrr.io/pkg/gt/man/fmt_currency.html">fmt_currency</a></span><span class="op">(</span>columns <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/vars.html">vars</a></span><span class="op">(</span><span class="va">income</span><span class="op">)</span>, 
+                 decimals <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> </code></pre></div>
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#uvmvsyewrd .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#uvmvsyewrd .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#uvmvsyewrd .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#uvmvsyewrd .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 4px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#uvmvsyewrd .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#uvmvsyewrd .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#uvmvsyewrd .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#uvmvsyewrd .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#uvmvsyewrd .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#uvmvsyewrd .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#uvmvsyewrd .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#uvmvsyewrd .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#uvmvsyewrd .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#uvmvsyewrd .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#uvmvsyewrd .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#uvmvsyewrd .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#uvmvsyewrd .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#uvmvsyewrd .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#uvmvsyewrd .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#uvmvsyewrd .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#uvmvsyewrd .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#uvmvsyewrd .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#uvmvsyewrd .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#uvmvsyewrd .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#uvmvsyewrd .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#uvmvsyewrd .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#uvmvsyewrd .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#uvmvsyewrd .gt_left {
+  text-align: left;
+}
+
+#uvmvsyewrd .gt_center {
+  text-align: center;
+}
+
+#uvmvsyewrd .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#uvmvsyewrd .gt_font_normal {
+  font-weight: normal;
+}
+
+#uvmvsyewrd .gt_font_bold {
+  font-weight: bold;
+}
+
+#uvmvsyewrd .gt_font_italic {
+  font-style: italic;
+}
+
+#uvmvsyewrd .gt_super {
+  font-size: 65%;
+}
+
+#uvmvsyewrd .gt_footnote_marks {
+  font-style: italic;
+  font-size: 65%;
+}
+</style>
+<div id="uvmvsyewrd" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><div class="inline-table"><table class="gt_table">
+<thead class="gt_header">
+<tr>
+<th colspan="3" class="gt_heading gt_title gt_font_normal" style><strong>Enos Data Observations</strong></th>
+    </tr>
+<tr>
+<th colspan="3" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style>Gender, Income, and End Attitude from the Trains Data</th>
+    </tr>
+</thead>
+<thead class="gt_col_headings"><tr>
+<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">Gender</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">Income</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">End Attitude</th>
+    </tr></thead>
+<tbody class="gt_table_body">
+<tr>
+<td class="gt_row gt_left">Female</td>
       <td class="gt_row gt_right">$135,000</td>
       <td class="gt_row gt_right">11</td>
     </tr>
@@ -3211,7 +3606,7 @@ Contact on Exclusionary Attitudes</em>
 <h3>Regression tables<a class="anchor" aria-label="anchor" href="#regression-tables"><i class="fas fa-link"></i></a>
 </h3>
 <p>We can making a <strong>gt</strong> table with a <code><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm()</a></code> regression object. Key to this is the <strong>gtsummary</strong> package and its <code><a href="http://www.danieldsjoberg.com/gtsummary//reference/tbl_regression.html">tbl_regression()</a></code> function.</p>
-<div class="sourceCode" id="cb876"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb877"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://mc-stan.org/rstanarm/">rstanarm</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://github.com/bbolker/broom.mixed">broom.mixed</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ddsjoberg/gtsummary">gtsummary</a></span><span class="op">)</span>
@@ -3230,7 +3625,7 @@ Contact on Exclusionary Attitudes</em>
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#khprlekswo .gt_table {
+#ntukgnpzfs .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -3255,7 +3650,7 @@ Contact on Exclusionary Attitudes</em>
   border-left-color: #D3D3D3;
 }
 
-#khprlekswo .gt_heading {
+#ntukgnpzfs .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -3267,7 +3662,7 @@ Contact on Exclusionary Attitudes</em>
   border-right-color: #D3D3D3;
 }
 
-#khprlekswo .gt_title {
+#ntukgnpzfs .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -3277,7 +3672,7 @@ Contact on Exclusionary Attitudes</em>
   border-bottom-width: 0;
 }
 
-#khprlekswo .gt_subtitle {
+#ntukgnpzfs .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -3287,13 +3682,13 @@ Contact on Exclusionary Attitudes</em>
   border-top-width: 0;
 }
 
-#khprlekswo .gt_bottom_border {
+#ntukgnpzfs .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#khprlekswo .gt_col_headings {
+#ntukgnpzfs .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3308,7 +3703,7 @@ Contact on Exclusionary Attitudes</em>
   border-right-color: #D3D3D3;
 }
 
-#khprlekswo .gt_col_heading {
+#ntukgnpzfs .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3328,7 +3723,7 @@ Contact on Exclusionary Attitudes</em>
   overflow-x: hidden;
 }
 
-#khprlekswo .gt_column_spanner_outer {
+#ntukgnpzfs .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3340,15 +3735,15 @@ Contact on Exclusionary Attitudes</em>
   padding-right: 4px;
 }
 
-#khprlekswo .gt_column_spanner_outer:first-child {
+#ntukgnpzfs .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#khprlekswo .gt_column_spanner_outer:last-child {
+#ntukgnpzfs .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#khprlekswo .gt_column_spanner {
+#ntukgnpzfs .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -3360,7 +3755,7 @@ Contact on Exclusionary Attitudes</em>
   width: 100%;
 }
 
-#khprlekswo .gt_group_heading {
+#ntukgnpzfs .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3382,7 +3777,7 @@ Contact on Exclusionary Attitudes</em>
   vertical-align: middle;
 }
 
-#khprlekswo .gt_empty_group_heading {
+#ntukgnpzfs .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3397,15 +3792,15 @@ Contact on Exclusionary Attitudes</em>
   vertical-align: middle;
 }
 
-#khprlekswo .gt_from_md > :first-child {
+#ntukgnpzfs .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#khprlekswo .gt_from_md > :last-child {
+#ntukgnpzfs .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#khprlekswo .gt_row {
+#ntukgnpzfs .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3424,7 +3819,7 @@ Contact on Exclusionary Attitudes</em>
   overflow-x: hidden;
 }
 
-#khprlekswo .gt_stub {
+#ntukgnpzfs .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3436,7 +3831,7 @@ Contact on Exclusionary Attitudes</em>
   padding-left: 12px;
 }
 
-#khprlekswo .gt_summary_row {
+#ntukgnpzfs .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3446,7 +3841,7 @@ Contact on Exclusionary Attitudes</em>
   padding-right: 5px;
 }
 
-#khprlekswo .gt_first_summary_row {
+#ntukgnpzfs .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3456,7 +3851,7 @@ Contact on Exclusionary Attitudes</em>
   border-top-color: #D3D3D3;
 }
 
-#khprlekswo .gt_grand_summary_row {
+#ntukgnpzfs .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3466,7 +3861,7 @@ Contact on Exclusionary Attitudes</em>
   padding-right: 5px;
 }
 
-#khprlekswo .gt_first_grand_summary_row {
+#ntukgnpzfs .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3476,11 +3871,11 @@ Contact on Exclusionary Attitudes</em>
   border-top-color: #D3D3D3;
 }
 
-#khprlekswo .gt_striped {
+#ntukgnpzfs .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#khprlekswo .gt_table_body {
+#ntukgnpzfs .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3489,7 +3884,7 @@ Contact on Exclusionary Attitudes</em>
   border-bottom-color: #D3D3D3;
 }
 
-#khprlekswo .gt_footnotes {
+#ntukgnpzfs .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3503,13 +3898,13 @@ Contact on Exclusionary Attitudes</em>
   border-right-color: #D3D3D3;
 }
 
-#khprlekswo .gt_footnote {
+#ntukgnpzfs .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#khprlekswo .gt_sourcenotes {
+#ntukgnpzfs .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3523,46 +3918,46 @@ Contact on Exclusionary Attitudes</em>
   border-right-color: #D3D3D3;
 }
 
-#khprlekswo .gt_sourcenote {
+#ntukgnpzfs .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#khprlekswo .gt_left {
+#ntukgnpzfs .gt_left {
   text-align: left;
 }
 
-#khprlekswo .gt_center {
+#ntukgnpzfs .gt_center {
   text-align: center;
 }
 
-#khprlekswo .gt_right {
+#ntukgnpzfs .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#khprlekswo .gt_font_normal {
+#ntukgnpzfs .gt_font_normal {
   font-weight: normal;
 }
 
-#khprlekswo .gt_font_bold {
+#ntukgnpzfs .gt_font_bold {
   font-weight: bold;
 }
 
-#khprlekswo .gt_font_italic {
+#ntukgnpzfs .gt_font_italic {
   font-style: italic;
 }
 
-#khprlekswo .gt_super {
+#ntukgnpzfs .gt_super {
   font-size: 65%;
 }
 
-#khprlekswo .gt_footnote_marks {
+#ntukgnpzfs .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="khprlekswo" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><div class="inline-table"><table class="gt_table">
+<div id="ntukgnpzfs" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><div class="inline-table"><table class="gt_table">
 <thead class="gt_header">
 <tr>
 <th colspan="3" class="gt_heading gt_title gt_font_normal" style>Regression of Attitudes about Immigration</th>
@@ -3597,7 +3992,7 @@ Contact on Exclusionary Attitudes</em>
 <tr>
 <td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Republican</td>
       <td class="gt_row gt_center">2.2</td>
-      <td class="gt_row gt_center">0.81, 3.5</td>
+      <td class="gt_row gt_center">0.84, 3.5</td>
     </tr>
 </tbody>
 <tfoot class="gt_sourcenotes"><tr>

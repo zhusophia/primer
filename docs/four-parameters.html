@@ -71,16 +71,43 @@
 <!-- Add page 217 to selecting variables. Simple version. Can't talk about everything. Can't talk about interactions, for example. Talk about testing and how stupid it is! -->
 <!-- Write out better models make better predictions on new data. Concepts! Cross validation. Leave one out. Blah, blah, blah. -->
 <!-- Going back to att_end models. Then loo() and loo_compare(). -->
+<!-- In Better models make better predictions, add red dots (to first) and red line (to second) to indicate where all the data points would be if your model were perfect. Should we change the aspect on these plots so that they are "square"? Maybe add y and y_hat to the x-axis labels for these two plots. At least discuss in the text. These plots are weird! Not seen before! -->
+<!-- Transform variables goes first, then select variables. -->
 <p><em>This chapter is still a DRAFT. Check back in a few weeks.</em></p>
 <p>In our haste to make progress — to get all the way through the process of building, interpreting and using models — we have given short shrift to some of the messy details of model building and evaluation. This chapter fills in those lacunae. We will also introduce models with four parameters.</p>
-<div id="transforming-variables" class="section level2" number="9.1">
+<div id="selecting-variables" class="section level2" number="9.1">
 <h2>
-<span class="header-section-number">9.1</span> Transforming variables<a class="anchor" aria-label="anchor" href="#transforming-variables"><i class="fas fa-link"></i></a>
+<span class="header-section-number">9.1</span> Selecting variables<a class="anchor" aria-label="anchor" href="#selecting-variables"><i class="fas fa-link"></i></a>
 </h2>
-<p>It is often convenient to transform a predictor variable.</p>
-<div id="centering" class="section level3" number="9.1.1">
+<!-- MF: Discuss indicator & index variables prior to explaining guidelines? Not this week! -->
+<p>How do we decide which variables to include in a model? There is no one right answer to this question. Our advice is to keep a variable X if any of the following circumstances apply:</p>
+<ul>
+<li><p>The variable has a large and well-estimated coefficient. This means, roughly, that the 95% confidence interval excludes zero.</p></li>
+<li><p>Underlying theory/observation suggests that X has a meaningfully connection to the outcome variable.</p></li>
+<li><p>If the variable has a small standard error, it is general practice to include it in our model to improve predictions. If the standard error of a coefficient is large and we find no other reason to include it in our model, it may be a signal to remove the variable from your model.</p></li>
+<li><p>If a predictor isn’t statistically significant, we would normally consider discarding it. The exception to this rule is if we wanted to compare two indicators (for instance, if we wanted to compare results from the variable <code>party</code> – to look at Democrats versus Republicans – in the <code>trains</code> dataset) in spite of that variable not appearing to be significant.</p></li>
+<li><p>It is standard in your field to include X in such regressions.</p></li>
+<li><p>Your boss/client/reviewer/supervisor wants to include X.</p></li>
+</ul>
+<!-- MF: Go through one of the datasets and explain whether we would include variables X, Y, and Z. Not this week.  --><div id="variables-in-the-trains-dataset" class="section level3" number="9.1.1">
 <h3>
-<span class="header-section-number">9.1.1</span> Centering<a class="anchor" aria-label="anchor" href="#centering"><i class="fas fa-link"></i></a>
+<span class="header-section-number">9.1.1</span> Variables in the <code>trains</code> dataset<a class="anchor" aria-label="anchor" href="#variables-in-the-trains-dataset"><i class="fas fa-link"></i></a>
+</h3>
+<p>To look at our recommendations in practice, let’s focus on the <code>trains</code> dataset. The variables in <code>trains</code> include <code>gender</code>, <code>liberal</code>, <code>party</code>, <code>age</code>, <code>income</code>, <code>att_start</code>, <code>treatment</code>, and <code>att_end</code>.Which variables would be best to include in a model?</p>
+</div>
+</div>
+<div id="transforming-variables" class="section level2" number="9.2">
+<h2>
+<span class="header-section-number">9.2</span> Transforming variables<a class="anchor" aria-label="anchor" href="#transforming-variables"><i class="fas fa-link"></i></a>
+</h2>
+<!-- MF: Look at "Scaling of predictors and regression coefficients" in RAOS (pg. 183) 
+
+Do we discuss anything in the "Other transformations section" (pg. 195)? This includes square root transformations, idiosyncratic transformations, & using discrete vs continuous predictors. DK: Not square root. Other stuff? Maybe at the end? -->
+<p>Another question for us data scientists: what happens when our assumptions break down? The first option is to extend our model, perhaps by addressing our concerns with validity by including error models. The second option, which we will focus on here, is to modify our data or model so that our assumptions are more reasonable. How do we accomplish this?</p>
+<p>It is often convenient to transform a predictor variable so that our model makes more sense. Let’s explore exactly what that means.</p>
+<div id="centering" class="section level3" number="9.2.1">
+<h3>
+<span class="header-section-number">9.2.1</span> Centering<a class="anchor" aria-label="anchor" href="#centering"><i class="fas fa-link"></i></a>
 </h3>
 <p>Recall our model of <code>income</code> as a function of <code>age</code>. Mathematics:</p>
 <p><span class="math display">\[ y_i = \beta_0  + \beta_1 age_i + \epsilon_i\]</span></p>
@@ -103,7 +130,7 @@
 ## Auxiliary parameter(s):
 ##       Median  MAD_SD 
 ## sigma 74166.4  5146.6</code></pre>
-<p>There is nothing wrong with this model. Yet the interpretation of <span class="math inline">\(\beta_0\)</span>, the intercept in the regression, is awkward. It means the average income for people of age zero. Yet that is useless! There are no people of zero age in our data. And, even if there were, it would be weird to think about such people taking the commuter trade into Boston and filling out our survey forms.</p>
+<p>There is nothing wrong with this model. Yet the interpretation of <span class="math inline">\(\beta_0\)</span>, the intercept in the regression, is awkward. It means the average income for people of age zero. That is useless! There are no people of zero age in our data. And, even if there were, it would be weird to think about such people taking the commuter trade into Boston and filling out our survey forms.</p>
 <p>It is easy, however, to <em>transform</em> <code>age</code> into a variable which makes the intercept more meaningful. Consider a new variable, <code>c_age</code>, which is <code>age</code> minus the average age in the sample. Using this <strong>c</strong>entered version of age does not change the predictions or residuals in the model, but it does make the intercept easier to interpret.</p>
 <div class="sourceCode" id="cb744"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains_2</span> <span class="op">&lt;-</span> <span class="va">trains</span> <span class="op">%&gt;%</span> 
@@ -124,9 +151,9 @@
 ## sigma 74273.6  4882.0</code></pre>
 <p>The intercept, 141,804, is the expected income for someone with <code>age_c = 0</code>, i.e., someone of an average age in the data, which is around 42.</p>
 </div>
-<div id="scaling" class="section level3" number="9.1.2">
+<div id="scaling" class="section level3" number="9.2.2">
 <h3>
-<span class="header-section-number">9.1.2</span> Scaling<a class="anchor" aria-label="anchor" href="#scaling"><i class="fas fa-link"></i></a>
+<span class="header-section-number">9.2.2</span> Scaling<a class="anchor" aria-label="anchor" href="#scaling"><i class="fas fa-link"></i></a>
 </h3>
 <p>Centering — changing a variable via addition/subtraction — often makes the intercept easier to interpret. Scaling — changing a variable via multiplication/division — often makes it easier to interpret coefficients. The most common scaling method is to divide the variable by its standard deviation.</p>
 <div class="sourceCode" id="cb746"><pre class="downlit sourceCode r">
@@ -150,9 +177,9 @@
 <p><em>When comparing two people, one about 1 standard deviation worth of years older than the other, we expect the older person to earn about 11,000 more.</em></p>
 <p>But, because we scaled without centering, the intercept is now back to the (nonsensical) meaning of the expected income for people of age 0.</p>
 </div>
-<div id="z-scores" class="section level3" number="9.1.3">
+<div id="z-scores" class="section level3" number="9.2.3">
 <h3>
-<span class="header-section-number">9.1.3</span> <em>z</em>-scores<a class="anchor" aria-label="anchor" href="#z-scores"><i class="fas fa-link"></i></a>
+<span class="header-section-number">9.2.3</span> <em>z</em>-scores<a class="anchor" aria-label="anchor" href="#z-scores"><i class="fas fa-link"></i></a>
 </h3>
 <p>The most common transformation applies both centering and scaling. The base R function <code><a href="https://rdrr.io/r/base/scale.html">scale()</a></code> subtracts the mean and divides by the standard deviation. A variable so transformed is a “<em>z</em>-score,” meaning a variable with a mean of zero and a standard deviation of one. Using <em>z</em>-scores makes interpretation easier, especially when we seek to compare the importance of different predictors.</p>
 <div class="sourceCode" id="cb748"><pre class="downlit sourceCode r">
@@ -177,9 +204,9 @@
 <p><em>When comparing two individuals who differ in age by one standard deviation, which is about 12 years in this study, the older person is expected to earn about 11,000 more than the younger.</em></p>
 <p>Note that, when using <em>z</em>-scores, we would often phrase this comparison in terms of “sigmas.” One person is “one sigma” older than another person means that they are one standard deviation older. This is simple enough, once you get used to it, but also confusing since we are already using the word “sigma” to mean <span class="math inline">\(\sigma\)</span>, the standard deviation of <span class="math inline">\(\epsilon_i\)</span>. Alas, <em>language is something we deal with rather than control.</em> You will hear the same word “sigma” applied to both concepts, even in the same sentence. Determine meaning by context.</p>
 </div>
-<div id="taking-logs" class="section level3" number="9.1.4">
+<div id="taking-logs" class="section level3" number="9.2.4">
 <h3>
-<span class="header-section-number">9.1.4</span> Taking logs<a class="anchor" aria-label="anchor" href="#taking-logs"><i class="fas fa-link"></i></a>
+<span class="header-section-number">9.2.4</span> Taking logs<a class="anchor" aria-label="anchor" href="#taking-logs"><i class="fas fa-link"></i></a>
 </h3>
 <p>It is often helpful to take the log of predictor variables, especially in cases in which their distribution is skewed. You should generally only take the log of variables for which all the values are strictly positive. The log of a negative number is not defined. Consider the number of registered voters (<code>rv13</code>) at each of the polling stations in <code>kenya</code>.</p>
 <div class="sourceCode" id="cb750"><pre class="downlit sourceCode r">
@@ -206,16 +233,16 @@
 <p>Most experienced data scientists would use the log of <code>rv13</code> rather than the raw value. Comments:</p>
 <ul>
 <li><p>We do not know the “true” model. Who is to say that a model using the raw value is right or wrong?</p></li>
-<li><p>Check whether or not this choice meaningfully effects the answer to your question. Much of the time, it won’t. That is, our inferences are often fairly “robust” to small changes in the model. If you get the same answer with <code>rv13</code> as from <code>log_rv13</code>, then no one cares which you use.</p></li>
+<li><p>Check whether or not this choice meaningfully affects the answer to your question. Much of the time, it won’t. That is, our inferences are often fairly “robust” to small changes in the model. If you get the same answer with <code>rv13</code> as from <code>log_rv13</code>, then no one cares which you use.</p></li>
 <li><p>Follow the conventions in your field. If everyone does X, then you should probably do X, unless you have a good reason not to. If you do have such a reason, explain it prominently.</p></li>
-<li><p>Most professionals, when presented with data distributed like <code>rv13</code> would take the log. Professionals hate (irrationally?) outliers. Any transformation which makes a distribution look more normal is generally considered a good idea.</p></li>
+<li><p>Most professionals, when presented with data distributed like <code>rv13</code>, would take the log. Professionals hate (irrationally?) outliers. Any transformation which makes a distribution look more normal is generally considered a good idea.</p></li>
 </ul>
 <p>Many of these suggestions apply to every aspect of the modeling process.</p>
 <!-- Split out general advice to elsewhere. -->
 </div>
-<div id="adding-transformed-terms" class="section level3" number="9.1.5">
+<div id="adding-transformed-terms" class="section level3" number="9.2.5">
 <h3>
-<span class="header-section-number">9.1.5</span> Adding transformed terms<a class="anchor" aria-label="anchor" href="#adding-transformed-terms"><i class="fas fa-link"></i></a>
+<span class="header-section-number">9.2.5</span> Adding transformed terms<a class="anchor" aria-label="anchor" href="#adding-transformed-terms"><i class="fas fa-link"></i></a>
 </h3>
 <p>Instead of simply transforming variables, we can add more terms which are transformed versions of a variable. Consider the relation of <code>height</code> to <code>age</code> in <code>nhanes</code>. Let’s start by dropping the missing values.</p>
 <div class="sourceCode" id="cb751"><pre class="downlit sourceCode r">
@@ -281,9 +308,9 @@
 <!-- ### If parameters are unicorns, why bother with transformations? -->
 <!-- * standardizing variables. Key advantage is to make the coefficients easier to interpret. Even though the "right" thing to do in looking at models is to use posterior_* to look at model predictions, this takes some time. It is very handy, first pass, to look at all the coefficients and get a sense of which ones are "interesting." Then, focus on those when making newobs tibbles. -->
 </div>
-<div id="transforming-the-outcome-variable" class="section level3" number="9.1.6">
+<div id="transforming-the-outcome-variable" class="section level3" number="9.2.6">
 <h3>
-<span class="header-section-number">9.1.6</span> Transforming the outcome variable<a class="anchor" aria-label="anchor" href="#transforming-the-outcome-variable"><i class="fas fa-link"></i></a>
+<span class="header-section-number">9.2.6</span> Transforming the outcome variable<a class="anchor" aria-label="anchor" href="#transforming-the-outcome-variable"><i class="fas fa-link"></i></a>
 </h3>
 <p>Transforming predictor variables is uncontroversial. It does not matter much. Change most continuous predictor variables to <span class="math inline">\(z\)</span>-scores and you won’t go far wrong. Or keep them in their original form, and take care with your interpretations. It’s all good.</p>
 <p>Transforming the outcome variable is a much more difficult question. Imagine that we seek to create a model which explains <code>rv13</code> from the <code>kenya</code> tibble. Should we transform it?</p>
@@ -292,20 +319,8 @@
 <li><p>Much of the same advice with regard to taking logs of predictor variables applies here as well.</p></li>
 </ul>
 <p>See <span class="citation"><a href="references.html#ref-roas" role="doc-biblioref">Gelman, Hill, and Vehtari</a> (<a href="references.html#ref-roas" role="doc-biblioref">2020</a>)</span></p>
-</div>
-</div>
-<div id="selecting-variables" class="section level2" number="9.2">
-<h2>
-<span class="header-section-number">9.2</span> Selecting variables<a class="anchor" aria-label="anchor" href="#selecting-variables"><i class="fas fa-link"></i></a>
-</h2>
-<p>How do we decide which variables to include in a model? There is no one right answer to this question. Our advice is to keep a variable X if any of the following circumstances apply:</p>
-<ul>
-<li><p>The variable has a large and well-estimated coefficient. This means, roughly, that the 95% confidence interval excludes zero.</p></li>
-<li><p>Underlying theory/observation suggests that X has a meaningfully connection to the outcome variable.</p></li>
-<li><p>It is standard in your field to include X in such regressions.</p></li>
-<li><p>Your boss/client/reviewer/supervisor wants to include X.</p></li>
-</ul>
 <!-- * Creating new variables, especially by combining different ones into one combined variable. -->
+</div>
 </div>
 <div id="comparing-models-in-theory" class="section level2" number="9.3">
 <h2>
@@ -406,7 +421,7 @@
 ##   lib_sigma as_sigma
 ##       &lt;dbl&gt;    &lt;dbl&gt;
 ## 1      2.68     1.35</code></pre>
-<p>There are many different measures of the error which we might calculate. The squared difference is most common for historical reasons: it was the mathemtically most tractable in the pre-computer age. Having calculated a squared difference for each observation, we can sum them or take their average or take the square root of their average. All produce the same relative ranking, but the last is most popular because it (more or less) corresponds to the estimated <span class="math inline">\(\sigma\)</span> for a linear model. Note how these measures are the same as the ones produced by the Bayesian models created above.</p>
+<p>There are many different measures of the error which we might calculate. The squared difference is most common for historical reasons: it was the mathematically most tractable in the pre-computer age. Having calculated a squared difference for each observation, we can sum them or take their average or take the square root of their average. All produce the same relative ranking, but the last is most popular because it (more or less) corresponds to the estimated <span class="math inline">\(\sigma\)</span> for a linear model. Note how these measures are the same as the ones produced by the Bayesian models created above.</p>
 <!-- DK: Could make a movie where we get an X value, we calculate a prediction, we plot it, then we plot the truth, then we measure the distance, then we calculate a squared error. Then speed up the movie, doing it for all the points.  -->
 <!-- DK: Could discuss uncertainty in the estimated sigma. But left it out in this draft. -->
 <p>Sadly, it is not wise to simply select the model which fits the data best because doing so can be misleading. After all, you are cheating! You are using that very data to select your parameters and then, after using the data once, turning around and “checking” to see how well your model fits the data. It better fit! You used it to pick your parameters! This is the danger of <em>overfitting</em>.</p>
@@ -420,6 +435,7 @@
 <p>What happens when we fit a model with one predictor?</p>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-610-1.png" width="100%"></div>
 <p>That is a reasonable model. It does not fit the data particularly well, but we certainly believe that higher values of <code>x</code> are associated with higher values of <code>y</code>. A linear fit is not unreasonable.</p>
+<!-- DK: Add a discussion about the difference between plotting y versus x, as we do here, and y versus y_hat, which is what we did in the previous section. In fact, show y versus y_hat with this model, right now! -->
 <p>But we can also use some of the lessons from above and try a quadratic fit by adding <span class="math inline">\(x^2\)</span> as a predictor.</p>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-611-1.png" width="100%"></div>
 <p>Is this a better model? Maybe?</p>
@@ -442,11 +458,13 @@
     <span class="fu">scale_y_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">10</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> </code></pre></div>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-612-1.png" width="100%"></div>
 <p><em>If the only criteria we cared about was how well the model predicts using the data on which the parameters were estimated, then a model with more parameters will always be better.</em> But that is not what truly matters. What matters is how well the model works on data which was not used to create the model.</p>
+<!-- DK: Discuss how this is the perfect model. Plot y versus y_hat. It is a perfect line!  -->
 </div>
 <div id="better-models-make-better-predictions-on-new-data" class="section level3" number="9.3.3">
 <h3>
 <span class="header-section-number">9.3.3</span> Better models make better predictions on new data<a class="anchor" aria-label="anchor" href="#better-models-make-better-predictions-on-new-data"><i class="fas fa-link"></i></a>
 </h3>
+<!-- DK: Gelman makes the relevant points. Ideal is totally new data after we submit our model. No cheating! Or, we can try to be disciplined and keep an out of sample. Discuss cross validation. Ultimate logic is leave one out validation. -->
 </div>
 </div>
 <div id="comparing-models-in-practice" class="section level2" number="9.4">
@@ -455,17 +473,28 @@
 </h2>
 <!-- Run loo (on both models from above). Explain each part. Don't use math they don't know. Focus on elpd_loo, since that is what compare_loo does. Then, run compare_loo, explain what it shows. Then, we choose the att_start model. It does much better! -->
 <!-- ### Selecting the rows -->
-<!-- ## Testing is nonsense -->
 </div>
-<div id="parallel-lines" class="section level2" number="9.5">
+<div id="testing-is-nonsense" class="section level2" number="9.5">
 <h2>
-<span class="header-section-number">9.5</span> Parallel lines<a class="anchor" aria-label="anchor" href="#parallel-lines"><i class="fas fa-link"></i></a>
+<span class="header-section-number">9.5</span> Testing is nonsense<a class="anchor" aria-label="anchor" href="#testing-is-nonsense"><i class="fas fa-link"></i></a>
+</h2>
+<p>As always, it is important to look at the practices of other professionals and the reasons we may choose not to follow those tactics. For instance, our continued problem with hypothesis testing. In hypothesis testing, we assert a null hypothesis <span class="math inline">\(H_0\)</span> about our data and an alternative hypothesis <span class="math inline">\(H_a\)</span>.</p>
+<p>When performing hypothesis testing, we either reject the hypothesis or we do not reject it. The qualifications for rejecting are met if the 95% confidence interval excludes the null hypothesis. If the hypothesis <em>is</em> included in our 95% confidence interval, we do not reject it. In the case of “insignificant” results, with p &gt; 0.5, we also can’t “reject” the null hypothesis. However, this does not mean that we accept it.</p>
+<p>The premise of hypothesis testing is to answer a specific question – one that may not even be particularly relevant to our understanding of the world – about our data. So, what are our problems with hypothesis testing?
+- Rejecting or not rejecting hypotheses doesn’t helps us to answer real questions.
+- The fact that a difference is not “significant” has no relevance to how we use the posterior to make decisions.
+- Statistical significance is not equal to <em>practical</em> importance.
+- There is no reason to <strong>test</strong> when you can summarize by providing the full posterior probability distribution.</p>
+</div>
+<div id="parallel-lines" class="section level2" number="9.6">
+<h2>
+<span class="header-section-number">9.6</span> Parallel lines<a class="anchor" aria-label="anchor" href="#parallel-lines"><i class="fas fa-link"></i></a>
 </h2>
 <!-- att_end ~ liberal + att_start. Same thing as chapters before. Show graphic of parallel lines. Cardinal virtues as always. And, extra, at the end we can use loo_compare to see if this model is better than simpler model of att_end ~ att_start. -->
 </div>
-<div id="summary-9" class="section level2" number="9.6">
+<div id="summary-9" class="section level2" number="9.7">
 <h2>
-<span class="header-section-number">9.6</span> Summary<a class="anchor" aria-label="anchor" href="#summary-9"><i class="fas fa-link"></i></a>
+<span class="header-section-number">9.7</span> Summary<a class="anchor" aria-label="anchor" href="#summary-9"><i class="fas fa-link"></i></a>
 </h2>
 
 </div>
@@ -478,16 +507,18 @@
       <ul class="nav navbar-nav">
 <li><a class="nav-link" href="#four-parameters"><span class="header-section-number">9</span> Four Parameters</a></li>
 <li>
-<a class="nav-link" href="#transforming-variables"><span class="header-section-number">9.1</span> Transforming variables</a><ul class="nav navbar-nav">
-<li><a class="nav-link" href="#centering"><span class="header-section-number">9.1.1</span> Centering</a></li>
-<li><a class="nav-link" href="#scaling"><span class="header-section-number">9.1.2</span> Scaling</a></li>
-<li><a class="nav-link" href="#z-scores"><span class="header-section-number">9.1.3</span> z-scores</a></li>
-<li><a class="nav-link" href="#taking-logs"><span class="header-section-number">9.1.4</span> Taking logs</a></li>
-<li><a class="nav-link" href="#adding-transformed-terms"><span class="header-section-number">9.1.5</span> Adding transformed terms</a></li>
-<li><a class="nav-link" href="#transforming-the-outcome-variable"><span class="header-section-number">9.1.6</span> Transforming the outcome variable</a></li>
+<a class="nav-link" href="#selecting-variables"><span class="header-section-number">9.1</span> Selecting variables</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#variables-in-the-trains-dataset"><span class="header-section-number">9.1.1</span> Variables in the trains dataset</a></li></ul>
+</li>
+<li>
+<a class="nav-link" href="#transforming-variables"><span class="header-section-number">9.2</span> Transforming variables</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#centering"><span class="header-section-number">9.2.1</span> Centering</a></li>
+<li><a class="nav-link" href="#scaling"><span class="header-section-number">9.2.2</span> Scaling</a></li>
+<li><a class="nav-link" href="#z-scores"><span class="header-section-number">9.2.3</span> z-scores</a></li>
+<li><a class="nav-link" href="#taking-logs"><span class="header-section-number">9.2.4</span> Taking logs</a></li>
+<li><a class="nav-link" href="#adding-transformed-terms"><span class="header-section-number">9.2.5</span> Adding transformed terms</a></li>
+<li><a class="nav-link" href="#transforming-the-outcome-variable"><span class="header-section-number">9.2.6</span> Transforming the outcome variable</a></li>
 </ul>
 </li>
-<li><a class="nav-link" href="#selecting-variables"><span class="header-section-number">9.2</span> Selecting variables</a></li>
 <li>
 <a class="nav-link" href="#comparing-models-in-theory"><span class="header-section-number">9.3</span> Comparing models in theory</a><ul class="nav navbar-nav">
 <li><a class="nav-link" href="#better-models-make-better-predictions"><span class="header-section-number">9.3.1</span> Better models make better predictions</a></li>
@@ -496,8 +527,9 @@
 </ul>
 </li>
 <li><a class="nav-link" href="#comparing-models-in-practice"><span class="header-section-number">9.4</span> Comparing models in practice</a></li>
-<li><a class="nav-link" href="#parallel-lines"><span class="header-section-number">9.5</span> Parallel lines</a></li>
-<li><a class="nav-link" href="#summary-9"><span class="header-section-number">9.6</span> Summary</a></li>
+<li><a class="nav-link" href="#testing-is-nonsense"><span class="header-section-number">9.5</span> Testing is nonsense</a></li>
+<li><a class="nav-link" href="#parallel-lines"><span class="header-section-number">9.6</span> Parallel lines</a></li>
+<li><a class="nav-link" href="#summary-9"><span class="header-section-number">9.7</span> Summary</a></li>
 </ul>
 
       <div class="book-extra">
