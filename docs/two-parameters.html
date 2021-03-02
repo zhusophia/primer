@@ -143,7 +143,7 @@
 <div class="sourceCode" id="cb631"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">nhanes</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">gender</span>, <span class="va">height</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu">sample_n</span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></code></pre></div>
+  <span class="fu">slice_sample</span><span class="op">(</span>n <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 5 x 3
 ##     age gender height
 ##   &lt;int&gt; &lt;chr&gt;   &lt;dbl&gt;
@@ -305,7 +305,7 @@
 
 <span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">9</span><span class="op">)</span>
 <span class="va">ch7</span> <span class="op">&lt;-</span> <span class="va">ch7_all</span> <span class="op">%&gt;%</span> 
-  <span class="fu">sample_n</span><span class="op">(</span><span class="fl">50</span><span class="op">)</span></code></pre></div>
+  <span class="fu">slice_sample</span><span class="op">(</span>n <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></code></pre></div>
 <p>Will the data we have — which is only for a sample of adult American men more than a decade ago — allow us to answer our questions, however roughly?</p>
 <p>That is where Wisdom comes in. In the social sciences, <em>there is never a perfect relationship between the data you have and the question you are trying to answer.</em> Data for American males in the past is not the same thing as data for American males today. Nor is it the same as the data for men in France or Mexico. Moreover, the problem hasn’t specified where on Earth we are, nor who we are near. Walking by a basketball tournament will generate different answers than walking around Times Square.</p>
 <p>Yet, this data is relevant. Right? It is certainly better than nothing. <em>Using not-perfect data is generally better than using no data at all.</em></p>
@@ -895,7 +895,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
 <code class="sourceCode R"><span class="va">ch7</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>fitted_value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html">fitted</a></span><span class="op">(</span><span class="va">fit_obj</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>residual <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/residuals.html">residuals</a></span><span class="op">(</span><span class="va">fit_obj</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu">sample_n</span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></code></pre></div>
+  <span class="fu">slice_sample</span><span class="op">(</span>n <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 5 x 3
 ##   height fitted_value residual
 ##    &lt;dbl&gt;        &lt;dbl&gt;    &lt;dbl&gt;
@@ -1204,9 +1204,9 @@ Then, create a tibble, first column is ID. Second column is height_sample, which
   <span class="co"># Note how sample_id is a tibble, not just a number, as we are used to in</span>
   <span class="co"># tibbles. List-columns can contain almost anything. The first argument to</span>
   <span class="co"># map() is the thing that we are iterating over. In this case, ID does not</span>
-  <span class="co"># matter since we are not using its value in the function call to sample_n().</span>
+  <span class="co"># matter since we are not using its value in the function call to slice_sample().</span>
   
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>sample_data <span class="op">=</span> <span class="fu">map</span><span class="op">(</span><span class="va">ID</span>, <span class="op">~</span> <span class="fu">sample_n</span><span class="op">(</span><span class="va">ch7_all</span>, <span class="fl">50</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>sample_data <span class="op">=</span> <span class="fu">map</span><span class="op">(</span><span class="va">ID</span>, <span class="op">~</span> <span class="fu">slice_sample</span><span class="op">(</span><span class="va">ch7_all</span>, n <span class="op">=</span> <span class="fl">50</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   
   <span class="co"># It is easy to forget both the tilde and the period when using map functions.</span>
   <span class="co"># In this row, we are doing the exact same modeling as we did above. But, in</span>
