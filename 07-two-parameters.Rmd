@@ -78,7 +78,7 @@ Look at a random sample of our data:
 ```{r}
 nhanes %>% 
   select(age, gender, height) %>% 
-  sample_n(5)
+  slice_sample(n = 5)
 ```
 
 Notice how there is a decimal in the `height` column of `ch7`. This is because `height` is a `<dbl>` and not an `<int>`.
@@ -140,7 +140,7 @@ ch7_all <- nhanes %>%
 
 set.seed(9)
 ch7 <- ch7_all %>% 
-  sample_n(50)
+  slice_sample(n = 50)
 ```
 
 
@@ -407,7 +407,7 @@ Two other important concepts in model creation are fitted values and residuals.
 ch7 %>% 
   mutate(fitted_value = fitted(fit_obj)) %>% 
   mutate(residual = residuals(fit_obj)) %>% 
-  sample_n(5)
+  slice_sample(n = 5)
 ```
 
 The fitted value represents the model's best guess at to what the true value of the outcome should be for that individual, given information about any covariates. This is a tricky concept since, after all, *we already know what the actual value is.* We commonly use "hat" notation for fitted values. $y_i$ is the actual height for man $i$. $\hat{y_i}$ is the fitted (or predicted or modeled) height for man $i$. It is the height we would guess if we did not know his true height. The residual, $r_i$, is the difference between the outcome ($y_i$) and the fitted value $\hat{y_i}$. These definitions lead to a natural decomposition of the outcome data:
@@ -729,9 +729,9 @@ cov_analysis <- tibble(ID = 1:n) %>%
   # Note how sample_id is a tibble, not just a number, as we are used to in
   # tibbles. List-columns can contain almost anything. The first argument to
   # map() is the thing that we are iterating over. In this case, ID does not
-  # matter since we are not using its value in the function call to sample_n().
+  # matter since we are not using its value in the function call to slice_sample().
   
-  mutate(sample_data = map(ID, ~ sample_n(ch7_all, 50))) %>% 
+  mutate(sample_data = map(ID, ~ slice_sample(ch7_all, n = 50))) %>% 
   
   # It is easy to forget both the tilde and the period when using map functions.
   # In this row, we are doing the exact same modeling as we did above. But, in

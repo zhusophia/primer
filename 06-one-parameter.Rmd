@@ -1,11 +1,8 @@
 # One Parameter {#one-parameter}
 
-<!-- Priorities:  --> 
-
-
 <!-- Another paragraph or two of discussion about the final posterior. How do we use it? Within what range would you offer 50/50 odds that the true percentage lies? (use quantile(0.25, 0.75). Area under the curve? Explain clearly how that 26% is calculated. What is post_dist? What does it mean? How can I use it? Maybe show it sorted? Add some code comments. -->
 
-<!-- better rayshader? -->
+<!-- Expand the use of rayshader. For each 3-D graphic, we need to add a movie with five frames. First frame is the current graphic. Second frame is with the conditional distribution set as a different color, probably red. We want to see this slice in the context of the joint distribution. Third frame shows the joint distribution with all non-red points going to zero. Ideally, this would be in motion, with the points just decreasing down. The meaning is that taking a conditional distribution means that everything outside that slice goes to zero. They are impossible. Fourth frame shows us rotate around so that we are looking at the cross-section from the side. -->
 
 <!-- You must understand what the standard error of $\hat{p}$ means. You do not need to understand why. -->
 
@@ -213,7 +210,7 @@ Observe that `urn` has `r scales::comma(nrow(urn))` rows, meaning that the urn c
 Note that, in this chapter, we have used the variable `ID` in two different ways: first, to keep track of the samples drawn by the 33 individual teams and, second, to keep track of the 
 `r scales::comma(nrow(urn))` beads in our virtual urn. And that is OK! `ID` means the same concept in both cases. We will need to be careful, however, when working with more than one table which has an `ID` column. In that case, we will rename one of the columns in order to avoid conflicts.   
 
-Now that we have a virtual analog of our urn, we need a virtual analog of the shovel seen in Figure 6.2 to generate virtual samples of 50 beads. We're going to use `sample_n()` and list-columns. 
+Now that we have a virtual analog of our urn, we need a virtual analog of the shovel seen in Figure 6.2 to generate virtual samples of 50 beads. We're going to use `slice_sample()` and list-columns. 
 
 Let's take a sample of 50 beads from our virtual urn.
 
@@ -221,11 +218,11 @@ Let's take a sample of 50 beads from our virtual urn.
 ```{r}
 
 # Define ID as 1 to look at one example of drawing fifty beads. When ID is
-# called within map(), we are performing sample_n() upon our urn once (ID = 1)
+# called within map(), we are performing slice_sample() upon our urn once (ID = 1)
 # and taking a sample of 50 beads.
 
 tibble(ID = 1) %>% 
-  mutate(shovel = map(ID, ~ sample_n(urn, size = 50)))
+  mutate(shovel = map(ID, ~ slice_sample(urn, n = 50)))
 ```
 
 As usual, map functions and list-columns are powerful but confusing.
@@ -238,7 +235,7 @@ Let's compute the proportion of beads in our virtual sample that are red. First,
 
 ```{r}
 tibble(ID = 1) %>% 
-  mutate(shovel = map(ID, ~ sample_n(urn, size = 50))) %>% 
+  mutate(shovel = map(ID, ~ slice_sample(urn, n = 50))) %>% 
   
   # Using map_int, perform the sum where (within the urn -- denotoed by the
   # period) the color is equal to red. This counts the number of red beads in
@@ -254,7 +251,7 @@ Second, add a column for the total number of beads. (We already "know" that this
 
 ```{r}
 tibble(ID = 1) %>% 
-  mutate(shovel = map(ID, ~ sample_n(urn, size = 50))) %>% 
+  mutate(shovel = map(ID, ~ slice_sample(urn, n = 50))) %>% 
   mutate(numb_red = map_int(shovel, ~ sum(.$color == "red"))) %>% 
   mutate(numb_beads = map_int(shovel, ~ length(.$color)))
 ```
@@ -263,7 +260,7 @@ Third, calculate the proportion red:
 
 ```{r}
 tibble(ID = 1) %>% 
-  mutate(shovel = map(ID, ~ sample_n(urn, size = 50))) %>% 
+  mutate(shovel = map(ID, ~ slice_sample(urn, n = 50))) %>% 
   mutate(numb_red = map_int(shovel, ~ sum(.$color == "red"))) %>% 
   mutate(numb_beads = map_int(shovel, ~ length(.$color))) %>% 
   mutate(prop_red = numb_red / numb_beads)
@@ -283,7 +280,7 @@ We'll save these results in a data frame called `virtual_samples`.
 set.seed(9)
 
 virtual_samples <- tibble(ID = 1:33) %>% 
-  mutate(shovel = map(ID, ~ sample_n(urn, size = 50))) %>% 
+  mutate(shovel = map(ID, ~ slice_sample(urn, n = 50))) %>% 
   mutate(numb_red = map_int(shovel, ~ sum(.$color == "red"))) %>% 
   mutate(numb_beads = map_int(shovel, ~ length(.$color))) %>% 
   mutate(prop_red = numb_red / numb_beads)
@@ -370,7 +367,7 @@ Now say we want to study the effects of sampling variation not for 33 samples, b
 set.seed(9)
 
 virtual_samples <- tibble(ID = 1:1000) %>% 
-  mutate(shovel = map(ID, ~ sample_n(urn, size = 50))) %>% 
+  mutate(shovel = map(ID, ~ slice_sample(urn, n = 50))) %>% 
   mutate(numb_red = map_int(shovel, ~ sum(.$color == "red"))) %>% 
   mutate(numb_beads = map_int(shovel, ~ length(.$color))) %>% 
   mutate(prop_red = numb_red / numb_beads)
@@ -409,7 +406,7 @@ Start by virtually using the shovel 1000 times. Then, compute the resulting 1000
 
 ```{r}
 virtual_samples_25 <- tibble(ID = 1:1000) %>% 
-  mutate(shovel = map(ID, ~ sample_n(urn, size = 25))) %>% 
+  mutate(shovel = map(ID, ~ slice_sample(urn, n = 25))) %>% 
   mutate(numb_red = map_int(shovel, ~ sum(.$color == "red"))) %>% 
   mutate(numb_beads = map_int(shovel, ~ length(.$color))) %>% 
   mutate(prop_red = numb_red / numb_beads)
@@ -428,7 +425,7 @@ We will repeat this process with a shovel size of **50**.
 
 ```{r}
 virtual_samples_50 <- tibble(ID = 1:1000) %>% 
-  mutate(shovel = map(ID, ~ sample_n(urn, size = 50))) %>% 
+  mutate(shovel = map(ID, ~ slice_sample(urn, n = 50))) %>% 
   mutate(numb_red = map_int(shovel, ~ sum(.$color == "red"))) %>% 
   mutate(numb_beads = map_int(shovel, ~ length(.$color))) %>% 
   mutate(prop_red = numb_red / numb_beads)
@@ -447,7 +444,7 @@ Finally, we will perform the same process with 1000 replicates to map the histog
 
 ```{r}
 virtual_samples_100 <- tibble(ID = 1:1000) %>% 
-  mutate(shovel = map(ID, ~ sample_n(urn, size = 100))) %>% 
+  mutate(shovel = map(ID, ~ slice_sample(urn, n = 100))) %>% 
   mutate(numb_red = map_int(shovel, ~ sum(.$color == "red"))) %>% 
   mutate(numb_beads = map_int(shovel, ~ length(.$color))) %>% 
   mutate(prop_red = numb_red / numb_beads)
@@ -560,7 +557,7 @@ Note that in the last section, we ran more or less the same code three times, bu
 
 ```{r}
 tibble(ID = 1:1000) %>% 
-  mutate(shovel = map(ID, ~ sample_n(urn, size = 25))) %>% 
+  mutate(shovel = map(ID, ~ slice_sample(urn, n = 25))) %>% 
   mutate(numb_red = map_int(shovel, ~ sum(.$color == "red"))) %>% 
   mutate(numb_beads = map_int(shovel, ~ length(.$color))) %>% 
   mutate(prop_red = numb_red / numb_beads)
@@ -571,7 +568,7 @@ Once you have a pipe which does what you want, creating a function is relatively
 ```{r}
 make_prop_red <- function(x, shovel_size, reps){
   tibble(ID = 1:reps) %>% 
-    mutate(shovel = map(ID, ~ sample_n(x, size = shovel_size))) %>% 
+    mutate(shovel = map(ID, ~ slice_sample(x, n = shovel_size))) %>% 
     mutate(numb_red = map_int(shovel, ~ sum(.$color == "red"))) %>% 
     mutate(numb_beads = map_int(shovel, ~ length(.$color))) %>% 
     mutate(prop_red = numb_red / numb_beads)
@@ -887,7 +884,7 @@ joint_dist <-
 # After making our joint distribution, take a sample of size 10.
 
 joint_dist %>% 
-  sample_n(10)
+  slice_sample(n = 10)
 ```
 
 After looking at our joint distribution, let's plot it. Call the `red_in_urn` for our y-axis, to indicate the number of red beads in the urn. Call `red_in_paddle` for our x-axis, to indicate the number of red beads in each paddle. This allows us to see which possible values of red beads in our samples correspond with $p$, the proportion of red beads in the urn.

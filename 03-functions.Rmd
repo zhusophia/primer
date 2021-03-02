@@ -378,7 +378,7 @@ The first step in function creation is to write code in a normal pipe which does
 ```{r}
 nhanes %>% 
   drop_na() %>%
-  sample_n(10) %>% 
+  slice_sample(n = 10) %>% 
   pull(height)
 ```
 
@@ -388,7 +388,7 @@ We start with `nhanes`, use `drop_na()` to remove rows with missing values for a
 no_NA_sampler <- function(){
   nhanes %>% 
     drop_na() %>%
-    sample_n(10) %>% 
+    slice_sample(n = 10) %>% 
     pull(height)
 }
 
@@ -403,7 +403,7 @@ The first version, however, "hard codes" a lot of options which we might want to
 no_NA_sampler <- function(n){
   nhanes %>% 
     drop_na() %>%
-    sample_n(n) %>% 
+    slice_sample(n = n) %>% 
     pull(height)
 }
 
@@ -417,7 +417,7 @@ What if we want to sample from a different variable than `height` or from a diff
 no_NA_sampler <- function(tbl, var, n){
   tbl %>% 
     drop_na() %>%
-    sample_n(n) %>% 
+    slice_sample(n = n) %>% 
     pull({{var}})
 }
 
@@ -455,7 +455,7 @@ no_NA_sampler <- function(tbl, var, n){
     # whether or not I am sampling with or without replacement and b) which I
     # should be doing.
     
-    sample_n(size = n) %>% 
+    slice_sample(n = n) %>% 
     pull({{var}})
 }
 ```
