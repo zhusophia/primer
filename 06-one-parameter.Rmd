@@ -18,17 +18,17 @@
 
 <!-- Could not get figure references to work. They have been removed. But we ought to figure that out and add them back!  Should create a simple example (three line Rmd file) and then ask on RStudio Community.  -->
 
-<!-- 1) Make a 15 second video, put it on YouTube. "We don't estimate parameters because we care about parameters. Parameters are imaginary! Like unicorns! [Put finger on forehead and imitate unicorn.] We estimate parameters to build Data Generating Mechanisms. And with a DGM, you can move the world!" NOTE: will do when I can get access to better internet. -->
+<!-- Make a 15 second video, put it on YouTube. "We don't estimate parameters because we care about parameters. Parameters are imaginary! Like unicorns! [Put finger on forehead and imitate unicorn.] We estimate parameters to build Data Generating Mechanisms. And with a DGM, you can move the world!" -->
 
 ```{r, echo = FALSE}
 knitr::include_app("https://www.youtube.com/embed/e3PJ3Du_zDc")
 ```
 
-This scene is from  *The Hunger Games*, a dystopian novel in which children are selected via lottery to fight to the death. Primrose Everdeen is selected from the urn. Why does she have the misfortune of being selected? Or, as we will refer to it henceforth, sampled?
+This scene is from  *The Hunger Games*, a dystopian novel in which children are selected via lottery to fight to the death. Primrose Everdeen is selected from the urn. Why does she have the misfortune of being selected? Or, as we data scientists say, *sampled*?
 
-Last chapter, we learned about probability, the act of quantifying uncertainty. This chapter, we will learn about *sampling*, the beginning of our journey toward inference. When we sample, we take a *portion* of a total population and attempt to draw a conclusion about the portion, a conclusion which we can then *generalize* to the entire population. 
+In Chapter \@ref(probability), we learned about probability, the framework for quantifying uncertainty. In this chapter, we will learn about *sampling*, the beginning of our journey toward inference. When we sample, we take some *units* from a population, calculate statistics based on those units, and make inferences about unknown parameters associated with the population. 
 
-The urn below has a certain number of red and a certain number of white beads all of equal size, mixed well together. What proportion of this urn's beads are red? That is, what is the value of $p$?
+The urn below has a certain number of red and a certain number of white beads all of equal size, mixed well together. What proportion, $p$, of this urn's beads are red? 
 
 ```{r, echo = FALSE, fig.cap = "An urn with red and white beads."}
 knitr::include_graphics("06-one-parameter/images/sampling_bowl_1.jpg")
@@ -36,15 +36,11 @@ knitr::include_graphics("06-one-parameter/images/sampling_bowl_1.jpg")
 
 One way to answer this question would be to perform an exhaustive count: remove each bead individually, count the number of red beads, count the number of white beads, and divide the number of red beads by the total number of beads. Call that ratio $p$, the proportion of red beads in the urn. However, this would be a long and tedious process. Therefore, we will use sampling! Consider two questions:
 
-*If we get 17 red beads in a random sample of size 50 taken from an urn, what proportion $p$ of the beads in the urn are red?*
+*If we get 17 red beads in a random sample of size 50 taken from the urn, what proportion $p$ of the beads in the urn are red?*
 
-*What is the probability, using the same urn, that we will draw more than 8 red beads if we use a shovel of size 20?*
+*What is the probability, using that same urn, that we will draw more than 8 red beads if we use a shovel of size 20?*
 
-To begin this chapter, we will look at a real sampling activity: the urn. We will build important conceptual knowledge that will aid us as we move into more complex examples. Next, we will simulate the urn example using our virtual tools and knowledge. These tools will help us automate the long process of sampling, and better understand the way in which we make predictions. 
-
-After this, we will attempt to understand *standard error* and the ways in which uncertainty factors into our predictions. In this section, we will also learn some important terminology related to sampling and data science. As we enter the second half of our chapter, we will answer the two questions above using our new understanding. 
-
-Finally, we will have a discussion section to go over important topics such as case studies, our sampling mechanism, and the difference between precision and accuracy. We will end with a summary that includes the most important takeaways from each section of this chapter. Good luck!
+To begin this chapter, we will look at a real sampling activity: the urn.  Then, we will simulate the urn example using R code. This will help us to understand the *standard error* and the ways in which uncertainty factors into our predictions. We then create a joint distribution of models and data for the urn example. We derive a posterior distribution from that joint distribution, and then use that posterior to answer our questions. 
 
 Use the **tidyverse** package. 
 
@@ -175,7 +171,7 @@ knitr::include_graphics("06-one-parameter/images/danny_sampling.png")
 ```
 
 
-Moreover, because we mixed the beads before each use of the shovel, the samples were randomly drawn. Because each sample was drawn at random, the samples were different from each other. Because the samples were different from each other, we obtained the different proportions red observed in the previous histogram. This is known as the concept of *sampling variation*. 
+Moreover, because we mixed the beads before each use of the shovel, the samples were random and independent. Because each sample was drawn at random, the samples were different from each other. Because the samples were different from each other, we obtained the different proportions red observed in the previous histogram. This is an example of  *sampling variation*. 
 
 In Section \@ref(virtual-sampling), we'll mimic the hands-on sampling activity we just performed on a computer. This will allow us not only to repeat the sampling exercise much more than 33 times, but it will also allow us to use shovels with different numbers of slots than just 50. 
 
@@ -186,17 +182,26 @@ To tie the contents of this chapter to the real world, we'll present an example 
 
 ## Virtual sampling {#virtual-sampling}
 
-In the previous Section \@ref(sampling-activity), we performed a *tactile* sampling activity. In other words, we used a physical urn of beads and a physical shovel. We performed this sampling activity by hand so that we could develop a firm understanding of the root ideas behind sampling. In this section, we mimic this tactile sampling activity with a *virtual* sampling activity using a computer. We have a virtual urn and a virtual shovel. 
+In Section \@ref(sampling-activity), we performed a *tactile* sampling activity. We used a physical urn of beads and a physical shovel. We performed this sampling activity by hand so that we could develop our intuition about the ideas behind sampling. In this section, we mimic this physical sampling with *virtual* sampling, using a computer. We have a virtual urn and a virtual shovel. 
 
 ### Using the virtual shovel once
 
-Let's start by performing the virtual analog of the tactile sampling exercise we performed in Section \@ref(sampling-activity). We first need a virtual analog of the urn seen in the beginning of our chapter. To this end, we create a tibble named `urn`. The rows of `urn` correspond exactly with the contents of the actual urn. 
+Virtual sampling requires a virtual urn. Create a tibble named `urn`. The rows of `urn` correspond exactly to the contents of the actual urn. 
 
-For reference, `sample_frac()` merely re-arranges the rows of the tibble. We use `set.seed()` to ensure that the beads in our virtual urn are always in the same order. This ensures that the figures in the book match their written descriptions.
 
 ```{r}
+# set.seed() ensures that the beads in our virtual urn are always in the same
+# order. This ensures that the figures in the book match their written
+# descriptions.
+
 set.seed(10)
+
 urn <- tibble(color = c(rep("red", 400), rep("white", 600))) %>%
+  
+  # sample_frac() keeps all the rows in the tibble but rearranges their order.
+  # We don't need to do this. A virtual urn does not care about the order of the
+  # beads. But we find it aesthetically pleasing.
+  
   sample_frac() %>% 
   mutate(ID = 1:1000) %>% 
   select(ID, color)
@@ -205,30 +210,36 @@ urn
 ```
 
 Observe that `urn` has `r scales::comma(nrow(urn))` rows, meaning that the urn contains 
-`r scales::comma(nrow(urn))` equally-sized beads. The first variable `ID` is used as an *identification variable*; none of the beads in the actual urn are marked with numbers. The second variable `color` indicates whether a particular virtual bead is red or white. View the contents of the urn in RStudio's data viewer and scroll through the contents to convince yourself that `urn` is indeed a virtual analog of the actual urn.
+`r scales::comma(nrow(urn))` beads. The first variable `ID` is used as an *identification variable*. None of the beads in the actual urn are marked with numbers. The second variable `color` indicates whether a particular virtual bead is red or white. View the contents of the urn in RStudio's data viewer and scroll through the contents to convince yourself that `urn` is indeed a virtual analog of the actual urn.
 
 Note that, in this chapter, we have used the variable `ID` in two different ways: first, to keep track of the samples drawn by the 33 individual teams and, second, to keep track of the 
-`r scales::comma(nrow(urn))` beads in our virtual urn. And that is OK! `ID` means the same concept in both cases. We will need to be careful, however, when working with more than one table which has an `ID` column. In that case, we will rename one of the columns in order to avoid conflicts.   
+`r scales::comma(nrow(urn))` beads in our virtual urn. And that is OK! `ID` means the same concept in both cases.   
 
-Now that we have a virtual analog of our urn, we need a virtual analog of the shovel seen in Figure 6.2 to generate virtual samples of 50 beads. We're going to use `slice_sample()` and list-columns. 
 
-Let's take a sample of 50 beads from our virtual urn.
+Now that we have a virtual urn, we need a virtual shovel. We use  `slice_sample()` and list-columns. Take a sample of 50 beads from our virtual urn.
 
 
 ```{r}
-
 # Define ID as 1 to look at one example of drawing fifty beads. When ID is
-# called within map(), we are performing slice_sample() upon our urn once (ID = 1)
-# and taking a sample of 50 beads.
+# called within map(), we are performing slice_sample() upon our urn once (ID =
+# 1) and taking a sample of 50 beads. Note that the ID in the main tibble has
+# nothing to do wkth the ID variable in urn. The former refers to samples from
+# the urn. The latter refers to beads in the urn.
 
 tibble(ID = 1) %>% 
   mutate(shovel = map(ID, ~ slice_sample(urn, n = 50)))
 ```
 
-As usual, map functions and list-columns are powerful but confusing.
+As usual, map functions and list-columns are powerful but confusing. The `str()` is a good way to explore tibbles with list-columns.
 
-<!-- DK: Walk through that code slowly. And through the output object at the end. Show that the tibble lives inside. -->
 
+```{r}
+tibble(ID = 1) %>% 
+  mutate(shovel = map(ID, ~ slice_sample(urn, n = 50))) %>% 
+  str()
+```
+
+There are two levels. There is one row in the tibble for each sample. So far, we have only drawn one sample. Within each row, there is a second level, the tibble which is the sample. That tibble has two variables: `ID` and `color`.
 
 Let's compute the proportion of beads in our virtual sample that are red. First, add a column which indicates the number of red beads.
 
