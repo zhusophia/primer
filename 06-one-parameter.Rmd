@@ -182,25 +182,26 @@ To tie the contents of this chapter to the real world, we'll present an example 
 
 ## Virtual sampling {#virtual-sampling}
 
-In Section \@ref(sampling-activity), we performed a *tactile* sampling activity. We used a physical urn of beads and a physical shovel. We performed this sampling activity by hand so that we could develop our intuition about the ideas behind sampling. In this section, we mimic this physical sampling with *virtual* sampling, using a computer. We have a virtual urn and a virtual shovel. 
+We just performed a *tactile* sampling activity. We used a physical urn of beads and a physical shovel. We did this by hand so that we could develop our intuition about the ideas behind sampling. In this section, we mimic this physical sampling with *virtual* sampling, using a computer.  
 
 ### Using the virtual shovel once
 
-Virtual sampling requires a virtual urn. Create a tibble named `urn`. The rows of `urn` correspond exactly to the contents of the actual urn. 
+Virtual sampling requires a virtual urn and a virtual shovel. Create a tibble named `urn`. The rows of `urn` correspond exactly to the contents of the actual urn. 
 
 
 ```{r}
 # set.seed() ensures that the beads in our virtual urn are always in the same
 # order. This ensures that the figures in the book match their written
-# descriptions.
+# descriptions. We want 40% of the beads to be red.
 
 set.seed(10)
 
-urn <- tibble(color = c(rep("red", 400), rep("white", 600))) %>%
+urn <- tibble(color = c(rep("red", 400), 
+                        rep("white", 600))) %>%
   
   # sample_frac() keeps all the rows in the tibble but rearranges their order.
   # We don't need to do this. A virtual urn does not care about the order of the
-  # beads. But we find it aesthetically pleasing.
+  # beads. But we find it aesthetically pleasing to mix them up.
   
   sample_frac() %>% 
   mutate(ID = 1:1000) %>% 
@@ -210,13 +211,13 @@ urn
 ```
 
 Observe that `urn` has `r scales::comma(nrow(urn))` rows, meaning that the urn contains 
-`r scales::comma(nrow(urn))` beads. The first variable `ID` is used as an *identification variable*. None of the beads in the actual urn are marked with numbers. The second variable `color` indicates whether a particular virtual bead is red or white. View the contents of the urn in RStudio's data viewer and scroll through the contents to convince yourself that `urn` is indeed a virtual analog of the actual urn.
+`r scales::comma(nrow(urn))` beads. The first variable `ID` is used as an *identification variable*. None of the beads in the actual urn are marked with numbers. The second variable `color` indicates whether a particular virtual bead is red or white. 
 
 Note that, in this chapter, we have used the variable `ID` in two different ways: first, to keep track of the samples drawn by the 33 individual teams and, second, to keep track of the 
 `r scales::comma(nrow(urn))` beads in our virtual urn. And that is OK! `ID` means the same concept in both cases.   
 
 
-Now that we have a virtual urn, we need a virtual shovel. We use  `slice_sample()` and list-columns. Take a sample of 50 beads from our virtual urn.
+Our virtual urn needs a virtual shovel. We use `slice_sample()` and a list-column to take a sample of 50 beads from our virtual urn.
 
 
 ```{r}
@@ -230,7 +231,7 @@ tibble(ID = 1) %>%
   mutate(shovel = map(ID, ~ slice_sample(urn, n = 50)))
 ```
 
-As usual, map functions and list-columns are powerful but confusing. The `str()` is a good way to explore tibbles with list-columns.
+As usual, map functions and list-columns are powerful but confusing. The `str()` function is a good way to explore a tibble with a list-column.
 
 
 ```{r}
@@ -241,22 +242,21 @@ tibble(ID = 1) %>%
 
 There are two levels. There is one row in the tibble for each sample. So far, we have only drawn one sample. Within each row, there is a second level, the tibble which is the sample. That tibble has two variables: `ID` and `color`.
 
-Let's compute the proportion of beads in our virtual sample that are red. First, add a column which indicates the number of red beads.
+Let's compute the proportion of beads in our virtual sample that are red. First, add a column which indicates the number of red beads in the sample taken in the shovel.
 
 
 ```{r}
 tibble(ID = 1) %>% 
   mutate(shovel = map(ID, ~ slice_sample(urn, n = 50))) %>% 
   
-  # Using map_int, perform the sum where (within the urn -- denotoed by the
+  # Using map_int, perform the sum where (within the shovel -- denoted by the
   # period) the color is equal to red. This counts the number of red beads in
-  # the urn.
+  # the shovel.
   
   mutate(numb_red = map_int(shovel, ~ sum(.$color == "red")))
 ```
 
-
-Why does this work? Because R treats `TRUE` like the number `1` and `FALSE` like the number `0`. So summing the number of `TRUE`s and `FALSE`s is equivalent to summing `1`'s and `0`'s. In the end, this operation counts the number of beads where `color` is `red`.
+How does this work? R treats `TRUE` like the number `1` and `FALSE` like the number `0`. So summing the number of `TRUE`s and `FALSE`s is equivalent to summing `1`'s and `0`'s. In the end, this operation counts the number of beads where `color` equals "red".
 
 Second, add a column for the total number of beads. (We already "know" that this is 50, but it never hurts to make our code more general.)
 
@@ -277,7 +277,7 @@ tibble(ID = 1) %>%
   mutate(prop_red = numb_red / numb_beads)
 ```
 
-Careful readers will note that the `numb_red` is changing in each example above. The reason, of course, is that each block re-runs the shovel exercise, getting a (potentially) different number of red beads each time. If we wanted the same number in each block, we would need to use `set.seed()` each time, always providing the same `seed` each time.
+Careful readers will note that the `numb_red` is changing in each example above. The reason, of course, is that each block re-runs the shovel exercise, getting a (potentially) different number of red beads. If we wanted the same number in each block, we would need to use `set.seed()` each time, always providing the same `seed` each time.
 
 Let's now perform the virtual analog of having 33 groups of students use the sampling shovel!
 
@@ -308,24 +308,29 @@ ggplot(aes(x = prop_red)) +
   geom_histogram(binwidth = 0.05, 
                  boundary = 0.4, 
                  color = "white") +
+  
+  # To use mathematical symbols in titles and labels, use the expression()
+  # function, as here.
+  
   labs(x = expression(hat(p)),
        y = "Count",
        title = "Distribution of 33 proportions red") +
   
-  # Labels the axes in an attractive fashion. Without this code, the axes labels
-  # would include 2.5, which makes no sense because all the values are integers.
+  # Label the y-axis in an attractive fashion. Without this code, the axis
+  # labels would include 2.5, which makes no sense because all the values are
+  # integers.
   
   scale_y_continuous(breaks = seq(2, 10, 2))
 ```
 
-Note that we add `binwidth = 0.05` and `boundary = 0.4` arguments as well. Setting `boundary = 0.4` ensures a binning scheme with one of the bins' boundaries at 0.4. Since `binwidth = 0.05` is also set, this will create bins with boundaries at 0.30, 0.35, 0.45, and so on. Recall that $\hat{p}$ is equal to the proportions red in our samples. 
+We set the `boundary` and `binwidth` arguments. Setting `boundary = 0.4` ensures a binning scheme with one bin's boundary at 0.4. Since `binwidth = 0.05`, this will create bins with boundaries at 0.30, 0.35, 0.45, and so on. Recall that $\hat{p}$ is equal to the proportion of beads which are red in our samples. 
 
-Observe that we occasionally obtained proportions red that are less than 30%. On the other hand, we occasionally obtained proportions that are greater than 45%. However, the most frequently occurring proportions were between 35% and 40%. Why do we have these differences in proportions red? Because of *sampling variation*. 
+Observe that we occasionally obtained proportions red that are less than 30%. On the other hand, we occasionally obtained proportions that are greater than 45%. However, the most frequently occurring proportions were between 35% and 45%. Why do we have these differences in proportions red? Because of *sampling variation*. 
 
 Compare our virtual results with our tactile results from the previous section. Observe that both histograms are somewhat similar in their center and variation, although not identical. These slight differences are again due to random sampling variation. Furthermore, observe that both distributions are somewhat bell-shaped.
 
 
-```{r, fig.cap = "Comparing 33 virtual and 33 tactile proportions red. Note that, though the figures differ slightly, both are centered around .35 to .40. This shows that, in both sampling distributions, the most frequently occuring proportion red is between 35 and 40%."}
+```{r, echo = FALSE, fig.cap = "Comparing 33 virtual and 33 tactile proportions red. Note that, though the figures differ slightly, both are centered around .35 to .45. This shows that, in both sampling distributions, the most frequently occuring proportion red is between 35% and 45%."}
 
 # bind_rows() takes our data from virtual_samples and "binds" it with our data
 # from tactile_sample_urn, resulting in one set of data for us to work with.
@@ -399,21 +404,14 @@ virtual_samples %>%
          title = "Distribution of 1,000 proportions red") 
 ```
 
-Once again, the most frequently occurring proportions of red beads occur between 35% and 45%. Every now and then, we obtain proportions as low as between 20% and 25%, and others as high as between 55% and 60%. These are rare, however. The missing buckets at .2 and .65 occur due to the fact that, with our urn, extreme highs and lows are infrequent -- occasionally, they do not occur at all. Furthermore, observe that we now have a much more symmetric and smoother bell-shaped distribution. This distribution is, in fact, approximated well by a normal distribution. 
+The most frequently occurring proportions of red beads occur, again, between 35% and 45%. Every now and then, we obtain proportions much lower or higher. These are rare, however. Observe that we now have a much more symmetric and smoother bell-shaped distribution. This shape is, in fact, well approximated by a normal distribution. 
+
+Why the empty spaces among the bars? Recall that, with only 50 beads, there are only 51 possible values for $\hat{p}$: 0, 0.02, 0.04, ..., 0.98, 1. A value of 0.03 or 0.39 is impossible, hence the gaps.
 
 
 ### The effect of different shovel sizes {#different-shovels}
 
-Instead of just one shovel, imagine we have three choices of shovels to extract a sample of beads with: shovels of size 25, 50, and 100.
-
-If our goal is to estimate the proportion of the urn's beads that are red, which shovel would we choose? 
-Using our newly developed tools for virtual sampling, let's unpack the effect of having different sample sizes! 
-
-1. Virtually use the appropriate shovel to generate 1,000 samples with `size` beads.
-1. Compute the resulting 1,000 replicates of the proportion of the shovel's beads that are red.
-1. Visualize the distribution of these 1,000 proportions red using a histogram.
-
-Start by virtually using the shovel 1000 times. Then, compute the resulting 1000 replicates of proportion red. Finally, plot the distribution using a histogram. 
+Instead of just one shovel, imagine we have three choices of shovels to extract a sample of beads with: shovels of size 25, 50, and 100. Using our newly developed tools for virtual sampling, let's unpack the effect of having different sample sizes. Start by virtually using the shovel 1,000 times. Then, compute the resulting 1,000 replicates of proportion red. Finally, plot the distribution using a histogram. 
 
 ```{r}
 virtual_samples_25 <- tibble(ID = 1:1000) %>% 
@@ -422,10 +420,9 @@ virtual_samples_25 <- tibble(ID = 1:1000) %>%
   mutate(numb_beads = map_int(shovel, ~ length(.$color))) %>% 
   mutate(prop_red = numb_red / numb_beads)
 
-
 virtual_samples_25 %>%
   ggplot(aes(x = prop_red)) +
-  geom_histogram(binwidth = 0.05, 
+  geom_histogram(binwidth = 0.01, 
                  boundary = 0.4, 
                  color = "white") +
   labs(x = "Proportion of 25 beads that were red", 
@@ -444,12 +441,14 @@ virtual_samples_50 <- tibble(ID = 1:1000) %>%
 
 virtual_samples_50  %>%
   ggplot(aes(x = prop_red)) +
-  geom_histogram(binwidth = 0.05, 
+  geom_histogram(binwidth = 0.01, 
                  boundary = 0.4, 
                  color = "white") +
   labs(x = "Proportion of 50 beads that were red", 
        title = "50")  
 ```
+
+There are about twice as many bars with the size-50 shovel than the size-25 shovel because the former allows for many more possible values for $\hat{p}$.
 
 Finally, we will perform the same process with 1000 replicates to map the histogram using a shovel size of **100**.
 
@@ -463,7 +462,7 @@ virtual_samples_100 <- tibble(ID = 1:1000) %>%
 
 virtual_samples_100 %>%
   ggplot(aes(x = prop_red)) +
-  geom_histogram(binwidth = 0.05, 
+  geom_histogram(binwidth = 0.01, 
                  boundary = 0.4, 
                  color = "white") +
   labs(x = "Proportion of 100 beads that were red", 
@@ -492,7 +491,7 @@ virtual_prop <- bind_rows(virtual_samples_25 %>%
 # (~n).
 
 comparing_sampling_distributions <- ggplot(virtual_prop, aes(x = prop_red)) +
-  geom_histogram(binwidth = 0.05, boundary = 0.4, color = "white") +
+  geom_histogram(binwidth = 0.01, boundary = 0.4, color = "white") +
   labs(x = "Proportion of shovel's beads that are red", 
        title = "Comparing distributions of proportions red for three different shovel sizes.") +
   facet_wrap(~ n) 
@@ -502,9 +501,9 @@ comparing_sampling_distributions <- ggplot(virtual_prop, aes(x = prop_red)) +
 comparing_sampling_distributions
 ```
 
-Observe that as the sample size increases, the variation of the 1,000 replicates of the proportion of red decreases. In other words, as the sample size increases, there are fewer differences due to sampling variation and the distribution centers more tightly around the same value. Eyeballing Figure 6.12, all three histograms appear to center around roughly 40%.
+Observe that as the sample size increases, the variation of the 1,000 replicates of the proportion of red decreases. In other words, as the sample size increases, there are fewer differences due to sampling variation and the distribution centers more tightly around the same value. All three histograms center around roughly 40%.
 
-We can be numerically explicit about the amount of variation in our three sets of 1,000 values of `prop_red` using the *standard deviation*. A standard deviation is a summary statistic that measures the amount of variation within a numerical variable. For all three sample sizes, let's compute the standard deviation of the 1,000 proportions red by running the following data wrangling code that uses the `sd()` summary function.
+We can be numerically explicit about the amount of variation in our three sets of 1,000 values of `prop_red` by using the *standard deviation*. A standard deviation is a summary statistic that measures the amount of variation within a numerical variable. For all three sample sizes, let's compute the standard deviation of the 1,000 proportions red by running the following data wrangling code that uses the `sd()` summary function.
 
 ```{r}
 virtual_samples_25 %>% 
@@ -518,7 +517,7 @@ virtual_samples_100 %>%
 ```
 
 
-```{r, fig.cap = "Comparing the number of slots in the shovel with the standard deviation of proportions red. Here, we see that SD decreases with higher sample sizes. This indicates that larger sample sizes yield more precise estimates."}
+```{r, echo = FALSE, fig.cap = "Comparing the number of slots in the shovel with the standard deviation of proportions red. Here, we see that standard deviation decreases with higher sample sizes. Larger sample sizes yield more precise estimates."}
 
 # Start by performing group_by(n) to get data separated
 # by our different shovel sizes. 
@@ -545,26 +544,22 @@ comparing_n_table  %>%
   
   # Use tab_header to add an appropriate title. 
   
-  tab_header(
-    title = "Comparing standard deviations of proportions red for three different shovels"
-  ) %>% 
+  tab_header(title = "Comparing standard deviations of proportions red for three different shovels") %>% 
   
   # Use fmt_number() to adjust the number of desired decimals
   # in the resulting table. 
   
-  fmt_number(
-    columns = "Standard deviation of proportions red",
-    decimals = 3
-  )
+  fmt_number(columns = "Standard deviation of proportions red",
+             decimals = 3)
 ```
 
 &nbsp;
 
-As we observed earlier, as the sample size increases, the variation decreases. In other words, there is less variation in the 1,000 values of the proportion red. So as the sample size increases, our guesses at the true proportion of the urn's beads that are red get more precise. Therefore, the larger the shovel, the more precise the result! 
+As the sample size increases, the variation decreases. In other words, there is less variation in the 1,000 values of the proportion red. As the sample size increases, our guesses at the true proportion of the urn's beads that are red get more precise. The larger the shovel, the more precise the result. 
 
 ### Functions are your friend!
 
-Note that in the last section, we ran more or less the same code three times, but with different sizes for our shovel (25, 50, and 100).  Whenever you find yourself writing the same code three or more times, you should write a *function* that does the same thing.  Let's look at the code that used a shovel of size 25 and calculated the proportion of beads that were red one more time:
+Note that in the last section, we ran more or less the same code three times, but with different sizes for our shovel: 25, 50, and 100.  Whenever you find yourself writing the same code three or more times, you should write a *function* that does the same thing.  Let's look at the code that used a shovel of size 25 and calculated the proportion of beads that were red one more time:
 
 ```{r}
 tibble(ID = 1:1000) %>% 
@@ -595,7 +590,7 @@ virtual_prop_red_50  <- make_prop_red(x = urn, shovel_size = 50,  reps = 1000)
 virtual_prop_red_100 <- make_prop_red(x = urn, shovel_size = 100, reps = 1000)
 ```
 
-But this still isn't the best way.  Note that we have three objects we need to deal with, `virtual_prop_red_25`, `virtual_prop_red_50`, and `virtual_prop_red_100`. Instead, let's store our results in a single tibble.  How can we do this?  By using `map()` to create a list column!
+But this still isn't the best way.  Note that we have three objects we need to deal with, `virtual_prop_red_25`, `virtual_prop_red_50`, and `virtual_prop_red_100`. Instead, let's store our results in a single tibble.  How can we do this?  By using `map()` to create a list-column!
 
 First, we'll create a tibble that has a variable named `shovel_size` with our values (25, 50, 100):
 
@@ -615,7 +610,7 @@ tibble(shovel_size = c(25, 50, 100)) %>%
 
 ```
 
-Adding another `map_*` function will let us get the standard deviations of our estimated proportions:
+Adding another map function will let us get the standard deviations of our estimated proportions:
 
 ```{r}
 shovels <- tibble(shovel_size = c(25, 50, 100)) %>%
@@ -672,7 +667,7 @@ The red line here represents an important statistical concept: standard error (S
 knitr::include_graphics("06-one-parameter/images/meme_math.png")
 ```
 
-This is the power of running many analyses at once using `map_*` functions and list columns: before, we could tell that the standard deviation was decreasing as the shovel size increased, but when only looking at shovel sizes of 25, 50, and 100, it wasn't clear *how quickly* it was decreasing.
+This is the power of running many analyses at once using map functions and list columns: before, we could tell that the standard deviation was decreasing as the shovel size increased, but when only looking at shovel sizes of 25, 50, and 100, it wasn't clear *how quickly* it was decreasing.
 
 ## Standard error {#standard-errors}
 
@@ -736,9 +731,9 @@ Phew, that's a lot of new terminology and notation to learn! Let's put them all 
 * the contents of the shovel are an **unbiased representation** of the contents of the urn's 1000 beads, thus
 * any result based on the shovel's beads can **generalize** to the urn, thus
 * the sample proportion $\hat{p}$ of the $n=50$ beads in the shovel that are red is a **"good guess"** of the population proportion $p$ of the $N=1000$ beads that are red, thus
-* instead of manually going over all 1000 beads in the urn, we can **infer** about the urn using the shovel. 
+* instead of manually going over all 1,000 beads in the urn, we can make **inferences** about the urn by using the results from the shovel. 
 
-Note that last word we wrote in bold: **infer**. The act of "inferring" means to deduce or conclude information from evidence and reasoning. In our sampling activities, we wanted to infer about the proportion of the urn's beads that are red. [*Statistical inference*](https://en.wikipedia.org/wiki/Statistical_inference) is the "theory, methods, and practice of forming judgments about the parameters of a population and the reliability of statistical relationships, typically on the basis of random sampling." In other words, statistical inference is the act of inference via sampling.
+The act of "inferring" means to deduce or conclude information from evidence and reasoning. In our sampling activities, we wanted to infer about the proportion of the urn's beads that are red. [*Statistical inference*](https://en.wikipedia.org/wiki/Statistical_inference) is the "theory, methods, and practice of forming judgments about the parameters of a population and the reliability of statistical relationships, typically on the basis of random sampling." In other words, statistical inference is the act of inference via sampling.
 
 
 ### Statistical definitions {#sampling-definitions}
