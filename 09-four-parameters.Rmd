@@ -8,11 +8,11 @@
 
 <!-- Write out better models make better predictions on new data. Concepts! Cross validation. Leave one out. Blah, blah, blah. -->
 
-<!-- Going back to att_end models. Then loo() and loo_compare(). -->
+<!-- Going back to att_end models. Then loo() and loo_compare(). MF: Done.-->
 
 <!-- In Better models make better predictions, add red dots (to first) and red line (to second) to indicate where all the data points would be if your model were perfect. Should we change the aspect on these plots so that they are "square"? Maybe add y and y_hat to the x-axis labels for these two plots. At least discuss in the text. These plots are weird! Not seen before! -->
 
-<!-- Transform variables goes first, then select variables. -->
+<!-- Transform variables goes first, then select variables. MF: DONE. -->
 
 *This chapter is still a DRAFT. Check back in a few weeks.*
 
@@ -20,34 +20,9 @@
 In our haste to make progress --- to get all the way through the process of building, interpreting and using models --- we have given short shrift to some of the messy details of model building and evaluation. This chapter fills in those lacunae. We will also introduce models with four parameters. 
 
 
-## Selecting variables
-
-<!-- MF: Discuss indicator & index variables prior to explaining guidelines? Not this week! -->
-
-How do we decide which variables to include in a model? There is no one right answer to this question. Our advice is to keep a variable X if any of the following circumstances apply:
-
-* The variable has a large and well-estimated coefficient. This means, roughly, that the 95% confidence interval excludes zero.
-
-* Underlying theory/observation suggests that X has a meaningfully connection to the outcome variable.
-
-* If the variable has a small standard error, it is general practice to include it in our model to improve predictions. If the standard error of a coefficient is large and we find no other reason to include it in our model, it may be a signal to remove the variable from your model. 
-
-* If a predictor isn't statistically significant, we would normally consider discarding it. The exception to this rule is if we wanted to compare two indicators (for instance, if we wanted to compare results from the variable `party` -- to look at Democrats versus Republicans -- in the `trains` dataset) in spite of that variable not appearing to be significant. 
-
-* It is standard in your field to include X in such regressions.
-
-* Your boss/client/reviewer/supervisor wants to include X.
-
-<!-- MF: Go through one of the datasets and explain whether we would include variables X, Y, and Z. Not this week.  --> 
-
-### Variables in the `trains` dataset
-
-To look at our recommendations in practice, let's focus on the `trains` dataset. The variables in `trains` include `gender`, `liberal`, `party`, `age`, `income`, `att_start`, `treatment`, and `att_end`.Which variables would be best to include in a model? 
-
-
 ## Transforming variables
 
-<!-- MF: Look at "Scaling of predictors and regression coefficients" in RAOS (pg. 183) 
+<!-- Look at "Scaling of predictors and regression coefficients" in RAOS (pg. 183) 
 
 Do we discuss anything in the "Other transformations section" (pg. 195)? This includes square root transformations, idiosyncratic transformations, & using discrete vs continuous predictors. DK: Not square root. Other stuff? Maybe at the end? -->
 
@@ -284,6 +259,33 @@ See @roas
 
 <!-- * Creating new variables, especially by combining different ones into one combined variable. -->
 
+## Selecting variables
+
+<!-- Discuss indicator & index variables prior to explaining guidelines? Not this week! -->
+
+How do we decide which variables to include in a model? There is no one right answer to this question. Our advice is to keep a variable X if any of the following circumstances apply:
+
+* The variable has a large and well-estimated coefficient. This means, roughly, that the 95% confidence interval excludes zero.
+
+* Underlying theory/observation suggests that X has a meaningfully connection to the outcome variable.
+
+* If the variable has a small standard error, it is general practice to include it in our model to improve predictions. If the standard error of a coefficient is large and we find no other reason to include it in our model, it may be a signal to remove the variable from your model. 
+
+* If a predictor isn't statistically significant, we would normally consider discarding it. The exception to this rule is if we wanted to compare two indicators (for instance, if we wanted to compare results from the variable `party` -- to look at Democrats versus Republicans -- in the `trains` dataset) in spite of that variable not appearing to be significant. 
+
+* It is standard in your field to include X in such regressions.
+
+* Your boss/client/reviewer/supervisor wants to include X.
+
+
+<!-- Go through one of the datasets and explain whether we would include variables X, Y, and Z. Not this week.  --> 
+
+### Variables in the `trains` dataset
+
+To look at our recommendations in practice, let's focus on the `trains` dataset. The variables in `trains` include `gender`, `liberal`, `party`, `age`, `income`, `att_start`, `treatment`, and `att_end`.Which variables would be best to include in a model? 
+
+
+
 
 ## Comparing models in theory
 
@@ -313,8 +315,6 @@ print(fit_att_start, detail = FALSE)
 They both seem like good models! The results make sense. People who are liberal have more liberal attitudes about immigration, so we would expect their `att_end` scores to be lower. We would also expect people to provide similar answers in two surveys administered a week or two apart. It makes sense that those with higher (more conservative) values for `att_start` would also have higher values for `att_end`.
 
 How do we choose between these models?
-
-
 
 ### Better models make better predictions
 
@@ -475,11 +475,99 @@ ovrftng %>%
 
 ### Better models make better predictions on new data
 
-<!-- DK: Gelman makes the relevant points. Ideal is totally new data after we submit our model. No cheating! Or, we can try to be disciplined and keep an out of sample. Discuss cross validation. Ultimate logic is leave one out validation. -->
+The most sensible way to test a model is to use the model to make predictions and compare those predictions to new data. After fitting the model using `stan_glm`, we would use `posterior_predict` to obtain simulations representing the predictive distribution for new cases. For instance, if we were to predict how someone's attitude changes toward immigration among Boston commuters based on political affiliation, we would want to go out and test our theories on new Boston commuters.
+
+When thinking of generalization to new data, it is important to consider what is relevant new data in the context of the modeling problem. Some models are used to predict the future and, in those cases, we can wait and eventually observe the future and check how good our model is for making predictions. Often models are used to obtain insight to some phenomenon without immediate plan for predictions. This is the case with our Boston commuters example. In such cases, we are also interested whether learned insights from on part of the data generalizes to other parts of the data. For example, if we  know how political attitudes informed future immigration stances in *Boston commuters*, we may want to know if those same conclusions could generalize to train commuters in different locations. 
+
+Even if we had detected clear problems with our predictions, this would not necessarily mean that there is anything wrong with the model as fit to the original dataset. However, we would need to understand it further before generalizing to other commuters. 
+
+Often, we would like to evaluate and compare models without waiting for new data. One can simply evaluate predictions on the observed data. But since these data have already been used to fit the model parameters, these predictions are optimistic for assessing generalization.
+
+In cross validation, part of the data is used to fit the model and the rest of the data—the hold-out set—is used as a proxy for future data. When there is no natural prediction task for future data, we can think of cross validation as a way to assess generalization from one part of the data to another part.
+
+In any form of cross validation, the model is re-fit leaving out one part of the data and then the prediction for the held-out part is evaluated. Cross validation removes the overfitting problem arising from using the same data for estimation and evaluation, but at the cost of requiring the model to be fit as many times as the number of partitions. In the next section, we will look at a type of cross validation called leave-one-out (LOO) cross validation.
+
+<!-- DK: Gelman makes the relevant points. Ideal is totally new data after we submit our model. No cheating! Or, we can try to be disciplined and keep an out of sample. Discuss cross validation. Ultimate logic is leave one out validation. MF: Done.-->
 
 ## Comparing models in practice
 
-<!-- Run loo (on both models from above). Explain each part. Don't use math they don't know. Focus on elpd_loo, since that is what compare_loo does. Then, run compare_loo, explain what it shows. Then, we choose the att_start model. It does much better! -->
+<!-- Run loo (on both models from above). Explain each part. Don't use math they don't know. Focus on elpd_loo, since that is what compare_loo does. Then, run compare_loo, explain what it shows. Then, we choose the att_start model. It does much better! MF: Done.-->
+
+
+### Cross validation using `loo()`
+
+<!-- MF: This is a rough draft. Everything needs to be expanded, but the basics are here. --> 
+
+To compare models without waiting for new data, we evaluate predictions on the observed data. However, due to the fact that the data has been used to fit the model parameters, our predictions are often optimistic when assessing generalization. 
+
+In cross validation, part of the data is used to fit the model, while the rest of the data is used as a proxy for future data. We can think of cross validation as a way to assess generalization from one part of the data to another part. How do we do this? 
+
+<!-- In leave-one-out cross validation, we want to perform inferences excluding each data point i, one at a time. In the above expression, excluding that one data point is equivalent to multiplying the posterior distribution by the factor 1/p(yi |θ). The LOO posterior excluding point i is written as p(θ|y−i) = p(θ|y)/p(yi|θ),andtheLOOdistributioniscomputedbytakingtheposteriorsimulations for θ obtained from stan_glm and giving each simulation a weight of 1/p(yi |θ). This set of weighted simulations is used to approximate the predictive distribution of yi , the held-out data point. -->
+
+We can hold out individual observations, called leave-one-out (LOO) cross validation; or groups of observations, called leave-one-group-out cross validation; or use past data to predict future observations, called leave-future-out cross validation. **When we perform cross validation, the model is re-fit leaving out one part of the data and then the prediction for the held-out part is evaluated.** 
+
+We have built an R package, `loo`, containing a function, `loo`, with a computational shortcut that uses probability calculations to approximate the leave-one-out evaluation, while only fitting the model once, and also accounting for posterior uncertainty in the fit. This is how we will determine which model is superior for our purposes. 
+
+First, we will refamiliarize ourselves with our first model, `fit_liberal`. 
+
+```{r}
+fit_liberal
+```
+
+Now, we will perform `loo()` on our model and look at the results. 
+
+```{r}
+loo_liberal <- fit_liberal %>% 
+  loo()
+
+loo_liberal
+```
+What does any of this mean? 
+
+- `elpd_loo` is the estimated log score along with a standard error representing uncertainty due to using only 115 data points.
+- `p_loo` is the estimated “effective number of parameters” in the model. 
+- `looic` is the LOO information criterion, −2 elpd_loo, which we compute for comparability to deviance.
+
+For our purposes, we mostly need to focus on `elpd_loo`. Let's explain, in more depth, what this information means. 
+
+Conclusion: **the higher our value for `elpd_loo`, the better our model performs.** This means that, when comparing models, we want to select the model with the higher value for `elpd_loo`. 
+
+Let's turn our attention to our second model. To begin, let's observe the qualities of `fit_att_start` once again. 
+
+```{r}
+fit_att_start
+```
+
+Great! Now, let's perform `loo()` on this model. 
+
+```{r}
+loo_att_start <- fit_att_start %>% 
+  loo()
+
+loo_att_start
+```
+
+The `elpd_loo` value for this model is -201.7. This is higher than the `elpd_loo` for `att_liberal`, implying that **this** model is superior. However, we can't see our estimates together. Is there a simpler way to calculate which model is better? 
+
+Actually, yes! To compare the two models directly, we can use the function `loo_compare` with our two `loo` objects created above. This will calculate the difference in `elpd_loo()` between our models for us, making our job easier:
+
+```{r}
+loo_compare(loo_att_start, loo_liberal)
+```
+
+<!-- MF: loo_compare should be yielding a result that includes model comparison with a note on which model is favored. I am figuring out why that isn't happening here. --> 
+
+The value for `elpd_diff` is equal to the difference in `elpd_loo` between our two models: elpd_loo for loo_att_start - elpd_loo for loo_liberal = -279.4 - (-201.7) = -77.7. The `se_diff` shows that the difference has a standard error of 12.0. This shows that, even when accounting for standard error, the better model is clear: `fit_att_start_`. Therefore, the attitude at the start of the `trains` study is more significant to predicting final attitude when compared with the variable `liberal`, which is an analog for political affiliation. 
+
+As we have seen,`loo_compare` is a shortcut for comparing two models. When you are deciding between two models, `loo_compare()` is a great way to simplify your decision. 
+
+<!-- MF: Need to include the following details:
+- When the difference (elpd_diff) is larger than 4, the number of observations is larger than 100, and the model is not badly misspecified then the standard error (se_diff) is a reliable measure of the uncertainty in the difference. Differences smaller than 4 are hard to distinguish from noise. BASICALLY: When elpd_diff < 4, there is no advantage to one model over the other --> 
+
+<!--  LOO discussion on pg 174: 
+The naive implementation of LOO would require the model to be fit n times, once for each held-out data point. The good news is that we have built an R package, loo, containing a function, loo, with a computational shortcut that uses probability calculations to approximate the leave-one-out evaluation, while only fitting the model once, and also accounting for posterior uncertainty in the fit.
+We first illustrate LOO cross validation with a small simulated dataset:
+-->
 
 <!-- ### Selecting the rows -->
 
@@ -498,11 +586,7 @@ The premise of hypothesis testing is to answer a specific question -- one that m
 
 ## Parallel lines
 
-
-
 <!-- att_end ~ liberal + att_start. Same thing as chapters before. Show graphic of parallel lines. Cardinal virtues as always. And, extra, at the end we can use loo_compare to see if this model is better than simpler model of att_end ~ att_start. -->
-
-
 
 ## Summary
 
