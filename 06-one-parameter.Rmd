@@ -871,11 +871,11 @@ It is useful to define a parameter, $p$, which is the proportion of red beads in
 set.seed(10)
 
 # Set values for the urn, paddle, and reps as this helps with creating our joint
-# distribution later.
+# distribution later. Using more than reps = 100 causes the 3-D plot to blow up.
 
 urn_size <- 1000
 paddle_size <- 50
-reps <- 1000
+reps <- 100
 
 # Create a tibble where red_in_urn creates a sequence from 0 to urn_size(1000)
 # by a value of 1. Create p as red_in_urn divided by the total urn_size. Column
@@ -901,7 +901,7 @@ After looking at our joint distribution, let's plot it. Call the `red_in_urn` fo
 ```{r, cache = TRUE}
 joint_dist %>%
   ggplot(aes(y = red_in_urn, x = red_in_paddle)) +
-    geom_point(alpha = 0.002) +
+    geom_point(alpha = 0.005) +
     labs(title = "Joint Distribution of Red Beads in Paddle and in Urn",
          x = "Number of Red Beads in Paddle",
          y = "Number of Red Beads in Urn")
@@ -912,7 +912,7 @@ It is easier to define our "model" in this joint distribution in terms of the un
 ```{r, cache = TRUE}
 joint_dist %>%
   ggplot(aes(y = p, x = red_in_paddle)) +
-    geom_point(alpha = 0.002) +
+    geom_point(alpha = 0.005) +
     labs(title = expression(paste(
       "Joint Distribution of Red Beads in Paddle and Proportion Red Beads in Urn ", 
       hat(p))), 
@@ -928,43 +928,45 @@ joint_dist %>%
 
 ```
 
-To better visualize this distribution, take a look at the 3D version of this plot. Note the saddle shape of the graphic. By this, we mean to note the peaks at the areas where the number of red beads in the paddle is 0 out of 50 and 50 out of 50. This is due to the fact that, when we draw 0 red beads in a sample of 50 beads, the possibilities for the number of red beads in the urn is consistently close to 0. Similarly, when our sample of 50 beads comes out with 50 red beads, the possibilities for the number of red beads in the urn is consistently closer to 1000. 
+<!-- DK: Why doesn't this work! The below code should be fine, right? Maybe are too many items on the x and y axis. Maybe if we set them with scale_x/y, we could get this to work. For now, knitting this just hangs in the niddle of creating the html. -->
+
+<!-- To better visualize this distribution, take a look at the 3D version of this plot. Note the saddle shape of the graphic. By this, we mean to note the peaks at the areas where the number of red beads in the paddle is 0 out of 50 and 50 out of 50. This is due to the fact that, when we draw 0 red beads in a sample of 50 beads, the possibilities for the number of red beads in the urn is consistently close to 0. Similarly, when our sample of 50 beads comes out with 50 red beads, the possibilities for the number of red beads in the urn is consistently closer to 1000.  -->
 
 
-```{r, cache = TRUE, echo = FALSE}
-joint_dist_p <- joint_dist %>% 
-  group_by(p, red_in_paddle) %>%
-  summarize(total = n(), .groups = "drop") %>% 
-  mutate(p = as.factor(p)) %>% 
-  mutate(red_in_paddle = as.factor(red_in_paddle)) %>% 
-  ggplot() +
-    geom_point(aes(x = red_in_paddle, y = p, color = total)) +
-    theme(legend.position = "none") +
-    labs(x = "Number of Reds in the Paddle",
-         y = expression(p),
-         title = "Empirical Distribution of Number of Reds",
-         subtitle = expression(paste("Based on simulations with various values of ", 
-                                     p))) +
-    theme(title = element_text(size = 9),
-          axis.text.x = element_text(size = 7),
-          axis.title.y = element_text(size = 7),
-          legend.position = "none")
+<!-- ```{r, cache = TRUE, echo = FALSE} -->
+<!-- joint_dist_p <- joint_dist %>%  -->
+<!--   group_by(p, red_in_paddle) %>% -->
+<!--   summarize(total = n(), .groups = "drop") %>%  -->
+<!--   mutate(p = as.factor(p)) %>%  -->
+<!--   mutate(red_in_paddle = as.factor(red_in_paddle)) %>%  -->
+<!--   ggplot() + -->
+<!--     geom_point(aes(x = red_in_paddle, y = p, color = total)) + -->
+<!--     theme(legend.position = "none") + -->
+<!--     labs(x = "Number of Reds in the Paddle", -->
+<!--          y = expression(p), -->
+<!--          title = "Empirical Distribution of Number of Reds", -->
+<!--          subtitle = expression(paste("Based on simulations with various values of ",  -->
+<!--                                      p))) + -->
+<!--     theme(title = element_text(size = 9), -->
+<!--           axis.text.x = element_text(size = 7), -->
+<!--           axis.title.y = element_text(size = 7), -->
+<!--           legend.position = "none") -->
 
-plot_gg(joint_dist_p,
-        width = 3.5,
-        zoom = 0.65,
-        theta = 25,
-        phi = 30,
-        sunangle = 225,
-        soliddepth = -50,
-        windowsize = c(2048,1536))
+<!-- plot_gg(joint_dist_p, -->
+<!--         width = 3.5, -->
+<!--         zoom = 0.65, -->
+<!--         theta = 25, -->
+<!--         phi = 30, -->
+<!--         sunangle = 225, -->
+<!--         soliddepth = -50, -->
+<!--         windowsize = c(2048,1536)) -->
 
-rglwidget()
+<!-- rglwidget() -->
 
-rgl.close()
-```
+<!-- rgl.close() -->
+<!-- ``` -->
 
-Now, we have explored the most likely possibilities according to all possible models of this scenario. Let's pivot to a posterior distribution, which will take a *slice* of our joint distribution that is more specific to our question. 
+Now, we have explored the most likely possibilities according to all possible models of this scenario. Let's create a posterior distribution by taking a *slice* of our joint distribution based on the number of red beads in the paddle. 
 
 ### Posterior distribution
 
