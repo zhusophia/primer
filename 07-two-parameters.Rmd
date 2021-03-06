@@ -605,8 +605,8 @@ pp <- posterior_predict(object = fit_obj,
         # Second part of the code requires some trickery.
   
         rowwise() %>% 
-        mutate(tallest = max(c_across(everything()))) %>% 
-        mutate(shortest = min(c_across(everything()))) %>% 
+        mutate(tallest = max(c_across())) %>% 
+        mutate(shortest = min(c_across())) %>% 
         mutate(diff = tallest - shortest) 
         
 pp        
@@ -657,7 +657,7 @@ pp <- posterior_predict(object = fit_obj,
   as_tibble() %>% 
   mutate_all(as.numeric) %>% 
   rowwise() %>% 
-  mutate(third_tallest = sort(c_across(everything()), 
+  mutate(third_tallest = sort(c_across(), 
                               decreasing = TRUE)[3])
 ```
 
@@ -933,7 +933,7 @@ pp <- posterior_predict(fit_2, newdata = newobs) %>%
   as_tibble() %>% 
   mutate_all(as.numeric) %>% 
   rowwise() %>% 
-  mutate(total = sum(c_across(everything())))
+  mutate(total = sum(c_across()))
 
 pp[, c("1", "2", "100", "total")]
 ```
