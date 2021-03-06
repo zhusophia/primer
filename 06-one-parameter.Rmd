@@ -48,6 +48,12 @@ Use the **tidyverse** package.
 library(tidyverse)
 ```
 
+```{r, message = FALSE}
+# Needed for the one 3-D plot below.
+
+library(rayshader)
+library(rgl)
+```
 
 ## Real sampling activity {#sampling-activity}
 
@@ -869,7 +875,7 @@ set.seed(10)
 
 urn_size <- 1000
 paddle_size <- 50
-reps <- 100
+reps <- 1000
 
 # Create a tibble where red_in_urn creates a sequence from 0 to urn_size(1000)
 # by a value of 1. Create p as red_in_urn divided by the total urn_size. Column
@@ -890,26 +896,25 @@ joint_dist %>%
   slice_sample(n = 10)
 ```
 
-After looking at our joint distribution, let's plot it. Call the `red_in_urn` for our y-axis, to indicate the number of red beads in the urn. Call `red_in_paddle` for our x-axis, to indicate the number of red beads in each paddle. This allows us to see which possible values of red beads in our samples correspond with $p$, the proportion of red beads in the urn.
+After looking at our joint distribution, let's plot it. Call the `red_in_urn` for our y-axis, to indicate the number of red beads in the urn. Call `red_in_paddle` for our x-axis, to indicate the number of red beads in each paddle. This allows us to see which possible values of red beads in our samples are most associated with certain values for the number of red beads in the urn.
 
 ```{r, cache = TRUE}
 joint_dist %>%
   ggplot(aes(y = red_in_urn, x = red_in_paddle)) +
-    geom_point(alpha = 0.005) +
+    geom_point(alpha = 0.002) +
     labs(title = "Joint Distribution of Red Beads in Paddle and in Urn",
          x = "Number of Red Beads in Paddle",
          y = "Number of Red Beads in Urn")
-
 ```
 
-It is easier to define our "model" in this joint distribution in terms of the unknown parameter $p$ rather than, as above, in terms of the unknown number of red beads in the urn. Showing our plot in terms of $p$ and using the term "proportion" rather than "number of red beads" is closer to what we are trying to model. The 
+It is easier to define our "model" in this joint distribution in terms of the unknown parameter $p$ rather than, as above, in terms of the unknown number of red beads in the urn. Showing our plot in terms of $p$ and using the term "proportion" rather than "number of red beads" is closer to what we are trying to model.
 
 ```{r, cache = TRUE}
 joint_dist %>%
   ggplot(aes(y = p, x = red_in_paddle)) +
-    geom_point(alpha = 0.005) +
+    geom_point(alpha = 0.002) +
     labs(title = expression(paste(
-      "Joint Distribution of Red Beads in Paddle and Proportion Red Beads in Urn", 
+      "Joint Distribution of Red Beads in Paddle and Proportion Red Beads in Urn ", 
       hat(p))), 
          x = "Number of Red Beads in Paddle",
          
@@ -923,10 +928,40 @@ joint_dist %>%
 
 ```
 
-To better visualize this distribution, take a look at the 3D version of this plot. Note the U shape of the graph. By this, we mean to note the peaks at the areas where the number of red beads in the paddle is 0 out of 50 and 50 out of 50. This is due to the fact that, when we draw 0 red beads in a sample of 50 beads, the possibilities for the number of red beads in the urn is consistently close to 0. Similarly, when our sample of 50 beads comes out with 50 red beads, the possibilities for the number of red beads in the urn is consistently closer to 1000. 
+To better visualize this distribution, take a look at the 3D version of this plot. Note the saddle shape of the graphic. By this, we mean to note the peaks at the areas where the number of red beads in the paddle is 0 out of 50 and 50 out of 50. This is due to the fact that, when we draw 0 red beads in a sample of 50 beads, the possibilities for the number of red beads in the urn is consistently close to 0. Similarly, when our sample of 50 beads comes out with 50 red beads, the possibilities for the number of red beads in the urn is consistently closer to 1000. 
 
-```{r, echo = FALSE, cache=TRUE, fig.cap = "A 3D image of our joint distribution created with Rayshader."}
-knitr::include_graphics("06-one-parameter/images/rayshader_full.png")
+
+```{r, cache = TRUE, echo = FALSE}
+joint_dist_p <- joint_dist %>% 
+  group_by(p, red_in_paddle) %>%
+  summarize(total = n(), .groups = "drop") %>% 
+  mutate(p = as.factor(p)) %>% 
+  mutate(red_in_paddle = as.factor(red_in_paddle)) %>% 
+  ggplot() +
+    geom_point(aes(x = red_in_paddle, y = p, color = total)) +
+    theme(legend.position = "none") +
+    labs(x = "Number of Reds in the Paddle",
+         y = expression(p),
+         title = "Empirical Distribution of Number of Reds",
+         subtitle = expression(paste("Based on simulations with various values of ", 
+                                     p))) +
+    theme(title = element_text(size = 9),
+          axis.text.x = element_text(size = 7),
+          axis.title.y = element_text(size = 7),
+          legend.position = "none")
+
+plot_gg(joint_dist_p,
+        width = 3.5,
+        zoom = 0.65,
+        theta = 25,
+        phi = 30,
+        sunangle = 225,
+        soliddepth = -50,
+        windowsize = c(2048,1536))
+
+rglwidget()
+
+rgl.close()
 ```
 
 Now, we have explored the most likely possibilities according to all possible models of this scenario. Let's pivot to a posterior distribution, which will take a *slice* of our joint distribution that is more specific to our question. 
@@ -1122,7 +1157,30 @@ fit_1 <- stan_glm(formula = red ~ 1,
                   seed = 2021)
 ```
 
-This single function call has done all the work which we did on our own previously: created the joint distribution and then estimated the posterior probability distribution, conditional on the data which was passed in to the `data` argument. Once we have the `fit_1` object, it is just a few lines of code to create the posterior probability distribution for the number of red beads drawn with a shovel of size 20.
+This single function call has done all the work which we did on our own previously: created the joint distribution and then estimated the posterior probability distribution, conditional on the data which was passed in to the `data` argument. Once we have the `fit_1` object, it is easy to answer two sorts of questions: the posterior probability distribution for $p$ and predictions for new draws from the urn. The key new functions are `posterior_epred()` for the former and `posterior_predict()` for the latter.
+
+For the posterior probability distribution:
+
+```{r, cache = TRUE}
+posterior_epred(fit_1, 
+                newdata = tibble(constant = 1)) %>% 
+  as_tibble() %>% 
+  ggplot(aes(x = `1`)) +
+    geom_histogram(aes(y = after_stat(count/sum(count))),
+                   bins = 50) + 
+    labs(title = "Posterior Probability Distribution",
+         subtitle = "Proportion of red beads in urn is centered around 0.34",
+         x = "Proportion p of Red Beads in Urn",
+         y = "Probability") + 
+  
+    scale_x_continuous(labels = scales::number_format()) +
+    scale_y_continuous(labels = scales::percent_format()) +
+    theme_classic()
+```
+
+
+
+For the posterior probability distribution for the number of red beads drawn with a shovel of size 20:
 
 
 ```{r, cache = TRUE}
@@ -1143,7 +1201,7 @@ posterior_predict(fit_1,
     theme_classic()
 ```
 
-This posterior is similar to the one we created, much more laboriously, above. 
+These two posteriors are very similar to the ones we created, much more laboriously, above. See Chapter \@ref(two-parameters) for a thorough discussion of the use of **rstanarm**. This package will be our main tool for the rest of the *Primer*.
 
 <!-- DK: But they are still different! Why is that? -->
 
