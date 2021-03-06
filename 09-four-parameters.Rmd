@@ -1,18 +1,14 @@
 # Four Parameters {#four-parameters}
 
-<!-- Models are often similar. -->
-
 <!-- Explore causal effects of models following chapter 18/19 in ROAS. Regress ending att on starting attitude and treatment effect. Show parallel lines. That is four parameters! Can also do the same thing with income and treatment. That will be a much worse model. Save interaction for five parameter chapter. -->
 
 <!-- Add page 217 to selecting variables. Simple version. Can't talk about everything. Can't talk about interactions, for example. Talk about testing and how stupid it is! -->
 
 <!-- Write out better models make better predictions on new data. Concepts! Cross validation. Leave one out. Blah, blah, blah. -->
 
-<!-- Going back to att_end models. Then loo() and loo_compare(). MF: Done.-->
 
 <!-- In Better models make better predictions, add red dots (to first) and red line (to second) to indicate where all the data points would be if your model were perfect. Should we change the aspect on these plots so that they are "square"? Maybe add y and y_hat to the x-axis labels for these two plots. At least discuss in the text. These plots are weird! Not seen before! -->
 
-<!-- Transform variables goes first, then select variables. MF: DONE. -->
 
 *This chapter is still a DRAFT. Check back in a few weeks.*
 
@@ -261,6 +257,8 @@ See @roas
 
 ## Selecting variables
 
+<!-- Introduce 4 parameter models. Use the exact same models as in chapter 8, but add a second right hand side variable. At the start, only use one categorical and one numeric. -->
+
 <!-- Discuss indicator & index variables prior to explaining guidelines? Not this week! -->
 
 How do we decide which variables to include in a model? There is no one right answer to this question. Our advice is to keep a variable X if any of the following circumstances apply:
@@ -278,11 +276,13 @@ How do we decide which variables to include in a model? There is no one right an
 * Your boss/client/reviewer/supervisor wants to include X.
 
 
-<!-- Go through one of the datasets and explain whether we would include variables X, Y, and Z. Not this week.  --> 
+<!-- Go through one of the datasets and explain whether we would include variables X, Y, and Z. Not this week.  Try out several different left-hand side variables, like age and att_end, which were teh dependent variables that we used in Chapter 8. In this chapter, we will allow for two right-hand side variables. (Perhaps these should always be one numeric and one categorical, except for the last one.) Connect to examples from chapter 8. Introduce four parameter models. --> 
+
+<!-- First case att_end ~ treatment + att_start. Keep both! Second case income ~ age + liberal. Strong keep for liberal. age is trickier. It is small. (Not really! Depends on whether or not you are looking at one year or 10. Don't let arbitrary scalings confuse you. Measured in decades it is 10 times bigger. Discuss z scaling?)  Not quite significant. No right answer! Third and last case is logistic, liberal ~ I(income/1e+05) + party. Tricky! Maybe keep both? But stronger case for party. Maybe discuss interpretation of coefficients of logistic regressions? Divide by 4 rule? -->
 
 ### Variables in the `trains` dataset
 
-To look at our recommendations in practice, let's focus on the `trains` dataset. The variables in `trains` include `gender`, `liberal`, `party`, `age`, `income`, `att_start`, `treatment`, and `att_end`.Which variables would be best to include in a model? 
+To look at our recommendations in practice, let's focus on the `trains` dataset. The variables in `trains` include `gender`, `liberal`, `party`, `age`, `income`, `att_start`, `treatment`, and `att_end`. Which variables would be best to include in a model? 
 
 
 
@@ -487,11 +487,9 @@ In cross validation, part of the data is used to fit the model and the rest of t
 
 In any form of cross validation, the model is re-fit leaving out one part of the data and then the prediction for the held-out part is evaluated. Cross validation removes the overfitting problem arising from using the same data for estimation and evaluation, but at the cost of requiring the model to be fit as many times as the number of partitions. In the next section, we will look at a type of cross validation called leave-one-out (LOO) cross validation.
 
-<!-- DK: Gelman makes the relevant points. Ideal is totally new data after we submit our model. No cheating! Or, we can try to be disciplined and keep an out of sample. Discuss cross validation. Ultimate logic is leave one out validation. MF: Done.-->
 
 ## Comparing models in practice
 
-<!-- Run loo (on both models from above). Explain each part. Don't use math they don't know. Focus on elpd_loo, since that is what compare_loo does. Then, run compare_loo, explain what it shows. Then, we choose the att_start model. It does much better! MF: Done.-->
 
 
 ### Cross validation using `loo()`
@@ -557,7 +555,7 @@ loo_compare(loo_att_start, loo_liberal)
 
 <!-- MF: loo_compare should be yielding a result that includes model comparison with a note on which model is favored. I am figuring out why that isn't happening here. --> 
 
-The value for `elpd_diff` is equal to the difference in `elpd_loo` between our two models: elpd_loo for loo_att_start - elpd_loo for loo_liberal = -279.4 - (-201.7) = -77.7. The `se_diff` shows that the difference has a standard error of 12.0. This shows that, even when accounting for standard error, the better model is clear: `fit_att_start_`. Therefore, the attitude at the start of the `trains` study is more significant to predicting final attitude when compared with the variable `liberal`, which is an analog for political affiliation. 
+The value for `elpd_diff` is equal to the difference in `elpd_loo` between our two models: elpd_loo for loo_att_start - elpd_loo for loo_liberal = -279.4 - (-201.7) = -77.7. The `se_diff` shows that the difference has a standard error of 12.0. This shows that, even when accounting for standard error, the better model is clear: `fit_att_start`. Therefore, the attitude at the start of the `trains` study is more significant to predicting final attitude when compared with the variable `liberal`, which is an analog for political affiliation. 
 
 As we have seen,`loo_compare` is a shortcut for comparing two models. When you are deciding between two models, `loo_compare()` is a great way to simplify your decision. 
 
