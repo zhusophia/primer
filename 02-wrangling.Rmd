@@ -1787,11 +1787,12 @@ tbl %>%
   rowwise()
 ```
 
-Note how "# Rowwise: " is printed out. Having set up the pipe to work across rows, we need to pass `c_across()` to whichever function we are using, specifying the variables we want.
+Note how "# Rowwise: " is printed out. Having set up the pipe to work across rows, we need to pass `c_across()` to whichever function we are using, generally specifying the variables we want to use. If we don't provide any arguments to `c_across()`, it will use all the columns in the tibble.
 
 ```{r}
 tbl %>% 
   rowwise() %>% 
+  mutate(sum_a_c = sum(c_across(c(a, c)))) %>% 
   mutate(largest = max(c_across())) %>% 
   mutate(largest_na = max(c_across(), na.rm = TRUE))
 ```
