@@ -1189,38 +1189,38 @@ FIGURE 6.20: If you are wondering how much you need to know, follow this helpful
 <p>We then add the specific results of the experiment, and calculate the conditional distribution of the models, given the data that we have seen:</p>
 <p><span class="math display">\[\text{Prob}(\text{models} | \text{data} = \text{results of experiment})\]</span></p>
 <p>The rest is just details.</p>
-<p>We can do the same thing with our sampling problem. Assume that we know that there are 1,000 beads in the urn, and that all of them are either red or white. Our experiment involves the one-time use of a paddle with 50 slots. We have 1,001 models under consideration. There might be zero red beads or one red bead or … 999 red beads or 1000 red beads. With a paddle of size 50, there are 51 possible results from our experiment: zero red beads or one red bead or . . . or 49 red beads or 50 red beads. With this information we can calculate <em>the joint distribution of models which we are considering and the experiment results we might observe.</em> Once we have that joint distribution, we can calculate the conditional distribution of the total number of red beads, given however many we observed in our sample.</p>
+<p>We can do the same thing with our sampling problem. Assume that we know that there are 1,000 beads in the urn, and that all of them are either red or white. Our experiment involves the one-time use of a shovel with 50 slots. We have 1,001 models under consideration. There might be zero red beads or one red bead or … 999 red beads or 1000 red beads. With a shovel of size 50, there are 51 possible results from our experiment: zero red beads or one red bead or . . . or 49 red beads or 50 red beads. With this information we can calculate <em>the joint distribution of models which we are considering and the experiment results we might observe.</em> Once we have that joint distribution, we can calculate the conditional distribution of the total number of red beads, given however many we observed in our sample.</p>
 <p>It is useful to define a parameter, <span class="math inline">\(p\)</span>, which is the proportion of red beads in the urn. This also takes on exactly 1,001 possible values: <span class="math inline">\(0, 1/1000, 2/1000, ..., 999/1000, 1\)</span>. With these assumptions, we can create an unnormalized joint distribution:</p>
 <!-- Note to future authors: I am somewhat concerned that this is not exactly correct since we really ought to sample what happens when you pick 50 beads out of an urn. This can be approximated with the binomial, which is what we have done here. And, with such big numbers, it is a good approximation. But it is not exactly correct. -->
 <div class="sourceCode" id="cb615"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>
 
-<span class="co"># Set values for the urn, paddle, and reps as this helps with creating our joint</span>
+<span class="co"># Set values for the urn, shovel, and reps as this helps with creating our joint</span>
 <span class="co"># distribution later. Using more than reps = 100 causes the 3-D plot to blow up.</span>
 
 <span class="va">urn_size</span> <span class="op">&lt;-</span> <span class="fl">1000</span>
-<span class="va">paddle_size</span> <span class="op">&lt;-</span> <span class="fl">50</span>
+<span class="va">shovel_size</span> <span class="op">&lt;-</span> <span class="fl">50</span>
 <span class="va">reps</span> <span class="op">&lt;-</span> <span class="fl">100</span>
 
 <span class="co"># Create a tibble where red_in_urn creates a sequence from 0 to urn_size(1000)</span>
 <span class="co"># by a value of 1. Create p as red_in_urn divided by the total urn_size. Column</span>
-<span class="co"># red_in_paddle will map p using rbinom(). Call n = reps (where reps is defined</span>
-<span class="co"># as 100) and size as paddle_size (defined as 50). Finally, unnest!</span>
+<span class="co"># red_in_shovel will map p using rbinom(). Call n = reps (where reps is defined</span>
+<span class="co"># as 100) and size as shovel_size (defined as 50). Finally, unnest!</span>
 
 <span class="va">joint_dist</span> <span class="op">&lt;-</span> 
   <span class="fu">tibble</span><span class="op">(</span>red_in_urn <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span>from <span class="op">=</span> <span class="fl">0</span>, to <span class="op">=</span> <span class="va">urn_size</span>, by <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
     <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>p <span class="op">=</span> <span class="va">red_in_urn</span> <span class="op">/</span> <span class="va">urn_size</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>red_in_paddle <span class="op">=</span> <span class="fu">map</span><span class="op">(</span><span class="va">p</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">reps</span>, 
-                                               size <span class="op">=</span> <span class="va">paddle_size</span>, 
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>red_in_shovel <span class="op">=</span> <span class="fu">map</span><span class="op">(</span><span class="va">p</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">reps</span>, 
+                                               size <span class="op">=</span> <span class="va">shovel_size</span>, 
                                                prob <span class="op">=</span> <span class="va">.</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu">unnest</span><span class="op">(</span><span class="va">red_in_paddle</span><span class="op">)</span> 
+    <span class="fu">unnest</span><span class="op">(</span><span class="va">red_in_shovel</span><span class="op">)</span> 
 
 <span class="co"># After making our joint distribution, take a sample of size 10.</span>
 
 <span class="va">joint_dist</span> <span class="op">%&gt;%</span> 
   <span class="fu">slice_sample</span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 10 x 3
-##    red_in_urn     p red_in_paddle
+##    red_in_urn     p red_in_shovel
 ##         &lt;dbl&gt; &lt;dbl&gt;         &lt;int&gt;
 ##  1        974 0.974            46
 ##  2        957 0.957            47
@@ -1232,24 +1232,24 @@ FIGURE 6.20: If you are wondering how much you need to know, follow this helpful
 ##  8        117 0.117             3
 ##  9        664 0.664            30
 ## 10        944 0.944            49</code></pre>
-<p>After looking at our joint distribution, let’s plot it. Call the <code>red_in_urn</code> for our y-axis, to indicate the number of red beads in the urn. Call <code>red_in_paddle</code> for our x-axis, to indicate the number of red beads in each paddle. This allows us to see which possible values of red beads in our samples are most associated with certain values for the number of red beads in the urn.</p>
+<p>After looking at our joint distribution, let’s plot it. Call the <code>red_in_urn</code> for our y-axis, to indicate the number of red beads in the urn. Call <code>red_in_shovel</code> for our x-axis, to indicate the number of red beads in each shovel. This allows us to see which possible values of red beads in our samples are most associated with certain values for the number of red beads in the urn.</p>
 <div class="sourceCode" id="cb617"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">joint_dist</span> <span class="op">%&gt;%</span>
-  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y <span class="op">=</span> <span class="va">red_in_urn</span>, x <span class="op">=</span> <span class="va">red_in_paddle</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y <span class="op">=</span> <span class="va">red_in_urn</span>, x <span class="op">=</span> <span class="va">red_in_shovel</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">geom_point</span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.005</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Joint Distribution of Red Beads in Paddle and in Urn"</span>,
-         x <span class="op">=</span> <span class="st">"Number of Red Beads in Paddle"</span>,
+    <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Joint Distribution of Red Beads in Shovel and in Urn"</span>,
+         x <span class="op">=</span> <span class="st">"Number of Red Beads in Shovel"</span>,
          y <span class="op">=</span> <span class="st">"Number of Red Beads in Urn"</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-471-1.png" width="100%"></div>
 <p>It is easier to define our “model” in this joint distribution in terms of the unknown parameter <span class="math inline">\(p\)</span> rather than, as above, in terms of the unknown number of red beads in the urn. Showing our plot in terms of <span class="math inline">\(p\)</span> and using the term “proportion” rather than “number of red beads” is closer to what we are trying to model.</p>
 <div class="sourceCode" id="cb618"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">joint_dist</span> <span class="op">%&gt;%</span>
-  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y <span class="op">=</span> <span class="va">p</span>, x <span class="op">=</span> <span class="va">red_in_paddle</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y <span class="op">=</span> <span class="va">p</span>, x <span class="op">=</span> <span class="va">red_in_shovel</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">geom_point</span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.005</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span>
-      <span class="st">"Joint Distribution of Red Beads in Paddle and Proportion Red Beads in Urn "</span>, 
+      <span class="st">"Joint Distribution of Red Beads in Shovel and Proportion Red Beads in Urn "</span>, 
       <span class="fu"><a href="https://rdrr.io/r/grDevices/plotmath.html">hat</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, 
-         x <span class="op">=</span> <span class="st">"Number of Red Beads in Paddle"</span>,
+         x <span class="op">=</span> <span class="st">"Number of Red Beads in Shovel"</span>,
          
          <span class="co"># Add the symbol for p-hat. </span>
          
@@ -1259,18 +1259,19 @@ FIGURE 6.20: If you are wondering how much you need to know, follow this helpful
   
   <span class="fu">theme</span><span class="op">(</span>axis.title.y <span class="op">=</span> <span class="fu">element_text</span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-472-1.png" width="100%"></div>
-<!-- DK: Why doesn't this work! The below code should be fine, right? Maybe are too many items on the x and y axis. Maybe if we set them with scale_x/y, we could get this to work. For now, knitting this just hangs in the niddle of creating the html. -->
-<!-- To better visualize this distribution, take a look at the 3D version of this plot. Note the saddle shape of the graphic. By this, we mean to note the peaks at the areas where the number of red beads in the paddle is 0 out of 50 and 50 out of 50. This is due to the fact that, when we draw 0 red beads in a sample of 50 beads, the possibilities for the number of red beads in the urn is consistently close to 0. Similarly, when our sample of 50 beads comes out with 50 red beads, the possibilities for the number of red beads in the urn is consistently closer to 1000.  -->
+<!-- DK: Why doesn't this work! The below code should be fine, right? Maybe are too many items on the x and y axis. Maybe if we set them with scale_x/y, we could get this to work. For now, knitting this just hangs in the middle of creating the html. -->
+<!-- DK: Should also explain how this example, while still discrete, points us toward the continuous case. The mathematics of going from discrete to continuous is hard. The intuition is easy: just increase the number of models and number of possible results from the experiment. Then, squint and wave your arms. Ignore the mathematics, here and elsewhere. -->
+<!-- To better visualize this distribution, take a look at the 3D version of this plot. Note the saddle shape of the graphic. By this, we mean to note the peaks at the areas where the number of red beads in the shovel is 0 out of 50 and 50 out of 50. This is due to the fact that, when we draw 0 red beads in a sample of 50 beads, the possibilities for the number of red beads in the urn is consistently close to 0. Similarly, when our sample of 50 beads comes out with 50 red beads, the possibilities for the number of red beads in the urn is consistently closer to 1000.  -->
 <!-- ```{r, cache = TRUE, echo = FALSE} -->
 <!-- joint_dist_p <- joint_dist %>%  -->
-<!--   group_by(p, red_in_paddle) %>% -->
+<!--   group_by(p, red_in_shovel) %>% -->
 <!--   summarize(total = n(), .groups = "drop") %>%  -->
 <!--   mutate(p = as.factor(p)) %>%  -->
-<!--   mutate(red_in_paddle = as.factor(red_in_paddle)) %>%  -->
+<!--   mutate(red_in_shovel = as.factor(red_in_shovel)) %>%  -->
 <!--   ggplot() + -->
-<!--     geom_point(aes(x = red_in_paddle, y = p, color = total)) + -->
+<!--     geom_point(aes(x = red_in_shovel, y = p, color = total)) + -->
 <!--     theme(legend.position = "none") + -->
-<!--     labs(x = "Number of Reds in the Paddle", -->
+<!--     labs(x = "Number of Reds in the Shovel", -->
 <!--          y = expression(p), -->
 <!--          title = "Empirical Distribution of Number of Reds", -->
 <!--          subtitle = expression(paste("Based on simulations with various values of ",  -->
@@ -1290,7 +1291,7 @@ FIGURE 6.20: If you are wondering how much you need to know, follow this helpful
 <!-- rglwidget() -->
 <!-- rgl.close() -->
 <!-- ``` -->
-<p>Now, we have explored the most likely possibilities according to all possible models of this scenario. Let’s create a posterior distribution by taking a <em>slice</em> of our joint distribution based on the number of red beads in the paddle.</p>
+<p>Now, we have explored the most likely possibilities according to all possible models of this scenario. Let’s create a posterior distribution by taking a <em>slice</em> of our joint distribution based on the number of red beads in the shovel.</p>
 </div>
 <div id="posterior-distribution" class="section level3" number="6.4.2">
 <h3>
@@ -1298,14 +1299,14 @@ FIGURE 6.20: If you are wondering how much you need to know, follow this helpful
 </h3>
 <p>When we look at our question – we are asking for the posterior probability of a certain case. This case is where we find that, using the 50 slot shovel, we get a result of 17 red beads. What does that make our posterior probability? We want:</p>
 <p><span class="math display">\[\text{Prob}(\text{models} | \text{data} = 17)\]</span></p>
-<p>The same approach works again. We take a “slice” of the joint distribution where the number of red beads in the paddle is equal to 17. After normalization, that gives us the posterior probability for <span class="math inline">\(p\)</span>, or for the number of red beads in the urn. Recall that there is a one-to-one mapping between <span class="math inline">\(p\)</span> and the number of red beads.</p>
+<p>The same approach works again. We take a “slice” of the joint distribution where the number of red beads in the shovel is equal to 17. After normalization, that gives us the posterior probability for <span class="math inline">\(p\)</span>, or for the number of red beads in the urn. Recall that there is a one-to-one mapping between <span class="math inline">\(p\)</span> and the number of red beads.</p>
 <div class="sourceCode" id="cb619"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">joint_dist</span> <span class="op">%&gt;%</span> 
   
-  <span class="co"># Filtering for where the red_in_paddle equals 17 allows us to isolate the</span>
+  <span class="co"># Filtering for where the red_in_shovel equals 17 allows us to isolate the</span>
   <span class="co"># data that pertains to our question.</span>
   
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">red_in_paddle</span> <span class="op">==</span> <span class="fl">17</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">red_in_shovel</span> <span class="op">==</span> <span class="fl">17</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">p</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">geom_histogram</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y <span class="op">=</span> <span class="fu">after_stat</span><span class="op">(</span><span class="va">count</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">count</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
                    bins <span class="op">=</span> <span class="fl">50</span><span class="op">)</span> <span class="op">+</span> 
@@ -1321,8 +1322,8 @@ FIGURE 6.20: If you are wondering how much you need to know, follow this helpful
     <span class="fu">scale_y_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org//reference/label_percent.html">percent_format</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">theme_classic</span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-473-1.png" width="100%"></div>
-<p>To visualize this in a 3D plot, see the slice in the figure below. There are a few things to note. First, the x-axis only extends to 600 (rather than the total 1000) due to the fact that, when the paddle only draws 17/50 = .34 = 34% red beads, it is almost impossible for the total number red beads in the total urn to exceed 600. The most likely number of red beads in the total urn, when the paddle draws 17/50 red beads, is somewhere in the 290-350 range. This is signified by the peak between these points. The probability is lower below 280 and above 350 because it is less likely that this is the number of red beads in the urn, conditional on the fact that the paddle drew 17/50 red beads. This is our posterior distribution.</p>
-<p>For any value of red beads found in the paddle (from 0 to 50), there is a posterior distribution of possible values of red beads in the total urn. This distribution is meant to illustrate that, though our sample gives an estimate of the total proportion of red beads in the entire urn, there is much variation in what the actual proportion might be. To summarize: the distribution of the hat things (the things we are predicting) is, more or less, your posterior.</p>
+<p>To visualize this in a 3D plot, see the slice in the figure below. There are a few things to note. First, the x-axis only extends to 600 (rather than the total 1000) due to the fact that, when the shovel only draws 17/50 = .34 = 34% red beads, it is almost impossible for the total number red beads in the total urn to exceed 600. The most likely number of red beads in the total urn, when the shovel draws 17/50 red beads, is somewhere in the 290-350 range. This is signified by the peak between these points. The probability is lower below 280 and above 350 because it is less likely that this is the number of red beads in the urn, conditional on the fact that the shovel drew 17/50 red beads. This is our posterior distribution.</p>
+<p>For any value of red beads found in the shovel (from 0 to 50), there is a posterior distribution of possible values of red beads in the total urn. This distribution is meant to illustrate that, though our sample gives an estimate of the total proportion of red beads in the entire urn, there is much variation in what the actual proportion might be. To summarize: the distribution of the hat things (the things we are predicting) is, more or less, your posterior.</p>
 <p>Recall the first question from the start of the Chapter:</p>
 <p><em>If we get 17 red beads in a random sample of size 50 taken from an urn, what proportion <span class="math inline">\(p\)</span> of the beads in the urn are red?</em></p>
 <p>The answer is not a single number. Our posterior distribution is just that: a distribution. From our sample, we have many different results for the proportion of red beads in the entire urn. Certain proportions, like the extremes close to 0% or 100%, are essentially impossible due to our sample value being 32%. Some sample proportions, like 40%, occur far more frequently than other sample proportions.</p>
@@ -1347,29 +1348,29 @@ FIGURE 6.20: If you are wondering how much you need to know, follow this helpful
 </h3>
 <p>Now that we have our posterior distribution for the proportion <span class="math inline">\(p\)</span> of red beads in the urn, we can use that object to forecast other outcomes, outcomes which we have not yet observed. Recall, from the start of the Chapter:</p>
 <p><em>Conditional on our answer to Question 1, what is the probability, using the same urn, that we will draw more than 8 red beads if we use a shovel of size 20?</em></p>
-<p>We need to create an (unnormalized) posterior distribution for the number of red beads in a new draw with a 20-slot paddle.</p>
+<p>We need to create an (unnormalized) posterior distribution for the number of red beads in a new draw with a 20-slot shovel.</p>
 <div class="sourceCode" id="cb620"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">17</span><span class="op">)</span>
 
-<span class="co"># Define a paddle size for our joint distributions</span>
+<span class="co"># Define a shovel size for our joint distributions</span>
 
-<span class="va">paddle_size</span> <span class="op">&lt;-</span> <span class="fl">20</span>
+<span class="va">shovel_size</span> <span class="op">&lt;-</span> <span class="fl">20</span>
 
-<span class="co"># To create our posterior distribution, filter for where the red in paddle is</span>
+<span class="co"># To create our posterior distribution, filter for where the red in shovel is</span>
 <span class="co"># equal to 17. This takes our slice.</span>
 
 <span class="va">post_dist</span> <span class="op">&lt;-</span> <span class="va">joint_dist</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">red_in_paddle</span> <span class="op">==</span> <span class="fl">17</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">red_in_shovel</span> <span class="op">==</span> <span class="fl">17</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   
-  <span class="co"># Remove the columns of red_in_urn and red_in_paddle so we are left with p.</span>
+  <span class="co"># Remove the columns of red_in_urn and red_in_shovel so we are left with p.</span>
   
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">red_in_urn</span>, <span class="op">-</span><span class="va">red_in_paddle</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">red_in_urn</span>, <span class="op">-</span><span class="va">red_in_shovel</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   
   <span class="co"># Create object new_reds which maps p using rbinom with size defined as our</span>
-  <span class="co"># previously created paddle_size of 20.</span>
+  <span class="co"># previously created shovel_size of 20.</span>
   
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>new_reds <span class="op">=</span> <span class="fu">map_int</span><span class="op">(</span><span class="va">p</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1</span>,
-                                        size <span class="op">=</span> <span class="va">paddle_size</span>,
+                                        size <span class="op">=</span> <span class="va">shovel_size</span>,
                                         prob <span class="op">=</span> <span class="va">.</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># Look at our created posterior distribution.</span>
@@ -1389,7 +1390,7 @@ FIGURE 6.20: If you are wondering how much you need to know, follow this helpful
 ##  9 0.198        5
 ## 10 0.2          2
 ## # … with 1,909 more rows</code></pre>
-<p>Note that we have two columns to focus on after removing the columns <code>red_in_urn</code> and <code>red_in_paddle</code>. The column <code>p</code> represents our probability for the number of red beads we draw with our paddle size of 20 (conditional upon a previous draw of 17 red beads). The column <code>new_reds</code> represents the number of red beads found in our draw of twenty beads with the corresponding value for <code>p</code>. Scroll through our object to look at the probabilities for various results of <code>new_reds</code>.</p>
+<p>Note that we have two columns to focus on after removing the columns <code>red_in_urn</code> and <code>red_in_shovel</code>. The column <code>p</code> represents our probability for the number of red beads we draw with our shovel size of 20 (conditional upon a previous draw of 17 red beads). The column <code>new_reds</code> represents the number of red beads found in our draw of twenty beads with the corresponding value for <code>p</code>. Scroll through our object to look at the probabilities for various results of <code>new_reds</code>.</p>
 <p>With this unnormalized distribution, it is easy to create the normalized posterior probability distribution.</p>
 <div class="sourceCode" id="cb622"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">post_dist</span> <span class="op">%&gt;%</span> 

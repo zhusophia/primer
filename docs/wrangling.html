@@ -1107,10 +1107,10 @@ as <code>&lt;dttm&gt;</code>.</p></li>
 <p>To get the current date or date-time you can use <code><a href="http://lubridate.tidyverse.org/reference/now.html">today()</a></code> or <code><a href="http://lubridate.tidyverse.org/reference/now.html">now()</a></code>:</p>
 <div class="sourceCode" id="cb274"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="http://lubridate.tidyverse.org/reference/now.html">today</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] "2021-03-06"</code></pre>
+<pre><code>## [1] "2021-03-07"</code></pre>
 <div class="sourceCode" id="cb276"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="http://lubridate.tidyverse.org/reference/now.html">now</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] "2021-03-06 17:30:34 EST"</code></pre>
+<pre><code>## [1] "2021-03-07 22:51:30 EST"</code></pre>
 <p>Otherwise, there are three ways you’re likely to create a date/time:</p>
 <ol style="list-style-type: decimal">
 <li>From a string.</li>
@@ -1197,10 +1197,10 @@ as <code>&lt;dttm&gt;</code>.</p></li>
 <p>You may want to switch between a date-time and a date. That’s the job of <code><a href="http://lubridate.tidyverse.org/reference/as_date.html">as_datetime()</a></code> and <code><a href="http://lubridate.tidyverse.org/reference/as_date.html">as_date()</a></code>:</p>
 <div class="sourceCode" id="cb296"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="http://lubridate.tidyverse.org/reference/as_date.html">as_datetime</a></span><span class="op">(</span><span class="fu"><a href="http://lubridate.tidyverse.org/reference/now.html">today</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] "2021-03-06 UTC"</code></pre>
+<pre><code>## [1] "2021-03-07 UTC"</code></pre>
 <div class="sourceCode" id="cb298"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="http://lubridate.tidyverse.org/reference/as_date.html">as_date</a></span><span class="op">(</span><span class="fu"><a href="http://lubridate.tidyverse.org/reference/now.html">now</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] "2021-03-06"</code></pre>
+<pre><code>## [1] "2021-03-07"</code></pre>
 <p>Sometimes you’ll get date/times as numeric offsets from the “Unix Epoch,” 1970-01-01. If the offset is in seconds, use <code><a href="http://lubridate.tidyverse.org/reference/as_date.html">as_datetime()</a></code>; if it’s in days, use <code><a href="http://lubridate.tidyverse.org/reference/as_date.html">as_date()</a></code>.</p>
 <div class="sourceCode" id="cb300"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="http://lubridate.tidyverse.org/reference/as_date.html">as_datetime</a></span><span class="op">(</span><span class="fl">60</span> <span class="op">*</span> <span class="fl">60</span> <span class="op">*</span> <span class="fl">10</span><span class="op">)</span></code></pre></div>
@@ -2101,19 +2101,20 @@ FIGURE 2.7: Rules of thumb about areas under normal curves.
 ## 1     2     3     5
 ## 2     4    NA     8
 ## 3    NA     7     9</code></pre>
-<p>Note how “# Rowwise:” is printed out. Having set up the pipe to work across rows, we need to pass <code>c_across()</code> to whichever function we are using, specifying the variables we want.</p>
+<p>Note how “# Rowwise:” is printed out. Having set up the pipe to work across rows, we need to pass <code>c_across()</code> to whichever function we are using, generally specifying the variables we want to use. If we don’t provide any arguments to <code>c_across()</code>, it will use all the columns in the tibble.</p>
 <div class="sourceCode" id="cb437"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">tbl</span> <span class="op">%&gt;%</span> 
   <span class="fu">rowwise</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>sum_a_c <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="fu">c_across</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">a</span>, <span class="va">c</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>largest <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="fu">c_across</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>largest_na <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="fu">c_across</span><span class="op">(</span><span class="op">)</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>## # A tibble: 3 x 5
+<pre><code>## # A tibble: 3 x 6
 ## # Rowwise: 
-##       a     b     c largest largest_na
-##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;      &lt;dbl&gt;
-## 1     2     3     5       5          5
-## 2     4    NA     8      NA          8
-## 3    NA     7     9      NA          9</code></pre>
+##       a     b     c sum_a_c largest largest_na
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;      &lt;dbl&gt;
+## 1     2     3     5       7       7          7
+## 2     4    NA     8      12      NA         12
+## 3    NA     7     9      NA      NA          9</code></pre>
 </div>
 </div>
 <div id="summary-2" class="section level2" number="2.11">
