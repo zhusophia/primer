@@ -860,7 +860,7 @@ $$\text{Prob}(\text{models} | \text{data} = \text{results of experiment})$$
 
 The rest is just details.
 
-We can do the same thing with our sampling problem. Assume that we know that there are 1,000 beads in the urn, and that all of them are either red or white. Our experiment involves the one-time use of a paddle with 50 slots. We have 1,001 models under consideration. There might be zero red beads or one red bead or ... 999 red beads or 1000 red beads. With a paddle of size 50, there are 51 possible results from our experiment: zero red beads or one red bead or . . . or 49 red beads or 50 red beads. With this information we can calculate *the joint distribution of models which we are considering and the experiment results we might observe.* Once we have that joint distribution, we can calculate the conditional distribution of the total number of red beads, given however many we observed in our sample. 
+We can do the same thing with our sampling problem. Assume that we know that there are 1,000 beads in the urn, and that all of them are either red or white. Our experiment involves the one-time use of a shovel with 50 slots. We have 1,001 models under consideration. There might be zero red beads or one red bead or ... 999 red beads or 1000 red beads. With a shovel of size 50, there are 51 possible results from our experiment: zero red beads or one red bead or . . . or 49 red beads or 50 red beads. With this information we can calculate *the joint distribution of models which we are considering and the experiment results we might observe.* Once we have that joint distribution, we can calculate the conditional distribution of the total number of red beads, given however many we observed in our sample. 
 
 It is useful to define a parameter, $p$, which is the proportion of red beads in the urn. This also takes on exactly 1,001 possible values: $0, 1/1000, 2/1000, ..., 999/1000, 1$. With these assumptions, we can create an unnormalized joint distribution:
 
@@ -870,25 +870,25 @@ It is useful to define a parameter, $p$, which is the proportion of red beads in
 ```{r, cache = TRUE}
 set.seed(10)
 
-# Set values for the urn, paddle, and reps as this helps with creating our joint
+# Set values for the urn, shovel, and reps as this helps with creating our joint
 # distribution later. Using more than reps = 100 causes the 3-D plot to blow up.
 
 urn_size <- 1000
-paddle_size <- 50
+shovel_size <- 50
 reps <- 100
 
 # Create a tibble where red_in_urn creates a sequence from 0 to urn_size(1000)
 # by a value of 1. Create p as red_in_urn divided by the total urn_size. Column
-# red_in_paddle will map p using rbinom(). Call n = reps (where reps is defined
-# as 100) and size as paddle_size (defined as 50). Finally, unnest!
+# red_in_shovel will map p using rbinom(). Call n = reps (where reps is defined
+# as 100) and size as shovel_size (defined as 50). Finally, unnest!
 
 joint_dist <- 
   tibble(red_in_urn = seq(from = 0, to = urn_size, by = 1)) %>% 
     mutate(p = red_in_urn / urn_size) %>% 
-    mutate(red_in_paddle = map(p, ~ rbinom(n = reps, 
-                                               size = paddle_size, 
+    mutate(red_in_shovel = map(p, ~ rbinom(n = reps, 
+                                               size = shovel_size, 
                                                prob = .))) %>%
-    unnest(red_in_paddle) 
+    unnest(red_in_shovel) 
 
 # After making our joint distribution, take a sample of size 10.
 
@@ -896,14 +896,14 @@ joint_dist %>%
   slice_sample(n = 10)
 ```
 
-After looking at our joint distribution, let's plot it. Call the `red_in_urn` for our y-axis, to indicate the number of red beads in the urn. Call `red_in_paddle` for our x-axis, to indicate the number of red beads in each paddle. This allows us to see which possible values of red beads in our samples are most associated with certain values for the number of red beads in the urn.
+After looking at our joint distribution, let's plot it. Call the `red_in_urn` for our y-axis, to indicate the number of red beads in the urn. Call `red_in_shovel` for our x-axis, to indicate the number of red beads in each shovel. This allows us to see which possible values of red beads in our samples are most associated with certain values for the number of red beads in the urn.
 
 ```{r, cache = TRUE}
 joint_dist %>%
-  ggplot(aes(y = red_in_urn, x = red_in_paddle)) +
+  ggplot(aes(y = red_in_urn, x = red_in_shovel)) +
     geom_point(alpha = 0.005) +
-    labs(title = "Joint Distribution of Red Beads in Paddle and in Urn",
-         x = "Number of Red Beads in Paddle",
+    labs(title = "Joint Distribution of Red Beads in Shovel and in Urn",
+         x = "Number of Red Beads in Shovel",
          y = "Number of Red Beads in Urn")
 ```
 
@@ -911,12 +911,12 @@ It is easier to define our "model" in this joint distribution in terms of the un
 
 ```{r, cache = TRUE}
 joint_dist %>%
-  ggplot(aes(y = p, x = red_in_paddle)) +
+  ggplot(aes(y = p, x = red_in_shovel)) +
     geom_point(alpha = 0.005) +
     labs(title = expression(paste(
-      "Joint Distribution of Red Beads in Paddle and Proportion Red Beads in Urn ", 
+      "Joint Distribution of Red Beads in Shovel and Proportion Red Beads in Urn ", 
       hat(p))), 
-         x = "Number of Red Beads in Paddle",
+         x = "Number of Red Beads in Shovel",
          
          # Add the symbol for p-hat. 
          
@@ -932,19 +932,19 @@ joint_dist %>%
 
 <!-- DK: Should also explain how this example, while still discrete, points us toward the continuous case. The mathematics of going from discrete to continuous is hard. The intuition is easy: just increase the number of models and number of possible results from the experiment. Then, squint and wave your arms. Ignore the mathematics, here and elsewhere. -->
 
-<!-- To better visualize this distribution, take a look at the 3D version of this plot. Note the saddle shape of the graphic. By this, we mean to note the peaks at the areas where the number of red beads in the paddle is 0 out of 50 and 50 out of 50. This is due to the fact that, when we draw 0 red beads in a sample of 50 beads, the possibilities for the number of red beads in the urn is consistently close to 0. Similarly, when our sample of 50 beads comes out with 50 red beads, the possibilities for the number of red beads in the urn is consistently closer to 1000.  -->
+<!-- To better visualize this distribution, take a look at the 3D version of this plot. Note the saddle shape of the graphic. By this, we mean to note the peaks at the areas where the number of red beads in the shovel is 0 out of 50 and 50 out of 50. This is due to the fact that, when we draw 0 red beads in a sample of 50 beads, the possibilities for the number of red beads in the urn is consistently close to 0. Similarly, when our sample of 50 beads comes out with 50 red beads, the possibilities for the number of red beads in the urn is consistently closer to 1000.  -->
 
 
 <!-- ```{r, cache = TRUE, echo = FALSE} -->
 <!-- joint_dist_p <- joint_dist %>%  -->
-<!--   group_by(p, red_in_paddle) %>% -->
+<!--   group_by(p, red_in_shovel) %>% -->
 <!--   summarize(total = n(), .groups = "drop") %>%  -->
 <!--   mutate(p = as.factor(p)) %>%  -->
-<!--   mutate(red_in_paddle = as.factor(red_in_paddle)) %>%  -->
+<!--   mutate(red_in_shovel = as.factor(red_in_shovel)) %>%  -->
 <!--   ggplot() + -->
-<!--     geom_point(aes(x = red_in_paddle, y = p, color = total)) + -->
+<!--     geom_point(aes(x = red_in_shovel, y = p, color = total)) + -->
 <!--     theme(legend.position = "none") + -->
-<!--     labs(x = "Number of Reds in the Paddle", -->
+<!--     labs(x = "Number of Reds in the Shovel", -->
 <!--          y = expression(p), -->
 <!--          title = "Empirical Distribution of Number of Reds", -->
 <!--          subtitle = expression(paste("Based on simulations with various values of ",  -->
@@ -968,7 +968,7 @@ joint_dist %>%
 <!-- rgl.close() -->
 <!-- ``` -->
 
-Now, we have explored the most likely possibilities according to all possible models of this scenario. Let's create a posterior distribution by taking a *slice* of our joint distribution based on the number of red beads in the paddle. 
+Now, we have explored the most likely possibilities according to all possible models of this scenario. Let's create a posterior distribution by taking a *slice* of our joint distribution based on the number of red beads in the shovel. 
 
 ### Posterior distribution
 
@@ -976,15 +976,15 @@ When we look at our question -- we are asking for the posterior probability of a
 
 $$\text{Prob}(\text{models} | \text{data} = 17)$$
 
-The same approach works again. We take a "slice" of the joint distribution where the number of red beads in the paddle is equal to 17. After normalization, that gives us the posterior probability for $p$, or for the number of red beads in the urn. Recall that there is a one-to-one mapping between $p$ and the number of red beads. 
+The same approach works again. We take a "slice" of the joint distribution where the number of red beads in the shovel is equal to 17. After normalization, that gives us the posterior probability for $p$, or for the number of red beads in the urn. Recall that there is a one-to-one mapping between $p$ and the number of red beads. 
 
 ```{r}
 joint_dist %>% 
   
-  # Filtering for where the red_in_paddle equals 17 allows us to isolate the
+  # Filtering for where the red_in_shovel equals 17 allows us to isolate the
   # data that pertains to our question.
   
-  filter(red_in_paddle == 17) %>% 
+  filter(red_in_shovel == 17) %>% 
   ggplot(aes(x = p)) +
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    bins = 50) + 
@@ -1001,9 +1001,9 @@ joint_dist %>%
     theme_classic()
 ```
 
-To visualize this in a 3D plot, see the slice in the figure below. There are a few things to note. First, the x-axis only extends to 600 (rather than the total 1000) due to the fact that, when the paddle only draws 17/50 = .34 = 34% red beads, it is almost impossible for the total number red beads in the total urn to exceed 600. The most likely number of red beads in the total urn, when the paddle draws 17/50 red beads, is somewhere in the 290-350 range. This is signified by the peak between these points. The probability is lower below 280 and above 350 because it is less likely that this is the number of red beads in the urn, conditional on the fact that the paddle drew 17/50 red beads. This is our posterior distribution. 
+To visualize this in a 3D plot, see the slice in the figure below. There are a few things to note. First, the x-axis only extends to 600 (rather than the total 1000) due to the fact that, when the shovel only draws 17/50 = .34 = 34% red beads, it is almost impossible for the total number red beads in the total urn to exceed 600. The most likely number of red beads in the total urn, when the shovel draws 17/50 red beads, is somewhere in the 290-350 range. This is signified by the peak between these points. The probability is lower below 280 and above 350 because it is less likely that this is the number of red beads in the urn, conditional on the fact that the shovel drew 17/50 red beads. This is our posterior distribution. 
 
-For any value of red beads found in the paddle (from 0 to 50), there is a posterior distribution of possible values of red beads in the total urn. This distribution is meant to illustrate that, though our sample gives an estimate of the total proportion of red beads in the entire urn, there is much variation in what the actual proportion might be. To summarize: the distribution of the hat things (the things we are predicting) is, more or less, your posterior.
+For any value of red beads found in the shovel (from 0 to 50), there is a posterior distribution of possible values of red beads in the total urn. This distribution is meant to illustrate that, though our sample gives an estimate of the total proportion of red beads in the entire urn, there is much variation in what the actual proportion might be. To summarize: the distribution of the hat things (the things we are predicting) is, more or less, your posterior.
 
 Recall the first question from the start of the Chapter: 
 
@@ -1037,30 +1037,30 @@ Now that we have our posterior distribution for the proportion $p$ of red beads 
 *Conditional on our answer to Question 1, what is the probability, using the same urn, that we will draw more than 8 red beads if we use a shovel of size 20?*
 
 
-We need to create an (unnormalized) posterior distribution for the number of red beads in a new draw with a 20-slot paddle.
+We need to create an (unnormalized) posterior distribution for the number of red beads in a new draw with a 20-slot shovel.
 
 ```{r}
 set.seed(17)
 
-# Define a paddle size for our joint distributions
+# Define a shovel size for our joint distributions
 
-paddle_size <- 20
+shovel_size <- 20
 
-# To create our posterior distribution, filter for where the red in paddle is
+# To create our posterior distribution, filter for where the red in shovel is
 # equal to 17. This takes our slice.
 
 post_dist <- joint_dist %>% 
-  filter(red_in_paddle == 17) %>% 
+  filter(red_in_shovel == 17) %>% 
   
-  # Remove the columns of red_in_urn and red_in_paddle so we are left with p.
+  # Remove the columns of red_in_urn and red_in_shovel so we are left with p.
   
-  select(-red_in_urn, -red_in_paddle) %>% 
+  select(-red_in_urn, -red_in_shovel) %>% 
   
   # Create object new_reds which maps p using rbinom with size defined as our
-  # previously created paddle_size of 20.
+  # previously created shovel_size of 20.
   
   mutate(new_reds = map_int(p, ~ rbinom(n = 1,
-                                        size = paddle_size,
+                                        size = shovel_size,
                                         prob = .)))
 
 # Look at our created posterior distribution.
@@ -1068,7 +1068,7 @@ post_dist <- joint_dist %>%
 post_dist 
 ```
 
-Note that we have two columns to focus on after removing the columns `red_in_urn` and `red_in_paddle`. The column `p` represents our probability for the number of red beads we draw with our paddle size of 20 (conditional upon a previous draw of 17 red beads). The column `new_reds` represents the number of red beads found in our draw of twenty beads with the corresponding value for `p`. Scroll through our object to look at the probabilities for various results of `new_reds`. 
+Note that we have two columns to focus on after removing the columns `red_in_urn` and `red_in_shovel`. The column `p` represents our probability for the number of red beads we draw with our shovel size of 20 (conditional upon a previous draw of 17 red beads). The column `new_reds` represents the number of red beads found in our draw of twenty beads with the corresponding value for `p`. Scroll through our object to look at the probabilities for various results of `new_reds`. 
 
 With this unnormalized distribution, it is easy to create the normalized posterior probability distribution.
 

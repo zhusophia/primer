@@ -37,7 +37,7 @@ As usual, $\epsilon_i \sim N(0, \sigma^2)$. Conceptually, this model is identica
 <!-- DK: Make these all line up nicer? -->
 
 $$ lived\_after_i =  \beta_1 x_{AL,i} + \beta_2 x_{AK,i} + ... + \beta_{49} x_{WI,i}  + \beta_{50} x_{WY,i} + \epsilon_i $$
-$$ lived\_after_i =  \beta_1 x 0 + \beta_2 1 + ... + \beta_{49} 0  + \beta_{50} 0 + \epsilon_i $$
+$$ lived\_after_i =  \beta_1 0 + \beta_2 1 + ... + \beta_{49} 0  + \beta_{50} 0 + \epsilon_i $$
 $$ lived\_after_i =   \beta_2  + \epsilon_i $$
 The interpretation is the same as when we modeled `age` as a function of `party` or `att_end` as a function of `treatment`. In all these cases, an individual can only be in one category. She can be a Democrat or a Republican. She can received the treatment or not. She can live in Alabama or Alaska or . . . . The only wrinkle we have added is that there are 50 categories under consideration, not just two.
 
@@ -56,11 +56,15 @@ We do not need to, explicitly, tell R that there are 50 categories. It determine
 fit_1
 ```
 
-That is a lot to take in! Examining and comparing two parameters --- the average attitude toward immigration of the treated and control, for example, is easy. Doing the same for 50 parameters is hard. Use `tidy()` from the **broom.mixed** package to create a tibble with all the parameters.
+That is a lot to take in! Examining and comparing two parameters --- the average attitude toward immigration of the treated and control, for example, is easy. Doing the same for 50 parameters is hard. The **broom** and  **broom.mixed** packages were created to make this problem easier to manage, for all sorts of statistical models. For **rstanarm** models, we need the latter.
+
+```{r, message = FALSE}
+library(broom.mixed)
+```
+
+`tidy()` is the key function.
 
 ```{r}
-library(broom.mixed)
-
 fit_1_params <- tidy(fit_1)
 
 fit_1_params
