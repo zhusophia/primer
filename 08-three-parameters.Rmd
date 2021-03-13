@@ -26,7 +26,7 @@ We want to build a model and then use that model to make claims about the world.
 
 *What is the expected age of a Democrat at the train station?*
 
-*In a group of three Democrats and three Republicans, what age difference should we expect between the oldest Democrat and the youngest Republican?* 
+*In a group of three Democrats and three Republicans, what will the age difference be between the oldest Democrat and the youngest Republican?* 
 
 We can answer these and similar questions by creating a model that uses party affiliation to predict age
 
@@ -175,15 +175,15 @@ Don't panic dear poets and philosophers, the whole thing is easier than it looks
 
 * On the left-hand side we have the outcome, $y_i$, which is the variable to be explained. In our case, this is the age of an individual in the population.
 
-* On the right-hand side we first have the part contained in the model, consisting of two similar terms. Each term consists of a parameter and a data point. The betas are our two parameters: $\beta_1$ is the average age of Republicans in the population and $\beta_2$ is the average age of Democrats in the population.  $republican_i$ and $democrat_i$ are our explanatory variables and take the values 1 or 0. If someone is a Republican we have $republican_i = 1$ and $democrat_i = 0$, if someone is a Democrat we have $republican_i = 0$ and $democrat_i = 1$. In other words, their values mutually exclusive -- if you are a Democrat, you cannot also be a Republican.
+* On the right-hand side we first have the part contained in the model: two similar terms added together. Each term consists of a parameter and a data point. The betas are our two parameters: $\beta_1$ is the average age of Republicans in the population and $\beta_2$ is the average age of Democrats in the population.  $republican_i$ and $democrat_i$ are our explanatory variables and take the values 1 or 0. If person $i$ is a Republican we have $republican_i = 1$ and $democrat_i = 0$. If person $i$ is a Democrat we have $republican_i = 0$ and $democrat_i = 1$. In other words, their values are mutually exclusive -- if you are a Democrat, you cannot also be a Republican.
 
 <!-- DK: "Connected to" is awkward here. -->
 
-* The last part, $\epsilon_i$ (“epsilon”), represents the unexplained part and is called the error term. It is simply the difference between the outcome and our model predictions. This includes all factors that have an influence on someone's age but are not connected to party affiliation. We assume that this error follows a normal distribution with an expected value of 0 (meaning it is 0 on average).
+* The last part, $\epsilon_i$ (“epsilon”), represents the unexplained part of the outcome and is called the error term. It is simply the difference between the outcome and our model predictions. This includes all factors that have an influence on someone's age but are not connected to party affiliation. We assume that this error follows a normal distribution with an expected value of 0 (meaning it is 0 on average).
 
-* The small $i$'s are an index to number observations. It is equivalent to the "ID" column in our Preceptor Table and simply states that the outcome for person $i$ is explained by the modeled and non-modeled factors for person $i$. 
+* The small $i$'s are an index to number the observations. It is equivalent to the "ID" column in our Preceptor Table and simply states that the outcome for person $i$ is explained by the modeled and non-modeled factors for person $i$. 
 
-* Keep in mind that the model is a claim about how the world works, not just for the 115 individuals for which we have data but for the all the people in the population for which we seek to draw inferences.
+* The model is a claim about how the world works, not just for the 115 individuals for which we have data but for the all the people in the population for which we seek to draw inferences.
 
 * Although terminology differs across academic fields, the most common term to describe a model like this is a "regression." We are "regressing" `age` on `party` in order to see if they are associated with each other. The formula above is a "regression formula", and the model is a "regression model." This terminology would also apply to our model of `height` in Chapter \@ref(two-parameters). 
 
@@ -200,7 +200,7 @@ knitr::include_graphics("other/images/Courage.jpg")
 Courage allows us to translate math to code.
 
 
-To get posterior distributions for our three parameters, we will again use `stan_glm()`, just as we did in Chapter \@ref(two-parameters). If we take a look at the formula, we can see that it is similar to the equation from before. 
+To get posterior distributions for our three parameters, we will again use `stan_glm()`, just as we did in Chapter \@ref(two-parameters). 
 
 ```{r}
 fit_1 <- stan_glm(age ~ party - 1, 
@@ -391,7 +391,7 @@ sum(pp$`1` > 50) / nrow(pp)
 
 Recall the second question:
 
-* In a group of three Democrats and three Republicans, what age difference should we expect between the oldest Democrat and the youngest Republican?
+* In a group of three Democrats and three Republicans, what will the age difference be between the oldest Democrat and the youngest Republican? 
 
 As before we start by creating a tibble with the desired input. Note that the name of the column ("party") and the observations ("Democrat", "Republican") must always be *exactly* as they are in the original data set. This tibble as well as our model can then be used as arguments for `posterior_predict()`:
 
