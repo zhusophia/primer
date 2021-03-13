@@ -82,7 +82,7 @@
 </h2>
 <p>We want to build a model and then use that model to make claims about the world.</p>
 <p><em>What is the expected age of a Democrat at the train station?</em></p>
-<p><em>In a group of three Democrats and three Republicans, what age difference should we expect between the oldest Democrat and the youngest Republican?</em></p>
+<p><em>In a group of three Democrats and three Republicans, what will the age difference be between the oldest Democrat and the youngest Republican?</em></p>
 <p>We can answer these and similar questions by creating a model that uses party affiliation to predict age</p>
 <div id="wisdom-2" class="section level3" number="8.1.1">
 <h3>
@@ -777,12 +777,12 @@ FIGURE 8.2: Justice
 <!-- DK: This whole section is very awkward. Start with which is data and which is parameters. -->
 <ul>
 <li><p>On the left-hand side we have the outcome, <span class="math inline">\(y_i\)</span>, which is the variable to be explained. In our case, this is the age of an individual in the population.</p></li>
-<li><p>On the right-hand side we first have the part contained in the model, consisting of two similar terms. Each term consists of a parameter and a data point. The betas are our two parameters: <span class="math inline">\(\beta_1\)</span> is the average age of Republicans in the population and <span class="math inline">\(\beta_2\)</span> is the average age of Democrats in the population. <span class="math inline">\(republican_i\)</span> and <span class="math inline">\(democrat_i\)</span> are our explanatory variables and take the values 1 or 0. If someone is a Republican we have <span class="math inline">\(republican_i = 1\)</span> and <span class="math inline">\(democrat_i = 0\)</span>, if someone is a Democrat we have <span class="math inline">\(republican_i = 0\)</span> and <span class="math inline">\(democrat_i = 1\)</span>. In other words, their values mutually exclusive – if you are a Democrat, you cannot also be a Republican.</p></li>
+<li><p>On the right-hand side we first have the part contained in the model: two similar terms added together. Each term consists of a parameter and a data point. The betas are our two parameters: <span class="math inline">\(\beta_1\)</span> is the average age of Republicans in the population and <span class="math inline">\(\beta_2\)</span> is the average age of Democrats in the population. <span class="math inline">\(republican_i\)</span> and <span class="math inline">\(democrat_i\)</span> are our explanatory variables and take the values 1 or 0. If person <span class="math inline">\(i\)</span> is a Republican we have <span class="math inline">\(republican_i = 1\)</span> and <span class="math inline">\(democrat_i = 0\)</span>. If person <span class="math inline">\(i\)</span> is a Democrat we have <span class="math inline">\(republican_i = 0\)</span> and <span class="math inline">\(democrat_i = 1\)</span>. In other words, their values are mutually exclusive – if you are a Democrat, you cannot also be a Republican.</p></li>
 </ul>
 <!-- DK: "Connected to" is awkward here. --><ul>
-<li><p>The last part, <span class="math inline">\(\epsilon_i\)</span> (“epsilon”), represents the unexplained part and is called the error term. It is simply the difference between the outcome and our model predictions. This includes all factors that have an influence on someone’s age but are not connected to party affiliation. We assume that this error follows a normal distribution with an expected value of 0 (meaning it is 0 on average).</p></li>
-<li><p>The small <span class="math inline">\(i\)</span>’s are an index to number observations. It is equivalent to the “ID” column in our Preceptor Table and simply states that the outcome for person <span class="math inline">\(i\)</span> is explained by the modeled and non-modeled factors for person <span class="math inline">\(i\)</span>.</p></li>
-<li><p>Keep in mind that the model is a claim about how the world works, not just for the 115 individuals for which we have data but for the all the people in the population for which we seek to draw inferences.</p></li>
+<li><p>The last part, <span class="math inline">\(\epsilon_i\)</span> (“epsilon”), represents the unexplained part of the outcome and is called the error term. It is simply the difference between the outcome and our model predictions. This includes all factors that have an influence on someone’s age but are not connected to party affiliation. We assume that this error follows a normal distribution with an expected value of 0 (meaning it is 0 on average).</p></li>
+<li><p>The small <span class="math inline">\(i\)</span>’s are an index to number the observations. It is equivalent to the “ID” column in our Preceptor Table and simply states that the outcome for person <span class="math inline">\(i\)</span> is explained by the modeled and non-modeled factors for person <span class="math inline">\(i\)</span>.</p></li>
+<li><p>The model is a claim about how the world works, not just for the 115 individuals for which we have data but for the all the people in the population for which we seek to draw inferences.</p></li>
 <li><p>Although terminology differs across academic fields, the most common term to describe a model like this is a “regression.” We are “regressing” <code>age</code> on <code>party</code> in order to see if they are associated with each other. The formula above is a “regression formula,” and the model is a “regression model.” This terminology would also apply to our model of <code>height</code> in Chapter <a href="two-parameters.html#two-parameters">7</a>.</p></li>
 <li><p>The model in Chapter <a href="two-parameters.html#two-parameters">7</a> is sometimes called “intercept-only” because the only (interesting) parameter is the intercept. Here we have a “two intercept” model because, instead of estimating an average for the whole population, we are estimating two averages.</p></li>
 </ul>
@@ -798,7 +798,7 @@ FIGURE 8.3: Courage
 </p>
 </div>
 <p>Courage allows us to translate math to code.</p>
-<p>To get posterior distributions for our three parameters, we will again use <code><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm()</a></code>, just as we did in Chapter <a href="two-parameters.html#two-parameters">7</a>. If we take a look at the formula, we can see that it is similar to the equation from before.</p>
+<p>To get posterior distributions for our three parameters, we will again use <code><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm()</a></code>, just as we did in Chapter <a href="two-parameters.html#two-parameters">7</a>.</p>
 <div class="sourceCode" id="cb704"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span><span class="va">age</span> <span class="op">~</span> <span class="va">party</span> <span class="op">-</span> <span class="fl">1</span>, 
                     data <span class="op">=</span> <span class="va">trains</span>, 
@@ -1360,7 +1360,7 @@ FIGURE 8.4: Temperance
 <pre><code>## [1] 0.26</code></pre>
 <p>Recall the second question:</p>
 <ul>
-<li>In a group of three Democrats and three Republicans, what age difference should we expect between the oldest Democrat and the youngest Republican?</li>
+<li>In a group of three Democrats and three Republicans, what will the age difference be between the oldest Democrat and the youngest Republican?</li>
 </ul>
 <p>As before we start by creating a tibble with the desired input. Note that the name of the column (“party”) and the observations (“Democrat,” “Republican”) must always be <em>exactly</em> as they are in the original data set. This tibble as well as our model can then be used as arguments for <code><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict()</a></code>:</p>
 <div class="sourceCode" id="cb715"><pre class="downlit sourceCode r">
