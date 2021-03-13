@@ -2,7 +2,21 @@
 
 <!-- Explore causal effects of models following chapter 18/19 in ROAS. Regress ending att on starting attitude and treatment effect. Show parallel lines. That is four parameters! Can also do the same thing with income and treatment. That will be a much worse model. Save interaction for five parameter chapter. -->
 
-<!-- DK: Transforming the outcome variable. Give some more thoughts or advice. -->
+<!-- When interpreting a causal coefficient, start with: "The causal effect of ..." For other coefficients, start with "When comparing . . ." -->
+
+<!-- Transforming the outcome variable. Give some more thoughts or advice. -->
+
+<!-- No hard-coding numbers! r scales::comma(round(coef(fit_1_c)["(Intercept)"], 0)) -->
+
+<!-- In all the examples, provide some clear interpretation sentences. Set them off with skipped lines, and maybe in italics. -->
+
+<!-- Expand rge "interpreting coefficients" section. Difference between across-unit and with-in unit. Causal versus predictive. Unless you have a set up with two or more potential outcomes, you can't do causal. You can't do intra-unit. 
+
+Whenever the setting is predictive --- that is, whenever it is not causal --- you are always comparing two different units (or groups of units). You are never considering a single unit. 
+
+Also, does not work in logistic. But divide by four rule. -->
+
+<!-- Clean up General guidelines for selecting variables. Reasons 1 and 3 seem similar.  -->
 
 
 *This chapter is still a DRAFT. Check back in a few weeks.*
@@ -245,6 +259,11 @@ Transforming the outcome variable is a much more difficult question. Imagine tha
 
 See @roas
 
+### Interpreting coefficients
+
+<!-- Give example of logistic regression. Intercept of logistic regression is impossible to interpret. -->
+
+The magnitude of the coefficients in linear models are relatively easy to understand. That is not true for logistic regressions. In that case, use the Divide-by-Four rule: Take a logistic regression coefficient (other than the constant term) and divide it by 4 to get an upper bound on the predictive difference corresponding to a unit difference in that variable. All this means is that, when evaluating if a predictor is helpful *in a logistic regression only*, divide the coefficient by four. 
 
 <!-- * Creating new variables, especially by combining different ones into one combined variable. -->
 
@@ -256,19 +275,25 @@ How do we decide which variables to include in a model? There is no one right an
 
 When deciding which variables to keep or discard in our models, our advice is to keep a variable X if any of the following circumstances apply:
 
-* The variable has a large and well-estimated coefficient. This means, roughly, that the 95% confidence interval excludes zero.
+* The variable has a large and well-estimated coefficient. This means, roughly, that the 95% confidence interval excludes zero. "Large" can only be defined in the context of the specific model. Speaking roughly, removing a variable with a large coefficient meaningfully changes the predictions of the model. 
 
 * Underlying theory/observation suggests that X has a meaningfully connection to the outcome variable.
 
-* If the variable has a small standard error relative to the size of the coefficient, it is general practice to include it in our model to improve predictions. If the standard error is large relative to the coefficient, and we find no other reason to include it in our model, it may be a signal to remove the variable from your model. 
+* If the variable has a small standard error relative to the size of the coefficient, it is general practice to include it in our model to improve predictions. The rule of thumb is to keep variables for which the estimated coefficient is more than two standard errors away from zero. Some of these variables won't "matter" much to the model. That is, their coefficients, although well-estimated, are small enough that removing the variable from the model will not affect the model's predictions very much.
 
-* If a predictor isn't statistically significant, we would normally consider discarding it. The exception to this rule is if we wanted to compare two indicators (for instance, if we wanted to compare results from the variable `party` -- to look at Democrats versus Republicans -- in the `trains` dataset) in spite of that variable not appearing to be significant. 
+* If the standard error is large relative to the coefficient, i.e., if the magnitude of the coefficient is more than two standard errors from zero, and we find no other reason to include it in our model, we should probably remove the variable from your model.
+
+<!-- DK: This is confusing. -->
+
+* The exception to this rule is if the variable is relevant to answering a question which we have. For example, if we want to know if the ending attitude toward immigration differs between men and women, we need to include `gender` in the model, even if its coefficient is small and closer to zero than two standard errors.
 
 * It is standard in your field to include X in such regressions.
 
 * Your boss/client/reviewer/supervisor wants to include X.
 
-Another trick to consider is the Divide-by-Four rule: As a rule of convenience, we can take logistic regression coefficients (other than the constant term) and divide them by 4 to get an upper bound of the predictive difference corresponding to a unit difference in x. All this means is that, when evaluating if a predictor is helpful *in a logistic regression only*, divide the coefficient by four. If the predictor exceeds this value, it is likely to be significant. 
+<!-- DK: This is not great. Need an example. Does it really belong here. If not, then where? -->
+
+
 
 Let's use the `trains` dataset to evaluate how helpful certain variables are to creating an effective model, based on the guidelines above.
 
@@ -279,6 +304,11 @@ To look at our recommendations in practice, let's focus on the `trains` dataset.
 ### att_end ~ treatment + att_start
 
 First, let's look at a model with a left hand variable, `att_end`, and two right side variables, `treatment` and `att_start`.
+
+```{r, echo = FALSE}
+set.seed(78)
+```
+
 
 ```{r}
 fit_1 <- stan_glm(att_end ~ treatment + att_start, 
@@ -665,7 +695,7 @@ loo_compare(loo_att_start, loo_liberal)
 
 The value for `elpd_diff` is equal to the difference in `elpd_loo` between our two models: elpd_loo for loo_att_start - elpd_loo for loo_liberal = -279.4 - (-201.7) = -77.7. The `se_diff` shows that the difference has a standard error of 12.0. This shows that, even when accounting for standard error, the better model is clear: `fit_att_start`. Therefore, the attitude at the start of the `trains` study is more significant to predicting final attitude when compared with the variable `liberal`, which is an analog for political affiliation. 
 
-As we have seen,`loo_compare` is a shortcut for comparing two models. When you are deciding between two models, `loo_compare()` is a great way to simplify your decision. 
+As we have seen, `loo_compare` is a shortcut for comparing two models. When you are deciding between two models, `loo_compare()` is a great way to simplify your decision. 
 
 What do we do when the value of `loo_compare()` is small? As a general practice, differences smaller than four are hard to distinguish from noise. In other words: when `elpd_diff` is less than 4, there is no advantage to one model over the other. 
 
@@ -688,10 +718,13 @@ The premise of hypothesis testing is to answer a specific question -- one that m
 
 <!-- att_end ~ liberal + att_start. Same thing as chapters before. Show graphic of parallel lines. Cardinal virtues as always. And, extra, at the end we can use loo_compare to see if this model is better than simpler model of att_end ~ att_start. -->
 
+What is the expected difference in attitude end between a liberal with start 6 and a non liberal with start 10? Do that by hand with posterior_epred. Then show how you can get a similar answer just by interpreting coefficents.
+
 
 ### Comparing complex and simple models 
 
 Complex: 
+
 ```{r}
 fit_first <- stan_glm(formula = att_end ~ liberal + att_start,
                   data = trains,
