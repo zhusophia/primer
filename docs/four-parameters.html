@@ -67,9 +67,16 @@
 <span class="header-section-number">9</span> Four Parameters<a class="anchor" aria-label="anchor" href="#four-parameters"><i class="fas fa-link"></i></a>
 </h1>
 <!-- Explore causal effects of models following chapter 18/19 in ROAS. Regress ending att on starting attitude and treatment effect. Show parallel lines. That is four parameters! Can also do the same thing with income and treatment. That will be a much worse model. Save interaction for five parameter chapter. -->
-<!-- Add page 217 to selecting variables. Simple version. Can't talk about everything. Can't talk about interactions, for example. Talk about testing and how stupid it is! MF: Done.-->
-<!-- Write out better models make better predictions on new data. Concepts! Cross validation. Leave one out. Blah, blah, blah. MF: Done. -->
-<!-- In Better models make better predictions, add red dots (to first) and red line (to second) to indicate where all the data points would be if your model were perfect. Should we change the aspect on these plots so that they are "square"? Maybe add y and y_hat to the x-axis labels for these two plots. At least discuss in the text. These plots are weird! Not seen before! MF: Done. -->
+<!-- When interpreting a causal coefficient, start with: "The causal effect of ..." For other coefficients, start with "When comparing . . ." -->
+<!-- Transforming the outcome variable. Give some more thoughts or advice. -->
+<!-- No hard-coding numbers! r scales::comma(round(coef(fit_1_c)["(Intercept)"], 0)) -->
+<!-- In all the examples, provide some clear interpretation sentences. Set them off with skipped lines, and maybe in italics. -->
+<!-- Expand rge "interpreting coefficients" section. Difference between across-unit and with-in unit. Causal versus predictive. Unless you have a set up with two or more potential outcomes, you can't do causal. You can't do intra-unit. 
+
+Whenever the setting is predictive --- that is, whenever it is not causal --- you are always comparing two different units (or groups of units). You are never considering a single unit. 
+
+Also, does not work in logistic. But divide by four rule. -->
+<!-- Clean up General guidelines for selecting variables. Reasons 1 and 3 seem similar.  -->
 <p><em>This chapter is still a DRAFT. Check back in a few weeks.</em></p>
 <p>In our haste to make progress — to get all the way through the process of building, interpreting and using models — we have given short shrift to some of the messy details of model building and evaluation. This chapter fills in those lacunae. We will also introduce models with four parameters.</p>
 <div id="transforming-variables" class="section level2" number="9.1">
@@ -295,6 +302,13 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
 <li><p>Much of the same advice with regard to taking logs of predictor variables applies here as well.</p></li>
 </ul>
 <p>See <span class="citation"><a href="references.html#ref-roas" role="doc-biblioref">Gelman, Hill, and Vehtari</a> (<a href="references.html#ref-roas" role="doc-biblioref">2020</a>)</span></p>
+</div>
+<div id="interpreting-coefficients" class="section level3" number="9.1.7">
+<h3>
+<span class="header-section-number">9.1.7</span> Interpreting coefficients<a class="anchor" aria-label="anchor" href="#interpreting-coefficients"><i class="fas fa-link"></i></a>
+</h3>
+<!-- Give example of logistic regression. Intercept of logistic regression is impossible to interpret. -->
+<p>The magnitude of the coefficients in linear models are relatively easy to understand. That is not true for logistic regressions. In that case, use the Divide-by-Four rule: Take a logistic regression coefficient (other than the constant term) and divide it by 4 to get an upper bound on the predictive difference corresponding to a unit difference in that variable. All this means is that, when evaluating if a predictor is helpful <em>in a logistic regression only</em>, divide the coefficient by four.</p>
 <!-- * Creating new variables, especially by combining different ones into one combined variable. -->
 </div>
 </div>
@@ -309,15 +323,17 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
 </h3>
 <p>When deciding which variables to keep or discard in our models, our advice is to keep a variable X if any of the following circumstances apply:</p>
 <ul>
-<li><p>The variable has a large and well-estimated coefficient. This means, roughly, that the 95% confidence interval excludes zero.</p></li>
+<li><p>The variable has a large and well-estimated coefficient. This means, roughly, that the 95% confidence interval excludes zero. “Large” can only be defined in the context of the specific model. Speaking roughly, removing a variable with a large coefficient meaningfully changes the predictions of the model.</p></li>
 <li><p>Underlying theory/observation suggests that X has a meaningfully connection to the outcome variable.</p></li>
-<li><p>If the variable has a small standard error, it is general practice to include it in our model to improve predictions. If the standard error of a coefficient is large and we find no other reason to include it in our model, it may be a signal to remove the variable from your model.</p></li>
-<li><p>If a predictor isn’t statistically significant, we would normally consider discarding it. The exception to this rule is if we wanted to compare two indicators (for instance, if we wanted to compare results from the variable <code>party</code> – to look at Democrats versus Republicans – in the <code>trains</code> dataset) in spite of that variable not appearing to be significant.</p></li>
+<li><p>If the variable has a small standard error relative to the size of the coefficient, it is general practice to include it in our model to improve predictions. The rule of thumb is to keep variables for which the estimated coefficient is more than two standard errors away from zero. Some of these variables won’t “matter” much to the model. That is, their coefficients, although well-estimated, are small enough that removing the variable from the model will not affect the model’s predictions very much.</p></li>
+<li><p>If the standard error is large relative to the coefficient, i.e., if the magnitude of the coefficient is more than two standard errors from zero, and we find no other reason to include it in our model, we should probably remove the variable from your model.</p></li>
+</ul>
+<!-- DK: This is confusing. --><ul>
+<li><p>The exception to this rule is if the variable is relevant to answering a question which we have. For example, if we want to know if the ending attitude toward immigration differs between men and women, we need to include <code>gender</code> in the model, even if its coefficient is small and closer to zero than two standard errors.</p></li>
 <li><p>It is standard in your field to include X in such regressions.</p></li>
 <li><p>Your boss/client/reviewer/supervisor wants to include X.</p></li>
 </ul>
-<p>Another trick to consider is the Divide-by-Four rule: As a rule of convenience, we can take logistic regression coefficients (other than the constant term) and divide them by 4 to get an upper bound of the predictive difference corresponding to a unit difference in x. All this means is that, when evaluating if a predictor is helpful, divide the coefficient by four. If the predictor exceeds this value, it is likely to be significant.</p>
-<p>Let’s use the <code>trains</code> dataset to evaluate how helpful certain variables are to creating an effective model, based on the guidelines above.</p>
+<!-- DK: This is not great. Need an example. Does it really belong here. If not, then where? --><p>Let’s use the <code>trains</code> dataset to evaluate how helpful certain variables are to creating an effective model, based on the guidelines above.</p>
 </div>
 <div id="variables-in-the-trains-dataset" class="section level3" number="9.2.2">
 <h3>
@@ -343,8 +359,8 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
 ##  predictors:   3
 ## ------
 ##                  Median MAD_SD
-## (Intercept)       2.4    0.4  
-## treatmentControl -1.0    0.3  
+## (Intercept)       2.3    0.4  
+## treatmentControl -0.9    0.3  
 ## att_start         0.8    0.0  
 ## 
 ## Auxiliary parameter(s):
@@ -379,13 +395,13 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
 ##  predictors:   3
 ## ------
 ##             Median   MAD_SD  
-## (Intercept) 111994.8  25164.1
-## age           1047.8    587.3
-## liberalTRUE -32305.2  13985.7
+## (Intercept) 111015.1  25409.9
+## age           1061.6    562.6
+## liberalTRUE -31754.0  14086.3
 ## 
 ## Auxiliary parameter(s):
 ##       Median  MAD_SD 
-## sigma 72739.8  4864.6
+## sigma 72800.0  4974.5
 ## 
 ## ------
 ## * For help interpreting the printed output see ?print.stanreg
@@ -411,13 +427,13 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
 ##  predictors:   3
 ## ------
 ##             Median   MAD_SD  
-## (Intercept) 156070.1   9023.3
-## z_age        13162.2   6890.9
-## liberalTRUE -31818.2  13640.4
+## (Intercept) 156076.6   9111.6
+## z_age        12910.3   6977.8
+## liberalTRUE -32378.9  13546.4
 ## 
 ## Auxiliary parameter(s):
 ##       Median  MAD_SD 
-## sigma 72880.4  4742.1
+## sigma 72732.3  4770.4
 ## 
 ## ------
 ## * For help interpreting the printed output see ?print.stanreg
@@ -466,10 +482,7 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
 <p>Now that we have looked at three cases of variables and decided whether they should be included, let’s discuss the concept of selecting variables generally.</p>
 <p>The variables we decided to keep and discard are <em>not necessarily the variables you would keep or discard</em>, or the variables that any other data scientist would keep or discard. It is much easier to <strong>keep</strong> a variable than it is to build a case for discarding a variable. Variables are helpful even when not significant, particularly when they are indicator variables which may separate the data into two groups that we want to study.</p>
 <p>The process of selecting variables – though we have guidelines – is complicated. There are many reasons to include a variable in a model. The main reasons to exclude a variable are if the variable isn’t significant or if the variable has a large standard error.</p>
-<!-- Introduce 4 parameter models. Use the exact same models as in chapter 8, but add a second right hand side variable. At the start, only use one categorical and one numeric. MF: Done.-->
 <!-- Discuss indicator & index variables prior to explaining guidelines? Not this week! -->
-<!-- Go through one of the datasets and explain whether we would include variables X, Y, and Z. Not this week.  Try out several different left-hand side variables, like age and att_end, which were teh dependent variables that we used in Chapter 8. In this chapter, we will allow for two right-hand side variables. (Perhaps these should always be one numeric and one categorical, except for the last one.) Connect to examples from chapter 8. Introduce four parameter models. MF: Done. -->
-<!-- First case att_end ~ treatment + att_start. Keep both! Second case income ~ age + liberal. Strong keep for liberal. age is trickier. It is small. (Not really! Depends on whether or not you are looking at one year or 10. Don't let arbitrary scalings confuse you. Measured in decades it is 10 times bigger. Discuss z scaling?)  Not quite significant. No right answer! Third and last case is logistic, liberal ~ I(income/1e+05) + party. Tricky! Maybe keep both? But stronger case for party. Maybe discuss interpretation of coefficients of logistic regressions? Divide by 4 rule? MF: Done.-->
 </div>
 </div>
 <div id="comparing-models-in-theory" class="section level2" number="9.3">
@@ -534,7 +547,7 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
          subtitle <span class="op">=</span> <span class="st">"Liberals are less conservative"</span>,
          x <span class="op">=</span> <span class="st">"Predicted Attitude"</span>,
          y <span class="op">=</span> <span class="st">"True Attitude"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-611-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-612-1.png" width="100%"></div>
 <!-- DK: Could put this discussion in fig.cap. Could add some details to the plots to indicate the points that I am talking about. Should create an animation, which brings in new point, forecasts it, and then measures how wrong the model was. -->
 <p>Because there are only two possible values for <code>liberal</code> — TRUE and FALSE — there are only two predictions which this model will make: about 10 for <code>liberal == FALSE</code> and about 8 for <code>liberal == TRUE</code>. (The points in the above plot are jittered.) For some individuals, these are perfect predictions. For others, they are poor predictions. the red circles on our plot illustrate the areas where our predictions are equal to true values. As we can see, the model isn’t great at predicting attitude end. (Note the two individuals who are <code>liberal == TRUE</code>, and who the model thinks will have <code>att_end == 8</code>, but who have <code>att_end == 15</code>. The model got them both very, very wrong.)</p>
 <p>Consider our second model, using <code>att_start</code> to forecast <code>att_end</code>.</p>
@@ -552,7 +565,7 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
          subtitle <span class="op">=</span> <span class="st">"Survey responses are somewhat consistent"</span>,
          x <span class="op">=</span> <span class="st">"Predicted Attitude"</span>,
          y <span class="op">=</span> <span class="st">"True Attitude"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-612-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-613-1.png" width="100%"></div>
 <p>Because <code>att_end</code> takes on 13 unique values, the model makes 13 unique predictions. Some of those predictions are perfect! But others are very wrong. The red line shows the points where our predictions match the truth. Note the individual with a predicted <code>att_end</code> of around 9 but with an actual value of <code>15</code>. That is a big miss!</p>
 <p>Rather than looking at individual cases, we need to look at the errors for all the predictions. Fortunately, a prediction error is the same thing as a residual, which is easy enough to calculate.</p>
 <div class="sourceCode" id="cb772"><pre class="downlit sourceCode r">
@@ -598,13 +611,13 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
 <span class="header-section-number">9.3.2</span> Beware overfitting<a class="anchor" aria-label="anchor" href="#beware-overfitting"><i class="fas fa-link"></i></a>
 </h3>
 <p>One of the biggest dangers in data science is <em>overfitting</em>, using a model with too many parameters which fits the data we have too well and, therefore, works poorly on data we have yet to see. Consider a simple example with 10 data points.</p>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-615-1.png" width="100%"></div>
-<p>What happens when we fit a model with one predictor?</p>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-616-1.png" width="100%"></div>
+<p>What happens when we fit a model with one predictor?</p>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-617-1.png" width="100%"></div>
 <p>That is a reasonable model. It does not fit the data particularly well, but we certainly believe that higher values of <code>x</code> are associated with higher values of <code>y</code>. A linear fit is not unreasonable.</p>
 <!-- DK: Add a discussion about the difference between plotting y versus x, as we do here, and y versus y_hat, which is what we did in the previous section. In fact, show y versus y_hat with this model, right now! -->
 <p>But we can also use some of the lessons from above and try a quadratic fit by adding <span class="math inline">\(x^2\)</span> as a predictor.</p>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-617-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-618-1.png" width="100%"></div>
 <p>Is this a better model? Maybe?</p>
 <p>But why stop at adding <span class="math inline">\(x^2\)</span> to the regression? Why not add <span class="math inline">\(x^3\)</span>, <span class="math inline">\(x^4\)</span> and all the way to <span class="math inline">\(x^9\)</span>? When we do so, the fit is much better.</p>
 <div class="sourceCode" id="cb776"><pre class="downlit sourceCode r">
@@ -623,7 +636,7 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
     <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"`y` as a 9-Degree Polynomial Function of `x`"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_x_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">10</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_y_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">10</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> </code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-618-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-619-1.png" width="100%"></div>
 <p><em>If the only criteria we cared about was how well the model predicts using the data on which the parameters were estimated, then a model with more parameters will always be better.</em> But that is not what truly matters. What matters is how well the model works on data which was not used to create the model.</p>
 <!-- DK: Discuss how this is the perfect model. Plot y versus y_hat. It is a perfect line!  -->
 </div>
@@ -758,7 +771,7 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
 ## .   0.0       0.0  
 ## . -77.7      12.0</code></pre>
 <p>The value for <code>elpd_diff</code> is equal to the difference in <code>elpd_loo</code> between our two models: elpd_loo for loo_att_start - elpd_loo for loo_liberal = -279.4 - (-201.7) = -77.7. The <code>se_diff</code> shows that the difference has a standard error of 12.0. This shows that, even when accounting for standard error, the better model is clear: <code>fit_att_start</code>. Therefore, the attitude at the start of the <code>trains</code> study is more significant to predicting final attitude when compared with the variable <code>liberal</code>, which is an analog for political affiliation.</p>
-<p>As we have seen,<code>loo_compare</code> is a shortcut for comparing two models. When you are deciding between two models, <code><a href="https://mc-stan.org/rstanarm/reference/loo.stanreg.html">loo_compare()</a></code> is a great way to simplify your decision.</p>
+<p>As we have seen, <code>loo_compare</code> is a shortcut for comparing two models. When you are deciding between two models, <code><a href="https://mc-stan.org/rstanarm/reference/loo.stanreg.html">loo_compare()</a></code> is a great way to simplify your decision.</p>
 <p>What do we do when the value of <code><a href="https://mc-stan.org/rstanarm/reference/loo.stanreg.html">loo_compare()</a></code> is small? As a general practice, differences smaller than four are hard to distinguish from noise. In other words: when <code>elpd_diff</code> is less than 4, there is no advantage to one model over the other.</p>
 <!-- ### Selecting the rows -->
 </div>
@@ -780,6 +793,7 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
 <span class="header-section-number">9.6</span> Parallel lines<a class="anchor" aria-label="anchor" href="#parallel-lines"><i class="fas fa-link"></i></a>
 </h2>
 <!-- att_end ~ liberal + att_start. Same thing as chapters before. Show graphic of parallel lines. Cardinal virtues as always. And, extra, at the end we can use loo_compare to see if this model is better than simpler model of att_end ~ att_start. -->
+<!-- What is the expected difference in attitude end between a liberal with start 6 and a non liberal with start 10? Do that by hand with posterior_epred. Then show how you can get a similar answer just by interpreting coefficents. -->
 <div id="comparing-complex-and-simple-models" class="section level3" number="9.6.1">
 <h3>
 <span class="header-section-number">9.6.1</span> Comparing complex and simple models<a class="anchor" aria-label="anchor" href="#comparing-complex-and-simple-models"><i class="fas fa-link"></i></a>
@@ -806,7 +820,7 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
 <code class="sourceCode R"><span class="fu"><a href="https://mc-stan.org/rstanarm/reference/loo.stanreg.html">loo_compare</a></span><span class="op">(</span><span class="va">loo_first</span>, <span class="va">loo_simple</span><span class="op">)</span></code></pre></div>
 <pre><code>##   elpd_diff se_diff
 ## .  0.0       0.0   
-## . -0.5       1.3</code></pre>
+## . -0.4       1.3</code></pre>
 </div>
 </div>
 <div id="summary-9" class="section level2" number="9.7">
@@ -831,6 +845,7 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
 <li><a class="nav-link" href="#taking-logs"><span class="header-section-number">9.1.4</span> Taking logs</a></li>
 <li><a class="nav-link" href="#adding-transformed-terms"><span class="header-section-number">9.1.5</span> Adding transformed terms</a></li>
 <li><a class="nav-link" href="#transforming-the-outcome-variable"><span class="header-section-number">9.1.6</span> Transforming the outcome variable</a></li>
+<li><a class="nav-link" href="#interpreting-coefficients"><span class="header-section-number">9.1.7</span> Interpreting coefficients</a></li>
 </ul>
 </li>
 <li>
