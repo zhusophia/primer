@@ -1223,7 +1223,17 @@ You can also view examples of both `pivot_longer()` and `pivot_wider()` on the [
 
 <!-- DK: This could be re-organized. More discussion of discrete versus continuous. -->
 
-What is a distribution? *Think of the distribution of a variable as an urn from which we can pull out, at random, values for that variable.* Drawing a thousand or so values from that urn, and then looking at a histogram, can show where the values are centered and how the values vary. Because we are sloppy, we will use the word distribution to refer to both the (imaginary!) urn from which we are drawing values and to the list of values we have drawn. *The vector of `r length(trains$age)` ages in the `trains` data is a distribution.*
+*A distribution is a function which shows the possible values of a variable and how often they occur.*
+
+Think of the distribution of a variable as an urn from which we can pull out, at random, values for that variable. Drawing a thousand or so values from that urn, and then looking at a histogram, can show where the values are centered and how the values vary. Because people are sloppy, they will use the word distribution to refer to both the (imaginary!) urn from which we are drawing values and to the list of values we have drawn. It is better, however, to keep three distinct ideas separate:
+
+* The *unknown true distribution* which, in reality, generates the data which we see. Outside of stylized examples in which we *assume* that a distribution follows a simple mathematical formula, we will never have access to the unknown true distribution. We can only estimate it, however imperfectly. This unknown true distribution is often referred to as the *data generating mechanism*, or DGM. It is a function or black box or urn which produces data. We can see the data. We can't see the urn.
+
+* The *estimated distribution* which, we think, generates the data which we see. Again, we can never know the unknown true distribution. But, by making some assumptions and using the data we have, we can *estimate* a distribution. Our estimate may be very close to the true distribution. Or it may be far away. The main task of data science to to create and use these estimated distributions. Almost always, these distributions are instantiated in computer code.
+
+* A *vector of numbers drawn* from the estimated distribution. Both true and estimated distributions can be complex beasties, difficult to describe accurately and in detail. But a vector of numbers drawn from a distribution is easy to understand and use. So, in general, we work with vectors of numbers. When someone --- either a colleague or a piece of R code --- has created a distribution which we want to use to answer a question, we don't really want the distribution itself. We just want a vectors of "draws" from that distribution. Vectors are easy to work with! Complex computer code is not.
+
+Again, people (including us!) will often be sloppy and use the same word, "distribution," without making it clear whether they are talking about the *true distribution*, the *estimated distribution*, or a vector of *draws* from the estimated distribution. Try not to be sloppy.
 
 ### Scaling a distribution
 
@@ -1255,7 +1265,7 @@ rolls_p <- tibble(value = rolls) %>%
   ggplot(aes(value)) +
     geom_bar(aes(y = after_stat(count))) +
     labs(title = "Distribution of 10 Rolls",
-         y = "Count")
+         y = "Count") 
 
 
 more_rolls_p <- tibble(value = more_rolls) %>% 
@@ -1277,13 +1287,15 @@ rolls_p <- tibble(value = rolls) %>%
   ggplot(aes(x = value)) +
     geom_bar(aes(y = after_stat(count/sum(count)))) +
     labs(title = "Distribution of 10 Rolls",
-         y = "Percentage")
+         y = "Percentage") +
+    scale_y_continuous(labels = scales::percent_format(accuracy = 1))
 
 more_rolls_p <- tibble(value = more_rolls) %>% 
   ggplot(aes(value)) +
     geom_bar(aes(y = after_stat(count/sum(count)))) +
     labs(title = "Distribution of 10,000 Rolls",
-         y = NULL)
+         y = NULL) +
+    scale_y_continuous(labels = scales::percent_format(accuracy = 1))
 
 rolls_p + more_rolls_p
 ```
@@ -1293,6 +1305,11 @@ rolls_p + more_rolls_p
 The most common distributions you will work with are *empirical* or *frequency* distributions, the values of `age` in the `trains` tibble, the values of `poverty` in the `kenya` tibble, and so on. But we can also create our own data by making "draws" from a distribution which we have concocted. 
 
 Consider the distribution of the possible values from rolling a fair die. We can use the `sample()` function to create draws from this distribution, meaning it will change (or sometimes stay the same) for every subsequent draw.
+
+```{r, echo = FALSE}
+set.seed(9)
+```
+
 
 ```{r}
 die <- c(1, 2, 3, 4, 5, 6)
@@ -1336,9 +1353,9 @@ tibble(result = sample(x = die,
     scale_y_continuous(labels = scales::comma_format())
 ```
 
-This makes the *dual nature of distributions* more clear. A distribution is the "thing" you see in this plot. A mathematical object with several different parts, including a set of possible values (1 through 6, in this case) and a record of the number of times each appears. A distribution is *also* the simple vector of numbers we used to create this plot.
+This makes the *dual nature of distributions* more clear. A distribution is the "thing" you see in this plot. A mathematical object with several different parts, including a set of possible values (1 through 6, in this case) and a record of the number of times each value appears. A distribution is *also* the simple vector of numbers we used to create this plot.
 
-In general, we travel back-and-forth between distribution as a thing and distribution as a vector of numbers depending on what we are trying to accomplish. The path back-and-force is via draws.
+In general, we travel back-and-forth between *distribution as a thing* and *distribution as a vector of draws* from the thing, depending on what we are trying to accomplish. 
 
 `sample()` is just one of many functions for creating draws --- or, more colloquially, "drawing" --- from a distribution. Three of the most important functions are: `runif()`, `rbinom()`, and `rnorm()`.
 
@@ -1604,13 +1621,14 @@ Once we have a vector of draws, we can examine various aspects of the distributi
 draws <- rnorm(100, mean = 2, sd = 1)
 ```
 
-Even though we know, because we wrote the code, that the draws come from a normal distribution with a mean of 2 and a standard deviation of 1, the calculated results will not match those values exactly because the draws themselves are random.
+This is a case in which there is no distinction between the *true distribution* and the *estimated distribution*. We know, by assumption, what the truth is.
+
+Even though we know, because we wrote the code, that the draws come from a normal distribution with a mean of 2 and a standard deviation of 1, the calculated results will not match those values exactly because the draws themselves are random. 
 
 ```{r}
 mean(draws)
 sd(draws)
 ```
-
 
 Note that we are more likely to use the median and the mad to summarize a distribution. In this case, they are very similar to the mean and standard deviation.
 
@@ -1620,7 +1638,7 @@ mad(draws)
 ```
 
 
-In practice, we will not know the exact distribution which generates our data. (If we did know, then estimation would be unnecessary.) The inherent randomness of the world means that calculated statistics will not match the underlying truth perfectly. But the more data that we collect, the closer the match will be.
+In practice, we will not know the exact distribution which generates our data. (If we did know, then estimation would not be necessary.) The inherent randomness of the world means that calculated statistics will not match the underlying truth perfectly. But the more data that we collect, the closer the match will be.
 
 In addition to the mean and standard deviation of the draws, we will often be interested in various quantiles of the distribution, most commonly because we want to create intervals which cover a specified portion of the draws. Examples:
 
