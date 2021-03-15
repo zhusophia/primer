@@ -1107,10 +1107,10 @@ as <code>&lt;dttm&gt;</code>.</p></li>
 <p>To get the current date or date-time you can use <code><a href="http://lubridate.tidyverse.org/reference/now.html">today()</a></code> or <code><a href="http://lubridate.tidyverse.org/reference/now.html">now()</a></code>:</p>
 <div class="sourceCode" id="cb274"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="http://lubridate.tidyverse.org/reference/now.html">today</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] "2021-03-13"</code></pre>
+<pre><code>## [1] "2021-03-14"</code></pre>
 <div class="sourceCode" id="cb276"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="http://lubridate.tidyverse.org/reference/now.html">now</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] "2021-03-13 11:03:14 EST"</code></pre>
+<pre><code>## [1] "2021-03-14 22:05:51 EDT"</code></pre>
 <p>Otherwise, there are three ways you’re likely to create a date/time:</p>
 <ol style="list-style-type: decimal">
 <li>From a string.</li>
@@ -1197,10 +1197,10 @@ as <code>&lt;dttm&gt;</code>.</p></li>
 <p>You may want to switch between a date-time and a date. That’s the job of <code><a href="http://lubridate.tidyverse.org/reference/as_date.html">as_datetime()</a></code> and <code><a href="http://lubridate.tidyverse.org/reference/as_date.html">as_date()</a></code>:</p>
 <div class="sourceCode" id="cb296"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="http://lubridate.tidyverse.org/reference/as_date.html">as_datetime</a></span><span class="op">(</span><span class="fu"><a href="http://lubridate.tidyverse.org/reference/now.html">today</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] "2021-03-13 UTC"</code></pre>
+<pre><code>## [1] "2021-03-14 UTC"</code></pre>
 <div class="sourceCode" id="cb298"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="http://lubridate.tidyverse.org/reference/as_date.html">as_date</a></span><span class="op">(</span><span class="fu"><a href="http://lubridate.tidyverse.org/reference/now.html">now</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] "2021-03-13"</code></pre>
+<pre><code>## [1] "2021-03-14"</code></pre>
 <p>Sometimes you’ll get date/times as numeric offsets from the “Unix Epoch,” 1970-01-01. If the offset is in seconds, use <code><a href="http://lubridate.tidyverse.org/reference/as_date.html">as_datetime()</a></code>; if it’s in days, use <code><a href="http://lubridate.tidyverse.org/reference/as_date.html">as_date()</a></code>.</p>
 <div class="sourceCode" id="cb300"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="http://lubridate.tidyverse.org/reference/as_date.html">as_datetime</a></span><span class="op">(</span><span class="fl">60</span> <span class="op">*</span> <span class="fl">60</span> <span class="op">*</span> <span class="fl">10</span><span class="op">)</span></code></pre></div>
@@ -1677,7 +1677,14 @@ FIGURE 2.5: Relationships among nycflights tables
 <span class="header-section-number">2.9</span> Distributions<a class="anchor" aria-label="anchor" href="#distributions"><i class="fas fa-link"></i></a>
 </h2>
 <!-- DK: This could be re-organized. More discussion of discrete versus continuous. -->
-<p>What is a distribution? <em>Think of the distribution of a variable as an urn from which we can pull out, at random, values for that variable.</em> Drawing a thousand or so values from that urn, and then looking at a histogram, can show where the values are centered and how the values vary. Because we are sloppy, we will use the word distribution to refer to both the (imaginary!) urn from which we are drawing values and to the list of values we have drawn. <em>The vector of 115 ages in the <code>trains</code> data is a distribution.</em></p>
+<p><em>A distribution is a function which shows the possible values of a variable and how often they occur.</em></p>
+<p>Think of the distribution of a variable as an urn from which we can pull out, at random, values for that variable. Drawing a thousand or so values from that urn, and then looking at a histogram, can show where the values are centered and how the values vary. Because people are sloppy, they will use the word distribution to refer to both the (imaginary!) urn from which we are drawing values and to the list of values we have drawn. It is better, however, to keep three distinct ideas separate:</p>
+<ul>
+<li><p>The <em>unknown true distribution</em> which, in reality, generates the data which we see. Outside of stylized examples in which we <em>assume</em> that a distribution follows a simple mathematical formula, we will never have access to the unknown true distribution. We can only estimate it, however imperfectly. This unknown true distribution is often referred to as the <em>data generating mechanism</em>, or DGM. It is a function or black box or urn which produces data. We can see the data. We can’t see the urn.</p></li>
+<li><p>The <em>estimated distribution</em> which, we think, generates the data which we see. Again, we can never know the unknown true distribution. But, by making some assumptions and using the data we have, we can <em>estimate</em> a distribution. Our estimate may be very close to the true distribution. Or it may be far away. The main task of data science to to create and use these estimated distributions. Almost always, these distributions are instantiated in computer code.</p></li>
+<li><p>A <em>vector of numbers drawn</em> from the estimated distribution. Both true and estimated distributions can be complex beasties, difficult to describe accurately and in detail. But a vector of numbers drawn from a distribution is easy to understand and use. So, in general, we work with vectors of numbers. When someone — either a colleague or a piece of R code — has created a distribution which we want to use to answer a question, we don’t really want the distribution itself. We just want a vectors of “draws” from that distribution. Vectors are easy to work with! Complex computer code is not.</p></li>
+</ul>
+<p>Again, people (including us!) will often be sloppy and use the same word, “distribution,” without making it clear whether they are talking about the <em>true distribution</em>, the <em>estimated distribution</em>, or a vector of <em>draws</em> from the estimated distribution. Try not to be sloppy.</p>
 <div id="scaling-a-distribution" class="section level3" number="2.9.1">
 <h3>
 <span class="header-section-number">2.9.1</span> Scaling a distribution<a class="anchor" aria-label="anchor" href="#scaling-a-distribution"><i class="fas fa-link"></i></a>
@@ -1720,7 +1727,7 @@ FIGURE 2.5: Relationships among nycflights tables
 <p>Now, suppose we wanted to roll this die 10 times. One of the arguments of the <code><a href="https://rdrr.io/r/base/sample.html">sample()</a></code> function is <code>replace</code>. We must specify it as <code>TRUE</code> if values can appear more than once. Since, when rolling a die 10 times, we expect that a value like 3 can appear more than once, we need to set <code>replace = TRUE</code>.</p>
 <div class="sourceCode" id="cb378"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">die</span>, size <span class="op">=</span> <span class="fl">10</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<pre><code>##  [1] 4 4 5 6 1 6 2 2 1 1</code></pre>
+<pre><code>##  [1] 5 6 3 3 3 4 3 6 4 5</code></pre>
 <p>In other words, rolling a 1 on the first roll should not preclude you from rolling a 1 on a later roll.</p>
 <p>What if the die is not “fair,” meaning that some sides are more likely to appear than others? The final argument of the <code><a href="https://rdrr.io/r/base/sample.html">sample()</a></code> function is the <code>prob</code> argument. It takes a vector (of the same length as the initial vector <code>x</code>) that contains all of the probabilities of selecting each one of the elements of <code>x</code>. Suppose that the probability of rolling a 1 was 0.5, and the probability of rolling any other value is 0.1. (These probabilities should sum to 1. If they don’t <code><a href="https://rdrr.io/r/base/sample.html">sample()</a></code> will automatically re-scale them.)</p>
 <div class="sourceCode" id="cb380"><pre class="downlit sourceCode r">
@@ -1728,7 +1735,7 @@ FIGURE 2.5: Relationships among nycflights tables
        size <span class="op">=</span> <span class="fl">10</span>, 
        replace <span class="op">=</span> <span class="cn">TRUE</span>, 
        prob <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>##  [1] 5 1 5 1 1 5 1 1 3 5</code></pre>
+<pre><code>##  [1] 1 1 3 1 2 1 1 6 1 1</code></pre>
 <p><strong>Remember: There is no real data here.</strong> We have not actually rolled a die. We have just made some assumptions about what would happen if we were to roll a die. With those assumptions we have built an urn — a <em>data generating mechanism</em> — from which we can draw as many values as we like. Let’s roll the unfair die 10,000 times.</p>
 <div class="sourceCode" id="cb382"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">tibble</span><span class="op">(</span>result <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">die</span>, 
@@ -1743,9 +1750,9 @@ FIGURE 2.5: Relationships among nycflights tables
     <span class="fu">scale_x_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">6</span>,
                        labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_y_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org//reference/label_number.html">comma_format</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-234-1.png" width="100%"></div>
-<p>This makes the <em>dual nature of distributions</em> more clear. A distribution is the “thing” you see in this plot. A mathematical object with several different parts, including a set of possible values (1 through 6, in this case) and a record of the number of times each appears. A distribution is <em>also</em> the simple vector of numbers we used to create this plot.</p>
-<p>In general, we travel back-and-forth between distribution as a thing and distribution as a vector of numbers depending on what we are trying to accomplish. The path back-and-force is via draws.</p>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-235-1.png" width="100%"></div>
+<p>This makes the <em>dual nature of distributions</em> more clear. A distribution is the “thing” you see in this plot. A mathematical object with several different parts, including a set of possible values (1 through 6, in this case) and a record of the number of times each value appears. A distribution is <em>also</em> the simple vector of numbers we used to create this plot.</p>
+<p>In general, we travel back-and-forth between <em>distribution as a thing</em> and <em>distribution as a vector of draws</em> from the thing, depending on what we are trying to accomplish.</p>
 <p><code><a href="https://rdrr.io/r/base/sample.html">sample()</a></code> is just one of many functions for creating draws — or, more colloquially, “drawing” — from a distribution. Three of the most important functions are: <code><a href="https://rdrr.io/r/stats/Uniform.html">runif()</a></code>, <code><a href="https://rdrr.io/r/stats/Binomial.html">rbinom()</a></code>, and <code><a href="https://rdrr.io/r/stats/Normal.html">rnorm()</a></code>.</p>
 </div>
 <div id="runif" class="section level3" number="2.9.3">
@@ -1755,7 +1762,7 @@ FIGURE 2.5: Relationships among nycflights tables
 <p>Consider a “uniform” distribution. This is the case in which every outcome in the range of possible outcomes has the same chance of occurring. The function <code><a href="https://rdrr.io/r/stats/Uniform.html">runif()</a></code> (spoken as “r-unif”) enables us to draw from a uniform contribution. <code><a href="https://rdrr.io/r/stats/Uniform.html">runif()</a></code> has three arguments: <code>n</code>, <code>min</code>, and <code>max</code>. <code><a href="https://rdrr.io/r/stats/Uniform.html">runif()</a></code> will produce <code>n</code> draws from between <code>min</code> and <code>max</code>, with each value having an equal chance of occurring.</p>
 <div class="sourceCode" id="cb383"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10</span>, min <span class="op">=</span> <span class="fl">4</span>, max <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></code></pre></div>
-<pre><code>##  [1] 4.0 5.6 4.3 5.4 4.3 4.1 4.2 4.8 4.8 5.9</code></pre>
+<pre><code>##  [1] 5.6 5.0 4.6 5.7 4.9 5.2 4.3 5.6 4.8 5.6</code></pre>
 <p>Mathematically, we would write:</p>
 <p><span class="math display">\[y_i \sim U(4, 6)\]</span>,</p>
 <p>This means that the each value for <span class="math inline">\(y\)</span> is drawn from a uniform distribution between four and six.</p>
@@ -1782,7 +1789,7 @@ FIGURE 2.5: Relationships among nycflights tables
          y <span class="op">=</span> <span class="st">"Count"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_x_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,
                        labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Tails"</span>, <span class="st">"Heads"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-237-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-238-1.png" width="100%"></div>
 <p>In our graph above, we use the function <code>scale_x_continuous()</code> because our x-axis variable is continuous, meaning it can take on any real values. The <code>breaks</code> argument to <code>scale_x_continuous()</code> converts our x-axis to having two different “tick marks.” There is a fairly even distribution of Tails and Heads. More draws would typically result in an even more equal split.</p>
 <p>Randomness creates (inevitable) tension between distribution as a “thing” and distribution as a vector of draws from that thing. In this case, the vector of draws is not balanced between Tails and Heads. Yet, we “know” that it should be since the coin is, by definition, fair. In a sense, the mathematics require an even split. Yet, randomness means that the vector of draws will rarely match the mathematically “true” result. And that is OK! First, randomness is an intrinsic property of the real world. Second, we can make the effect of randomness be as small as we want by increasing the number of draws.</p>
 <!-- DK: Could do a little example of that, showing the convergence to 50% as n increases. -->
@@ -1796,7 +1803,7 @@ FIGURE 2.5: Relationships among nycflights tables
          y <span class="op">=</span> <span class="st">"Count"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_x_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,
                        labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Tails"</span>, <span class="st">"Heads"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-238-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-239-1.png" width="100%"></div>
 <p>The distribution — the imaginary urn — from which we draw the results of a coin flip for a fair coin is a different distribution — a different imaginary urn — from the distribution for a biased coin. In fact, there are an infinite number of distributions. <em>Yet as long as we can draw values from a distribution, we can work with it.</em> Mathematics:</p>
 <p><span class="math display">\[y_i \sim B(n, p)\]</span>.</p>
 <p>Each value for <span class="math inline">\(y\)</span> is drawn from a binomial distribution with parameters <span class="math inline">\(n\)</span> for the number of trials and <span class="math inline">\(p\)</span> for the probability of success.</p>
@@ -1811,7 +1818,7 @@ FIGURE 2.5: Relationships among nycflights tables
          x <span class="op">=</span> <span class="st">"Total Number of Heads in Ten Flips"</span>,
          y <span class="op">=</span> <span class="st">"Count"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_x_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-239-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-240-1.png" width="100%"></div>
 </div>
 <div id="normal" class="section level3" number="2.9.5">
 <h3>
@@ -1829,8 +1836,8 @@ FIGURE 2.5: Relationships among nycflights tables
 <li>The dashed normal curve has mean <span class="math inline">\(\mu = 15\)</span> &amp; standard deviation <span class="math inline">\(\sigma = 2\)</span>.</li>
 </ol>
 <div class="figure">
-<span id="fig:unnamed-chunk-240"></span>
-<img src="book_temp_files/figure-html/unnamed-chunk-240-1.png" alt="Three normal distributions." width="100%"><p class="caption">
+<span id="fig:unnamed-chunk-241"></span>
+<img src="book_temp_files/figure-html/unnamed-chunk-241-1.png" alt="Three normal distributions." width="100%"><p class="caption">
 FIGURE 2.6: Three normal distributions.
 </p>
 </div>
@@ -1849,8 +1856,8 @@ FIGURE 2.6: Three normal distributions.
 <li>The middle six segments represent the interval -3 to 3. The shaded area above this interval represents 2.35% + 13.5% + 34% + 34% + 13.5% + 2.35% = 99.7% of the area under the curve. In other words, 99.7% of values.</li>
 </ol>
 <div class="figure">
-<span id="fig:unnamed-chunk-241"></span>
-<img src="book_temp_files/figure-html/unnamed-chunk-241-1.png" alt="Rules of thumb about areas under normal curves." width="100%"><p class="caption">
+<span id="fig:unnamed-chunk-242"></span>
+<img src="book_temp_files/figure-html/unnamed-chunk-242-1.png" alt="Rules of thumb about areas under normal curves." width="100%"><p class="caption">
 FIGURE 2.7: Rules of thumb about areas under normal curves.
 </p>
 </div>
@@ -1863,18 +1870,18 @@ FIGURE 2.7: Rules of thumb about areas under normal curves.
 <code class="sourceCode R"><span class="fu">tibble</span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
     <span class="fu">geom_histogram</span><span class="op">(</span>bins <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-244-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-245-1.png" width="100%"></div>
 <p>As you can see, it is not as symmetrical as the one displayed above. This is not surprising! If you just draw 10 beads from the urn, you can not possibly have a very good sense of what all the numbers on all the beads in the urn look like. What if we draw 100 values? What about 100,000?</p>
 <div class="sourceCode" id="cb393"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">tibble</span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">geom_histogram</span><span class="op">(</span>bins <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-245-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-246-1.png" width="100%"></div>
 <div class="sourceCode" id="cb394"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">tibble</span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">100000</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">geom_histogram</span><span class="op">(</span>bins <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-246-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-247-1.png" width="100%"></div>
 <p>Now it’s looking a lot more similar to the “truth,” although still imperfect.</p>
 <p>Now, let’s compare normal distributions with varying means and standard deviations, which can be set using the mean and sd arguments included with the function.</p>
 <div class="sourceCode" id="cb395"><pre class="downlit sourceCode r">
@@ -1890,7 +1897,7 @@ FIGURE 2.7: Rules of thumb about areas under normal curves.
          fill <span class="op">=</span> <span class="st">"Distribution"</span>,
          x <span class="op">=</span> <span class="st">"Value"</span>,
          y <span class="op">=</span> <span class="st">"Density"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-247-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-248-1.png" width="100%"></div>
 </div>
 <div id="working-with-draws" class="section level3" number="2.9.6">
 <h3>
@@ -1900,6 +1907,7 @@ FIGURE 2.7: Rules of thumb about areas under normal curves.
 <p>Once we have a vector of draws, we can examine various aspects of the distribution. Examples:</p>
 <div class="sourceCode" id="cb396"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">100</span>, mean <span class="op">=</span> <span class="fl">2</span>, sd <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></code></pre></div>
+<p>This is a case in which there is no distinction between the <em>true distribution</em> and the <em>estimated distribution</em>. We know, by assumption, what the truth is.</p>
 <p>Even though we know, because we wrote the code, that the draws come from a normal distribution with a mean of 2 and a standard deviation of 1, the calculated results will not match those values exactly because the draws themselves are random.</p>
 <div class="sourceCode" id="cb397"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">draws</span><span class="op">)</span></code></pre></div>
@@ -1914,7 +1922,7 @@ FIGURE 2.7: Rules of thumb about areas under normal curves.
 <div class="sourceCode" id="cb403"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/mad.html">mad</a></span><span class="op">(</span><span class="va">draws</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 1.1</code></pre>
-<p>In practice, we will not know the exact distribution which generates our data. (If we did know, then estimation would be unnecessary.) The inherent randomness of the world means that calculated statistics will not match the underlying truth perfectly. But the more data that we collect, the closer the match will be.</p>
+<p>In practice, we will not know the exact distribution which generates our data. (If we did know, then estimation would not be necessary.) The inherent randomness of the world means that calculated statistics will not match the underlying truth perfectly. But the more data that we collect, the closer the match will be.</p>
 <p>In addition to the mean and standard deviation of the draws, we will often be interested in various quantiles of the distribution, most commonly because we want to create intervals which cover a specified portion of the draws. Examples:</p>
 <div class="sourceCode" id="cb405"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/quantile.html">quantile</a></span><span class="op">(</span><span class="va">draws</span>, probs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.25</span>, <span class="fl">0.75</span><span class="op">)</span><span class="op">)</span></code></pre></div>
@@ -1950,7 +1958,7 @@ FIGURE 2.7: Rules of thumb about areas under normal curves.
          subtitle <span class="op">=</span> <span class="st">"You can sum distributions just like you sum numbers"</span>,
          x <span class="op">=</span> <span class="st">"Value"</span>,
          y <span class="op">=</span> <span class="st">"Probability"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-252-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-253-1.png" width="100%"></div>
 <p>Drawing from a distribution also allows us to answer questions via <em>simulation.</em> For example, imagine that A and B are both flipping fair coins. A flips the coin 3 times. B flips the coin 6 times. What is the probability that A flips more heads than B?</p>
 <p>It is obvious that B will win this game more often than A. It is also obvious that A will win some of the time. But in order to estimate the chances of A winning, we can simply simulate playing the game 1,000 times.</p>
 <div class="sourceCode" id="cb412"><pre class="downlit sourceCode r">
@@ -1966,6 +1974,7 @@ FIGURE 2.7: Rules of thumb about areas under normal curves.
 ##       &lt;dbl&gt;
 ## 1     0.091</code></pre>
 <p>A has about a 9% chance of winning the game.</p>
+<p>In data science, the most important kind of distribution is a <em>probability distribution</em>, a concept which we will introduce in Chapter <a href="probability.html#probability">5</a>.</p>
 <!-- DK: Could do more here, like look at prediction games, betting and so on. -->
 </div>
 </div>
