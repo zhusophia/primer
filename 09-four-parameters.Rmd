@@ -1,25 +1,18 @@
 # Four Parameters {#four-parameters}
 
-<!-- Explore causal effects of models following chapter 18/19 in ROAS. Regress ending att on starting attitude and treatment effect. Show parallel lines. That is four parameters! Can also do the same thing with income and treatment. That will be a much worse model. Save interaction for five parameter chapter. MF: Done.-->
-
-<!-- When interpreting a causal coefficient, start with: "The causal effect of ..." For other coefficients, start with "When comparing . . ." MF: Done. -->
+<!-- Add Summary section -->
 
 <!-- Transforming the outcome variable. Give some more thoughts or advice. -->
 
-<!-- No hard-coding numbers! r scales::comma(round(coef(fit_1_c)["(Intercept)"], 0)) MF: Done.-->
-
 <!-- In all the examples, provide some clear interpretation sentences. Set them off with skipped lines, and maybe in italics. -->
 
-<!-- Expand rge "interpreting coefficients" section. Difference between across-unit and with-in unit. Causal versus predictive. Unless you have a set up with two or more potential outcomes, you can't do causal. You can't do intra-unit. 
+<!-- Expand "interpreting coefficients" section. Difference between across-unit and within-unit. Causal versus predictive. Unless you have a set up with two or more potential outcomes, you can't do causal. You can't do intra-unit. Or is it inter-unit? I get confused!
 
 Whenever the setting is predictive --- that is, whenever it is not causal --- you are always comparing two different units (or groups of units). You are never considering a single unit. 
 
+Comparing within rows of the Preceptor Table versus across rows, which is all you can do without two potential outcomes.
+
 Also, does not work in logistic. But divide by four rule. -->
-
-<!-- Clean up General guidelines for selecting variables. Reasons 1 and 3 seem similar.  -->
-
-
-*This chapter is still a DRAFT. Check back in a few weeks.*
 
 
 In our haste to make progress --- to get all the way through the process of building, interpreting and using models --- we have given short shrift to some of the messy details of model building and evaluation. This chapter fills in those lacunae. We will also introduce models with four parameters. 
@@ -47,7 +40,6 @@ We fit this using the `trains` data from **primer.data**.
 library(tidyverse)
 library(primer.data)
 library(rstanarm)
-library(moderndive)
 library(broom.mixed)
 ```
 
@@ -293,7 +285,6 @@ When deciding which variables to keep or discard in our models, our advice is to
 
 * Your boss/client/reviewer/supervisor wants to include X.
 
-<!-- DK: This is not great. Need an example. Does it really belong here. If not, then where? -->
 
 
 
@@ -748,15 +739,15 @@ Is that data believable? Maybe? One could imagine that `att_end` would be predic
 knitr::include_graphics("other/images/Courage.jpg")
 ``` 
 
-The use of `stan_glm` is the same as usual. Using `stan_glm`, we will create our model, `fitted_1`. 
+The use of `stan_glm` is the same as usual. Using `stan_glm`, we will create our model, `fit_1`. 
 
 ```{r}
-fitted_1 <- stan_glm(formula = att_end ~ liberal + att_start,
+fit_1 <- stan_glm(formula = att_end ~ liberal + att_start,
                   data = trains,
                   refresh = 0,
                   seed = 42)
 
-fitted_1
+fit_1
 ```
 
 To remind ourselves, recall that the `(Intercept)` here is representing the `att_end` value for cases where `liberal = FALSE`. The next row, `liberalTRUE` gives a median value which represents the *offset* in the prediction compared with the `(Intercept)`. In other words, the true intercept for cases where `liberal = TRUE` is represented by $(Intercept) + liberalTRUE$. The value of `att_start` is the slope for our two cases. For each one unit increase of `att_start`, we see an increase of `att_end` by the median value. 
@@ -776,7 +767,7 @@ The mathematics for this model will be explained after tidying our data and extr
 # First, we will tidy the data from our model and select the term and estimate.
 # This allows us to create our regression lines more easily.
 
-tidy <- fitted_1 %>% 
+tidy <- fit_1 %>% 
   tidy() %>% 
   select(term, estimate)
 
@@ -860,6 +851,7 @@ ggplot(trains, aes(x = att_start, y = att_end, color = liberal)) +
     # setting slope equal to our previously created liberal_true_att_slope. The
     # color call is for teal, to match the colors used by tidyverse for
     # geom_point().
+  
   geom_abline(intercept = liberal_true_intercept,
               slope = liberal_true_att_slope,
               color = "#00BFC4", 
@@ -877,20 +869,7 @@ This is our parallel slopes model. What we have done, essentially, is created a 
 
 As we can see, commuters who are *not* liberal tend to start with slightly higher values for `att_start`. Commuters who *are* liberal tend to have lower starting values for `att_start`. 
 
-<!-- MF: The method above was taken from this article on your page: https://www.davidkane.info/files/modern-dive-6.4. Should we show the geom_parallel_slopes method as well? (BELOW) --> 
 
-We can also use a shortcut function `geom_parallel_slopes` from the `moderndive` package to accomplish a similar plot. This plot, however, is Frequentist, not Bayesian.
-
-```{r}
-trains %>% 
-ggplot(aes(x = att_start, y = att_end, color = liberal)) +
-  geom_point() +
-  geom_parallel_slopes(se = FALSE) +
-  labs(title = "Parallel Slopes Model",
-       x = "Attitude at Start", 
-       y = "Attitude at End", 
-       color = "Liberal?") 
-```
 Visualizing Bayesian multi-variate regression models is certainly a more involved process, as we do not automatically get singular point estimates for our intercepts and slopes with Bayes, and as we do not have a special method = "lm" argument or `gg_parallel_slopes()` function with Bayes. And, as we have seen, all of our work in visualizing Bayesian models results in very similar graphs to the above Frequentist ones. However, it is still very, very useful to know how to visualize Bayesian models, as only Bayesian models allow us to make probabilistic inferences about those models’ parameters.
 
 ### Temperance
@@ -912,6 +891,7 @@ fit_first <- stan_glm(formula = att_end ~ liberal + att_start,
 ```
 
 Simple: 
+
 ```{r}
 fit_simple<- stan_glm(formula = att_end ~ att_start,
                   data = trains,
@@ -919,6 +899,7 @@ fit_simple<- stan_glm(formula = att_end ~ att_start,
 ```
 
 Make loo() regression for both:
+
 ```{r}
 loo_first <- fit_first %>% 
   loo()
@@ -928,6 +909,7 @@ loo_simple <- fit_simple %>%
 ```
 
 Perform loo_compare:
+
 ```{r}
 loo_compare(loo_first, loo_simple)
 ```
