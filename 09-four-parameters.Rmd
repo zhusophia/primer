@@ -1,12 +1,12 @@
 # Four Parameters {#four-parameters}
 
-<!-- Explore causal effects of models following chapter 18/19 in ROAS. Regress ending att on starting attitude and treatment effect. Show parallel lines. That is four parameters! Can also do the same thing with income and treatment. That will be a much worse model. Save interaction for five parameter chapter. -->
+<!-- Explore causal effects of models following chapter 18/19 in ROAS. Regress ending att on starting attitude and treatment effect. Show parallel lines. That is four parameters! Can also do the same thing with income and treatment. That will be a much worse model. Save interaction for five parameter chapter. MF: Done.-->
 
-<!-- When interpreting a causal coefficient, start with: "The causal effect of ..." For other coefficients, start with "When comparing . . ." -->
+<!-- When interpreting a causal coefficient, start with: "The causal effect of ..." For other coefficients, start with "When comparing . . ." MF: Done. -->
 
 <!-- Transforming the outcome variable. Give some more thoughts or advice. -->
 
-<!-- No hard-coding numbers! r scales::comma(round(coef(fit_1_c)["(Intercept)"], 0)) -->
+<!-- No hard-coding numbers! r scales::comma(round(coef(fit_1_c)["(Intercept)"], 0)) MF: Done.-->
 
 <!-- In all the examples, provide some clear interpretation sentences. Set them off with skipped lines, and maybe in italics. -->
 
@@ -47,6 +47,8 @@ We fit this using the `trains` data from **primer.data**.
 library(tidyverse)
 library(primer.data)
 library(rstanarm)
+library(moderndive)
+library(broom.mixed)
 ```
 
 
@@ -311,20 +313,22 @@ set.seed(78)
 
 
 ```{r}
-fit_1 <- stan_glm(att_end ~ treatment + att_start, 
+fit_1_model <- stan_glm(att_end ~ treatment + att_start, 
                     data = trains, 
                     refresh = 0)
 
-fit_1
+fit_1_model
 ```
 
-How do we decide which variables are useful? First, let's look at our intercept. The 95% confidence interval for  `att_end` is equal to the coefficient plus or minus 2 standard errors = 2.3 +/- 0.8 = 1.5 to 3.1. When we divide this by four, we get .375 to .775. Therefore, any variable that exceeds these values is likely to be significant enough to include in our model. 
+How do we decide which variables are useful? First, let's look at our intercept. The 95% confidence interval for  `att_end` is equal to the coefficient-- `r scales::comma(round(coef(fit_1_model)["(Intercept)"], 1))`-- plus or minus two standard errors.
 
-As `treatmentControl`, a value which impacts our (Intercept) by a factor of -1.0, not only exceeds the minimum requirement of .375, but also exceeds the upper boundary of significance of .775, we definitely want to keep the variable `treatment`. In addition to being significant, it satisfies a number of other requirements:
+The causal effect of the variable `treatmentControl` is `r scales::comma(round(coef(fit_1_model)["treatmentControl"], 0))`. This means that, compared with the predicted `att_end` for groups under treatment, those in the control group have a predicted attitude that is one entire point lower. As we can see, this is a large and well estimated coefficient. Recall that this means, roughly, that the 95% confidence interval excludes zero. To calculate the 95% confidence interval, we take the coefficient plus or minus two standard errors: `r round(((coef(fit_1_model)["treatmentControl"]) - (2 * .2)), 1)` and `r round(((coef(fit_1_model)["treatmentControl"]) + (2 * .2)), 1)`. As we can see, the 95% confidence interval *does* exclude zero, suggesting that `treatment` is a worthy variable. 
+
+In addition to being meaningful, which is enough to justify inclusion in our model, this variable satisfies a number of other qualifications:
 - The variable has a small standard error.
 - The variable is considered an indicator variable, which separates two groups of significance (treatment and control) that we would like to study. 
 
-The variable `att_start`, with a coefficient of 0.8, is also significant. In addition, the standard error is small, the impact on our prediction for `att_end` is meaningful, and it is standard practice to include a "before" comparison to our "after" values. 
+The variable `att_start`, with a coefficient of `r scales::comma(round(coef(fit_1_model)["att_start"], 1))`, is also meaningful. Due to the fact that the `MAD_SD` value here is 0, we do not need to find the 95% confidence interval to know --intuitively-- that this variable has a large and well estimated coefficient. 
 
 **Conclusion**: keep both variables! `Treatment` and `att_start` are both significant, as well as satisfying other requirements in our guidelines. They are *more* than worthy of inclusion in our model.  
 
@@ -340,11 +344,11 @@ fit_2 <- stan_glm(income ~ age + liberal,
 fit_2
 ```
 
-Great! We have an estimate for income of those who fall into the category of `liberalFALSE`, as well as data on our right hand side variables of `age` and `liberalTRUE`. Recall the divide-by-four rule. The range for (Intercept), our 95% confidence interval, is calculated by taking our coefficient plus or minus 2 standard errors (MAD_SD). The lower range is $58703.7$ and the upper range is $162834.9$. Dividing both of these values by 4, we get $14675.93$ and $40708.725$. 
+Great! We have an estimate for income of those who fall into the category of `liberalFALSE`, as well as data on our right hand side variables of `age` and `liberalTRUE`. 
 
-As we can see, `liberalTRUE` falls within the boundaries for significance. It is, therefore, a great addition to our model! 
+When comparing `liberalTRUE` with our `(Intercept)`, recall that the `(Intercept)` is calculating income for the case where `liberal == FALSE`. As we can see, then, the coefficient for `liberalTRUE`, `r scales::comma(round(coef(fit_2)["liberalTRUE"], 1))`, shows that the  liberals in our dataset make less on average than non-liberals in our dataset. The coefficient is large relative to the `(Intercept)` and, with rough mental math, we see that the 95% confidence interval excludes 0. Therefore, `liberal` is a helpful variable!
 
-The variable `age`, however, does not seem to be significant. The value of `age` is very low. It does not seem to make a meaningful difference. This being said, we just learned about a bunch of helpful transformations! We also know that the variable `age`, unmodified, is calculating starting at age 0, an impossibility in our data. 
+The variable `age`, however, does not appear to have a meaningful impact on our `(Intercept)`. The coefficient of `age` is low and the 95% confidence interval *does not* exclude 0. This being said, we just learned about a bunch of helpful transformations! We also know that the variable `age`, unmodified, is calculating starting at age 0, an impossibility in our data. 
 
 Recall the work above that z-scaled the variable `age` to be more significant. This is pasted below for reference. 
 
@@ -363,9 +367,9 @@ fit_scaled <- stan_glm(income ~ z_age + liberal,
 fit_scaled
 ```
 
-This looks better! Even with our transformation, `z_age` is still on the lower bounds of our significance. Whether we include it in our model is not clear, especially when compared with the variable `liberal`, which shows clear significance. 
+Even with our transformation, `z_age` is not looking like a great addition. The 95% confidence interval, done with rough mental math, includes 0. Whether we include `age` or `z_age`  in our model is not clear, especially when compared with the variable `liberal`, which is more obviously meaningful.
 
-**Conclusion**: definitely keep `liberal`! Age is less clear. Age when z-scaled is *just* significant enough to consider including. It is really a matter of preference at this point. If age is important to our model in some way, we keep it. If it isn't relevant to our conclusions, we consider discarding it. 
+**Conclusion**: definitely keep `liberal`! Age is less clear. Age when z-scaled is *just* significant enough to consider including. It is really a matter of preference at this point. If age is important to our model in some way, we keep it. If it isn't relevant to our conclusions, we discard it. 
 
 ### liberal ~ I(income/1e+05) + party
 
@@ -380,11 +384,11 @@ fit_3 <- stan_glm(liberal ~ I(income/1e+05) + party,
 fit_3
 ```
 
-Let's start by looking at our (Intercept). The 95% confidence interval is $0.7$ plus or minus 2 standard errors ($0.2$). Therefore, the confidence interval is $0.5$ to $0.9$. Divided by four, we get $0.125$ to $0.225$.
+Recall that, for logistic models, the `(Intercept)` is nearly impossible to interpret. To evaluate the impact of variables, we will need to use the Divide-by-Four rule. This instructs us to take a logistic regression coefficient (other than the constant term) and divide it by 4 to get an upper bound on the predictive difference corresponding to a unit difference in that variable. All this means is that, when evaluating if a predictor is helpful *in a logistic regression only*, divide the coefficient by four.
 
-As we can see instantly, `partyRepublican` is very meaningful. We will want this variable in our model. 
+For `partyRepublican`, we take our coefficient, `r scales::comma(round(coef(fit_3)["partyRepublican"], 1))`, and divide it by 4: `r round(((coef(fit_3)["partyRepublican"])/4), 3)`. This is the upper bound on the predictive difference corresponding to a unit difference in this variable. Therefore, we see that `partyRepublican` is meaningful. We will want this variable in our model. 
 
-The variable `income`, however, is still not very significant. The `MAD_SD` for income is also equal to the median itself, suggesting a large standard error. Though we may choose to include `income` for reasons unrelated to significance, it does not appear to be worthy of inclusion on the basis of significance alone. 
+The variable `income`, however, seems less promising. In addition to the resulting value from the Divide-by-Four rule being low (`r round(((coef(fit_3)["I(income/1e+05)"])/4), 3)`), the `MAD_SD` for income is also equal to the median itself, indicating a large standard error. Though we may choose to include `income` for reasons unrelated to its impact in our model, it does not appear to be worthy of inclusion on the basis of predictive value alone. 
 
 **Conclusion**: the variable `party` is significant; we will include it in our model. Unless we have a strong reason to include `income`, it may not be helpful in creating our models. 
 
@@ -715,6 +719,182 @@ The premise of hypothesis testing is to answer a specific question -- one that m
 
 
 ## Parallel lines
+
+To conclude this chapter, we will look at a four parameter model. The model we will use will measure `att_end` as a function of `liberal` and `att_start`. 
+
+### Wisdom
+
+```{r echo = FALSE, fig.cap = "Wisdom"}
+knitr::include_graphics("other/images/Wisdom.jpg")
+```
+
+Before making a model which seeks to explain `att_end`, we should plot it and the variables we think are connected to it:
+
+```{r}
+ggplot(trains, aes(x = att_start, y = att_end, color = liberal)) +
+  geom_point() +
+  labs(title = "Attitude End Compared with Attitude Start and Liberal",
+       x = "Attitude at Start of Study",
+       y = "Attitude at End of Study",
+       color = "Liberal?")
+```
+
+
+Is that data believable? Maybe? One could imagine that `att_end` would be predicted fairly well by `att_start`. This makes sense for most of our datapoints, which show not much difference between the attitudes. But what about the great disparities in attitude shown for the individual with a starting attitude of 9 and an ending attitude around 15? In a real data science project, this would require further investigation. For now, we ignore the issue and blithely press on.
+
+### Courage
+
+```{r echo = FALSE, fig.cap = "Courage"}
+knitr::include_graphics("other/images/Courage.jpg")
+``` 
+
+The use of `stan_glm` is the same as usual. Using `stan_glm`, we will create our model, `fitted_1`. 
+
+```{r}
+fitted_1 <- stan_glm(formula = att_end ~ liberal + att_start,
+                  data = trains,
+                  refresh = 0,
+                  seed = 42)
+
+fitted_1
+```
+
+To remind ourselves, recall that the `(Intercept)` here is representing the `att_end` value for cases where `liberal = FALSE`. The next row, `liberalTRUE` gives a median value which represents the *offset* in the prediction compared with the `(Intercept)`. In other words, the true intercept for cases where `liberal = TRUE` is represented by $(Intercept) + liberalTRUE$. The value of `att_start` is the slope for our two cases. For each one unit increase of `att_start`, we see an increase of `att_end` by the median value. 
+
+### Justice 
+
+```{r echo = FALSE, fig.cap = "Justice"}
+knitr::include_graphics("other/images/Justice.jpg")
+```
+
+Now that we know what our data is showing us, we will need to tidy our data and extract values to create a parallel slopes model. The parallel slopes model allows us to visualize multi-variate Bayesian modeling (i.e. modeling with more than one explanatory variable). That is a complicated way of saying that we will visualize the fitted model created above in a way that allows us to see the intercepts and slopes for two different groups, `liberalTRUE` and `liberalFALSE`. 
+
+The mathematics for this model will be explained after tidying our data and extracting it. 
+
+```{r}
+
+# First, we will tidy the data from our model and select the term and estimate.
+# This allows us to create our regression lines more easily.
+
+tidy <- fitted_1 %>% 
+  tidy() %>% 
+  select(term, estimate)
+
+tidy
+
+# Extract and name the columns of our tidy object. By calling tidy$estimate[1],
+# we are telling R to extract the first value from the estimate column in our
+# tidy object.
+
+intercept <- tidy$estimate[1]
+liberal_true <- tidy$estimate[2]
+att_start <- tidy$estimate[3]
+
+```
+
+Now that we have extracted the estimated values of each coefficient, we can plug them into the following equation in order to find the equation of the line if liberal = TRUE and the equation of the line if liberal = FALSE:
+
+$$y_i = \beta_0  + \beta_1 x_1 + \beta_2 x_2$$
+
+If $y = att_end$, $x_1 = `att_start`$, $x_2 = `liberal`$, then the equations are as follows:
+
+If liberal = FALSE:
+
+$$y = \beta_0  + \beta_1 x_1 $$
+Which equates to, in `y = b + mx` form:
+
+**y = intercept + att_start(att_start)**
+
+If liberal = TRUE: 
+
+$$y = (\beta_0  + \beta_2) + \beta_1 x_1 $$
+Which equates to, in `y = b + mx` form:
+
+**y = (intercept + liberal_true) + att_start(att_start)**
+
+Thus, we can define the following terms—- `liberal_false_intercept` and `liberal_false_att_slope`; and `liberal_true_intercept` and `liberal_true_att_slope`:
+
+
+```{r}
+# Recall that the (Intercept) shows us the estimate for the case where liberal =
+# FALSE. We want to extract the liberal_false_intercept to indicate where the
+# intercept in our visualization should be. The slope for this case, and for the
+# liberal = TRUE case, is att_start.
+
+liberal_false_intercept <- intercept
+liberal_false_att_slope <- att_start
+
+#  When wanting the intercept for liberal = TRUE, recall that the estimate for
+#  liberalTRUE is the offset from our (Intercept). Therefore, to know the true
+#  intercept, we must add liberal_true to our intercept.
+
+liberal_true_intercept <- intercept + liberal_true
+liberal_true_att_slope <- att_start
+```
+
+All we've done here is extracted the values for our intercepts and slopes, and named them to be separated into two groups. This allows us to create a `geom_abline` object that takes a unique slope and intercept value, so we can separate the `liberalTRUE` and `liberalFALSE` observations. 
+
+```{r}
+
+# From the dataset trains, call attitude start for the x-axis and att_end for
+# the y-axis with color as liberal. This will split our data into two color
+# coordinates (one for liberal = TRUE and one for liberal = FALSE)
+
+ggplot(trains, aes(x = att_start, y = att_end, color = liberal)) +
+  
+  # Use geom_point to show the datapoints. 
+  
+  geom_point() +
+  
+  # Create a geom_abline object for the liberal false values. Set the intercept
+  # equal to our previously created liberal_false_intercept, while setting slope
+  # equal to our previously created liberal_false_att_slope. The color call is
+  # for coral, to match the colors used by tidyverse for geom_point().
+  geom_abline(intercept = liberal_false_intercept,
+              slope = liberal_false_att_slope, 
+              color = "#F8766D", 
+              size = 1) +
+  
+    # Create a geom_abline object for the liberal TRUE values. Set the
+    # intercept equal to our previously created liberal_true_intercept, while
+    # setting slope equal to our previously created liberal_true_att_slope. The
+    # color call is for teal, to match the colors used by tidyverse for
+    # geom_point().
+  geom_abline(intercept = liberal_true_intercept,
+              slope = liberal_true_att_slope,
+              color = "#00BFC4", 
+              size = 1) +
+  
+  # Add the appropriate titles and axis labels. 
+  
+  labs(title = "Parallel Slopes Model",
+       x = "Attitude at Start", 
+       y = "Attitude at End", 
+       color = "Liberal?") 
+```
+
+This is our parallel slopes model. What we have done, essentially, is created a unique line for `liberalTRUE` and `liberalFALSE` to observe the differences in the groups as related to attitude start and attitude end. 
+
+As we can see, commuters who are *not* liberal tend to start with slightly higher values for `att_start`. Commuters who *are* liberal tend to have lower starting values for `att_start`. 
+
+<!-- MF: The method above was taken from this article on your page: https://www.davidkane.info/files/modern-dive-6.4. Should we show the geom_parallel_slopes method as well? (BELOW) --> 
+
+We can also use a shortcut function `geom_parallel_slopes` from the `moderndive` package to accomplish a similar plot. This plot, however, is Frequentist, not Bayesian.
+
+```{r}
+trains %>% 
+ggplot(aes(x = att_start, y = att_end, color = liberal)) +
+  geom_point() +
+  geom_parallel_slopes(se = FALSE) +
+  labs(title = "Parallel Slopes Model",
+       x = "Attitude at Start", 
+       y = "Attitude at End", 
+       color = "Liberal?") 
+```
+Visualizing Bayesian multi-variate regression models is certainly a more involved process, as we do not automatically get singular point estimates for our intercepts and slopes with Bayes, and as we do not have a special method = "lm" argument or `gg_parallel_slopes()` function with Bayes. And, as we have seen, all of our work in visualizing Bayesian models results in very similar graphs to the above Frequentist ones. However, it is still very, very useful to know how to visualize Bayesian models, as only Bayesian models allow us to make probabilistic inferences about those models’ parameters.
+
+### Temperance
+
 
 <!-- att_end ~ liberal + att_start. Same thing as chapters before. Show graphic of parallel lines. Cardinal virtues as always. And, extra, at the end we can use loo_compare to see if this model is better than simpler model of att_end ~ att_start. -->
 
