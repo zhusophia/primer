@@ -5,16 +5,7 @@
 <!-- Review concept of dummy variables in the context of the intercept model with categorical predictor. -->
 
 
-<!-- Need to add a plot of fitted values and raw data. This will look a bit weird since, for each model, there are only two fitted values. Best is a jittered scatter plot with two columns, and then the fitted values put in the middle in red. -->
-
-<!-- governors %>%  -->
-<!--   ggplot(aes(sex, alive_post)) +  -->
-<!--     geom_jitter(width = 0.1, alpha = 0.2) +  -->
-<!--     geom_point(data = sex_means, aes(y = avg), color = "red") -->
-<!-- ``` -->
-
-
-Models have parameters. In Chapter \@ref(one-parameter) we created models with a single parameter $p$, the proportion of red beads in an urn. In Chapter \@ref(two-parameters), we used models with two parameters: $\mu$ (the average height in the population, generically known as a model "intercept") and $\sigma$ (the variation in height in the population). Here --- can you guess where this is going? --- we will build models with three parameters: $\sigma$ (which serves the same role throughout the book) and two coefficients. In models which relate a continuous predictor to the outcome, those two parameters will be labeled $\beta_0$ and $\beta_1$. In models which estimate two averages, the parameters will be $\beta_1$ and $\beta_2$. All this notation is confusing, not least because different academic fields use inconsistent schemes. The key is to just follow the Cardinal Virtues and tackle your problem step by step.
+Models have parameters. In Chapter \@ref(one-parameter) we created models with a single parameter $p$, the proportion of red beads in an urn. In Chapter \@ref(two-parameters), we used models with two parameters: $\mu$ (the average height in the population, generically known as a model "intercept") and $\sigma$ (the variation in height in the population). Here --- can you guess where this is going? --- we will build models with three parameters: $\sigma$ (which serves the same role throughout the book) and two coefficients. In models which relate a continuous predictor to the outcome, those two parameters will be labeled $\beta_0$ and $\beta_1$. In models which estimate two averages, the parameters will be $\beta_1$ and $\beta_2$. All this notation is confusing, not least because different academic fields use inconsistent schemes. Follow the Cardinal Virtues and tackle your problem step by step.
 
 <!-- DK: More detail? -->
 
@@ -41,7 +32,7 @@ Wisdom begins with a look at your data.
 #### EDA for `trains`
 
 
-*Always explore your data.* To demonstrate modeling with three parameters, we will use the `trains` data set from the **primer.data** package. Recall the discussion from Chapter \@ref(rubin-causal-model). @enos2014 randomly placed Spanish-speaking confederates on nine train platforms around Boston, Massachusetts. Exposure to Spanish-speakers -- the `treatment` -- influenced attitudes toward immigration. These reactions were measured through changes in answers to three survey questions. Let's load the libraries we will need in this chapter, all of which we have used before, and look at the data.
+*Always explore your data.* To demonstrate modeling with three parameters, we will use the `trains` data set from the **primer.data** package. Recall the discussion from Chapter \@ref(rubin-causal-model). @enos2014 randomly placed Spanish-speaking confederates on nine train platforms around Boston, Massachusetts. Exposure to Spanish-speakers -- the `treatment` -- influenced attitudes toward immigration. These reactions were measured through changes in answers to three survey questions. Load the necessary libraries and look at the data.
 
 ```{r, message=FALSE}
 library(primer.data)
@@ -75,7 +66,7 @@ ch8 %>%
   glimpse()
 ```
 
-Pay attention to the variable types. Do they make sense? Perhaps. But there are certainly grounds for suspicion. Why are `age` and `att_end` doubles rather than integers? All the values in the data appear to be integers, so there is no benefit to having these variables be doubles. Why is `party` a character variable and `treatment` a factor variable? It could be that these are intentional choices made by the creator of the tibble, i.e., us. These could be mistakes. Or, most likely, these choices are a mixture of sensible and arbitrary. Regardless, it is your responsibility to notice them. You can't make a good model without looking closely at the data which you are using.
+Pay attention to the variable types. Do they make sense? Perhaps. But there are certainly grounds for suspicion. Why is  `att_end` a double rather than an integer? All the values in the data appear to be integers, so there is no benefit to having these variables be doubles. Why is `party` a character variable and `treatment` a factor variable? It could be that these are intentional choices made by the creator of the tibble, i.e., us. Or, these could be mistakes. Most likely, these choices are a mixture of sensible and arbitrary. Regardless, it is your responsibility to notice them. You can't make a good model without looking closely at the data which you are using.
 
 ```{r}
 ch8 %>% 
@@ -923,25 +914,142 @@ So far in this chapter, we have only considered *continuous* outcome variables. 
 `liberal`, however, only takes on two values: TRUE and FALSE. In order to model it, we must use the `binomial` family. 
 
 
-But first, following *Wisdom*, let's look at our data.
+### Wisdom
+
+Look at our data.
 
 
 ```{r}
-ch8_lib_inc <- trains %>% 
-  select(liberal, income) %>% 
-  mutate(income = income / 1000)
+ch8 %>%
+  ggplot(aes(x = income, y = liberal)) + 
+  geom_jitter(width = 0, height = 0.1) + 
+  labs(title = "Liberal Status by Income in Trains Dataset",
+       subtitle = "Where the gap in the income distribution?",
+       x = "Income",
+       y = "Liberal") +
+  scale_x_continuous(labels = scales::dollar_format())
+```
 
-fit_4 <- stan_glm(data = ch8_lib_inc,
+Why is there only one observation with an income between $135,000 and $250,000? We don't know. The important thing is to notice it, to explore the variables you are using in the model.
+
+<!-- DK: Add representativeness. -->
+
+### Justice
+
+Recall the discussion in Section \@ref(zero-one-outcomes) about the logistic regression model which we use whenever the outcome or dependent variable is binary/logical. The math is there, if you care about math. We don't. Instead, recall the fundamental structure of all data science problems:
+
+$$\text{outcome} = \text{model} + \text{what is not in the model}$$
+The exact mathematics of the model --- the parameters, their interpretations --- are all just [dross](https://en.wikipedia.org/wiki/Dross) in the foundry of our inferences: unavoidable but not worth our time. 
+
+Even if the math is ignorable, the causal versus predictive nature of the model is not. Is this a causal model or a predictive model? It depends! It could be causal if you assume that we can *manipulate* someone's income, if, that is, there are at least two potential outcomes: person $i$'s liberal status if she makes X dollars and person $i$'s liberal status if she makes Y dollars. Remember: *No causation without manipulation*. The definition of a causal effect is the difference between two potential outcomes. If you only have one outcome, then your model can not be causal. 
+
+In many circumstances, we don't really care if a model is causal or not. We might only want to forecast/predict/explain the outcome variable. In that case, whether we can interpret the influence of a variable as causal is irrelevant to our use of that variable.
+
+### Courage
+
+Fitting a logistic model is easy. We use all the same arguments as usual, but with `family = binomial` added.
+
+```{r}
+fit_4 <- stan_glm(data = ch8,
                   formula = liberal ~ income,
                   family = binomial,
                   refresh = 0,
                   seed = 365)
+```
 
-print(fit_4, digits = 3)
+Having fit the model, we can look at a printed summary. Note the use of the `digits` argument to display more digits in the print out.
+
+```{r}
+print(fit_4, digits = 6)
+```
+
+Fitted models tell us about the posterior distributions from the parameters in the formula which defines the model we have estimated. *We are assuming that the model is true.* And, as discussed in Chapter \@ref(one-parameter), that assumption is always false! Our model is never a perfectly accurate representation of reality. But, if it were perfect, then the posterior for $\beta_0$, $\beta_1$, and so on would be perfect as well.
+
+When working with a linear model, we will often interpret the meaning of the parameters, as we have already done in the first three sections of this chapter. Such interpretations are much harder with logistic models because the math is much less convenient. So, we won't even bother to try to understand the meaning of these parameters. However, we can note that $\beta_1$ is negative, suggesting that people with higher incomes are less likely to be liberal.
+
+
+### Temperance
+
+*Among all people who have an income $100,000, what proportion are liberal?*
+
+Although our model is now logistic, all the steps in answering a question like this as the same.
+
+```{r}
+newobs <- tibble(income = 100000)
+
+pe <- posterior_epred(fit_4, 
+                      newdata = newobs) %>% 
+  as_tibble()
+```
+
+`pe` is a tibble with a single vector. That vector is 4,000 draws from the posterior distribution of proportion of people, among those who make $100,000, who are liberal. The population proportion is the same thing as the probability for any single individual.
+
+```{r}
+pe %>% 
+  ggplot(aes(x = `1`)) +
+    geom_histogram(aes(y = after_stat(count/sum(count))),
+                   bins = 100)  +
+    labs(title = "Posterior for Proportion Liberal Among $100,000 Earners",
+         subtitle = "The population proportion is the same as the probability for any individual",
+         x = "Income",
+         y = "Probability of Being Liberal") +
+    scale_x_continuous(labels = scales::percent_format(accuracy = 1)) +
+    scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+    theme_classic()
 ```
 
 
+*Assume we have a group of eight people, two of whom make $100,000, two $200,000, two $300,000 and two $400,000. How many will be liberal?*
 
+Because we are trying to predict the outcome for a small number of units, we use `posterior_predict()`. The more complex the questions we ask, the more care we need to devote to making the `newobs` tibble. We use the same `rowwise()` and `c_across()` tricks as earlier in the chapter.
+
+```{r}
+newobs <- tibble(income = c(rep(100000, 2),
+                            rep(200000, 2),
+                            rep(300000, 2),
+                            rep(400000, 2)))
+                 
+
+pp <- posterior_predict(fit_4, 
+                        newdata = newobs) %>% 
+  as_tibble() %>% 
+  mutate_all(as.numeric) %>% 
+  rowwise() %>% 
+  mutate(total = sum(c_across()))
+
+pp
+```
+
+Study the `pp` tibble. Understand its component parts. The first column, for example, is 4,000 draws from the posterior distribution for the liberal status of a random person with an income of $100,000. Note how all the draws are zeroes or ones. That is very different from the draws we have seen before! But it also makes sense. We are making a prediction about a binary variable, a variable which only have two possible values: zero or one. So, any (reasonable!) predictions will only be zero or one.
+
+The second column is the same thing as the first column. Both are 4,000 draws from the posterior distribution for the liberal status of a random person with an income of $100,000. Yet they also have different values. They are both the same thing and different things, in the same way that `rnorm(10)` and `rnorm(10)` are the same thing --- both are 10 draws from the standard normal distribution --- and different things in that the values vary.
+
+The third and fourth columnes are different from the first two columns. They are both 4,000 draws from the posterior distribution for the liberal status of a random person with an income of $200,000. And so on for later columns. We can answer very difficult questions by putting together simple building blocks, each of them a set of draws from a posterior distribution. Recall the discussion in Section \@ref(distributions).
+
+The `total` column is simply the sum of the first eight columns. Having created the building blocks with 8 columns of draws from four different posterior distributions, we can switch our focus to each row. Consider row 2. It has a vector of 8 numbers: `1 1 1 0 0 1 0 0`. We can treat that vector as a unit of analysis. This is what might happen with our 8 people. The first three might be liberal, the fourth not liberal and so on. This row is just one example of what might happen, one draw from the posterior distribution of possible outcomes for groups of eight people with these incomes.
+
+We can simplify this draw by taking the sum, or doing anything else which might answer the question with which we are confronted. Posterior distributions are as flexible as individual numbers. We can, more or less, just use algebra to work with them. 
+
+Graphically we have:
+
+
+```{r}
+pp %>% 
+  ggplot(aes(x = total)) +
+    geom_histogram(aes(y = after_stat(count/sum(count))),
+                   bins = 100)  +
+    labs(title = "Posterior for Number of Liberals in Group with Varied Incomes",
+         subtitle = "Two is the most likely number, but values from 0 to 5 are plausible",
+         x = "Number of Liberals",
+         y = "Probability") +
+    scale_x_continuous(labels = scales::number_format(accuracy = 1)) +
+    scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+    theme_classic()
+```
+
+As always, there is some *truth*. If, tomorrow, we were to meet 8 new people, with the specified incomes, a certain number of them would be liberal. If we had the ideal Preceptor Table, we could just look up that number. No data science required. Alas, we don't know the truth. The bets we can do is to create a posterior distribution for that unknown value, as we have done here. We then need to translate that posterior into English --- "The most likely number of liberals is 2 or 3, but a total as low as zero or as high as 5 is also plausible. Having 6 liberals would be really surprising. Having 7 or 8 is almost impossible."
+
+<!-- DK: Add Temperance verbiage. -->
 
 ## Summary
 
@@ -958,7 +1066,7 @@ Similar to previous chapters, our first task is to use *Wisdom* . We judge how r
 
 * Use `posterior_epred()` to estimate expected values. The **e** in **e**pred stands for **e**xpected.
 
-* Use `posterior_predict()` to make forecasts for individuals. The variable in predictions is always greater than the variability in expectations because predictions can't pretend than $\epsilon_i$ is always zero.
+* Use `posterior_predict()` to make forecasts for individuals. The variable in predictions is always greater than the variability in expectations because predictions can't pretend that $\epsilon_i$ is zero.
 
 Once we have draws from a posterior distribution for our outcome variable --- whether that be an expectation or a prediction --- we can manipulate those draws to answer our question. 
 
