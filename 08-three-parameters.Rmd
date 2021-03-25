@@ -95,7 +95,7 @@ There are more Democrats in this dataset than Republicans. Democrats also span a
 
 In data science, there are two main aspects to Wisdom: representativeness and ethics. The data that we have are very limited. There are only 115 observations, all from 2012 and involving train commuters to Boston. How useful will this data be today, or for other populations around Boston, or for other cities in the US? Only your judgment, along with advice from your colleagues, can guide you.
 
-The key concept is the idea of a "population." From which larger population is the data we have being (conceptually) drawn? If we were only interested in the age of indidividuals in our data set, we would have no need for inference. *We know everyone's ages already.* We only need tools like `stan_glm()` if we seek to understand individuals not in our data. Only if our data is "representative," at least to some extent, of that larger population can we use our data to answer our questions.
+The key concept is the idea of a "population." From which larger population is the data we have being (conceptually) drawn? If we were only interested in the age of individuals in our data set, we would have no need for inference. *We know everyone's ages already.* We only need tools like `stan_glm()` if we seek to understand individuals not in our data. Only if our data is "representative," at least to some extent, of that larger population can we use our data to answer our questions.
 
 The ethical issues are, fortunately, not fraught. Estimating someone's age is (universally?) viewed as OK. Estimating someone's health or income or criminal record are far dicier. 
 
@@ -745,7 +745,7 @@ We would not expect a treatment effect of this magnitude to be common, but, at t
 
 So far, we have only created models in which the predictor variable is discrete, with two possible values. `party` is either "Democrat" or "Republican". `treatment` is either "Treated" or "Control". Often times, however, the predictor variable will be continuous. Fortunately, the exact same approach works in this case. Consider:
 
-* What would you expect the income to be for a 40-year old?
+* *What would you expect the income to be for a 40-year old?*
 
 ### Wisdom
 
@@ -911,8 +911,12 @@ pe %>%
 
 So far in this chapter, we have only considered *continuous* outcome variables. `age`, `att_end` and `income` all take on a variety of values. None of them are, truly, continuous, of course. `age` is only reported as an integer value. `att_end` can only, by definition, take on 13 distinct values. However, from a modeling perspective, what matters is that they have more than 2 possible values.
 
-`liberal`, however, only takes on two values: TRUE and FALSE. In order to model it, we must use the `binomial` family. 
+`liberal`, however, only takes on two values: TRUE and FALSE. In order to model it, we must use the `binomial` family. We begin, as always, with some questions:
 
+
+*Among all people who have an income $100,000, what proportion are liberal?*
+
+*Assume we have a group of eight people, two of whom make $100,000, two $200,000, two $300,000 and two $400,000. How many will be liberal?*
 
 ### Wisdom
 
@@ -932,14 +936,26 @@ ch8 %>%
 
 Why is there only one observation with an income between $135,000 and $250,000? We don't know. The important thing is to notice it, to explore the variables you are using in the model.
 
-<!-- DK: Add representativeness. -->
+The second part of Wisdom is examining whether the data we have is representative of al overall population about which we seek to draw inferences. Our data is from 2012 and includes only Boston-area commuters. Our questions are, apparently, about today. Are they for the world, the US, the Boston-area, or just commuters at these select train stations? We don't know! The questions are not very precise. 
+
+One of the key jobs of a data scientist is to guide people --- our colleagues, bosses and clients --- toward asking precise questions. We must help them to translate English into inference. That translation requires precision. In this case, let's assume that the questions reference Boston-area commuters in 2021.
+
+So, is the data we have from 2012 representative of the data from 2021 about which we seek to draw inferences? Maybe? There is rarely a correct answer to this question. Some things have changed in Boston and some things have not. Our job is to think about these changes and adjust our confidence in our final answers accordingly. Or, in the worst case scenario, if there is no way to understand our actual data and our desired data as coming from the same population, we must stop the project right there.
+
 
 ### Justice
 
-Recall the discussion in Section \@ref(zero-one-outcomes) about the logistic regression model which we use whenever the outcome or dependent variable is binary/logical. The math is there, if you care about math. We don't. Instead, recall the fundamental structure of all data science problems:
+Recall the discussion in Section \@ref(zero-one-outcomes) about the logistic regression model which we use whenever the outcome or dependent variable is binary/logical. The math is there, if you care about math. We don't, at least not too much. Reminder:
+
+$$p(\text{Liberal}_i = \text{TRUE}) = \frac{\text{exp}(\beta_0 + \beta_1 \text{income}_i)}{1 + \text{exp}(\beta_0 + \beta_1 \text{income}_i)}$$
+
+This model only has two parameters, $\beta_0$ and $\beta_1$. But these parameters do not have simple interpretations, unlike the parameters in a linear (or gaussian) model.
+
+
+Recall the fundamental structure of all data science problems:
 
 $$\text{outcome} = \text{model} + \text{what is not in the model}$$
-The exact mathematics of the model --- the parameters, their interpretations --- are all just [dross](https://en.wikipedia.org/wiki/Dross) in the foundry of our inferences: unavoidable but not worth our time. 
+The exact mathematics of the model --- the parameters, their interpretations --- are all just [dross](https://en.wikipedia.org/wiki/Dross) in the foundry of our inferences: unavoidable but not worth too much of our time. 
 
 Even if the math is ignorable, the causal versus predictive nature of the model is not. Is this a causal model or a predictive model? It depends! It could be causal if you assume that we can *manipulate* someone's income, if, that is, there are at least two potential outcomes: person $i$'s liberal status if she makes X dollars and person $i$'s liberal status if she makes Y dollars. Remember: *No causation without manipulation*. The definition of a causal effect is the difference between two potential outcomes. If you only have one outcome, then your model can not be causal. 
 
@@ -957,13 +973,13 @@ fit_4 <- stan_glm(data = ch8,
                   seed = 365)
 ```
 
-Having fit the model, we can look at a printed summary. Note the use of the `digits` argument to display more digits in the print out.
+Having fit the model, we can look at a printed summary. Note the use of the `digits` argument to display more digits in the printout.
 
 ```{r}
 print(fit_4, digits = 6)
 ```
 
-Fitted models tell us about the posterior distributions from the parameters in the formula which defines the model we have estimated. *We are assuming that the model is true.* And, as discussed in Chapter \@ref(one-parameter), that assumption is always false! Our model is never a perfectly accurate representation of reality. But, if it were perfect, then the posterior for $\beta_0$, $\beta_1$, and so on would be perfect as well.
+Fitted models tell us about the posterior distributions for the parameters in the formula which defines the model we have estimated. *We are assuming that the model is true.* And, as discussed in Chapter \@ref(one-parameter), that assumption is always false! Our model is never a perfectly accurate representation of reality. But, if it were perfect, then the posterior distributions which we have created for $\beta_0$, $\beta_1$, and so on would be perfect as well.
 
 When working with a linear model, we will often interpret the meaning of the parameters, as we have already done in the first three sections of this chapter. Such interpretations are much harder with logistic models because the math is much less convenient. So, we won't even bother to try to understand the meaning of these parameters. However, we can note that $\beta_1$ is negative, suggesting that people with higher incomes are less likely to be liberal.
 
@@ -972,7 +988,7 @@ When working with a linear model, we will often interpret the meaning of the par
 
 *Among all people who have an income $100,000, what proportion are liberal?*
 
-Although our model is now logistic, all the steps in answering a question like this as the same.
+Although our model is now logistic, all the steps in answering a question like this are the same as with a linear/guassian model.
 
 ```{r}
 newobs <- tibble(income = 100000)
@@ -1024,7 +1040,7 @@ Study the `pp` tibble. Understand its component parts. The first column, for exa
 
 The second column is the same thing as the first column. Both are 4,000 draws from the posterior distribution for the liberal status of a random person with an income of $100,000. Yet they also have different values. They are both the same thing and different things, in the same way that `rnorm(10)` and `rnorm(10)` are the same thing --- both are 10 draws from the standard normal distribution --- and different things in that the values vary.
 
-The third and fourth columnes are different from the first two columns. They are both 4,000 draws from the posterior distribution for the liberal status of a random person with an income of $200,000. And so on for later columns. We can answer very difficult questions by putting together simple building blocks, each of them a set of draws from a posterior distribution. Recall the discussion in Section \@ref(distributions).
+The third and fourth columns are different from the first two columns. They are both 4,000 draws from the posterior distribution for the liberal status of a random person with an income of $200,000. And so on for later columns. We can answer very difficult questions by putting together simple building blocks, each of them a set of draws from a posterior distribution. Recall the discussion in Section \@ref(distributions).
 
 The `total` column is simply the sum of the first eight columns. Having created the building blocks with 8 columns of draws from four different posterior distributions, we can switch our focus to each row. Consider row 2. It has a vector of 8 numbers: `1 1 1 0 0 1 0 0`. We can treat that vector as a unit of analysis. This is what might happen with our 8 people. The first three might be liberal, the fourth not liberal and so on. This row is just one example of what might happen, one draw from the posterior distribution of possible outcomes for groups of eight people with these incomes.
 
@@ -1049,7 +1065,9 @@ pp %>%
 
 As always, there is some *truth*. If, tomorrow, we were to meet 8 new people, with the specified incomes, a certain number of them would be liberal. If we had the ideal Preceptor Table, we could just look up that number. No data science required. Alas, we don't know the truth. The bets we can do is to create a posterior distribution for that unknown value, as we have done here. We then need to translate that posterior into English --- "The most likely number of liberals is 2 or 3, but a total as low as zero or as high as 5 is also plausible. Having 6 liberals would be really surprising. Having 7 or 8 is almost impossible."
 
-<!-- DK: Add Temperance verbiage. -->
+Are these two posterior probability distributions perfect? No! This is the central message of the virtue of Temperance. We must demonstrate our humility when we use our models. Recall the distinction between the *unknown true distribution* and the *estimated distribution*. The first is the posterior distribution we would create of we understood every detail of the process and could accurately model it. We would still not know the true unknown number, but our posterior distribution for that number would be perfect. Yet, our model is never perfect. We are making all sorts of assumptions behind the scenes. Some of those assumptions are plausible. Others are less so. Either way, the *estimated distribution* is what we have graphed above. 
+
+The central lesson of Temperance is: Don't confuse the *estimated* posterior (which is what you have) with the *true* posterior (which is what you want). Recognize the unavoidable imperfections in the process. You can still use your estimated posterior --- what choice do you have? --- but be cautious and humble in doing so. The more that you suspect that your estimated posterior differs from the true posterior, the more humble and cautious you should be.
 
 ## Summary
 
@@ -1079,4 +1097,7 @@ Once we have draws from a posterior distribution for our outcome variable --- wh
 * *Predictive models and causal models use the same math and the same code.*
 
 * *"When comparing" is a great phrase to start the summary of any non-causal model.*
+
+* *Don't confuse the estimated posterior (which is what you have) with the true posterior (which is what you want). Be humble and cautious in your use of the posterior.*
+
 
