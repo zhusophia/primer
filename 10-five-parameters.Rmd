@@ -6,10 +6,12 @@
 
 <!-- Is fit_gov_* a good naming scheme for the models? -->
 
+
+
 <!-- Get rid of duplicate names? Add more discussion below? Perhaps use as a good example of how the estimated posterior is not the true posterior because of the assumptions we are making about the structure of the error term. -->
 
 
-The next step in our model building education is to learn about *interactions*. The effect of a treatment relative to a control is almost never uniform. The effect might be bigger in women than in men, smaller in the rich relative to the poor. The technical term for such effects is "heterogeneous," which is just Ph.D.'ese for "different." With enough data, all effects are heterogeneous. Causal effects, at least in the social science, always vary across units. To model this reality, we rely on interactions, on allowing the effect size to differ. The same applies for predictive models. The relationship between our outcome variable $y$ and a predictor variable $x$ is rarely constant. The relationship varies based on the values of other variables. To take account of interactions, we need models with at least 5 parameters. 
+Last chapter, we studied four parameters: models in which we studied multiple right-hand side variables at once. The next step in our model building education is to learn about *interactions*. The effect of a treatment relative to a control is almost never uniform. The effect might be bigger in women than in men, smaller in the rich relative to the poor. The technical term for such effects is "heterogeneous," which is just Ph.D.'ese for "different." With enough data, all effects are heterogeneous. Causal effects, at least in the social science, always vary across units. To model this reality, we rely on interactions, on allowing the effect size to differ. The same applies for predictive models. The relationship between our outcome variable $y$ and a predictor variable $x$ is rarely constant. The relationship varies based on the values of other variables. To take account of interactions, we need models with at least 5 parameters. 
 
 <!-- DK: Add some more. What are the key lessons? What do we carry over from previous chapters? What is new? Hit the data science research cycle. -->
 
@@ -41,7 +43,7 @@ library(rstanarm)
 
 <!-- We discuss below that we only have data for people who are already dead. That is an interesting restriction, and effects the Preceptor Table in interesting ways. Or is such a discussion too advanced? -->
 
-The **primer.data** package includes the  `governors` data set which features the demographic information about the candidates for governor in the United States. @barfort2020 gathered this data concluded that winning a gubernatorial election increases a candidate's lifespan.
+The **primer.data** package includes the  `governors` data set which features the demographic information about the candidates for governor in the United States. @barfort2020 gathered this data and concluded that winning a gubernatorial election increases a candidate's lifespan.
 
 
 ```{r}
@@ -50,7 +52,9 @@ glimpse(governors)
 
 <!-- DK: Should restrict the data to one observation per person. A subtle issue. Think about the infinite Preceptor Table. -->
 
+
 There are `r ncol(governors)` variables and `r scales::comma(nrow(governors))` observations. In this Chapter, we will only be looking at the variables `last_name`, `year`, `state`, `sex`, `lived_after`, `election_age`, `won`, and `close_race`. 
+
 
 ```{r}
 ch10 <- governors %>% 
@@ -70,6 +74,9 @@ ch10 %>%
 
 For now, we leave in multiple observations for a single person.
 
+First, let's sample from our dataset. 
+
+
 ```{r, echo = FALSE}
 # Bit of a cheat to ensure that one of the sampled candidates is female.
 
@@ -80,14 +87,15 @@ set.seed(14)
 slice_sample(ch10, n = 5)
 ```
 
-`sex` is most often "Male", as we might expect.
-
+As we might expect, `sex` is most often "Male". To be more precise in inspecting our data, let's `skim()` the dataset. 
 
 ```{r}
 skim(ch10)
 ```
 
-`skim()` groups the variables together by type.  We are given histograms of the numeric data. In looking at the histogram for `year`, we see that it is skewed right --- meaning that most of the data is bunched to the left and that there is a smaller tail to the right --- with half of the observations from election years between 1945 and 1962. This makes sense logically, because we are only looking at deceased candidates, and candidates from more recent elections are more likely to still be alive.
+`skim()` groups the variable together by type, and provides some analysis for each variable.  We are also given histograms of the numeric data. 
+
+Looking at the histogram for `year`, we see that it is skewed right --- meaning that most of the data is bunched to the left and that there is a smaller tail to the right --- with half of the observations from election years between 1945 and 1962. This makes sense logically, because we are only looking at deceased candidates, and candidates from more recent elections are more likely to still be alive.
 
 In using this data set, our left-side variable will be `lived_after`. We are trying to understand/predict how many years a candidate will live after the election. 
 
@@ -99,7 +107,7 @@ ch10 %>%
   labs(title = "US Gubernatorial Candidate Years Lived Post-Election",
        subtitle = "Candidates who died more recently can't have lived for long post-election",
        caption = "Data: Barfort, Klemmensen and Larsen (2019)",
-       x = "Year",
+       x = "Year Elected",
        y = "Years Lived After Election") +
   scale_y_continuous(labels = scales::label_number()) +
   theme_classic() 
@@ -107,10 +115,11 @@ ch10 %>%
 
 <!-- DK: Fix -->
 
-Starting with the relationship between `lived_after` and `year`, there is a rough line above which there are no observations. There are no data points in the top right portion of the graph because it is not possible to have run in 2011 and then live 50 years after the election took place. This edge of the data represents, approximately, the most years a candidate could have possibly lived, and still have died, given the year of the election. The reason the data is slanted downward is because the maximum value for this scenario is greater in earlier years. That is, those candidates who ran for governor in earlier years could live a long time after the election and still have died prior to the data set creation, giving them higher `lived_after` values than those who ran for office in more recent years. The edge of the scatter plot is not perfectly straight because, for many election years, no candidate had the decency to die just before data collection.
+Note that there is a rough line above which we see no observations. Why might this be? When looking at the year elected and years lived post-election, there is missing data in the upper right quadrant due to the fact that it is impossible to have been elected post-2000 and lived more than 21 years. Simply put: this "edge" of the data represents, approximately, the most years a candidate could have lived, and still have died, given the year that they were elected. 
 
-There are fewer observations in later years because fewer recent candidates have died recently. 
+The reason the data is slanted downward is because the maximum value for this scenario is greater in earlier years. That is, those candidates who ran for governor in earlier years could live a long time after the election and still have died prior to the data set creation, giving them higher `lived_after` values than those who ran for office in more recent years. The edge of the scatter plot is not perfectly straight because, for many election years, no candidate had the decency to die just before data collection. The reason for so few observations in later years is that fewer recent candidates have died.
 
+To begin visualizing our `lived_after` data, we will inspect the difference in years lived post election between male and female candidates. 
 
 ```{r}
 ch10 %>%
@@ -125,13 +134,14 @@ ch10 %>%
   theme_classic() 
 ```
 
-This plot shows that men live much longer, on average, than women after the election. Does that make sense to you?
+
+This plot shows that men live much longer, on average, than women after the election. Does that make sense to you? Is there an intuitive explanation for why this might be? 
 
 
 ### Population
 
 
-The concept of the "population" is subtle and important. *The population is not the set of candidates for which we have data.* That is the data set. The population is the larger --- potentially much larger --- set of individuals about whom we want to make inferences. *The parameters in our models refer to the population, not to the data set.*
+The concept of the "population" is subtle and important. *The population is not the set of candidates for which we have data.* That is the dataset. The population is the larger --- potentially much larger --- set of individuals about whom we want to make inferences. *The parameters in our models refer to the population, not to the dataset.*
 
 Consider a simple example. Define $\mu$ as the average number of years lived by candidates for governor after Election Day. Can we calculate $\mu$ from our data? No! There are many candidates for governor who are still alive, who are not included in our data even though they are part of the "population" we want to study. $\mu$ can not be *calculated.* It can only be *estimated.*
 
@@ -141,9 +151,9 @@ Note, also, that there are many different populations, each with its own $\mu$, 
 
 * The population of all candidates for governor in the US from 1900 to 2012. A priori, we would not expect a major difference between candidates who run in 1946 and those who run in 1942. How different could they be? It is therefore not unreasonable to extend the population of interest back in time, even if we have no data for earlier periods.
 
-* The population of all candidates for governor in the US from 1945 to 2030. We are often interested in the future. We want to make predictions about what will happen to candidates, even to candidates who have not yet run for office.
+* The population of all candidates for governor in the US from 1945 to 2030. We are often interested in the future. We want to make predictions about what *will* happen to candidates, including candidates who have not yet run for office.
 
-* The population of candidates for governor around the world. Other countries have governors also! We want to understand their longevity as well.
+* The population of candidates for governor around the world. Other countries have governors! We want to understand their longevity as well.
 
 * The population of candidates for all political offices in the US. We might expect candidates for Senator to have similar lifespans to candidates for Governor.
 
@@ -195,20 +205,27 @@ The math is fairly simple:
 $$ lived\_after_i =  \beta_0 + \beta_1 election\_age_i + \epsilon_i $$
 
 
-with $\epsilon_i \sim N(0, \sigma^2)$. $lived\_after_i$ is the number of years lived after the election for candidate $i$. $election\_age_i$ is the number of years lived before the election for candidate $i$. $\epsilon_i$ is the "error term," the difference between the actual years-lived for candidate $i$ and the modeled years-lived.  $\epsilon_i$ is normally distributed with a mean of 0 and a standard deviation of $\sigma$. The key distinction is between:
+with $\epsilon_i \sim N(0, \sigma^2)$. 
+- $lived\_after_i$ is the number of years lived after the election for candidate $i$. 
+- $election\_age_i$ is the number of years lived before the election for candidate $i$. 
+- $\epsilon_i$ is the "error term," the difference between the actual years-lived for candidate $i$ and the modeled years-lived.  $\epsilon_i$ is normally distributed with a mean of 0 and a standard deviation of $\sigma$. 
+
+The key distinction is between:
 
 * *Variables*, always subscripted with $i$, whose values (potentially) vary across individuals.
 
 * *Parameters*, never subscripted with $i$, whose values are constant across individuals.
 
-Why do we use $lived\_after_i$ in this formula instead of $y_i$? The more often we remind ourselves about the variables actual substance, the better. But there is another common convention: to always use $y_i$ as the symbol for the dependent variable. It would not be usual to describe this model as:
+Why do we use $lived\_after_i$ in this formula instead of $y_i$? The more often we remind ourselves about the variable's actual substance, the better. But there is another common convention: to always use $y_i$ as the symbol for the dependent variable. It would not be unusual to describe this model as:
 
 $$ y_i =  \beta_0 + \beta_1 election\_age_i + \epsilon_i $$
 Both mean the same thing. 
 
 <!-- DK: Better words needed. -->
 
-Either way, $\beta_0$ is the "intercept" of the regression, the average value for the population of $lived\_after$, among those for whom $election\_age = 0$. $\beta_1$ is the "coefficient" of  $election\_age$. When comparing two individuals, the first with an $election\_age$ 1 year older than the second,  we expect the first to have a $lived\_after$ value $\beta_1$ different from the second. In other words, we expect the older to have fewer years remaining, because $\beta_1$ is negative. Again, this is the value for the population from which our data is drawn.  
+Either way, $\beta_0$ is the "intercept" of the regression, the average value for the population of $lived\_after$, among those for whom $election\_age = 0$. 
+
+$\beta_1$ is the "coefficient" of  $election\_age$. When comparing two individuals, the first with an $election\_age$ 1 year older than the second,  we expect the first to have a $lived\_after$ value $\beta_1$ different from the second. In other words, we expect the older to have fewer years remaining, because $\beta_1$ is negative. Again, this is the value for the population from which our data is drawn.  
 
 
 There are three unknown parameters --- $\beta_0$, $\beta_1$ and $\sigma$ --- just as with the models we used in Chapter \@ref(three-parameters).
@@ -233,7 +250,7 @@ The parameter values:
 print(fit_gov_1, detail = FALSE)
 ```
 
-As is almost always the case, $\sigma$ is a nuisance parameter, somethings whose value we are not interested in. This is why `stan_glm()` refers to it as an "Auxiliary" parameter.
+As is almost always the case, $\sigma$ is a nuisance parameter, a value we are not interested in. This is why `stan_glm()` refers to it as an "Auxiliary" parameter.
 
 The posterior distributions of $\beta_0$ (the intercept) and $\beta_1$ (the coefficient of $election\_age_i$), on the other hand, are important. Before looking at the posteriors themselves, let's examine the fitted values:
 
@@ -452,13 +469,13 @@ The interpretation of this parameter is the same as we have seen before. There i
 
 ### c_election_age and sex
 
-Our outcome variable continues to be `lived_after`, but now we will have two different explanatory variables: `c_election_age` and `sex`. Note that `sex` is a categorical explanatory variable and `c_election_age` is a continuous explanatory variable. This is the same type of model --- parallel slopes --- as we saw in Chapter \@ref(four-parameters)
+Our outcome variable continues to be `lived_after`, but now we will have two different explanatory variables: `c_election_age` and `sex`. Note that `sex` is a categorical explanatory variable and `c_election_age` is a continuous explanatory variable. This is the same type of model --- parallel slopes --- as we saw in Chapter \@ref(four-parameters).
 
 Math: 
 
 $$ lived\_after_i =  \beta_0 + \beta_1 male_i + \beta_2 c\_election\_age_i + \epsilon_i $$
 
-But wait! The variable name is `sex` not `male`. Where does `male` come from?
+But wait! The variable name is `sex`, not `male`. Where does `male` come from?
 
 <!-- DK: Indicator versus index. Which is this? Explain both? -->
 
@@ -467,7 +484,9 @@ The answer is that `male` is an *indicator* variable, meaning a 0/1 variable. `m
 * The outcome variable is $lived\_after_i$, the number of years a person is alive after the election. $male_i$ is one of our explanatory variables. If we are predicting the number of years a male candidate lives after the election, this value will be 1. When we are making this prediction for female candidates, this value will be 0. $c\_election\_age_i$ is our other explanatory variable. It is the number of years a candidate has lived before the election. 
 
 
+
 * $\beta_0$ is the average number of years lived after the election for women, who on the day of election, have been alive the average number of years of all candidates (i.e. both male and female). $\beta_0$ is also the intercept of the equation. In other words, $\beta_0$ is the expected value of $lived\_after_i$, if $male_i = 0$ and $c\_election\_age_i = 0$. 
+
 
 * $\beta_1$ is almost meaningless by itself. The only time it has meaning is when its value is connected to our intercept (i.e. $\beta_0 + \beta_1$). When the two are added together, you get the average number of years lived after the election for men, who on the day of election, have been alive the average number of years for all candidates.
 
@@ -495,7 +514,9 @@ Looking at our results, you can see that our intercept value is around `r round(
 Note that `sexMale` is around `r round(coef(fit_gov_3)["sexMale"], 0)`. This is our coefficient, $\beta_1$. We need to connect this value to our intercept value to get something meaningful. Using the formula $\beta_0 + \beta_1$, we find out that the number of years the average male candidate ---  who, on the day of election, is the average age of all candidates --- would live is around `r round(coef(fit_gov_3)["(Intercept)"] + coef(fit_gov_3)["sexMale"], 0)` years.  
 
 
+
 Now take a look at the coefficient for $c\_election\_age_i$, $\beta_2$. The median of the posterior, `r round(coef(fit_gov_3)["c_election_age"], 1)`, represents the slope of the model. When comparing two candates who differ by one year in `c_election_age`, we expect that they will differ by `r round(coef(fit_gov_3)["c_election_age"], 1)` years in `lived_after`. It makes sense that this value is negative. The more years a candidate has lived, the fewer years the candidate has left to live. So, for every extra year a candidate is alive before an election, their lifespan after the election will be `r abs(round(coef(fit_gov_3)["c_election_age"], 1))` years lower, on average.
+
 
 
 Let’s now look at some posteriors.
@@ -963,11 +984,11 @@ Expected values vary much less than predictions. The above chart makes that easy
 
 ### Testing
 
-In a normal statistics book, we would have already discussed the concept of "testing" extensively. The terminology varies by field. "Tests," "testing," "hypothesis tests," "tests of significance," and "null hypothesis significance testing" all refer to the same concept. We will refer to this collection of approaches as NHST, a common abbreviation derived from the initials of the last phrase. Wikpedia provides an [overview](https://en.wikipedia.org/wiki/Statistical_hypothesis_testing). 
+In a normal statistics book, we would have already discussed the concept of "testing" extensively. The terminology varies by field. "Tests," "testing," "hypothesis tests," "tests of significance," and "null hypothesis significance testing" all refer to the same concept. We will refer to this collection of approaches as NHST, a common abbreviation derived from the initials of the last phrase. Wikipedia provides an [overview](https://en.wikipedia.org/wiki/Statistical_hypothesis_testing). 
 
 *Our view: Amateurs test. Professionals summarize.*
 
-Consider the question of the expected difference in lifespans for our South Dakato and Washington candidates. Is that difference "significant?" Can we "reject the null hypothesis?" The convential answer is Yes. Anytime that zero is outside of the 95% confidence interval, we can declare the result significant. But why should we? What does that gain us? We already have the full posterior probability distribution. That is knowledge. A Yes/No question throws away too much information to (almost) ever be useful. There is no reason to *test* when you can *summarize* by providing the full posterior probability distribution.
+Consider the question of the expected difference in lifespans for our South Dakota and Washington candidates. Is that difference "significant?" Can we "reject the null hypothesis?" The conventional answer is Yes. Anytime that zero is outside of the 95% confidence interval, we can declare the result significant. But why should we? How does that help us? We already have the full posterior probability distribution. That is knowledge. A Yes/No question throws away too much information to (almost) ever be useful. There is no reason to *test* when you can *summarize* by providing the full posterior probability distribution.
 
 The same arguments apply in the case of "insignificant" results, with "$p > 0.5$, when we can't "reject" the null hypothesis. Instead of expected values, consider the case of two candidates, one from South Dakota and one from Washington. Is the difference in their predicted lifespans "significant?" Who cares!? We have the full posterior probability distribution for that prediction --- also known as the posterior predictive distribution --- as graphed above. The 95% confidence interval includes zero. Does that mean we should throw it away? No! That would be nonsense. Yes, there is a 20% chance that the South Dakota candidate lives longer, so we can hardly be surprised when that happens. But we still think that it is much more likely that the Washington candidate lives longer. Indeed, we would consider 4-to-1 odds as fair. The fact that the difference is not "significant" has no relevance to how we use the posterior to make decisions.
 

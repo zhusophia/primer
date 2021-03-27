@@ -4,11 +4,11 @@
 
 <!-- Transforming the outcome variable. Give some more thoughts or advice. -->
 
-<!-- In all the examples, provide some clear interpretation sentences. Set them off with skipped lines, and maybe in italics. -->
+<!-- In all the examples, provide some clear interpretation sentences. Set them off with skipped lines, and maybe in italics. MF: DOne.-->
 
-<!-- Expand "interpreting coefficients" section. Difference between across-unit and within-unit. Causal versus predictive. Unless you have a set up with two or more potential outcomes, you can't do causal. You can't do intra-unit. Or is it inter-unit? I get confused!
+<!-- Expand "interpreting coefficients" section. Difference between across-unit and within-unit. Causal versus predictive. Unless you have a set up with two or more potential outcomes, you can't do causal. You can't do intra-unit. Or is it inter-unit? I get confused! MF: Done.
 
-Whenever the setting is predictive --- that is, whenever it is not causal --- you are always comparing two different units (or groups of units). You are never considering a single unit. 
+Whenever the setting is predictive --- that is, whenever it is not causal --- you are always comparing two different units (or groups of units). You are never considering a single unit. MF: Done.
 
 Comparing within rows of the Preceptor Table versus across rows, which is all you can do without two potential outcomes.
 
@@ -257,7 +257,13 @@ See @roas
 
 <!-- Give example of logistic regression. Intercept of logistic regression is impossible to interpret. -->
 
+When we interpret coefficients, it is important to know the difference between *across unit* and *within unit* comparisons. When we compare *across unit*, meaning comparing Joe and George, we are not looking at a causal relationship. *Within unit* discussions, where we are comparing Joe under treatment versus Joe under control, are causal. This means that within unit interpretation is only possible in causal models, where we are studying **one unit** under **two conditions**. When we talk about two potential outcomes, we are discussing the same person or unit under two conditions. 
+
+To put this in terms of the Preceptor tables, a *within unit* comparison is looking at one **row** of data: the data for Joe under control and the data for Joe under treatment. We are comparing **one unit**, or (in this case) one person, to itself under two conditions. An *across unit* comparison is looking at multiple rows of data, with a focus on differences across columns. We are looking at differences *without making any causal claims*. We are *predicting*, but we are not implying causation. 
+
 The magnitude of the coefficients in linear models are relatively easy to understand. That is not true for logistic regressions. In that case, use the Divide-by-Four rule: Take a logistic regression coefficient (other than the constant term) and divide it by 4 to get an upper bound on the predictive difference corresponding to a unit difference in that variable. All this means is that, when evaluating if a predictor is helpful *in a logistic regression only*, divide the coefficient by four. 
+
+
 
 <!-- * Creating new variables, especially by combining different ones into one combined variable. -->
 
@@ -311,7 +317,17 @@ fit_1_model <- stan_glm(att_end ~ treatment + att_start,
 fit_1_model
 ```
 
-How do we decide which variables are useful? First, let's look at our intercept. The 95% confidence interval for  `att_end` is equal to the coefficient-- `r scales::comma(round(coef(fit_1_model)["(Intercept)"], 1))`-- plus or minus two standard errors.
+How do we decide which variables are useful? First, let's interpret our coefficients. 
+
+* The variable before the tilde, `att_end`, is our outcome. 
+
+* The explanatory variables are `treatment`, which says whether a commuter relieved treatment or control conditions, and `att_start`, which measures attitude at the start of the study. 
+
+- The 95% confidence interval for  `att_end` is equal to the coefficient-- `r scales::comma(round(coef(fit_1_model)["(Intercept)"], 1))`-- plus or minus two standard errors. This shows the estimate for the `att_end` where the commuters were under treatment and **were not** in the control group. 
+- The variable `treatmentControl` represents the *offset* in `att_end` from the estimate for our `(Intercept)`. This offset is for the group of people that were in the Control group. To find the estimated `att_end` for those in this group, you must add the median for `treatmentControl` to the `(Intercept)` median. 
+- The variable `att_start` measures the expected difference in `att_end` for every one unit increase in `att_start`. 
+
+
 
 The causal effect of the variable `treatmentControl` is `r scales::comma(round(coef(fit_1_model)["treatmentControl"], 0))`. This means that, compared with the predicted `att_end` for groups under treatment, those in the control group have a predicted attitude that is one entire point lower. As we can see, this is a large and well estimated coefficient. Recall that this means, roughly, that the 95% confidence interval excludes zero. To calculate the 95% confidence interval, we take the coefficient plus or minus two standard errors: `r round(((coef(fit_1_model)["treatmentControl"]) - (2 * .2)), 1)` and `r round(((coef(fit_1_model)["treatmentControl"]) + (2 * .2)), 1)`. As we can see, the 95% confidence interval *does* exclude zero, suggesting that `treatment` is a worthy variable. 
 
@@ -336,6 +352,17 @@ fit_2
 ```
 
 Great! We have an estimate for income of those who fall into the category of `liberalFALSE`, as well as data on our right hand side variables of `age` and `liberalTRUE`. 
+
+First, let's interpret our coefficients. 
+
+* The variable before the tilde, `income`, is our outcome. 
+
+* The explanatory variables are `liberal`, which has a resulting value of TRUE or FALSE, and `age`, a numeric variable. 
+
+- The `(Intercept)` is estimating income where `liberal == FALSE`. Therefore, it is the estimated income for commuters that are not liberals. - The estimate for `age` is showing the increase in income with every additional year of age, starting at age 0.  
+- The estimate for `liberalTRUE` represents the offset in predicted income for commuters who *are* liberal. To find the estimate, we must add the prediction to our `(Intercept)` value. We see that, on average, liberal commuters make less money. 
+
+It is important to note that we are not looking at a causal relationship for either of these explanatory variables. We are noting the differences between two groups, without considering causality. This is known as an *across unit* comparison. When we compare *across unit* we are not looking at a causal relationship. 
 
 When comparing `liberalTRUE` with our `(Intercept)`, recall that the `(Intercept)` is calculating income for the case where `liberal == FALSE`. As we can see, then, the coefficient for `liberalTRUE`, `r scales::comma(round(coef(fit_2)["liberalTRUE"], 1))`, shows that the  liberals in our dataset make less on average than non-liberals in our dataset. The coefficient is large relative to the `(Intercept)` and, with rough mental math, we see that the 95% confidence interval excludes 0. Therefore, `liberal` is a helpful variable!
 
@@ -851,7 +878,7 @@ ggplot(trains, aes(x = att_start, y = att_end, color = liberal)) +
     # setting slope equal to our previously created liberal_true_att_slope. The
     # color call is for teal, to match the colors used by tidyverse for
     # geom_point().
-  
+
   geom_abline(intercept = liberal_true_intercept,
               slope = liberal_true_att_slope,
               color = "#00BFC4", 
@@ -869,11 +896,13 @@ This is our parallel slopes model. What we have done, essentially, is created a 
 
 As we can see, commuters who are *not* liberal tend to start with slightly higher values for `att_start`. Commuters who *are* liberal tend to have lower starting values for `att_start`. 
 
-
-Visualizing Bayesian multi-variate regression models is certainly a more involved process, as we do not automatically get singular point estimates for our intercepts and slopes with Bayes, and as we do not have a special method = "lm" argument or `gg_parallel_slopes()` function with Bayes. And, as we have seen, all of our work in visualizing Bayesian models results in very similar graphs to the above Frequentist ones. However, it is still very, very useful to know how to visualize Bayesian models, as only Bayesian models allow us to make probabilistic inferences about those models’ parameters.
-
 ### Temperance
 
+Having created (and checked) a model, we now use the model to answer questions. Models are made for use, not for beauty. The world confronts us. Make decisions we must. Our decisions will be better ones if we use high quality models to help make them.
+
+What we really care about is data we haven't seen yet, mostly data from tomorrow. But what if the world changes, as it always does? If it doesn't change much, maybe we are OK. If it changes a lot, then what good will our model be? In general, the world changes some. That means that are forecasts are more uncertain that a naive use of our model might suggest. 
+
+Though we cannot predict the future, we can use `loo()` to test our model's predictions on data it has not seen yet -- specifically, data we have excluded and then reintroduced. To cross validate our model, we will use `loo()`, or leave-one-out cross validation. 
 
 <!-- att_end ~ liberal + att_start. Same thing as chapters before. Show graphic of parallel lines. Cardinal virtues as always. And, extra, at the end we can use loo_compare to see if this model is better than simpler model of att_end ~ att_start. -->
 
@@ -882,42 +911,63 @@ Visualizing Bayesian multi-variate regression models is certainly a more involve
 
 ### Comparing complex and simple models 
 
-Complex: 
+When creating a model, it can often be temping to create something more "complex". Take, for instance, the model below. It looks at the left side variable, `att_end` as a function of the right side variables `liberal` and `att_start`. 
 
 ```{r}
 fit_first <- stan_glm(formula = att_end ~ liberal + att_start,
                   data = trains,
                   refresh = 0)
+
+fit_first
 ```
 
-Simple: 
+Now, let's look at a more simple model with one right hand side variable, `att_start`. 
 
 ```{r}
 fit_simple<- stan_glm(formula = att_end ~ att_start,
                   data = trains,
                   refresh = 0)
+
+fit_simple
 ```
 
-Make loo() regression for both:
+After inspecting our models, we will use `loo()` to measure how good our model is at making predictions on data it has not yet seen. First, look at the leave-one-out cross validation for our more complex model. 
 
 ```{r}
 loo_first <- fit_first %>% 
   loo()
 
+loo_first
+```
+Perform `loo()` on our simple model. 
+```{r}
 loo_simple <- fit_simple %>% 
   loo()
-```
 
-Perform loo_compare:
+loo_simple
+```
+Recall that the data that is relevant is the data from `elpd_loo`. The estimates for `elpd_loo` for our models are fairly similar. The standard error (SE) for this row is also very similar. However, it appears that the simple model performs slightly better, as the estimate is closer to zero and the SE is slightly less. To compare these directly, we will use `loo_compare`. 
 
 ```{r}
 loo_compare(loo_first, loo_simple)
 ```
 
+We see that the simple model is superior at predicting the future. The difference is small, but it is an important takeaway: *complex models are not necessarily superior models.*
+
 ## Summary
 
+In this chapter, we covered a number of topics important to effectively creating models. 
 
+*Key commands*:
+- Create a model using `stan_glm()`. 
+- After creating a model, we can use `loo()` to perform leave-one-out cross validation. This assesses how effectively our model makes predictions for data it has not seen yet.
+- The command `loo_compare()` allows us to compare two models, to see which one performs better in leave-one-out cross validation. The superior model makes better predictions. 
 
+*Remember*: 
+- We can transform variables -- through centering, scaling, taking logs, etc. -- to make them more sensible. Consider using a transformation if the intercept is awkward. For instance, if the intercept for `age` represents the estimate for people of age zero, we might consider transforming `age` to be easier to interpret. 
+- When selecting variables to include in our model, follow this rule: keep it if the variable has a large and well-estimated coefficient. This means that the 95% confidence interval excludes zero. Speaking roughly, removing a variable with a large coefficient meaningfully changes the predictions of the model.
+- When we compare *across unit*, meaning comparing Joe and George, we are not looking at a causal relationship. *Within unit* discussions, where we are comparing Joe under treatment versus Joe under control, are causal. This means that within unit interpretation is only possible in causal models, where we are studying **one unit** under **two conditions**. 
+- When we talk about two potential outcomes, we are discussing the same person or unit under two conditions. 
 
 
 
