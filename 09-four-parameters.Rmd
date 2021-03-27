@@ -1,18 +1,35 @@
 # Four Parameters {#four-parameters}
 
+<!-- MAKE SURE WE CAN SEE MODEL PRINTOUT with loo_compare(). If not, then hard code its value in the book directly. -->
+
+
+<!-- Discuss the difference in our estimated treatment effect for this chapter and the model in chapter 8 and in the model we did not use here. There is no truth! Which is why we need to be humble and cautious when using our posterior. Be Temperate! -->
+
+<!-- Preceptor's Posterior is the posterior you would calculate if all the assumptions you made under Wisdom and Justice were correct. Sadly, they never are! So, you can never know Preceptor's Posterior. Your posterior will, you hope, be a closish approximation of Preceptor's Posterior. -->
+
+
+<!-- Some discussion of population in parallel lines example at end. -->
+
+<!-- Edit Justice section to make sense, given it now comes before courage. -->
+
+<!-- Fix up math discussion. Don't use att_end as coefficient. -->
+
+<!-- Change Justice section to discuss the math of three possible models you are considering. Predictive or am I doing causal? What is the treatment effect is my question? So, must be causal.  -->
+
+<!-- Add a third model, att_end = treatment + att_start. Pick that one. -->
+
+<!-- Add a question to Temperance and answer it. Probably posterior_epred(). Probably a causation question. Meaning the expected causal effect for a certain sort of person. Which is also a parameter in the regression, which is a good connection to make. -->
+
+<!-- One sentence explaining what broom.mixed is for at start of chapter. -->
+
 <!-- Add Summary section -->
 
 <!-- Transforming the outcome variable. Give some more thoughts or advice. -->
 
-<!-- In all the examples, provide some clear interpretation sentences. Set them off with skipped lines, and maybe in italics. MF: DOne.-->
 
-<!-- Expand "interpreting coefficients" section. Difference between across-unit and within-unit. Causal versus predictive. Unless you have a set up with two or more potential outcomes, you can't do causal. You can't do intra-unit. Or is it inter-unit? I get confused! MF: Done.
+<!-- Comparing within rows of the Preceptor Table versus across rows, which is all you can do without two potential outcomes. -->
 
-Whenever the setting is predictive --- that is, whenever it is not causal --- you are always comparing two different units (or groups of units). You are never considering a single unit. MF: Done.
-
-Comparing within rows of the Preceptor Table versus across rows, which is all you can do without two potential outcomes.
-
-Also, does not work in logistic. But divide by four rule. -->
+<!-- Also, does not work in logistic. But divide by four rule.  -->
 
 
 In our haste to make progress --- to get all the way through the process of building, interpreting and using models --- we have given short shrift to some of the messy details of model building and evaluation. This chapter fills in those lacunae. We will also introduce models with four parameters. 
@@ -669,8 +686,7 @@ fit_liberal
 Now, we will perform `loo()` on our model and look at the results. 
 
 ```{r}
-loo_liberal <- fit_liberal %>% 
-  loo()
+loo_liberal <- loo(fit_liberal)
 
 loo_liberal
 ```
@@ -696,8 +712,7 @@ fit_att_start
 Great! Now, let's perform `loo()` on this model. 
 
 ```{r}
-loo_att_start <- fit_att_start %>% 
-  loo()
+loo_att_start <- loo(fit_att_start) 
 
 loo_att_start
 ```
@@ -758,26 +773,9 @@ ggplot(trains, aes(x = att_start, y = att_end, color = liberal)) +
 ```
 
 
-Is that data believable? Maybe? One could imagine that `att_end` would be predicted fairly well by `att_start`. This makes sense for most of our datapoints, which show not much difference between the attitudes. But what about the great disparities in attitude shown for the individual with a starting attitude of 9 and an ending attitude around 15? In a real data science project, this would require further investigation. For now, we ignore the issue and blithely press on.
+Is that data believable? Maybe? One could imagine that `att_end` would be predicted fairly well by `att_start`. This makes sense for most of our data points, which show not much difference between the attitudes. But what about the great disparities in attitude shown for the individual with a starting attitude of 9 and an ending attitude around 15? In a real data science project, this would require further investigation. For now, we ignore the issue and blithely press on.
 
-### Courage
 
-```{r echo = FALSE, fig.cap = "Courage"}
-knitr::include_graphics("other/images/Courage.jpg")
-``` 
-
-The use of `stan_glm` is the same as usual. Using `stan_glm`, we will create our model, `fit_1`. 
-
-```{r}
-fit_1 <- stan_glm(formula = att_end ~ liberal + att_start,
-                  data = trains,
-                  refresh = 0,
-                  seed = 42)
-
-fit_1
-```
-
-To remind ourselves, recall that the `(Intercept)` here is representing the `att_end` value for cases where `liberal = FALSE`. The next row, `liberalTRUE` gives a median value which represents the *offset* in the prediction compared with the `(Intercept)`. In other words, the true intercept for cases where `liberal = TRUE` is represented by $(Intercept) + liberalTRUE$. The value of `att_start` is the slope for our two cases. For each one unit increase of `att_start`, we see an increase of `att_end` by the median value. 
 
 ### Justice 
 
@@ -825,7 +823,8 @@ Which equates to, in `y = b + mx` form:
 
 If liberal = TRUE: 
 
-$$y = (\beta_0  + \beta_2) + \beta_1 x_1 $$
+$$y = (\beta_0  + \beta_2) + \beta_1 x_1$$
+
 Which equates to, in `y = b + mx` form:
 
 **y = (intercept + liberal_true) + att_start(att_start)**
@@ -868,16 +867,16 @@ ggplot(trains, aes(x = att_start, y = att_end, color = liberal)) +
   # equal to our previously created liberal_false_intercept, while setting slope
   # equal to our previously created liberal_false_att_slope. The color call is
   # for coral, to match the colors used by tidyverse for geom_point().
+  
   geom_abline(intercept = liberal_false_intercept,
               slope = liberal_false_att_slope, 
               color = "#F8766D", 
               size = 1) +
   
-    # Create a geom_abline object for the liberal TRUE values. Set the
-    # intercept equal to our previously created liberal_true_intercept, while
-    # setting slope equal to our previously created liberal_true_att_slope. The
-    # color call is for teal, to match the colors used by tidyverse for
-    # geom_point().
+  # Create a geom_abline object for the liberal TRUE values. Set the intercept
+  # equal to our previously created liberal_true_intercept, while setting slope
+  # equal to our previously created liberal_true_att_slope. The color call is
+  # for teal, to match the colors used by tidyverse for geom_point().
 
   geom_abline(intercept = liberal_true_intercept,
               slope = liberal_true_att_slope,
@@ -895,6 +894,54 @@ ggplot(trains, aes(x = att_start, y = att_end, color = liberal)) +
 This is our parallel slopes model. What we have done, essentially, is created a unique line for `liberalTRUE` and `liberalFALSE` to observe the differences in the groups as related to attitude start and attitude end. 
 
 As we can see, commuters who are *not* liberal tend to start with slightly higher values for `att_start`. Commuters who *are* liberal tend to have lower starting values for `att_start`. 
+
+
+
+### Courage
+
+```{r echo = FALSE, fig.cap = "Courage"}
+knitr::include_graphics("other/images/Courage.jpg")
+``` 
+
+The use of `stan_glm` is the same as usual. Using `stan_glm`, we will create our model, `fit_1`. 
+
+```{r}
+fit_1 <- stan_glm(formula = att_end ~ treatment + liberal,
+                  data = trains,
+                  refresh = 0,
+                  seed = 42)
+
+fit_1
+```
+
+To remind ourselves, recall that the `(Intercept)` here is representing the `att_end` value for cases where `liberal = FALSE`. The next row, `liberalTRUE` gives a median value which represents the *offset* in the prediction compared with the `(Intercept)`. In other words, the true intercept for cases where `liberal = TRUE` is represented by $(Intercept) + liberalTRUE$. The value of `att_start` is the slope for our two cases. For each one unit increase of `att_start`, we see an increase of `att_end` by the median value. 
+
+
+```{r}
+fit_2 <- stan_glm(formula = att_end ~ treatment + att_start,
+                  data = trains,
+                  refresh = 0,
+                  seed = 56)
+
+fit_2
+```
+
+```{r}
+L1 <- loo(fit_1)
+
+L1
+```
+
+```{r}
+L2 <- loo(fit_2)
+
+L2
+```
+
+```{r}
+loo_compare(L1, L2)
+```
+
 
 ### Temperance
 
