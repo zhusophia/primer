@@ -1,9 +1,7 @@
 # Four Parameters {#four-parameters}
 
-<!-- Discuss the difference in our estimated treatment effect for this chapter and the model in chapter 8 and in the model we did not use here. There is no truth! Which is why we need to be humble and cautious when using our posterior. Be Temperate! -->
 
-
-<!-- Change Justice section to discuss the math of three possible models you are considering. Predictive or am I doing causal? What is the treatment effect is my question? So, must be causal.  -->
+<!-- Change Justice section to discuss the math of three possible models you are considering. Predictive or am I doing causal? What is the treatment effect is my question? So, must be causal. Key point: Just because you are using treatment, does not mean that you care it is causal. You may not care. You might only want prediction. So, everything really starts with your question. If you are not asking a causal question, then you don't care if a lefthand side variable has a causal interpretation. You just care if it helps you make better predictions. -->
 
 <!-- Add a question to Temperance and answer it. Probably posterior_epred(). Probably a causation question. Meaning the expected causal effect for a certain sort of person. Which is also a parameter in the regression, which is a good connection to make. MF: Did not have time for this, but I can complete it this week. -->
 
@@ -739,7 +737,11 @@ The premise of hypothesis testing is to answer a specific question -- one that m
 
 ## Parallel lines
 
-To conclude this chapter, we will look at a four parameter model. The model we will use will measure `att_end` as a function of `liberal` and `att_start`. 
+To conclude this chapter, we will look at a four parameter model. The model we will use will measure `att_end` as a function of `liberal` or `att_start` or `treatment` or some combination of these variables. 
+
+<!-- DK: We are no longer in the business of telling you what the model should be. There are lots of models we could use! We need to explore the different models and then pick one. -->
+
+<!-- DK: There are three different four parameter models that you could make here. Let's look at all three, pick one and then use it. -->
 
 ### Wisdom
 
@@ -788,7 +790,7 @@ We are making inferences about groups of people according to their political aff
 
 When creating a parallel slops model, we use the basic equation of a line: 
 
-$$y_i = \beta_0  + \beta_1 x_1 + \beta_2 x_2$$
+$$y_i = \beta_0  + \beta_1 x_{1,i} + \beta_2 x_{2,i}$$
 
 If $y = att_end$, $x_1 = `att_start`$, $x_2 = `liberal`$, then the equations are as follows:
 
@@ -806,6 +808,8 @@ $$y = (\beta_0  + \beta_2) + \beta_1 x_1$$
 Which equates to, in `y = b + mx` form:
 
 $$y = (intercept + liberal\_true) + \beta_1 att\_start$$
+
+<!-- DK: Explain, slowly, how we interpret the coefficients, and combinations of the coefficients in the case with treatment and liberal. The intercept is the expected value for someone with FALSE for both treatment and liberal.  The expected value for someone who is both liberal and got the treatment is b_0 + b_1 + b_2. -->
 
 ### Courage
 
@@ -932,6 +936,9 @@ To interpret briefly:
 
 An important point here is that **these models are causal**. When including the variable `treatment`, we have a measured causal effect of a condition. This is different from our prior parallel slopes model, where we were modeling for prediction, not causation. 
 
+
+<!-- DK: A causal model is one in which, at least in theory, one of the righthand side variables could have been manipulated, and when you care about estimating causal effects. If someone just needs to forecast or predict something that, almost always, she is not asking a causal question, so she does not care if the righthand side variables could be manipulated. Is the sunset beautiful if no one is looking at it? Is the model causal if I just want to predict? -->
+
 To see how these models compare in performance, we will perform leave-one-out (LOO) cross validation again. 
 
 ```{r}
@@ -965,6 +972,9 @@ What we really care about is data we haven't seen yet, mostly data from tomorrow
 Having created (and checked) a model, we now use the model to answer questions. Models are made for use, not for beauty. The world confronts us. Make decisions we must. Our decisions will be better ones if we use high quality models to help make them.
 
 Preceptor's Posterior is the posterior you would calculate if all the assumptions you made under Wisdom and Justice were correct. Sadly, they never are! So, you can never know Preceptor's Posterior. Our posterior will, we hope, be a close-ish approximation of Preceptor's Posterior.
+
+
+<!-- Discuss the difference in our estimated treatment effect for this chapter and the model in chapter 8 and in the model we did not use here. There is no truth! Which is why we need to be humble and cautious when using our posterior. Be Temperate! -->
 
 <!-- att_end ~ liberal + att_start. Same thing as chapters before. Show graphic of parallel lines. Cardinal virtues as always. And, extra, at the end we can use loo_compare to see if this model is better than simpler model of att_end ~ att_start. -->
 
