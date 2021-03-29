@@ -2,6 +2,8 @@
 
 <!-- DK: Need a non-parallel lines plot, like the parallel lines plot in chapter 9. -->
 
+<!-- Too much hard coding of numbers. Need to replace with coef(whatever)[2] -->
+
 <!-- Clean up all the plots, especially the legends. -->
 
 <!-- Is fit_gov_* a good naming scheme for the models? -->
@@ -161,7 +163,7 @@ Note, also, that there are many different populations, each with its own $\mu$, 
 
 All of these populations are different, so each has a different $\mu$. Which $\mu$ we are interested in depends on the problem we are trying to solve. It is a judgment call, a matter of Wisdom, as to whether or not that data we have is "close enough" to the population we are interested in to justify making a model.
 
-Even though the original question is about "political candidates" in general, and does not specifically refer to either the United States or to elections for governor, we will assume that the data we have for US governors is, uh, *representative enough* of the population we are interested in (global politicians) that the exercise is useful. If we did not believe that, then we should stop right now. *The major part of Wisdom is deciding what questions you can't answer because of the data you don't have.*
+Even though the original question is about "political candidates" in general, and does not specifically refer to either the United States or to elections for governor, we will assume that the data we have for US governors is, uh, *representative enough* of the population we are interested in (global politicians) that the exercise is useful. If we did not believe that, then we should stop right now. *The major part of Wisdom is deciding what questions you can't answer because of the data you just don't have.*
 
 
 <!-- DK: Add more? Talk about ethics? Connect to ideal Preceptor Table? -->
@@ -218,7 +220,8 @@ The key distinction is between:
 
 Why do we use $lived\_after_i$ in this formula instead of $y_i$? The more often we remind ourselves about the variable's actual substance, the better. But there is another common convention: to always use $y_i$ as the symbol for the dependent variable. It would not be unusual to describe this model as:
 
-$$ y_i =  \beta_0 + \beta_1 election\_age_i + \epsilon_i $$
+$$ y_i =  \beta_0 + \beta_1 election\_age_i + \epsilon_i$$
+
 Both mean the same thing. 
 
 <!-- DK: Better words needed. -->
@@ -228,7 +231,7 @@ Either way, $\beta_0$ is the "intercept" of the regression, the average value fo
 $\beta_1$ is the "coefficient" of  $election\_age$. When comparing two individuals, the first with an $election\_age$ 1 year older than the second,  we expect the first to have a $lived\_after$ value $\beta_1$ different from the second. In other words, we expect the older to have fewer years remaining, because $\beta_1$ is negative. Again, this is the value for the population from which our data is drawn.  
 
 
-There are three unknown parameters --- $\beta_0$, $\beta_1$ and $\sigma$ --- just as with the models we used in Chapter \@ref(three-parameters).
+There are three unknown parameters --- $\beta_0$, $\beta_1$ and $\sigma$ --- just as with the models we used in Chapter \@ref(three-parameters). Before we get to the five parameter case, it is useful to review this earlier material.
 
 You may recall from middle school algebra that the equation of a line is $y = m x + b$. There are two parameters: $m$ and $b$. The intercept $b$ is the value of $y$ when $x = 0$. The slope coefficient $m$ for $x$ is the increase in $y$ for every increase of one in $x$. When defining a regression line, we use slightly different notation but the fundamental relationship is the same. 
 
@@ -272,7 +275,7 @@ ch10 %>%
 ```
 
 
-Consider someone who is about 40 years old on Election Day. We have a score or more data points for candidates around that age. Two died soon after the election. Some of them lived for 50 or more years after the election. *Variation fills the world.* But the fitted line tells us that, on average, we would expect a candidate that age to live for a little less than 40 years after the election. 
+Consider someone who is about 40 years old on Election Day. We have a score or more data points for candidates around that age. Two died soon after the election. Some of them lived for 50 or more years after the election. *Variation fills the world.* But the fitted line tells us that, on average, we would expect a candidate that age to live about 37 years after the election. 
 
 <!-- DK: Add a red circle to the graphic to show how we figured that out? -->
 
@@ -283,18 +286,18 @@ This model, with a continuous independent (or "predictor") variable, has an infi
 
 <!-- DK: Does this section work? If it does, we ought to do it in every chapter. If not, then why bother? It is certainly confusing to understand why sticking in the median is a good idea . . . Need to connected math to fitted values more clearly. But that might be difficult since I am hazy on how fitted values fit in a Bayesian context . . .-->
 
-We can create a formula for the fitted values by placing the median values of the parameters into the mathematical formula:
+We can create a formula for the fitted values by placing the median values of the posterior distribution of the parameters into the mathematical formula:
 
 <!-- DK: This seems sloppy. equinomatic usage case?-->
 
 
-$$ lived\_after_i =  72.7 - 0.9 election\_age_i$$
+$$lived\_after_i =  72.7 - 0.9 election\_age_i$$
 
 Consider the intercept. Since our independent variable is $election\_age_i$, the intercept is the $lived\_after_i$ value when $election\_age_i$ is zero. Here, we would interpret this intercept as the average lifespan of a gubernatorial candidate after the election, if the candidate was alive for zero years prior to the election. 
 
-This is, of course, substantively nonsense. No one runs for office on the day they are born. In the next model, we will explore ways of making the intercept more interpretable. In the meantime, the math is the math. 
+This is, of course, substantively nonsense. No one runs for office in the year they are born. In the next model, we will explore ways of making the intercept more interpretable. In the meantime, the math is the math. 
 
-Consider the coefficient for $election\_age_i$, $\beta_1$. The median of the posterior, -0.9, represents the slope of the model. For every unit increase in our independent variable, our dependent variable will change by this amount. For every additional day a candidate is alive before an election, their lifespan after the election will be 0.9 years lower, on average. If we are given the number of years a candidate lived before the election and want to estimate how long they will live for after, we will multiply the years they were alive prior by this beta of -0.9, and then combine that with the intercept. 
+Consider the coefficient for $election\_age_i$, $\beta_1$. The median of the posterior, -0.9, represents the slope of the model. For every unit increase in our independent variable, our dependent variable will change by this amount. For every additional year a candidate is alive before an election, their lifespan after the election will be 0.9 years lower, on average. If we are given the number of years a candidate lived before the election and want to estimate how long they will live for after, we will multiply the years they were alive prior by this beta of -0.9, and then combine that with the intercept. 
 
 This is a descriptive model, not a causal model. Remember our motto from Chapter \@ref(rubin-causal-model): *No causation without manipulation.* There is no way, for person $i$, to change the years that she has been alive on Election Day. On the day of this election, she is X years old. There is no way to change that. So, there are not two (or more) potential outcomes. Without more than one potential outcome, there can not be a causal effect.
 
