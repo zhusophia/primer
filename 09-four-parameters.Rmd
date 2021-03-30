@@ -332,7 +332,7 @@ In addition to being meaningful, which is enough to justify inclusion in our mod
 
 The variable `att_start`, with a coefficient of `r scales::comma(round(coef(fit_1_model)["att_start"], 1))`, is also meaningful. Due to the fact that the `MAD_SD` value here is 0, we do not need to find the 95% confidence interval to know --intuitively-- that this variable has a large and well estimated coefficient. 
 
-**Conclusion**: keep both variables! `Treatment` and `att_start` are both significant, as well as satisfying other requirements in our guidelines. They are *more* than worthy of inclusion in our model.  
+**Conclusion**: keep both variables! `treatment` and `att_start` are both significant, as well as satisfying other requirements in our guidelines. They are *more* than worthy of inclusion in our model.  
 
 ### income ~ age + liberal
 
@@ -354,35 +354,16 @@ First, let's interpret our coefficients.
 
 * The explanatory variables are `liberal`, which has a resulting value of TRUE or FALSE, and `age`, a numeric variable. 
 
-- The `(Intercept)` is estimating income where `liberal == FALSE`. Therefore, it is the estimated income for commuters that are not liberals. - The estimate for `age` is showing the increase in income with every additional year of age, starting at age 0.  
-- The estimate for `liberalTRUE` represents the offset in predicted income for commuters who *are* liberal. To find the estimate, we must add the prediction to our `(Intercept)` value. We see that, on average, liberal commuters make less money. 
+- The `(Intercept)` is estimating income where `liberal == FALSE`. Therefore, it is the estimated income for commuters that are not liberals and who have `age = 0`. The estimate for `age` is showing the increase in income with every additional year of age.  
+- The estimate for `liberalTRUE` represents the offset in predicted income for commuters who *are* liberal. To find the estimate, we must add the coefficient to our `(Intercept)` value. We see that, on average, liberal commuters make less money. 
 
 It is important to note that we are not looking at a causal relationship for either of these explanatory variables. We are noting the differences between two groups, without considering causality. This is known as an *across unit* comparison. When we compare *across unit* we are not looking at a causal relationship. 
 
 When comparing `liberalTRUE` with our `(Intercept)`, recall that the `(Intercept)` is calculating income for the case where `liberal == FALSE`. As we can see, then, the coefficient for `liberalTRUE`, `r scales::comma(round(coef(fit_2)["liberalTRUE"], 1))`, shows that the  liberals in our dataset make less on average than non-liberals in our dataset. The coefficient is large relative to the `(Intercept)` and, with rough mental math, we see that the 95% confidence interval excludes 0. Therefore, `liberal` is a helpful variable!
 
-The variable `age`, however, does not appear to have a meaningful impact on our `(Intercept)`. The coefficient of `age` is low and the 95% confidence interval *does not* exclude 0. This being said, we just learned about a bunch of helpful transformations! We also know that the variable `age`, unmodified, is calculating starting at age 0, an impossibility in our data. 
+The variable `age`, however, does not appear to have a meaningful impact on our `(Intercept)`. The coefficient of `age` is low and the 95% confidence interval *does not* exclude 0. 
 
-Recall the work above that z-scaled the variable `age` to be more significant. This is pasted below for reference. 
-
-```{r}
-trains_age <- trains %>% 
-  mutate(z_age = scale(age))
-```
-
-Let's run our regression again, this time using `z_age`, to see if the resulting value is more significant. 
-
-```{r}
-fit_scaled <- stan_glm(income ~ z_age + liberal, 
-                    data = trains_age, 
-                    refresh = 0)
-
-fit_scaled
-```
-
-Even with our transformation, `z_age` is not looking like a great addition. The 95% confidence interval, done with rough mental math, includes 0. Whether we include `age` or `z_age`  in our model is not clear, especially when compared with the variable `liberal`, which is more obviously meaningful.
-
-**Conclusion**: definitely keep `liberal`! Age is less clear. Age when z-scaled is *just* significant enough to consider including. It is really a matter of preference at this point. If age is important to our model in some way, we keep it. If it isn't relevant to our conclusions, we discard it. 
+**Conclusion**: definitely keep `liberal`! `age` is less clear. It is really a matter of preference at this point. 
 
 ### liberal ~ I(income/1e+05) + party
 
@@ -397,13 +378,13 @@ fit_3 <- stan_glm(liberal ~ I(income/1e+05) + party,
 fit_3
 ```
 
-Recall that, for logistic models, the `(Intercept)` is nearly impossible to interpret. To evaluate the impact of variables, we will need to use the Divide-by-Four rule. This instructs us to take a logistic regression coefficient (other than the constant term) and divide it by 4 to get an upper bound on the predictive difference corresponding to a unit difference in that variable. All this means is that, when evaluating if a predictor is helpful *in a logistic regression only*, divide the coefficient by four.
+Recall that, for logistic models, the `(Intercept)` is nearly impossible to interpret. To evaluate the impact of variables, we will need to use the Divide-by-Four rule. This instructs us to take a logistic regression coefficient (other than the constant term) and divide it by 4 to get an upper bound on the predictive difference corresponding to a unit difference in that variable. All this means is that, when evaluating if a predictor is helpful, *in a logistic regression only*, to divide the coefficient by four.
 
-For `partyRepublican`, we take our coefficient, `r scales::comma(round(coef(fit_3)["partyRepublican"], 1))`, and divide it by 4: `r round(((coef(fit_3)["partyRepublican"])/4), 3)`. This is the upper bound on the predictive difference corresponding to a unit difference in this variable. Therefore, we see that `partyRepublican` is meaningful. We will want this variable in our model. 
+For `partyRepublican`, we take our coefficient, `r scales::comma(round(coef(fit_3)["partyRepublican"], 1))`, and divide it by 4: `r round(((coef(fit_3)["partyRepublican"])/4), 3)`. This is the upper bound on the predictive difference corresponding to a unit difference in this variable. Therefore, we see that `partyRepublican` is meaningful. We want this variable in our model. 
 
-The variable `income`, however, seems less promising. In addition to the resulting value from the Divide-by-Four rule being low (`r round(((coef(fit_3)["I(income/1e+05)"])/4), 3)`), the `MAD_SD` for income is also equal to the median itself, indicating a large standard error. Though we may choose to include `income` for reasons unrelated to its impact in our model, it does not appear to be worthy of inclusion on the basis of predictive value alone. 
+The variable `income`, however, seems less promising. In addition to the resulting value from the Divide-by-Four rule being low (`r round(((coef(fit_3)["I(income/1e+05)"])/4), 3)`), the `MAD_SD` for income is also equal to the posterior median itself, indicating a standard error which is large relative to the magnitude of the coefficient. Though we may choose to include `income` for reasons unrelated to its impact in our model, it does not appear to be worthy of inclusion on the basis of predictive value alone. 
 
-**Conclusion**: the variable `party` is significant; we will include it in our model. Unless we have a strong reason to include `income`, it may not be helpful in creating our models. 
+**Conclusion**: the variable `party` is significant; we will include it in our model. Unless we have a strong reason to include `income`, we should exclude it. 
 
 ### Final thoughts
 
@@ -790,22 +771,22 @@ When creating a parallel slops model, we use the basic equation of a line:
 
 $$y_i = \beta_0  + \beta_1 x_{1,i} + \beta_2 x_{2,i}$$
 
-If $y = att_end$, $x_1 = `att_start`$, $x_2 = `liberal`$, then the equations are as follows:
+If $y = att\_end$, $x_1 = att\_start$, $x\_2 = liberal$, then the equations are as follows:
 
 If liberal = FALSE:
 
-$$y = \beta_0  + \beta_1 x_1 $$
+$$y_i = \beta_0  + \beta_1 x_{1,i}$$
 Which equates to, in `y = b + mx` form:
 
-$$y = intercept +  \beta_1 att\_start$$
+$$y_i = intercept +  \beta_1 att\_start_i$$
 
 If liberal = TRUE: 
 
-$$y = (\beta_0  + \beta_2) + \beta_1 x_1$$
+$$y_i = (\beta_0  + \beta_2) + \beta_1 x_{1,i}$$
 
 Which equates to, in `y = b + mx` form:
 
-$$y = (intercept + liberal\_true) + \beta_1 att\_start$$
+$$y_i = (intercept + liberal\_true) + \beta_1 att\_start_i$$
 
 <!-- DK: Explain, slowly, how we interpret the coefficients, and combinations of the coefficients in the case with treatment and liberal. The intercept is the expected value for someone with FALSE for both treatment and liberal.  The expected value for someone who is both liberal and got the treatment is b_0 + b_1 + b_2. -->
 
@@ -928,8 +909,11 @@ fit_2
 ```
 
 To interpret briefly: 
+
 * `(Intercept)` here is representing the `att_end` value for cases where `treatment does not equal Control`. 
+
 * `treamtmentControl` gives a median value which represents the *offset* in the prediction compared with the `(Intercept)`. In other words, the true intercept for cases where `treatment = Control` is represented by $(Intercept) + treatmentControl$. 
+
 * `att_start` represents the slope for both groups representing a unit change. 
 
 An important point here is that **these models are causal**. When including the variable `treatment`, we have a measured causal effect of a condition. This is different from our prior parallel slopes model, where we were modeling for prediction, not causation. 
