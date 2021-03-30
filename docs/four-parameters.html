@@ -65,17 +65,12 @@
 <h1>
 <span class="header-section-number">9</span> Four Parameters<a class="anchor" aria-label="anchor" href="#four-parameters"><i class="fas fa-link"></i></a>
 </h1>
-<!-- Add Summary section -->
+<!-- Change Justice section to discuss the math of three possible models you are considering. Predictive or am I doing causal? What is the treatment effect is my question? So, must be causal. Key point: Just because you are using treatment, does not mean that you care it is causal. You may not care. You might only want prediction. So, everything really starts with your question. If you are not asking a causal question, then you don't care if a lefthand side variable has a causal interpretation. You just care if it helps you make better predictions. -->
+<!-- Add a question to Temperance and answer it. Probably posterior_epred(). Probably a causation question. Meaning the expected causal effect for a certain sort of person. Which is also a parameter in the regression, which is a good connection to make. MF: Did not have time for this, but I can complete it this week. -->
 <!-- Transforming the outcome variable. Give some more thoughts or advice. -->
-<!-- In all the examples, provide some clear interpretation sentences. Set them off with skipped lines, and maybe in italics. -->
-<!-- Expand "interpreting coefficients" section. Difference between across-unit and within-unit. Causal versus predictive. Unless you have a set up with two or more potential outcomes, you can't do causal. You can't do intra-unit. Or is it inter-unit? I get confused!
-
-Whenever the setting is predictive --- that is, whenever it is not causal --- you are always comparing two different units (or groups of units). You are never considering a single unit. 
-
-Comparing within rows of the Preceptor Table versus across rows, which is all you can do without two potential outcomes.
-
-Also, does not work in logistic. But divide by four rule. -->
-<p>In our haste to make progress — to get all the way through the process of building, interpreting and using models — we have given short shrift to some of the messy details of model building and evaluation. This chapter fills in those lacunae. We will also introduce models with four parameters.</p>
+<!-- Comparing within rows of the Preceptor Table versus across rows, which is all you can do without two potential outcomes. -->
+<!-- Also, does not work in logistic. But divide by four rule.  -->
+<p>In our haste to make progress — to get all the way through the process of building, interpreting and using models — we have given short shrift to some of the messy details of model building and evaluation. This chapter fills in those lacunae. We will also introduce models with four parameters, including <em>parallel slopes</em> models.</p>
 <div id="transforming-variables" class="section level2" number="9.1">
 <h2>
 <span class="header-section-number">9.1</span> Transforming variables<a class="anchor" aria-label="anchor" href="#transforming-variables"><i class="fas fa-link"></i></a>
@@ -91,7 +86,7 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
 </h3>
 <p>Recall our model of <code>income</code> as a function of <code>age</code>. Mathematics:</p>
 <p><span class="math display">\[ y_i = \beta_0  + \beta_1 age_i + \epsilon_i\]</span></p>
-<p>We fit this using the <code>trains</code> data from <strong>primer.data</strong>.</p>
+<p>We fit this using the <code>trains</code> data from <strong>primer.data</strong>. We will also be using a new package, <strong>broom.mixed</strong>, which allows us to tidy regression data for plotting.</p>
 <div class="sourceCode" id="cb750"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">primer.data</span><span class="op">)</span>
@@ -130,7 +125,7 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
 ## Auxiliary parameter(s):
 ##       Median  MAD_SD 
 ## sigma 74273.6  4882.0</code></pre>
-<p>The intercept, 141,804, is the expected income for someone with <code>age_c = 0</code>, i.e., someone of an average age in the data, which is around 42.</p>
+<p>The intercept, 141,804, is the expected income for someone with <code>c_age = 0</code>, i.e., someone of an average age in the data, which is around 42.</p>
 </div>
 <div id="scaling" class="section level3" number="9.1.2">
 <h3>
@@ -306,6 +301,8 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
 <span class="header-section-number">9.1.7</span> Interpreting coefficients<a class="anchor" aria-label="anchor" href="#interpreting-coefficients"><i class="fas fa-link"></i></a>
 </h3>
 <!-- Give example of logistic regression. Intercept of logistic regression is impossible to interpret. -->
+<p>When we interpret coefficients, it is important to know the difference between <em>across unit</em> and <em>within unit</em> comparisons. When we compare <em>across unit</em>, meaning comparing Joe and George, we are not looking at a causal relationship. <em>Within unit</em> discussions, where we are comparing Joe under treatment versus Joe under control, are causal. This means that within unit interpretation is only possible in causal models, where we are studying <strong>one unit</strong> under <strong>two conditions</strong>. When we talk about two potential outcomes, we are discussing the same person or unit under two conditions.</p>
+<p>To put this in terms of the Preceptor tables, a <em>within unit</em> comparison is looking at one <strong>row</strong> of data: the data for Joe under control and the data for Joe under treatment. We are comparing <strong>one unit</strong>, or (in this case) one person, to itself under two conditions. An <em>across unit</em> comparison is looking at multiple rows of data, with a focus on differences across columns. We are looking at differences <em>without making any causal claims</em>. We are <em>predicting</em>, but we are not implying causation.</p>
 <p>The magnitude of the coefficients in linear models are relatively easy to understand. That is not true for logistic regressions. In that case, use the Divide-by-Four rule: Take a logistic regression coefficient (other than the constant term) and divide it by 4 to get an upper bound on the predictive difference corresponding to a unit difference in that variable. All this means is that, when evaluating if a predictor is helpful <em>in a logistic regression only</em>, divide the coefficient by four.</p>
 <!-- * Creating new variables, especially by combining different ones into one combined variable. -->
 </div>
@@ -368,7 +365,14 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
 ## ------
 ## * For help interpreting the printed output see ?print.stanreg
 ## * For info on the priors used see ?prior_summary.stanreg</code></pre>
-<p>How do we decide which variables are useful? First, let’s look at our intercept. The 95% confidence interval for <code>att_end</code> is equal to the coefficient– 2– plus or minus two standard errors.</p>
+<p>How do we decide which variables are useful? First, let’s interpret our coefficients.</p>
+<ul>
+<li><p>The variable before the tilde, <code>att_end</code>, is our outcome.</p></li>
+<li><p>The explanatory variables are <code>treatment</code>, which says whether a commuter relieved treatment or control conditions, and <code>att_start</code>, which measures attitude at the start of the study.</p></li>
+<li><p>The 95% confidence interval for <code>att_end</code> is equal to the coefficient– 2– plus or minus two standard errors. This shows the estimate for the <code>att_end</code> where the commuters were under treatment and <strong>were not</strong> in the control group.</p></li>
+<li><p>The variable <code>treatmentControl</code> represents the <em>offset</em> in <code>att_end</code> from the estimate for our <code>(Intercept)</code>. This offset is for the group of people that were in the Control group. To find the estimated <code>att_end</code> for those in this group, you must add the median for <code>treatmentControl</code> to the <code>(Intercept)</code> median.</p></li>
+<li><p>The variable <code>att_start</code> measures the expected difference in <code>att_end</code> for every one unit increase in <code>att_start</code>.</p></li>
+</ul>
 <p>The causal effect of the variable <code>treatmentControl</code> is -1. This means that, compared with the predicted <code>att_end</code> for groups under treatment, those in the control group have a predicted attitude that is one entire point lower. As we can see, this is a large and well estimated coefficient. Recall that this means, roughly, that the 95% confidence interval excludes zero. To calculate the 95% confidence interval, we take the coefficient plus or minus two standard errors: -1.3 and -0.5. As we can see, the 95% confidence interval <em>does</em> exclude zero, suggesting that <code>treatment</code> is a worthy variable.</p>
 <p>In addition to being meaningful, which is enough to justify inclusion in our model, this variable satisfies a number of other qualifications:
 - The variable has a small standard error.
@@ -406,6 +410,14 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
 ## * For help interpreting the printed output see ?print.stanreg
 ## * For info on the priors used see ?prior_summary.stanreg</code></pre>
 <p>Great! We have an estimate for income of those who fall into the category of <code>liberalFALSE</code>, as well as data on our right hand side variables of <code>age</code> and <code>liberalTRUE</code>.</p>
+<p>First, let’s interpret our coefficients.</p>
+<ul>
+<li><p>The variable before the tilde, <code>income</code>, is our outcome.</p></li>
+<li><p>The explanatory variables are <code>liberal</code>, which has a resulting value of TRUE or FALSE, and <code>age</code>, a numeric variable.</p></li>
+<li><p>The <code>(Intercept)</code> is estimating income where <code>liberal == FALSE</code>. Therefore, it is the estimated income for commuters that are not liberals. - The estimate for <code>age</code> is showing the increase in income with every additional year of age, starting at age 0.<br></p></li>
+<li><p>The estimate for <code>liberalTRUE</code> represents the offset in predicted income for commuters who <em>are</em> liberal. To find the estimate, we must add the prediction to our <code>(Intercept)</code> value. We see that, on average, liberal commuters make less money.</p></li>
+</ul>
+<p>It is important to note that we are not looking at a causal relationship for either of these explanatory variables. We are noting the differences between two groups, without considering causality. This is known as an <em>across unit</em> comparison. When we compare <em>across unit</em> we are not looking at a causal relationship.</p>
 <p>When comparing <code>liberalTRUE</code> with our <code>(Intercept)</code>, recall that the <code>(Intercept)</code> is calculating income for the case where <code>liberal == FALSE</code>. As we can see, then, the coefficient for <code>liberalTRUE</code>, -31,754, shows that the liberals in our dataset make less on average than non-liberals in our dataset. The coefficient is large relative to the <code>(Intercept)</code> and, with rough mental math, we see that the 95% confidence interval excludes 0. Therefore, <code>liberal</code> is a helpful variable!</p>
 <p>The variable <code>age</code>, however, does not appear to have a meaningful impact on our <code>(Intercept)</code>. The coefficient of <code>age</code> is low and the 95% confidence interval <em>does not</em> exclude 0. This being said, we just learned about a bunch of helpful transformations! We also know that the variable <code>age</code>, unmodified, is calculating starting at age 0, an impossibility in our data.</p>
 <p>Recall the work above that z-scaled the variable <code>age</code> to be more significant. This is pasted below for reference.</p>
@@ -690,8 +702,7 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
 ## * For info on the priors used see ?prior_summary.stanreg</code></pre>
 <p>Now, we will perform <code><a href="https://mc-stan.org/rstanarm/reference/loo.stanreg.html">loo()</a></code> on our model and look at the results.</p>
 <div class="sourceCode" id="cb786"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">loo_liberal</span> <span class="op">&lt;-</span> <span class="va">fit_liberal</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/loo.stanreg.html">loo</a></span><span class="op">(</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">loo_liberal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/loo.stanreg.html">loo</a></span><span class="op">(</span><span class="va">fit_liberal</span><span class="op">)</span>
 
 <span class="va">loo_liberal</span></code></pre></div>
 <pre><code>## 
@@ -740,8 +751,7 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
 ## * For info on the priors used see ?prior_summary.stanreg</code></pre>
 <p>Great! Now, let’s perform <code><a href="https://mc-stan.org/rstanarm/reference/loo.stanreg.html">loo()</a></code> on this model.</p>
 <div class="sourceCode" id="cb790"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">loo_att_start</span> <span class="op">&lt;-</span> <span class="va">fit_att_start</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/loo.stanreg.html">loo</a></span><span class="op">(</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">loo_att_start</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/loo.stanreg.html">loo</a></span><span class="op">(</span><span class="va">fit_att_start</span><span class="op">)</span> 
 
 <span class="va">loo_att_start</span></code></pre></div>
 <pre><code>## 
@@ -766,10 +776,12 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
 <p>To compare the two models directly, we can use the function <code>loo_compare</code> with our two <code>loo</code> objects created above. This will calculate the difference in <code>elpd_loo()</code> between our models for us, making our job easier:</p>
 <div class="sourceCode" id="cb792"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://mc-stan.org/rstanarm/reference/loo.stanreg.html">loo_compare</a></span><span class="op">(</span><span class="va">loo_att_start</span>, <span class="va">loo_liberal</span><span class="op">)</span></code></pre></div>
-<pre><code>##   elpd_diff se_diff
-## .   0.0       0.0  
-## . -77.7      12.0</code></pre>
-<p>The value for <code>elpd_diff</code> is equal to the difference in <code>elpd_loo</code> between our two models: elpd_loo for loo_att_start - elpd_loo for loo_liberal = -279.4 - (-201.7) = -77.7. The <code>se_diff</code> shows that the difference has a standard error of 12.0. This shows that, even when accounting for standard error, the better model is clear: <code>fit_att_start</code>. Therefore, the attitude at the start of the <code>trains</code> study is more significant to predicting final attitude when compared with the variable <code>liberal</code>, which is an analog for political affiliation.</p>
+<pre><code>##               elpd_diff se_diff
+## fit_att_start   0.0       0.0  
+## fit_liberal   -77.7      12.0</code></pre>
+<p>The value for <code>elpd_diff</code> is equal to the difference in <code>elpd_loo</code> between our two models. The<code>se_diff</code> shows that the difference in standard error.</p>
+<p>To interpret the results directly, it is important to note that the first row will be the superior model. The values of <code>elpd_diff</code> and <code>att_start</code> will be 0, as these columns show the offset in the estimates compared to the better model. To reiterate: when the better model is compared to itself, those values will be 0. The following rows show the offset in <code>elpd</code> and <code>se</code> values between the less effective model, <code>fit_liberal</code>, and the more effective model, <code>fit_att_start</code>.</p>
+<p>The better model is clear: <code>fit_att_start</code>. Therefore, the attitude at the start of the <code>trains</code> study is more significant to predicting final attitude when compared with the variable <code>liberal</code>, which is an analog for political affiliation.</p>
 <p>As we have seen, <code>loo_compare</code> is a shortcut for comparing two models. When you are deciding between two models, <code><a href="https://mc-stan.org/rstanarm/reference/loo.stanreg.html">loo_compare()</a></code> is a great way to simplify your decision.</p>
 <p>What do we do when the value of <code><a href="https://mc-stan.org/rstanarm/reference/loo.stanreg.html">loo_compare()</a></code> is small? As a general practice, differences smaller than four are hard to distinguish from noise. In other words: when <code>elpd_diff</code> is less than 4, there is no advantage to one model over the other.</p>
 <!-- ### Selecting the rows -->
@@ -791,7 +803,9 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
 <h2>
 <span class="header-section-number">9.6</span> Parallel lines<a class="anchor" aria-label="anchor" href="#parallel-lines"><i class="fas fa-link"></i></a>
 </h2>
-<p>To conclude this chapter, we will look at a four parameter model. The model we will use will measure <code>att_end</code> as a function of <code>liberal</code> and <code>att_start</code>.</p>
+<p>To conclude this chapter, we will look at a four parameter model. The model we will use will measure <code>att_end</code> as a function of <code>liberal</code> or <code>att_start</code> or <code>treatment</code> or some combination of these variables.</p>
+<!-- DK: We are no longer in the business of telling you what the model should be. There are lots of models we could use! We need to explore the different models and then pick one. -->
+<!-- DK: There are three different four parameter models that you could make here. Let's look at all three, pick one and then use it. -->
 <div id="wisdom-6" class="section level3" number="9.6.1">
 <h3>
 <span class="header-section-number">9.6.1</span> Wisdom<a class="anchor" aria-label="anchor" href="#wisdom-6"><i class="fas fa-link"></i></a>
@@ -811,16 +825,51 @@ FIGURE 9.1: Wisdom
        y <span class="op">=</span> <span class="st">"Attitude at End of Study"</span>,
        color <span class="op">=</span> <span class="st">"Liberal?"</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-634-1.png" width="100%"></div>
-<p>Is that data believable? Maybe? One could imagine that <code>att_end</code> would be predicted fairly well by <code>att_start</code>. This makes sense for most of our datapoints, which show not much difference between the attitudes. But what about the great disparities in attitude shown for the individual with a starting attitude of 9 and an ending attitude around 15? In a real data science project, this would require further investigation. For now, we ignore the issue and blithely press on.</p>
+<p>Is that data believable? Maybe? One could imagine that <code>att_end</code> would be predicted fairly well by <code>att_start</code>. This makes sense for most of our data points, which show not much difference between the attitudes. But what about the great disparities in attitude shown for the individual with a starting attitude of 9 and an ending attitude around 15? In a real data science project, this would require further investigation. For now, we ignore the issue and blithely press on.</p>
+<p>Another component of Wisdom is the population. The concept of the “population” is subtle and important. <em>The population is not the set of commuters for which we have data.</em> That is the dataset. The population is the larger — potentially much larger — set of individuals about whom we want to make inferences. <em>The parameters in our models refer to the population, not to the dataset.</em></p>
+<p>There are many different populations, each with its own <span class="math inline">\(\mu\)</span>, in which we might be interested. For instance:</p>
+<ul>
+<li><p>The population of Boston commuters on the specific train and time included in our dataset.</p></li>
+<li><p>The population of <em>all</em> Boston commuters.</p></li>
+<li><p>The population of commuters in the United States.</p></li>
+</ul>
+<p>All of these populations are different, so each has a different <span class="math inline">\(\mu\)</span>. Which <span class="math inline">\(\mu\)</span> we are interested in depends on the problem we are trying to solve. It is a judgment call, a matter of Wisdom, as to whether or not that data we have is “close enough” to the population we are interested in to justify making a model.</p>
+<p><strong>The major part of Wisdom is deciding what questions you can’t answer because of the data you don’t have.</strong></p>
 </div>
-<div id="courage-6" class="section level3" number="9.6.2">
+<div id="justice-6" class="section level3" number="9.6.2">
 <h3>
-<span class="header-section-number">9.6.2</span> Courage<a class="anchor" aria-label="anchor" href="#courage-6"><i class="fas fa-link"></i></a>
+<span class="header-section-number">9.6.2</span> Justice<a class="anchor" aria-label="anchor" href="#justice-6"><i class="fas fa-link"></i></a>
 </h3>
 <div class="figure">
 <span id="fig:unnamed-chunk-635"></span>
+<img src="other/images/Justice.jpg" alt="Justice" width="100%"><p class="caption">
+FIGURE 9.2: Justice
+</p>
+</div>
+<p>Now that we have considered the connection between our data and the predictions we seek to make, we will need to consider our model.</p>
+<p>First: is our model causal or predictive? Recall that our model measures <code>att_end</code> as a function of <code>liberal</code> and <code>att_start</code>. The variables <code>liberal</code> and <code>att_start</code> do not involve a control or treatment dynamic. There is no manipulation with these variables. Given that <strong>there is no causation without manipulation</strong>, this is a predictive model.</p>
+<p>We are making inferences about groups of people according to their political affiliation and starting attitude. We are not measuring causality, but we <em>are</em> predicting outcomes.</p>
+<p>When creating a parallel slops model, we use the basic equation of a line:</p>
+<p><span class="math display">\[y_i = \beta_0  + \beta_1 x_{1,i} + \beta_2 x_{2,i}\]</span></p>
+<p>If <span class="math inline">\(y = att_end\)</span>, <span class="math inline">\(x_1 = `att_start`\)</span>, <span class="math inline">\(x_2 = `liberal`\)</span>, then the equations are as follows:</p>
+<p>If liberal = FALSE:</p>
+<p><span class="math display">\[y = \beta_0  + \beta_1 x_1 \]</span>
+Which equates to, in <code>y = b + mx</code> form:</p>
+<p><span class="math display">\[y = intercept +  \beta_1 att\_start\]</span></p>
+<p>If liberal = TRUE:</p>
+<p><span class="math display">\[y = (\beta_0  + \beta_2) + \beta_1 x_1\]</span></p>
+<p>Which equates to, in <code>y = b + mx</code> form:</p>
+<p><span class="math display">\[y = (intercept + liberal\_true) + \beta_1 att\_start\]</span></p>
+<!-- DK: Explain, slowly, how we interpret the coefficients, and combinations of the coefficients in the case with treatment and liberal. The intercept is the expected value for someone with FALSE for both treatment and liberal.  The expected value for someone who is both liberal and got the treatment is b_0 + b_1 + b_2. -->
+</div>
+<div id="courage-6" class="section level3" number="9.6.3">
+<h3>
+<span class="header-section-number">9.6.3</span> Courage<a class="anchor" aria-label="anchor" href="#courage-6"><i class="fas fa-link"></i></a>
+</h3>
+<div class="figure">
+<span id="fig:unnamed-chunk-636"></span>
 <img src="other/images/Courage.jpg" alt="Courage" width="100%"><p class="caption">
-FIGURE 9.2: Courage
+FIGURE 9.3: Courage
 </p>
 </div>
 <p>The use of <code>stan_glm</code> is the same as usual. Using <code>stan_glm</code>, we will create our model, <code>fit_1</code>.</p>
@@ -849,20 +898,8 @@ FIGURE 9.2: Courage
 ## ------
 ## * For help interpreting the printed output see ?print.stanreg
 ## * For info on the priors used see ?prior_summary.stanreg</code></pre>
-<p>To remind ourselves, recall that the <code>(Intercept)</code> here is representing the <code>att_end</code> value for cases where <code>liberal = FALSE</code>. The next row, <code>liberalTRUE</code> gives a median value which represents the <em>offset</em> in the prediction compared with the <code>(Intercept)</code>. In other words, the true intercept for cases where <code>liberal = TRUE</code> is represented by <span class="math inline">\((Intercept) + liberalTRUE\)</span>. The value of <code>att_start</code> is the slope for our two cases. For each one unit increase of <code>att_start</code>, we see an increase of <code>att_end</code> by the median value.</p>
-</div>
-<div id="justice-6" class="section level3" number="9.6.3">
-<h3>
-<span class="header-section-number">9.6.3</span> Justice<a class="anchor" aria-label="anchor" href="#justice-6"><i class="fas fa-link"></i></a>
-</h3>
-<div class="figure">
-<span id="fig:unnamed-chunk-637"></span>
-<img src="other/images/Justice.jpg" alt="Justice" width="100%"><p class="caption">
-FIGURE 9.3: Justice
-</p>
-</div>
-<p>Now that we know what our data is showing us, we will need to tidy our data and extract values to create a parallel slopes model. The parallel slopes model allows us to visualize multi-variate Bayesian modeling (i.e. modeling with more than one explanatory variable). That is a complicated way of saying that we will visualize the fitted model created above in a way that allows us to see the intercepts and slopes for two different groups, <code>liberalTRUE</code> and <code>liberalFALSE</code>.</p>
-<p>The mathematics for this model will be explained after tidying our data and extracting it.</p>
+<p>To remind ourselves, recall that the <code>(Intercept)</code> here is representing the <code>att_end</code> value for cases where <code>liberal = FALSE</code> and <code>treatment does not equal Control</code>. The next row, <code>liberalTRUE</code> gives a median value which represents the <em>offset</em> in the prediction compared with the <code>(Intercept)</code>. In other words, the true intercept for cases where <code>liberal = TRUE</code> is represented by <span class="math inline">\((Intercept) + liberalTRUE\)</span>. The value of <code>treatmentControl</code> is the offset in <code>att_end</code> for those in the Control group.</p>
+<p>To find our intercepts, we will need to tidy our regression using the <code><a href="https://generics.r-lib.org/reference/tidy.html">tidy()</a></code> function from the <strong>broom.mixed</strong> package. We tidy our data and extract values to create a parallel slopes model. The parallel slopes model allows us to visualize multi-variate Bayesian modeling (i.e. modeling with more than one explanatory variable). That is a complicated way of saying that we will visualize the fitted model created above in a way that allows us to see the intercepts and slopes for two different groups, <code>liberalTRUE</code> and <code>liberalFALSE</code>:</p>
 <div class="sourceCode" id="cb797"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># First, we will tidy the data from our model and select the term and estimate.</span>
 <span class="co"># This allows us to create our regression lines more easily.</span>
@@ -886,18 +923,7 @@ FIGURE 9.3: Justice
 <span class="va">intercept</span> <span class="op">&lt;-</span> <span class="va">tidy</span><span class="op">$</span><span class="va">estimate</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>
 <span class="va">liberal_true</span> <span class="op">&lt;-</span> <span class="va">tidy</span><span class="op">$</span><span class="va">estimate</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>
 <span class="va">att_start</span> <span class="op">&lt;-</span> <span class="va">tidy</span><span class="op">$</span><span class="va">estimate</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span></code></pre></div>
-<p>Now that we have extracted the estimated values of each coefficient, we can plug them into the following equation in order to find the equation of the line if liberal = TRUE and the equation of the line if liberal = FALSE:</p>
-<p><span class="math display">\[y_i = \beta_0  + \beta_1 x_1 + \beta_2 x_2\]</span></p>
-<p>If <span class="math inline">\(y = att_end\)</span>, <span class="math inline">\(x_1 = `att_start`\)</span>, <span class="math inline">\(x_2 = `liberal`\)</span>, then the equations are as follows:</p>
-<p>If liberal = FALSE:</p>
-<p><span class="math display">\[y = \beta_0  + \beta_1 x_1 \]</span>
-Which equates to, in <code>y = b + mx</code> form:</p>
-<p><strong>y = intercept + att_start(att_start)</strong></p>
-<p>If liberal = TRUE:</p>
-<p><span class="math display">\[y = (\beta_0  + \beta_2) + \beta_1 x_1 \]</span>
-Which equates to, in <code>y = b + mx</code> form:</p>
-<p><strong>y = (intercept + liberal_true) + att_start(att_start)</strong></p>
-<p>Thus, we can define the following terms—- <code>liberal_false_intercept</code> and <code>liberal_false_att_slope</code>; and <code>liberal_true_intercept</code> and <code>liberal_true_att_slope</code>:</p>
+<p>Now, we can define the following terms—- <code>liberal_false_intercept</code> and <code>liberal_false_att_slope</code>; and <code>liberal_true_intercept</code> and <code>liberal_true_att_slope</code>:</p>
 <div class="sourceCode" id="cb800"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Recall that the (Intercept) shows us the estimate for the case where liberal =</span>
 <span class="co"># FALSE. We want to extract the liberal_false_intercept to indicate where the</span>
@@ -915,7 +941,7 @@ Which equates to, in <code>y = b + mx</code> form:</p>
 <span class="va">liberal_true_att_slope</span> <span class="op">&lt;-</span> <span class="va">att_start</span></code></pre></div>
 <p>All we’ve done here is extracted the values for our intercepts and slopes, and named them to be separated into two groups. This allows us to create a <code>geom_abline</code> object that takes a unique slope and intercept value, so we can separate the <code>liberalTRUE</code> and <code>liberalFALSE</code> observations.</p>
 <div class="sourceCode" id="cb801"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># From the dataset trains, call attitude start for the x-axis and att_end for</span>
+<code class="sourceCode R"><span class="co"># From the dataset trains, use att_start for the x-axis and att_end for</span>
 <span class="co"># the y-axis with color as liberal. This will split our data into two color</span>
 <span class="co"># coordinates (one for liberal = TRUE and one for liberal = FALSE)</span>
 
@@ -929,17 +955,17 @@ Which equates to, in <code>y = b + mx</code> form:</p>
   <span class="co"># equal to our previously created liberal_false_intercept, while setting slope</span>
   <span class="co"># equal to our previously created liberal_false_att_slope. The color call is</span>
   <span class="co"># for coral, to match the colors used by tidyverse for geom_point().</span>
+  
   <span class="fu">geom_abline</span><span class="op">(</span>intercept <span class="op">=</span> <span class="va">liberal_false_intercept</span>,
               slope <span class="op">=</span> <span class="va">liberal_false_att_slope</span>, 
               color <span class="op">=</span> <span class="st">"#F8766D"</span>, 
               size <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span>
   
-    <span class="co"># Create a geom_abline object for the liberal TRUE values. Set the</span>
-    <span class="co"># intercept equal to our previously created liberal_true_intercept, while</span>
-    <span class="co"># setting slope equal to our previously created liberal_true_att_slope. The</span>
-    <span class="co"># color call is for teal, to match the colors used by tidyverse for</span>
-    <span class="co"># geom_point().</span>
-  
+  <span class="co"># Create a geom_abline object for the liberal TRUE values. Set the intercept</span>
+  <span class="co"># equal to our previously created liberal_true_intercept, while setting slope</span>
+  <span class="co"># equal to our previously created liberal_true_att_slope. The color call is</span>
+  <span class="co"># for teal, to match the colors used by tidyverse for geom_point().</span>
+
   <span class="fu">geom_abline</span><span class="op">(</span>intercept <span class="op">=</span> <span class="va">liberal_true_intercept</span>,
               slope <span class="op">=</span> <span class="va">liberal_true_att_slope</span>,
               color <span class="op">=</span> <span class="st">"#00BFC4"</span>, 
@@ -950,52 +976,126 @@ Which equates to, in <code>y = b + mx</code> form:</p>
   <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Parallel Slopes Model"</span>,
        x <span class="op">=</span> <span class="st">"Attitude at Start"</span>, 
        y <span class="op">=</span> <span class="st">"Attitude at End"</span>, 
-       color <span class="op">=</span> <span class="st">"Liberal?"</span><span class="op">)</span> </code></pre></div>
+       color <span class="op">=</span> <span class="st">"Liberal"</span><span class="op">)</span> </code></pre></div>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-640-1.png" width="100%"></div>
 <p>This is our parallel slopes model. What we have done, essentially, is created a unique line for <code>liberalTRUE</code> and <code>liberalFALSE</code> to observe the differences in the groups as related to attitude start and attitude end.</p>
 <p>As we can see, commuters who are <em>not</em> liberal tend to start with slightly higher values for <code>att_start</code>. Commuters who <em>are</em> liberal tend to have lower starting values for <code>att_start</code>.</p>
-<p>Visualizing Bayesian multi-variate regression models is certainly a more involved process, as we do not automatically get singular point estimates for our intercepts and slopes with Bayes, and as we do not have a special method = “lm” argument or <code>gg_parallel_slopes()</code> function with Bayes. And, as we have seen, all of our work in visualizing Bayesian models results in very similar graphs to the above Frequentist ones. However, it is still very, very useful to know how to visualize Bayesian models, as only Bayesian models allow us to make probabilistic inferences about those models’ parameters.</p>
+<p>Now, what if we want to look at another model? To judge whether we can have a superior model? Let’s create another object, using <code>stan_glm</code>, that looks at <code>att_end</code> as a function of <code>treatment</code> and <code>att_start</code>.</p>
+<div class="sourceCode" id="cb802"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">fit_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">att_end</span> <span class="op">~</span> <span class="va">treatment</span> <span class="op">+</span> <span class="va">att_start</span>,
+                  data <span class="op">=</span> <span class="va">trains</span>,
+                  refresh <span class="op">=</span> <span class="fl">0</span>,
+                  seed <span class="op">=</span> <span class="fl">56</span><span class="op">)</span>
+
+<span class="va">fit_2</span></code></pre></div>
+<pre><code>## stan_glm
+##  family:       gaussian [identity]
+##  formula:      att_end ~ treatment + att_start
+##  observations: 115
+##  predictors:   3
+## ------
+##                  Median MAD_SD
+## (Intercept)       2.4    0.4  
+## treatmentControl -1.0    0.2  
+## att_start         0.8    0.0  
+## 
+## Auxiliary parameter(s):
+##       Median MAD_SD
+## sigma 1.3    0.1   
+## 
+## ------
+## * For help interpreting the printed output see ?print.stanreg
+## * For info on the priors used see ?prior_summary.stanreg</code></pre>
+<p>To interpret briefly:
+* <code>(Intercept)</code> here is representing the <code>att_end</code> value for cases where <code>treatment does not equal Control</code>.
+* <code>treamtmentControl</code> gives a median value which represents the <em>offset</em> in the prediction compared with the <code>(Intercept)</code>. In other words, the true intercept for cases where <code>treatment = Control</code> is represented by <span class="math inline">\((Intercept) + treatmentControl\)</span>.
+* <code>att_start</code> represents the slope for both groups representing a unit change.</p>
+<p>An important point here is that <strong>these models are causal</strong>. When including the variable <code>treatment</code>, we have a measured causal effect of a condition. This is different from our prior parallel slopes model, where we were modeling for prediction, not causation.</p>
+<!-- DK: A causal model is one in which, at least in theory, one of the righthand side variables could have been manipulated, and when you care about estimating causal effects. If someone just needs to forecast or predict something that, almost always, she is not asking a causal question, so she does not care if the righthand side variables could be manipulated. Is the sunset beautiful if no one is looking at it? Is the model causal if I just want to predict? -->
+<p>To see how these models compare in performance, we will perform leave-one-out (LOO) cross validation again.</p>
+<div class="sourceCode" id="cb804"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">L1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/loo.stanreg.html">loo</a></span><span class="op">(</span><span class="va">fit_1</span><span class="op">)</span>
+
+<span class="va">L1</span></code></pre></div>
+<pre><code>## 
+## Computed from 4000 by 115 log-likelihood matrix
+## 
+##          Estimate   SE
+## elpd_loo   -202.3 13.1
+## p_loo         5.5  2.3
+## looic       404.6 26.1
+## ------
+## Monte Carlo SE of elpd_loo is 0.1.
+## 
+## Pareto k diagnostic values:
+##                          Count Pct.    Min. n_eff
+## (-Inf, 0.5]   (good)     114   99.1%   2531      
+##  (0.5, 0.7]   (ok)         1    0.9%   157       
+##    (0.7, 1]   (bad)        0    0.0%   &lt;NA&gt;      
+##    (1, Inf)   (very bad)   0    0.0%   &lt;NA&gt;      
+## 
+## All Pareto k estimates are ok (k &lt; 0.7).
+## See help('pareto-k-diagnostic') for details.</code></pre>
+<p>Perform <code><a href="https://mc-stan.org/rstanarm/reference/loo.stanreg.html">loo()</a></code> on our second model:</p>
+<div class="sourceCode" id="cb806"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">L2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/loo.stanreg.html">loo</a></span><span class="op">(</span><span class="va">fit_2</span><span class="op">)</span>
+
+<span class="va">L2</span></code></pre></div>
+<pre><code>## 
+## Computed from 4000 by 115 log-likelihood matrix
+## 
+##          Estimate   SE
+## elpd_loo   -195.3 12.2
+## p_loo         5.1  1.8
+## looic       390.5 24.5
+## ------
+## Monte Carlo SE of elpd_loo is 0.1.
+## 
+## Pareto k diagnostic values:
+##                          Count Pct.    Min. n_eff
+## (-Inf, 0.5]   (good)     114   99.1%   1625      
+##  (0.5, 0.7]   (ok)         1    0.9%   206       
+##    (0.7, 1]   (bad)        0    0.0%   &lt;NA&gt;      
+##    (1, Inf)   (very bad)   0    0.0%   &lt;NA&gt;      
+## 
+## All Pareto k estimates are ok (k &lt; 0.7).
+## See help('pareto-k-diagnostic') for details.</code></pre>
+<p>Recall that the relevant data is the data from <code>elpd_loo</code>. The estimates for <code>elpd_loo</code> vary quite a bit. Recall that the superior model will have a value of <code>elpd_loo()</code> that is closer to 0. The standard error (SE) for these models also differs some. To compare these directly, we will use <code>loo_compare</code>.</p>
+<div class="sourceCode" id="cb808"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://mc-stan.org/rstanarm/reference/loo.stanreg.html">loo_compare</a></span><span class="op">(</span><span class="va">L1</span>, <span class="va">L2</span><span class="op">)</span></code></pre></div>
+<pre><code>##       elpd_diff se_diff
+## fit_2  0.0       0.0   
+## fit_1 -7.0       3.8</code></pre>
+<p>Recall that, with <code><a href="https://mc-stan.org/rstanarm/reference/loo.stanreg.html">loo_compare()</a></code>, the resulting data shows the superior model first, with values of 0 for <code>elpd_diff</code> and <code>se_diff</code>, since it compares the models to the best option. The values of <code>elpd_diff</code> and <code>se_diff</code> for <code>fit_1</code> show the difference in the models. As we can see, <code>fit_2</code>, the model which looks at <code>treatment</code> + <code>att_start</code>, is better.</p>
+<p>But how certain can we be that it is better? Note that the difference between the two models is not quite two standard errors. So, there is a reasonable possibility that the difference is due to chance.</p>
+<!-- DK: Say more here! -->
 </div>
 <div id="temperance-6" class="section level3" number="9.6.4">
 <h3>
 <span class="header-section-number">9.6.4</span> Temperance<a class="anchor" aria-label="anchor" href="#temperance-6"><i class="fas fa-link"></i></a>
 </h3>
+<p>What we really care about is data we haven’t seen yet, mostly data from tomorrow. But what if the world changes, as it always does? If it doesn’t change much, maybe we are OK. If it changes a lot, then what good will our model be? In general, the world changes some. That means that are forecasts are more uncertain that a naive use of our model might suggest.
+Having created (and checked) a model, we now use the model to answer questions. Models are made for use, not for beauty. The world confronts us. Make decisions we must. Our decisions will be better ones if we use high quality models to help make them.</p>
+<p>Preceptor’s Posterior is the posterior you would calculate if all the assumptions you made under Wisdom and Justice were correct. Sadly, they never are! So, you can never know Preceptor’s Posterior. Our posterior will, we hope, be a close-ish approximation of Preceptor’s Posterior.</p>
+<!-- Discuss the difference in our estimated treatment effect for this chapter and the model in chapter 8 and in the model we did not use here. There is no truth! Which is why we need to be humble and cautious when using our posterior. Be Temperate! -->
 <!-- att_end ~ liberal + att_start. Same thing as chapters before. Show graphic of parallel lines. Cardinal virtues as always. And, extra, at the end we can use loo_compare to see if this model is better than simpler model of att_end ~ att_start. -->
 <!-- What is the expected difference in attitude end between a liberal with start 6 and a non liberal with start 10? Do that by hand with posterior_epred. Then show how you can get a similar answer just by interpreting coefficents. -->
-</div>
-<div id="comparing-complex-and-simple-models" class="section level3" number="9.6.5">
-<h3>
-<span class="header-section-number">9.6.5</span> Comparing complex and simple models<a class="anchor" aria-label="anchor" href="#comparing-complex-and-simple-models"><i class="fas fa-link"></i></a>
-</h3>
-<p>Complex:</p>
-<div class="sourceCode" id="cb802"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">fit_first</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">att_end</span> <span class="op">~</span> <span class="va">liberal</span> <span class="op">+</span> <span class="va">att_start</span>,
-                  data <span class="op">=</span> <span class="va">trains</span>,
-                  refresh <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
-<p>Simple:</p>
-<div class="sourceCode" id="cb803"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">fit_simple</span><span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">att_end</span> <span class="op">~</span> <span class="va">att_start</span>,
-                  data <span class="op">=</span> <span class="va">trains</span>,
-                  refresh <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
-<p>Make loo() regression for both:</p>
-<div class="sourceCode" id="cb804"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">loo_first</span> <span class="op">&lt;-</span> <span class="va">fit_first</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/loo.stanreg.html">loo</a></span><span class="op">(</span><span class="op">)</span>
-
-<span class="va">loo_simple</span> <span class="op">&lt;-</span> <span class="va">fit_simple</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/loo.stanreg.html">loo</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<p>Perform loo_compare:</p>
-<div class="sourceCode" id="cb805"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://mc-stan.org/rstanarm/reference/loo.stanreg.html">loo_compare</a></span><span class="op">(</span><span class="va">loo_first</span>, <span class="va">loo_simple</span><span class="op">)</span></code></pre></div>
-<pre><code>##   elpd_diff se_diff
-## .  0.0       0.0   
-## . -0.6       1.3</code></pre>
 </div>
 </div>
 <div id="summary-9" class="section level2" number="9.7">
 <h2>
 <span class="header-section-number">9.7</span> Summary<a class="anchor" aria-label="anchor" href="#summary-9"><i class="fas fa-link"></i></a>
 </h2>
+<p>In this chapter, we covered a number of topics important to effectively creating models.</p>
+<p><em>Key commands</em>:
+- Create a model using <code><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm()</a></code>.
+- After creating a model, we can use <code><a href="https://mc-stan.org/rstanarm/reference/loo.stanreg.html">loo()</a></code> to perform leave-one-out cross validation. This assesses how effectively our model makes predictions for data it has not seen yet.
+- The command <code><a href="https://mc-stan.org/rstanarm/reference/loo.stanreg.html">loo_compare()</a></code> allows us to compare two models, to see which one performs better in leave-one-out cross validation. The superior model makes better predictions.</p>
+<p><em>Remember</em>:
+- We can transform variables – through centering, scaling, taking logs, etc. – to make them more sensible. Consider using a transformation if the intercept is awkward. For instance, if the intercept for <code>age</code> represents the estimate for people of age zero, we might consider transforming <code>age</code> to be easier to interpret.
+- When selecting variables to include in our model, follow this rule: keep it if the variable has a large and well-estimated coefficient. This means that the 95% confidence interval excludes zero. Speaking roughly, removing a variable with a large coefficient meaningfully changes the predictions of the model.
+- When we compare <em>across unit</em>, meaning comparing Joe and George, we are not looking at a causal relationship. <em>Within unit</em> discussions, where we are comparing Joe under treatment versus Joe under control, are causal. This means that within unit interpretation is only possible in causal models, where we are studying <strong>one unit</strong> under <strong>two conditions</strong>.
+- When we talk about two potential outcomes, we are discussing the same person or unit under two conditions.</p>
 
 </div>
 </div>
@@ -1044,10 +1144,9 @@ Which equates to, in <code>y = b + mx</code> form:</p>
 <li>
 <a class="nav-link" href="#parallel-lines"><span class="header-section-number">9.6</span> Parallel lines</a><ul class="nav navbar-nav">
 <li><a class="nav-link" href="#wisdom-6"><span class="header-section-number">9.6.1</span> Wisdom</a></li>
-<li><a class="nav-link" href="#courage-6"><span class="header-section-number">9.6.2</span> Courage</a></li>
-<li><a class="nav-link" href="#justice-6"><span class="header-section-number">9.6.3</span> Justice</a></li>
+<li><a class="nav-link" href="#justice-6"><span class="header-section-number">9.6.2</span> Justice</a></li>
+<li><a class="nav-link" href="#courage-6"><span class="header-section-number">9.6.3</span> Courage</a></li>
 <li><a class="nav-link" href="#temperance-6"><span class="header-section-number">9.6.4</span> Temperance</a></li>
-<li><a class="nav-link" href="#comparing-complex-and-simple-models"><span class="header-section-number">9.6.5</span> Comparing complex and simple models</a></li>
 </ul>
 </li>
 <li><a class="nav-link" href="#summary-9"><span class="header-section-number">9.7</span> Summary</a></li>

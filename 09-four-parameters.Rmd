@@ -21,13 +21,11 @@ In our haste to make progress --- to get all the way through the process of buil
 
 Do we discuss anything in the "Other transformations section" (pg. 195)? This includes square root transformations, idiosyncratic transformations, & using discrete vs continuous predictors. DK: Not square root. Other stuff? Maybe at the end? -->
 
-An important question for us data scientists: what happens when our assumptions break down? The first option is to extend our model, perhaps by addressing our concerns with validity by including error models. The second option, which we will focus on here, is to modify our data or model so that our assumptions are more reasonable. How do we accomplish this?
-
-It is often convenient to transform a predictor variable so that our model makes more sense. Let's explore exactly what that means. 
+It is often convenient to transform a predictor variable so that our model makes more sense. 
 
 ### Centering
 
-Recall our model of `income` as a function of `age`. Mathematics:
+Recall our model of `income` as a function of `age`.
 
 $$ y_i = \beta_0  + \beta_1 age_i + \epsilon_i$$
 
@@ -87,7 +85,7 @@ print(fit_1_s, detail = FALSE)
 
 `s_age` is age **s**caled by its own standard deviation. A change in one unit of `s_age` is the same as a change in one standard deviation of the `age`, which is about `r round(sd(trains$age))`. The interpretation of $\beta_1$ is now:
 
-*When comparing two people, one about 1 standard deviation worth of years older than the other, we expect the older person to earn about `r scales::comma(round(coef(fit_1_s)["s_age"], -3))` more.*
+*When comparing two people, one about 1 standard deviation worth of years older than the other, we expect the older person to earn about `r scales::comma(round(coef(fit_1_s)["s_age"], -3))` dollars more.*
 
 But, because we scaled without centering, the intercept is now back to the (nonsensical) meaning of the expected income for people of age 0. 
 
@@ -112,7 +110,7 @@ The two parameters are easy to interpret after this transformation.
 
 *The expected income of someone of average age, which is about `r round(mean(trains$age))` in this study, is about `r scales::comma(round(coef(fit_1_z)["(Intercept)"], -3))` dollars.*
 
-*When comparing two individuals who differ in age by one standard deviation, which is about `r round(sd(trains$age))` years in this study, the older person is expected to earn about `r scales::comma(round(coef(fit_1_z)["z_age"], -3))` more than the younger.*
+*When comparing two individuals who differ in age by one standard deviation, which is about `r round(sd(trains$age))` years in this study, the older person is expected to earn about `r scales::comma(round(coef(fit_1_z)["z_age"], -3))` dollars more than the younger.*
 
 Note that, when using *z*-scores, we would often phrase this comparison in terms of "sigmas." One person is "one sigma" older than another person means that they are one standard deviation older. This is simple enough, once you get used to it, but also confusing since we are already using the word "sigma" to mean $\sigma$, the standard deviation of $\epsilon_i$. Alas, *language is something we deal with rather than control.* You will hear the same word "sigma" applied to both concepts, even in the same sentence. Determine meaning by context.
 
