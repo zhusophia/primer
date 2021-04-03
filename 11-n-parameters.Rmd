@@ -1,7 +1,38 @@
 # N Parameters {#n-parameters}
 
+<!-- Two goals this week: -->
+
+<!-- First, replace geom_pointrange with appropriate functions from ggdist. https://mjskay.github.io/ggdist/ Do not use tidy(). Start with 
+
+
+fit_1 %>% 
+  as_tibble() %>% 
+  pivot_longer(cols = stateAlabama:stateWyoming,
+               names_to = "state",
+               values_to = "years") %>% 
+  mutate(state = str_replace(state, "state", "")) %>%              
+  ggplot(aes(x = vals, y = pulls)) +
+  
+  # Not these geoms. I think we just want pointinterval
+  
+  stat_halfeye(aes(fill = stat(cut_cdf_qi(cdf, .width = c(0.95, 1)))),
+               show.legend = FALSE) +
+  scale_fill_calc()
+
+
+-->
+
+
+<!-- Second, make shaming part of chapter good! Population, temperance, Preceptor's Posterior, ideal Preceptor Table, testing. All the cool themes. Bring it all together. Make the students say Ahhh! -->
+
+<!-- Where is the question that we are trying to answer? Do we answer them? Are they good questions? -->
+
+<!-- Example: No discussion of population, validity, representativeness or ethics in Wisdom discussion. -->
 
 <!-- * Should start with  single variable which actually requires lots of parameters. For example, death_age as a function of state and come up with a different average death_age for each state. This is cheating in that it is too many parameters, or rather that some of the parameters need to be estimated for too little data.  But it would allow us to explain a bunch of stuff! Including Bayesian shrinkage. Saving this till the end of the model causes us to miss stuff. But the rest of the analysis used lived_after. Which is better. Yes? Should we discuss? Use both? -->
+
+
+<!-- Consider getting rid of state example, or moving it as a teaser to end of chaoter 10. Could we make a similar point with an example from shaming? -->
 
 *This chapter is still a DRAFT.*
 
@@ -18,6 +49,7 @@ Let's continue our examination of the longevity of gubernatorial candidates whic
 library(tidyverse)
 library(primer.data)
 library(rstanarm)
+library(ggdist)
 
 ch11 <- governors %>% 
   select(last_name, year, state, sex, lived_after, election_age) %>% 
@@ -103,9 +135,14 @@ fit_1_params %>%
 ```
 
 
-There are 50 parameters.
+There are 51 parameters, an average for 50 states and $\sigma$.
 
-<!-- DK: Explain Bayesian shrinkage! Show a graphic which compares them. Just run lm, using tidy to gather, merge and plot, perhaps with posteriors, perhaps not. -->
+
+<!-- DK: Switch above to using ggdist. -->
+
+<!-- DK: Add a sensible discussion about whether or not we believe this.  -->
+
+<!-- DK: In the next draft if this chapter, we ought to use a different data set which illustrates Bayesian shrinkage. Alas, does not work for this data because all the states have about the same number of observations. -->
 
 
 
@@ -159,36 +196,37 @@ $\beta_{51}$, our coefficient value for $election\_age_i$, is `r round(coef(fit_
 $\beta_{51} + \beta_{52}$, our coefficients for $election\_age_i$ and `sexMale:election_age`, results in the value of around `r round(coef(fit_gov_1)["election_age"] + coef(fit_gov_1)["sexMale:election_age"], 1)`. This value is our slope for men.
 
 
+<!-- DK: This is a mess! -->
 
-Posterior distribution for female candidates in Washington and South Dakota. 
+<!-- Posterior distribution for female candidates in Washington and South Dakota.  -->
 
 <!-- DK: Clean up math here. No hard coding numbers!-->
 
-```{r}
-fit_gov_1 %>% 
-  as_tibble() %>% 
-  mutate(Washington_females = `(Intercept)` + stateWashington) %>% 
-  mutate (SD_females = `(Intercept)` + `stateSouth Dakota`) %>% 
-  select(Washington_females, SD_females) %>% 
-  pivot_longer(cols = Washington_females:SD_females, 
-               names_to = "parameters",
-               values_to = "years") %>% 
-  ggplot(aes(years, fill = parameters)) +
-    geom_histogram(aes(y = after_stat(count/sum(count))),
-                   alpha = 0.5, 
-                   bins = 100, 
-                   position = "identity") +
-    labs(title = "Posterior Probability Distribution",
-         subtitle = "for women that live in Washington and South Dakota",
-         x = "Average Years Lived Post Election",
-         y = "Probability") + 
-    scale_x_continuous(labels = scales::number_format()) +
-    scale_y_continuous(labels = scales::percent_format()) +
-    theme_classic()
-```
+<!-- ```{r} -->
+<!-- fit_gov_1 %>%  -->
+<!--   as_tibble() %>%  -->
+<!--   mutate(Washington_females = `(Intercept)` + stateWashington) %>%  -->
+<!--   mutate (SD_females = `(Intercept)` + `stateSouth Dakota`) %>%  -->
+<!--   select(Washington_females, SD_females) %>%  -->
+<!--   pivot_longer(cols = Washington_females:SD_females,  -->
+<!--                names_to = "parameters", -->
+<!--                values_to = "years") %>%  -->
+<!--   ggplot(aes(years, fill = parameters)) + -->
+<!--     geom_histogram(aes(y = after_stat(count/sum(count))), -->
+<!--                    alpha = 0.5,  -->
+<!--                    bins = 100,  -->
+<!--                    position = "identity") + -->
+<!--     labs(title = "Posterior Probability Distribution", -->
+<!--          subtitle = "for women that live in Washington and South Dakota", -->
+<!--          x = "Average Years Lived Post Election", -->
+<!--          y = "Probability") +  -->
+<!--     scale_x_continuous(labels = scales::number_format()) + -->
+<!--     scale_y_continuous(labels = scales::percent_format()) + -->
+<!--     theme_classic() -->
+<!-- ``` -->
 
 
-The posterior above shows that female candidates in Washington live longer after the election than female candidates in South Dakota. Interesting huh? Our knowledge about averages is always more precise than our knowledge about individuals. 
+<!-- The posterior above shows that female candidates in Washington live longer after the election than female candidates in South Dakota. Interesting huh? Our knowledge about averages is always more precise than our knowledge about individuals.  -->
 
 
 
@@ -203,11 +241,12 @@ The posterior above shows that female candidates in Washington live longer after
 knitr::include_graphics("other/images/Wisdom.jpg")
 ```
 
+Imagine you are running for Governor and want to do a better job of getting your voters to vote. You recently read about a large-scale experiment showing the effect of sending out a voting reminder that "shames" citizens who do not vote. You are considering sending out a "shaming" voting reminder yourself. What will happen if you do? Will more voters show up to the polls? Additionally, on the day of the election a female citizen is randomly selected. What is the probability she will vote?  
+
+
 ### EDA of `shaming`
 
-
-
-Imagine you are running for Governor and want to do a better job of getting your voters to vote. You recently read about a large-scale experiment showing the effect of sending out a voting reminder that "shames" citizens who do not vote. You are considering sending out a "shaming" voting reminder yourself. What will happen if you do? Will more voters show up to the polls? Additionally, on the day of the election a female citizen is randomly selected. What is the probability she will vote?    
+  
 
 Consider a new data set, `shaming`, corresponding to an experiment carried out by Gerber, Green, and Larimer (2008) titled "Social Pressure and Voter Turnout: Evidence from a Large-Scale Field Experiment". This experiment used several hundred thousand registered voters and a series of mailings to determine the effect of social pressure on voter turnout. 
 
@@ -318,7 +357,19 @@ Does this mean our data is unhelpful? Of course not! With four treatments (and t
 
 That being said, the map from our question to our data is almost never perfect. In data science, we often have to look at our data, understand its limitations, and try our best to make inferences that help our cause.
 
-### primary_06 and (treatment + age)
+## Justice and Courage
+
+```{r echo = FALSE, out.width="60%", fig.align='center', fig.cap = "Justice"}
+knitr::include_graphics("other/images/Justice.jpg")
+```
+
+```{r echo = FALSE, out.width="60%", fig.align='center', fig.cap = "Courage"}
+knitr::include_graphics("other/images/Courage.jpg")
+```
+
+<!-- MF: Insert the math. Adjust the discussion to make clear which values apply to which parameters. -->
+
+### primary_06 ~ treatment + age
 
 <!-- What should the Preceptor tables look like with these models? Like chapter 3. Should each model have its own Preceptor Table? No! Just one preceptor table at the start, with 5 columns under Y, and 4 covariates, where one is treatment assigned. -->
 
@@ -405,42 +456,42 @@ Note that the median for age is 0.004. Age is therefore positively correlated wi
 
 Now, let's return to our voting difference between the Control and Neighbors groups. Let's model the posterior probability distribution for the rates of voting. 
 
+<!-- # In progress. Modify x-axis labels *10.  -->
 
-```{r}
+<!-- Be careful! This is messed up. It is the posterior for those with voting age zero, which is nonsense, so why look at it! -->
 
-# In progress. Modify x-axis labels *10. 
 
-model_3 %>% 
-  as_tibble() %>% 
-  mutate(Neighbors = `(Intercept)` + `treatmentNeighbors`) %>% 
-  mutate(Control = `(Intercept)`) %>% 
-  select(Neighbors, Control) %>% 
-  pivot_longer(cols = Neighbors:Control,
-               names_to = "parameters",
-               values_to = "percent_voting") %>% 
-  ggplot(aes(percent_voting, fill = parameters)) +
-  geom_histogram(aes(y = after_stat(count/sum(count))),
-                   alpha = 0.5, 
-                   bins = 100, 
-                   position = "identity") +
-    labs(title = "Posterior Probability Distribution",
-         subtitle = "for Control versus Neighbors voting rates",
-         x = "% of group voting",
-         y = "Probability") + 
-    scale_x_continuous(labels = scales::number_format()) +
-    scale_y_continuous(labels = scales::percent_format()) +
-    theme_classic()
-  
-```
+<!-- ```{r} -->
+<!-- model_3 %>%  -->
+<!--   as_tibble() %>%  -->
+<!--   mutate(Neighbors = `(Intercept)` + `treatmentNeighbors`) %>%  -->
+<!--   mutate(Control = `(Intercept)`) %>%  -->
+<!--   select(Neighbors, Control) %>%  -->
+<!--   pivot_longer(cols = Neighbors:Control, -->
+<!--                names_to = "parameters", -->
+<!--                values_to = "percent_voting") %>%  -->
+<!--   ggplot(aes(percent_voting, fill = parameters)) + -->
+<!--   geom_histogram(aes(y = after_stat(count/sum(count))), -->
+<!--                    alpha = 0.5,  -->
+<!--                    bins = 100,  -->
+<!--                    position = "identity") + -->
+<!--     labs(title = "Posterior Probability Distribution", -->
+<!--          subtitle = "for Control versus Neighbors voting rates", -->
+<!--          x = "% of group voting", -->
+<!--          y = "Probability") +  -->
+<!--     scale_x_continuous(labels = scales::number_format()) + -->
+<!--     scale_y_continuous(labels = scales::percent_format()) + -->
+<!--     theme_classic() -->
+
+<!-- ``` -->
 
 <!-- Add in explanations.
 Obvious difference in Neighbors as more likely to vote. 
 Very few chances that Control votes more (though possible).-->
 
 
-### primary_06 & (age + solo + treatment)
+### primary_06 ~ age + solo + treatment
 
-<!-- MF: Thinking about graphs/visualizations for this section: are they necessary? I believe they help students visualize concepts, but most graphs won't show up 'pretty' because of the YES/NO as our main variable. --> 
 
 Now that we have analyzed the impact of our various treatments on voting behavior, let's turn to three different variables together: sex, solo (living alone), and treatment.
 
@@ -460,38 +511,38 @@ First, let's look at which variables are included on our left hand side. Besides
 - age, with a median of 0.004: as before, the age represents the positively correlated increase with voting as someone ages. For every decade older a participant is, their chance of voting increases by 4%. 
 - soloTRUE, with a median of 0.015: as compared with participants in households exceeding 1 persons, participants who live alone are more likely to vote by a factor of 0.015 = 1.5%. Note that this is only true for our baseline group of Control participants and does not include an analysis for those in Neighbors. 
 
-```{r}
 
-# Modify x scale
+<!-- ```{r} -->
 
-model_4 %>% 
-  as_tibble() %>% 
-  mutate(SoloTrue = `(Intercept)` + `soloTRUE`) %>% 
-  mutate(SoloFalse = `(Intercept)`) %>% 
-  select(SoloTrue, SoloFalse) %>% 
-  pivot_longer(cols = SoloTrue:SoloFalse,
-               names_to = "parameters",
-               values_to = "percent_voting") %>% 
-  ggplot(aes(percent_voting, fill = parameters)) +
-    geom_histogram(aes(y = after_stat(count/sum(count))),
-                   alpha = 0.5, 
-                   bins = 100, 
-                   position = "identity") +
-    labs(title = "Posterior Probability Distribution",
-         subtitle = "for those who live alone versus live with other people",
-         x = "% of group voting",
-         y = "Probability") + 
-    scale_x_continuous(labels = scales::number_format()) +
-    scale_y_continuous(labels = scales::percent_format()) +
-    theme_classic()
-  
-```
+<!-- # Modify x scale -->
+
+<!-- model_4 %>%  -->
+<!--   as_tibble() %>%  -->
+<!--   mutate(SoloTrue = `(Intercept)` + `soloTRUE`) %>%  -->
+<!--   mutate(SoloFalse = `(Intercept)`) %>%  -->
+<!--   select(SoloTrue, SoloFalse) %>%  -->
+<!--   pivot_longer(cols = SoloTrue:SoloFalse, -->
+<!--                names_to = "parameters", -->
+<!--                values_to = "percent_voting") %>%  -->
+<!--   ggplot(aes(percent_voting, fill = parameters)) + -->
+<!--     geom_histogram(aes(y = after_stat(count/sum(count))), -->
+<!--                    alpha = 0.5,  -->
+<!--                    bins = 100,  -->
+<!--                    position = "identity") + -->
+<!--     labs(title = "Posterior Probability Distribution", -->
+<!--          subtitle = "for those who live alone versus live with other people", -->
+<!--          x = "% of group voting", -->
+<!--          y = "Probability") +  -->
+<!--     scale_x_continuous(labels = scales::number_format()) + -->
+<!--     scale_y_continuous(labels = scales::percent_format()) + -->
+<!--     theme_classic() -->
+
+<!-- ``` -->
 
 <!-- Add in explanation. -->
 
-### primary_06 & (age, solo, treatment, + interactions)
+### primary_06 ~ age + solo + treatment + solo*treatment
 
-<!-- MF: What posterior probability distributions would be interesting for the interactions section? DK: Ones that highlights the fact that the causal effects vary. --> 
 
 Since we've now studied a model with three different variables, it is time to look at interactions! Here, we will look at `primary_06` as a function of age, solo, treatment, and `solo*treatment`. What does `solo*treatment` mean for us? It means we are looking at the `solo` and `treatment` variables as they correspond to one another. 
 
@@ -519,7 +570,7 @@ Now, we will turn out attention to our interactions.
 
 What does this tell us? First, we know that (of the various treatments) Neighbors continues to be the most effective, even in those female citizens that are living alone. We also know that, in those females living alone, the control and Hawthorne treatment are less effective as compared with the Civic Duty treatment. And, while the Self and Neighbors treatments *did* increase voter turnout, the rate of increase was less as compared to the soloFALSE group (showed in the previous model). -->
 
-### Temperance
+## Temperance
 
 ```{r echo = FALSE, fig.cap = "Temperance"}
 knitr::include_graphics("other/images/Temperance.jpg")

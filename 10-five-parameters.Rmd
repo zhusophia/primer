@@ -1,15 +1,16 @@
 # Five Parameters {#five-parameters}
 
-<!-- DK: Need a non-parallel lines plot, like the parallel lines plot in chapter 9. MF: Done. -->
-
-<!-- Too much hard coding of numbers. Need to replace with coef(whatever)[2] MF: This seemed to be done already. -->
+<!-- Testing section makes no sense. -->
 
 <!-- Clean up all the plots, especially the legends. Huh? -->
 
-<!-- fit_gov_* is not a good naming scheme for the models. Should be like chapter 9, where we have fit_1, fit_2. MF: DONE-->
-
 <!-- Add more discussion below? Perhaps use as a good example of how the estimated posterior is not the true posterior because of the assumptions we are making about the structure of the error term. -->
 
+<!-- Do we really believe the posterior for male/female expected years lived? No! Or, at the very least, we are suspicious. Discuss Preceptor's Posterior. -->
+
+<!-- In Temperance connect the expected value to the ideal Preceptor table. -->
+
+<!-- Improve summary section. -->
 
 Last chapter, we studied four parameters: models in which we studied multiple right-hand side variables at once. The next step in our model building education is to learn about *interactions*. The effect of a treatment relative to a control is almost never uniform. The effect might be bigger in women than in men, smaller in the rich relative to the poor. The technical term for such effects is "heterogeneous," which is just Ph.D.'ese for "different." With enough data, all effects are heterogeneous. Causal effects, at least in the social science, always vary across units. To model this reality, we rely on interactions, on allowing the effect size to differ. The same applies for predictive models. The relationship between our outcome variable $y$ and a predictor variable $x$ is rarely constant. The relationship varies based on the values of other variables. To take account of interactions, we need models with at least 5 parameters. 
 
@@ -283,8 +284,6 @@ ch10 %>%
 
 Consider someone who is about 40 years old on Election Day. We have a score or more data points for candidates around that age. This area is highlighted by the red box on our plot. As we can see, two died soon after the election. Some of them lived for 50 or more years after the election. *Variation fills the world.* However, the fitted line tells us that, on average, we would expect a candidate that age to live about 37 years after the election. 
 
-<!-- DK: Add a red circle to the graphic to show how we figured that out? MF: Done. -->
-
 This model, with a continuous independent (or "predictor") variable, has an infinite number of fitted values, one for each possible value of `election_age`. 
 
 <!-- DK: I am nervous that election_age, as used here, is a different variable that election_age when, later, we transform it.  -->
@@ -463,7 +462,7 @@ posterior_epred(fit_2a,
   ggplot(aes(`1`)) + 
     geom_histogram(aes(y = after_stat(count/sum(count))),
                    bins = 100) +
-    labs(title = "Posterior Distribution of Average Male Candidate Yeas Le  ft`",
+    labs(title = "Posterior Distribution of Average Male Candidate Yeas Left",
          y = "Probability",
          x = "Years To Live After the Election") + 
     scale_x_continuous(labels = scales::number_format()) +
@@ -842,7 +841,7 @@ ggplot(ch10, aes(x = c_election_age, y = lived_after, color = sex)) +
   
   labs(title = "Interaction Model",
        subtitle = "Comparing post election lifespan across sex",
-       x = "Years Lived (+ or - Average Age) at Time of Election", 
+       x = "Average Age at Time of Election", 
        y = "Years Lived Post-Election", 
        color = "Sex") +
   theme_classic()
@@ -1080,13 +1079,15 @@ Expected values vary much less than predictions. The above chart makes that easy
 
 ### Testing
 
+<!-- DK: This is a mess! -->
+
 In a normal statistics book, we would have already discussed the concept of "testing" extensively. The terminology varies by field. "Tests," "testing," "hypothesis tests," "tests of significance," and "null hypothesis significance testing" all refer to the same concept. We will refer to this collection of approaches as NHST, a common abbreviation derived from the initials of the last phrase. Wikipedia provides an [overview](https://en.wikipedia.org/wiki/Statistical_hypothesis_testing). 
 
 *Our view: Amateurs test. Professionals summarize.*
 
 Consider the question of the expected difference in lifespans for our South Dakota and Washington candidates. Is that difference "significant?" Can we "reject the null hypothesis?" The conventional answer is Yes. Anytime that zero is outside of the 95% confidence interval, we can declare the result significant. But why should we? How does that help us? We already have the full posterior probability distribution. That is knowledge. A Yes/No question throws away too much information to (almost) ever be useful. There is no reason to *test* when you can *summarize* by providing the full posterior probability distribution.
 
-The same arguments apply in the case of "insignificant" results, with "$p > 0.5$, when we can't "reject" the null hypothesis. Instead of expected values, consider the case of two candidates, one from South Dakota and one from Washington. Is the difference in their predicted lifespans "significant?" Who cares!? We have the full posterior probability distribution for that prediction --- also known as the posterior predictive distribution --- as graphed above. The 95% confidence interval includes zero. Does that mean we should throw it away? No! That would be nonsense. Yes, there is a 20% chance that the South Dakota candidate lives longer, so we can hardly be surprised when that happens. But we still think that it is much more likely that the Washington candidate lives longer. Indeed, we would consider 4-to-1 odds as fair. The fact that the difference is not "significant" has no relevance to how we use the posterior to make decisions.
+The same arguments apply in the case of "insignificant" results, with $p > 0.5$, when we can't "reject" the null hypothesis. Instead of expected values, consider the case of two candidates, one from South Dakota and one from Washington. Is the difference in their predicted lifespans "significant?" Who cares!? We have the full posterior probability distribution for that prediction --- also known as the posterior predictive distribution --- as graphed above. The 95% confidence interval includes zero. Does that mean we should throw it away? No! That would be nonsense. Yes, there is a 20% chance that the South Dakota candidate lives longer, so we can hardly be surprised when that happens. But we still think that it is much more likely that the Washington candidate lives longer. Indeed, we would consider 4-to-1 odds as fair. The fact that the difference is not "significant" has no relevance to how we use the posterior to make decisions.
 
 The same reasoning applies to every parameter we estimate, to every prediction we make. Never test --- unless your boss demands a test. *Use your judgment, make your models, summarize your knowledge of the world, and use that summary to make decisions.*
 
