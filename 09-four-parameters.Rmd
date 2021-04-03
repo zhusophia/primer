@@ -811,6 +811,7 @@ fit_1 <- stan_glm(formula = att_end ~ liberal + att_start,
 fit_1
 ```
 
+
 To remind ourselves, recall that the `(Intercept)` here is representing the `att_end` value for cases where `liberal = FALSE` and `treatment does not equal Control`. The next row, `liberalTRUE` gives a median value which represents the *offset* in the prediction compared with the `(Intercept)`. In other words, the true intercept for cases where `liberal = TRUE` is represented by $(Intercept) + liberalTRUE$. The value of `treatmentControl` is the offset in `att_end` for those in the Control group. 
 
 To find our intercepts, we will need to tidy our regression using the `tidy()` function from the **broom.mixed** package. We tidy our data and extract values to create a parallel slopes model. The parallel slopes model allows us to visualize multi-variate Bayesian modeling (i.e. modeling with more than one explanatory variable). That is a complicated way of saying that we will visualize the fitted model created above in a way that allows us to see the intercepts and slopes for two different groups, `liberalTRUE` and `liberalFALSE`: 
@@ -926,6 +927,7 @@ An important point here is that **these models are causal**. When including the 
 <!-- DK: A causal model is one in which, at least in theory, one of the righthand side variables could have been manipulated, and when you care about estimating causal effects. If someone just needs to forecast or predict something that, almost always, she is not asking a causal question, so she does not care if the righthand side variables could be manipulated. Is the sunset beautiful if no one is looking at it? Is the model causal if I just want to predict? -->
 
 To see how these models compare in performance, we will perform leave-one-out (LOO) cross validation again. 
+
 
 ```{r}
 L1 <- loo(fit_1)
