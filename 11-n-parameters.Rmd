@@ -1,9 +1,9 @@
 # N Parameters {#n-parameters}
 
 
-<!-- * Should start with  single variable which actually requires lots of parameters. For example, death_age as a function of state and come up with a different average death_age for each state. This is cheating in that it is too many parameters, or rather than some of the parameters need to be estimated for too little data.  But it would allow us to explain a bunch of stuff! Including Bayesian shrinkage. Saving this till the end of the model causes us to miss stuff. But the rest of the analysis used lived_after. Which is better. Yes? Should we discuss? Use both? -->
+<!-- * Should start with  single variable which actually requires lots of parameters. For example, death_age as a function of state and come up with a different average death_age for each state. This is cheating in that it is too many parameters, or rather that some of the parameters need to be estimated for too little data.  But it would allow us to explain a bunch of stuff! Including Bayesian shrinkage. Saving this till the end of the model causes us to miss stuff. But the rest of the analysis used lived_after. Which is better. Yes? Should we discuss? Use both? -->
 
-*This chapter is still a DRAFT. Check back in a few weeks.*
+*This chapter is still a DRAFT.*
 
 Having created models with one parameter in Chapter \@ref(one-parameter), two parameters in Chapter \@ref(two-parameters), three parameters in Chapter \@ref(three-parameters), four parameters in Chapter \@ref(four-parameters) and five parameters in Chapter \@ref(five-parameters), you are now ready to make the jump to $N$ parameters. 
 
@@ -28,7 +28,9 @@ ch11 <- governors %>%
 
 ### state
 
-Consider a model in which years lived after the election is a function of the state in which the candidate lives. This assumption generates a model with 51 parameters, an average for each state and the residual variance. Mathematics:
+Consider a model in which years lived after the election is a function of the state in which the candidate lives. This assumption generates a model with 51 parameters, one average value for each state and the residual variance. But not using an intercept, we give the parameters an easier interpretation. With an intercept, the interpretation for each of the other $\beta$'s would be as the difference in expected age relative to the first state. 
+
+Mathematics:
 
 
 $$ lived\_after_i =  \beta_1 x_{AL,i} + \beta_2 x_{AK,i} + ... + \beta_{49} x_{WI,i}  + \beta_{50} x_{WY,i} + \epsilon_i$$
@@ -39,9 +41,9 @@ As usual, $\epsilon_i \sim N(0, \sigma^2)$. Conceptually, this model is identica
 $$ lived\_after_i =  \beta_1 x_{AL,i} + \beta_2 x_{AK,i} + ... + \beta_{49} x_{WI,i}  + \beta_{50} x_{WY,i} + \epsilon_i $$
 $$ lived\_after_i =  \beta_1 0 + \beta_2 1 + ... + \beta_{49} 0  + \beta_{50} 0 + \epsilon_i $$
 $$ lived\_after_i =   \beta_2  + \epsilon_i $$
-The interpretation is the same as when we modeled `age` as a function of `party` or `att_end` as a function of `treatment`. In all these cases, an individual can only be in one category. She can be a Democrat or a Republican. She can received the treatment or not. She can live in Alabama or Alaska or . . . . The only wrinkle we have added is that there are 50 categories under consideration, not just two.
+The interpretation is the same as when we modeled `age` as a function of `party` or `att_end` as a function of `treatment` in Chapter \@ref(three-parameters). (Review those sections if this is unclear.) In all these cases, an individual can only be in one category. She can be a Democrat or a Republican. She can received the treatment or not. She can live in Alabama or Alaska or . . . . The only wrinkle we have added is that there are 50 categories under consideration, not just two.
 
-The code is exactly the same as in those Chapter \@ref(three-parameters) exmaples.
+The code is exactly the same as in those Chapter \@ref(three-parameters) examples.
 
 ```{r}
 fit_1 <- stan_glm(formula = lived_after ~ state - 1,
@@ -80,6 +82,8 @@ fit_1_params %>%
  
  <!-- DK: Going forward, would you expect candidates from Delaware to live 14 years longer than candidates from Wyoming? Discuss what these terms mean. -->
  
+<!-- DK: Should change this to use the ggdist package. -->
+ 
 A graphical display is the best way to examine numerous parameters at the same time.  
 
 
@@ -99,12 +103,16 @@ fit_1_params %>%
 ```
 
 
-There are 51 parameters.
+There are 50 parameters.
+
+<!-- DK: Explain Bayesian shrinkage! Show a graphic which compares them. Just run lm, using tidy to gather, merge and plot, perhaps with posteriors, perhaps not. -->
+
+
 
 
 ### state, election_age, sex and election_age*sex
 
-Let's consider one more model, one which adds `state` to the model we used at the end of the previous chapter. 
+Let's consider another model for $lived\_age$, one which adds `state` to the model we used at the end of the previous chapter. 
 
 Math:
 
@@ -119,6 +127,8 @@ $$ lived\_after_i =  \beta_0 +  \beta_1 x_{AK,i} + \beta_2 x_{AR,i} + ... \beta_
 * $\beta_0$ will be the intercept for one state alone. When the model is printed, you will see that (Intercept) takes on the lived_after value for female candidates in Alabama. 
 
 * $\beta_{50}$ is the coefficient for the explanatory variable $male_i$. When we are trying to find the intercepts for female candidates, the explanatory variable will take on the value of 0. However,  $male_i$ = 1 when we are trying to find intercept values for male candidates. Therefore, you add the $\beta_{50}$ value to the female intercept value to find the value of lived_after for male candidates. $\beta_{51}$ is the coefficient for the explanatory variable $election\_age_i$. It it just the slope for women. $\beta_{52}$ is difficult to interpret. However, it gains meaning when it is added to $\beta_{51}$, which results in the slope for men.
+
+<!-- DK: Missing stuff here! -->
  
 
 ```{r, cache = TRUE}
