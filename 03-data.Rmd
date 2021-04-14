@@ -1,0 +1,203 @@
+# Data {#data}
+
+*This chapter is a draft.*
+
+
+## Introduction
+
+Start by loading the packages which we will need in this chapter.
+
+```{r, message = FALSE}
+library(tidyverse)
+library(primer.data)
+library(lubridate)
+library(janitor)
+library(skimr)
+library(nycflights13)
+library(gapminder)
+library(fivethirtyeight)
+```
+
+## Data Gathering
+
+The `read_csv()` function turns text files into tibbles. More specifically, it converts files whose values are separated by commas. Let’s import a **c**omma **s**eparated **v**alues (hence "csv") file from the internet. The `read_csv()` function included in the **readr** package, which is one of the packages in the Tidyverse, is different than the `read.csv()` function that comes installed with R. Always use Tidyverse functions, if possible. 
+
+Each comma from the csv file corresponds to a column, and the column names are taken from the first line of the file. The function then "guesses" an appropriate data type for each of the columns. The link below is for a file containing faculty gender data across departments at Harvard University. Note, the `file` argument of the `read_csv()` function is very flexible. Below, it takes a url. `file` can also be the absolute or relative path for a file saved locally on your computer. 
+
+```{r}
+url <- "https://raw.githubusercontent.com/PPBDS/primer/master/02-wrangling/data/faculty.csv"
+
+fac <- read_csv(file = url, 
+                skip = 1)
+fac
+```
+
+We need to "skip" the first row of the file because there is a code comment at the top, which has nothing to do with the actual data.
+
+```{r}
+summary(fac)
+```
+
+Don't confuse `summary()`, which is a built-in --- generally termed "base" --- R function for providing a summary of an object, with `summarize()`, which is one of the more important functions from **dplyr**, one of the Tidyverse packages.
+
+You may notice that something appears to be wrong with this dataset. Which department could have employed 644 male professors? We will explore this mystery later in the Chapter.
+
+<!-- DK: Mention other read in functions, and packages like readxl. Connect it better to the tutorials. -->
+
+
+### HTML
+
+<!-- DK: Rewrite these sections. -->
+
+The data we need to answer a question is not always in a handy csv file. For example, we can find interesting data about murders in the US in [this Wikipedia page](https://en.wikipedia.org/w/index.php?title=Gun_violence_in_the_United_States_by_state): 
+
+
+```{r, echo = FALSE}
+knitr::include_graphics("03-data/images/murders-data-wiki-page.png")
+```
+
+To get this data, we need to do some web scraping, a process which begins with a URL, a **u**niform **r**esource **l**ocator. 
+
+```{r}
+url <- paste0("https://en.wikipedia.org/w/index.php?title=",
+              "Gun_violence_in_the_United_States_by_state",
+              "&direction=prev&oldid=810166167")
+```
+
+
+Web scraping, or web harvesting, is the process of extracting data from a website. The information used by a browser to render web pages is received as a text file from a server. The text is code written in **H**yper **T**ext **M**arkup **L**anguage (HTML). Every browser has a way to show the html source code for a page. 
+
+```{r, echo = FALSE}
+knitr::include_graphics("03-data/images/html-code.png")
+```
+
+Here are a few lines of code from the Wikipedia page that provides the US murders data:
+
+```
+<table class="wikitable sortable">
+<tr>
+<th>State</th>
+<th><a href="/wiki/List_of_U.S._states_and_territories_by_population" 
+title="List of U.S. states and territories by population">Population</a><br />
+<small>(total inhabitants)</small><br />
+<small>(2015)</small> <sup id="cite_ref-1" class="reference">
+<a href="#cite_note-1">[1]</a></sup></th>
+<th>Murders and Nonnegligent
+<p>Manslaughter<br />
+<small>(total deaths)</small><br />
+<small>(2015)</small> <sup id="cite_ref-2" class="reference">
+<a href="#cite_note-2">[2]</a></sup></p>
+</th>
+<th>Murder and Nonnegligent
+<p>Manslaughter Rate<br />
+<small>(per 100,000 inhabitants)</small><br />
+<small>(2015)</small></p>
+</th>
+</tr>
+<tr>
+<td><a href="/wiki/Alabama" title="Alabama">Alabama</a></td>
+<td>4,853,875</td>
+<td>348</td>
+<td>7.2</td>
+</tr>
+<tr>
+<td><a href="/wiki/Alaska" title="Alaska">Alaska</a></td>
+<td>737,709</td>
+<td>59</td>
+<td>8.0</td>
+</tr>
+<tr>
+```
+
+
+### The rvest package
+
+**rvest**, maintained by [the team at RStudio](https://rvest.tidyverse.org/), is the best package for getting data from the web. Although there are a bewildering array of R packages for every task, you should always start with one maintained by high quality people/organizations. [RStudio maintained packages](https://www.tidyverse.org/packages/) are always good. A new version, 1.0, of **rvest** is imminent. Upgrade once it comes out. 
+
+```{r, message=FALSE, warning=FALSE}
+library(rvest)
+h <- read_html(url)
+```
+
+
+Note that the entire Murders in the US Wikipedia webpage is now contained in `h`. The class of this object is:
+
+```{r}
+class(h)
+```
+
+The **rvest** package is actually more general; it handles XML documents. XML is a general markup language used to represent any kind of data. HTML is a specific type of XML developed for representing webpages. Here we focus on HTML documents.
+
+Now, how do we extract the table from the object `h`? If we print `h`, we don't really see much:
+
+```{r}
+h
+```
+
+We can see all the code that defines the downloaded webpage using the `html_text` function like this:
+
+```{r, eval=FALSE}
+html_text(h)
+```
+
+We don't show the output here because it includes thousands of characters, but if we look at it, we can see that the data is stored in an HTML table -- note the line of the HTML code above `<table class="wikitable sortable">`. The different parts of an HTML document, often defined with a message in between  `<` and `>`  are referred to as nodes. The **rvest** package includes functions to extract nodes of an HTML document: `html_nodes` extracts all nodes of different types and `html_node` extracts the first one. To extract the tables from the html code we use:
+
+```{r} 
+tab <- h %>% html_nodes("table")
+```
+
+Now, instead of the entire webpage, we just have the html code for the tables in the page:
+
+```{r}
+tab
+```
+
+The table we are interested is the first one:
+
+```{r}
+tab[[1]]
+```
+
+This is clearly not a tidy dataset, not even a data frame. In the code above, you can definitely see a pattern and writing code to extract just the data is very doable. In fact, **rvest** includes a function just for converting HTML tables into data frames:
+
+
+```{r}
+tab <- tab[[1]] %>% html_table
+class(tab)
+```
+
+We are now much closer to having a usable data table:
+
+```{r}
+tab <- tab %>% setNames(c("state", "population", 
+                          "total", "murder_rate")) 
+
+head(tab)
+```
+
+We still have some wrangling to do. For example, we need to remove the commas and turn characters into numbers. Before continuing with this, we will learn a more general approach to extracting information from web sites.
+
+
+### CSS selectors
+
+The default look of a webpage made with the most basic HTML is quite unattractive. The aesthetically pleasing pages we see today are made using CSS to define the look and style of webpages. The fact that all pages for a company have the same style usually results from their use of the same CSS file to define the style. The general way these CSS files work is by defining how each of the elements of a webpage will look. The title, headings, itemized lists, tables, and links, for example, each receive their own style including font, color, size, and distance from the margin. CSS does this by leveraging patterns used to define these elements, referred to as selectors. An example of such a pattern, which we used above, is `table`, but there are many, many more. 
+
+If we want to grab data from a webpage and we happen to know a selector that is unique to the part of the page containing this data, we can use the `html_nodes` function. However, knowing which selector can be quite complicated. 
+In fact, the complexity of webpages has been increasing as they become more sophisticated. For some of the more advanced ones, it seems almost impossible to find the nodes that define a particular piece of data. However, selector gadgets actually make this possible.
+
+SelectorGadget^[http://selectorgadget.com/] is piece of software that allows you to interactively determine what CSS selector you need to extract specific components from the webpage. If you plan on scraping data other than tables from html pages, we highly recommend you install it. A Chrome extension is available which permits you to turn on the gadget and then, as you click through the page, it highlights parts and shows you the selector you need to extract these parts. There are various demos of how to do this including **rvest** author Hadley Wickham's
+vignette^[https://cran.r-project.org/web/packages/rvest/vignettes/selectorgadget.html] and other tutorials based on the vignette^[https://stat4701.github.io/edav/2015/04/02/rvest_tutorial/] ^[https://www.analyticsvidhya.com/blog/2017/03/beginners-guide-on-web-scraping-in-r-using-rvest-with-hands-on-knowledge/].
+
+### JSON
+
+An increasingly common format for sharing data is JavaScript Object Notation or JSON. Because this format is very general, it is nothing like a spreadsheet. Consider an example of information stored in a JSON format:
+
+```{r, echo = FALSE}
+library(jsonlite)
+example <- data.frame(name= c("Miguel", "Sofia", "Aya", "Cheng"), student_id = 1:4, exam_1 = c(85, 94, 87, 90), exam_2 = c(86, 93, 88, 91))
+json <- toJSON(example, pretty = TRUE) 
+json
+```
+
+The file above actually represents a tibble. To read it, we can use the function `fromJSON` from the **jsonlite** package. Note that JSON files are often made available via the internet. Several organizations provide a JSON API or a web service that you can connect directly to and from which you can obtain data. 
+
