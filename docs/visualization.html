@@ -1076,7 +1076,6 @@ FIGURE 1.3: `mutate() adds a column to a tibble.
 <code class="sourceCode R"><span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu">group_by</span><span class="op">(</span><span class="va">gender</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">summarize</span><span class="op">(</span>mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
 <pre><code>## # A tibble: 2 x 2
 ##   gender  mean
 ##   &lt;chr&gt;  &lt;dbl&gt;
@@ -1084,7 +1083,7 @@ FIGURE 1.3: `mutate() adds a column to a tibble.
 ## 2 Male    43.5</code></pre>
 <p>Notice the message R sends us. The warning means that the tibble which issues forth from the end of the pipe has been “ungrouped.” This means the group attribute we applied with <code><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by()</a></code> has been removed. This behavior is the (sensible) default.</p>
 <p>The proper way to handle the situation, here and everywhere else that we use <code><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by()</a></code> and <code>summarize()</code>, is to specify the <code>.groups</code> argument.</p>
-<div class="sourceCode" id="cb105"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb104"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu">group_by</span><span class="op">(</span><span class="va">gender</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">summarize</span><span class="op">(</span>mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span>,
@@ -1116,24 +1115,24 @@ FIGURE 1.3: `mutate() adds a column to a tibble.
 <span class="header-section-number">1.4.1</span> Plot objects<a class="anchor" aria-label="anchor" href="#plot-objects"><i class="fas fa-link"></i></a>
 </h3>
 <p>Plots are R objects, just like tibbles. We can create them, print them and save them. Up until now, we have just “spat” them out in an R code chunk. Nothing wrong with that! Indeed, this is the most common approach to plotting in R. Sometimes, however, it is handy to work with a plot object. Consider:</p>
-<div class="sourceCode" id="cb107"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb106"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">train_plot</span> <span class="op">&lt;-</span> <span class="fu">ggplot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">trains</span>, 
        mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">age</span>, 
                      y <span class="op">=</span> <span class="va">income</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p>This is the same code as our first example with <code>geom_point()</code>. <code>train_plot</code> is an R object. This code does not print anything out. In order to make this plot appear, we need to print it out explicitly:</p>
-<div class="sourceCode" id="cb108"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb107"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">train_plot</span></code></pre></div>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-92-1.png" width="100%"></div>
 <p>Recall that typing the name of an object is the same thing as using <code><a href="https://rdrr.io/r/base/print.html">print()</a></code>. Now that we have this object, we can display it whenever we want.</p>
 <p>But, sometimes, we want a permanent copy of the plot, saved to our computer. That is the purpose of <code>ggsave()</code>:</p>
-<div class="sourceCode" id="cb109"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb108"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggsave</span><span class="op">(</span>filename <span class="op">=</span> <span class="st">"enos_trains.jpg"</span>, 
        plot <span class="op">=</span> <span class="va">train_plot</span><span class="op">)</span></code></pre></div>
 <p><code>ggsave()</code> uses the suffix of the provided <code>filename</code> to determine the type of image to save. Because we use “enos_trains.jpg,” the file is saved in JPEG format. If we had used “enos_trains.png,” the file would have been saved as a PNG. We can display a saved file by using <code><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html">knitr::include_graphics()</a></code>. For example:</p>
-<div class="sourceCode" id="cb110"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb110-1"><a href="visualization.html#cb110-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb110-2"><a href="visualization.html#cb110-2" aria-hidden="true" tabindex="-1"></a><span class="in">knitr::include_graphics("enos_trains.jpg")</span></span>
-<span id="cb110-3"><a href="visualization.html#cb110-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
+<div class="sourceCode" id="cb109"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb109-1"><a href="visualization.html#cb109-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb109-2"><a href="visualization.html#cb109-2" aria-hidden="true" tabindex="-1"></a><span class="in">knitr::include_graphics("enos_trains.jpg")</span></span>
+<span id="cb109-3"><a href="visualization.html#cb109-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
 <p>This code displays the image in an Rmd, assuming that the file “enos_trains.jpg” is located in the current working directory. A common scenario is that we create an image and store it in a directory named <code>figures/</code> and then use that figure in more than one Rmd.</p>
 </div>
 <div id="faceting" class="section level3" number="1.4.2">
@@ -1142,12 +1141,12 @@ FIGURE 1.3: `mutate() adds a column to a tibble.
 </h3>
 <p>Faceting splits a visualization into parts, one for each value of another variable.. This will create multiple copies of the same type of plot with matching x and y axes, but whose contents will differ.</p>
 <p>Before we proceed, let’s create a subset of the tibble <code>gapminder</code>, from the <strong>gapminder</strong>, package to use. (You may need to install the <strong>gapminder</strong> package for this code to work.)</p>
-<div class="sourceCode" id="cb111"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb110"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jennybc/gapminder">gapminder</a></span><span class="op">)</span>
 <span class="va">gapminder_filt</span> <span class="op">&lt;-</span> <span class="va">gapminder</span> <span class="op">%&gt;%</span> 
       <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">year</span> <span class="op">==</span> <span class="fl">2007</span>, <span class="va">continent</span> <span class="op">!=</span> <span class="st">"Oceania"</span><span class="op">)</span></code></pre></div>
 <p>Let’s plot our filtered data using <code>geom_point()</code></p>
-<div class="sourceCode" id="cb112"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb111"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">gapminder_filt</span>, 
        mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">gdpPercap</span>, 
                      y <span class="op">=</span> <span class="va">lifeExp</span>, 
@@ -1155,7 +1154,7 @@ FIGURE 1.3: `mutate() adds a column to a tibble.
   <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-95-1.png" width="100%"></div>
 <p>It is difficult to compare the continents despite the colors. It would be much easier if we could “split” this scatterplot by the 4 continents. In other words, we would create plots of <code>gdpPercap</code> and <code>lifeExp</code> for each <code>continent</code> separately. We do this by using the function <code>facet_wrap()</code> with the argument <code>~ continent</code>.</p>
-<div class="sourceCode" id="cb113"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb112"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">gapminder_filt</span>, 
        mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">gdpPercap</span>, 
                      y <span class="op">=</span> <span class="va">lifeExp</span>, 
@@ -1164,7 +1163,7 @@ FIGURE 1.3: `mutate() adds a column to a tibble.
   <span class="fu">facet_wrap</span><span class="op">(</span><span class="op">~</span> <span class="va">continent</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-96-1.png" width="100%"></div>
 <p>This is much better! We can specify the number of rows and columns in the grid by using the <code>nrow</code> argument inside of <code>facet_wrap()</code>. Let’s get all continents in a row by setting <code>nrow</code> to 1. Let’s also add a trend line <code>geom_smooth()</code> to our faceted plot.</p>
-<div class="sourceCode" id="cb114"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb113"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">gapminder_filt</span>, 
        mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">gdpPercap</span>, 
                      y <span class="op">=</span> <span class="va">lifeExp</span>, 
@@ -1182,14 +1181,14 @@ FIGURE 1.3: `mutate() adds a column to a tibble.
 <span class="header-section-number">1.4.3</span> Stats<a class="anchor" aria-label="anchor" href="#stats"><i class="fas fa-link"></i></a>
 </h3>
 <p>Consider the following histogram.</p>
-<div class="sourceCode" id="cb115"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb114"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">gapminder</span>, 
        mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">lifeExp</span><span class="op">)</span><span class="op">)</span><span class="op">+</span> 
   <span class="fu">geom_histogram</span><span class="op">(</span>bins <span class="op">=</span> <span class="fl">20</span>, 
                  color <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-98-1.png" width="100%"></div>
 <p>Recall that the y-aesthetic of a histogram — the count of the observations in each bin — gets computed automatically. We can use the <code>after_stat()</code> argument within <code>geom_histogram()</code> to generate percent values as our y-aesthetic.</p>
-<div class="sourceCode" id="cb116"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb115"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">gapminder</span>, 
        mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">lifeExp</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">geom_histogram</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y <span class="op">=</span> <span class="fu">after_stat</span><span class="op">(</span><span class="va">count</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">count</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, 
@@ -1203,7 +1202,7 @@ FIGURE 1.3: `mutate() adds a column to a tibble.
 </h3>
 <!-- DK: Awk? Delete? Need more tricks, but more pithily explained and demonstrated. -->
 <p>We can switch the axes on a plot with <code>coord_flip()</code>. Consider the faceted scatterplot we previously created.</p>
-<div class="sourceCode" id="cb117"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb116"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">gapminder_filt</span>, 
        mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">gdpPercap</span>, 
                      y <span class="op">=</span> <span class="va">lifeExp</span>, 
@@ -1215,7 +1214,7 @@ FIGURE 1.3: `mutate() adds a column to a tibble.
               se <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-100-1.png" width="100%"></div>
 <p>Adding the layer <code>coord_flip()</code> flips the axes.</p>
-<div class="sourceCode" id="cb118"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb117"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">gapminder_filt</span>, 
        mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">gdpPercap</span>, 
                      y <span class="op">=</span> <span class="va">lifeExp</span>, 
@@ -1234,7 +1233,7 @@ FIGURE 1.3: `mutate() adds a column to a tibble.
 <span class="header-section-number">1.4.5</span> Axis Limits and Scales<a class="anchor" aria-label="anchor" href="#axis-limits-and-scales"><i class="fas fa-link"></i></a>
 </h3>
 <p>We can also manipulate the limits of the axes by using <code><a href="https://rdrr.io/r/graphics/plot.window.html">xlim()</a></code> and <code><a href="https://rdrr.io/r/graphics/plot.window.html">ylim()</a></code> within a call to <code>coord_cartesian()</code>. For example, assume that we are only interested in countries with a GDP per capita from 0 to 30,000. Recall that, because <code>data</code> is the first argument and <code>mapping</code> is the second to <code>ggplot()</code>, we don’t actually have to name the arguments. We can just provide them, as long as they are in the correct order.</p>
-<div class="sourceCode" id="cb119"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb118"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span><span class="va">gapminder_filt</span>, 
        <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">gdpPercap</span>, y <span class="op">=</span> <span class="va">lifeExp</span>, color <span class="op">=</span> <span class="va">continent</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
@@ -1243,7 +1242,7 @@ FIGURE 1.3: `mutate() adds a column to a tibble.
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-102-1.png" width="100%"></div>
 <p>We can see that the GDP per capita on the x-axis is now only shown from 0 to 30,000.</p>
 <p>We can also change the scaling of the axes. For example, it might be useful to display the axes on a logarithmic scale by using <code>scale_x_log10()</code> or <code>scale_y_log10()</code>. Also, note that we can (lazily!) not provide the explicit <code>x</code> and <code>y</code> argument names to <code>aes()</code> as long as we provide the values in the right order: <code>x</code> comes before <code>y</code>.</p>
-<div class="sourceCode" id="cb120"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb119"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span><span class="va">gapminder_filt</span>, 
        <span class="fu">aes</span><span class="op">(</span><span class="va">gdpPercap</span>, <span class="va">lifeExp</span>, color <span class="op">=</span> <span class="va">continent</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
@@ -1260,7 +1259,7 @@ FIGURE 1.3: `mutate() adds a column to a tibble.
 <!-- DK: Should learn about ggrepel -->
 <p>Recall we use <code>labs()</code> to add labels and titles to our plots.
 We can also change labels inside the plots using <code>geom_text()</code>.</p>
-<div class="sourceCode" id="cb121"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb120"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span><span class="va">gapminder_filt</span>, 
        <span class="fu">aes</span><span class="op">(</span><span class="va">gdpPercap</span>, <span class="va">lifeExp</span>, color <span class="op">=</span> <span class="va">continent</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
@@ -1285,7 +1284,7 @@ We can also change labels inside the plots using <code>geom_text()</code>.</p>
 </h3>
 <p><strong>Themes</strong> can be used to change the overall appearance of a plot without much effort. We add themes as layers to our plots. You can find an overview of the different themes in <strong>ggplot</strong> <a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">here</a>.</p>
 <p>Consider the following faceted scatterplot.</p>
-<div class="sourceCode" id="cb122"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb121"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">gapminder</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">continent</span> <span class="op">!=</span> <span class="st">"Oceania"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">year</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">year</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -1303,7 +1302,7 @@ We can also change labels inside the plots using <code>geom_text()</code>.</p>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-105-1.png" width="100%"></div>
 <p>Note the use of the <code>breaks</code> argument to <code>scale_x_log10()</code>. This specifies the location of labels on the x-axis. We can also use the <code>labels</code> argument if we want to change their appearence. These tricks work in the entire family of <code>scale_*</code> functions.</p>
 <p>Let’s now add a theme to our faceted scatterplot. We will use the theme <code><a href="https://rdrr.io/pkg/ggthemes/man/theme_economist.html">theme_economist()</a></code>, from the <strong>ggthemes</strong> package, to make our plot look like the plots in the <em>The Economist</em>.</p>
-<div class="sourceCode" id="cb123"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb122"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://github.com/jrnold/ggthemes">ggthemes</a></span><span class="op">)</span>
 
 <span class="va">gapminder</span> <span class="op">%&gt;%</span>
@@ -1324,7 +1323,7 @@ We can also change labels inside the plots using <code>geom_text()</code>.</p>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-106-1.png" width="100%"></div>
 <p>This looks pretty good. However, notice the legend the top of our graph. It crowds our graph and takes away from the most important part: the data. We can use <code>theme()</code> to customize the non-data parts of our plots such as background, gridlines, and legends. Let’s de-clutter the graph by removing our legend. We can do this by using the <code>legend.position</code> argument and setting it to “none.”</p>
 <!-- DK: Make this new code consistent with the above. -->
-<div class="sourceCode" id="cb124"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb123"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">gapminder</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">continent</span> <span class="op">!=</span> <span class="st">"Oceania"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">year</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">year</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -1363,7 +1362,7 @@ We can also change labels inside the plots using <code>geom_text()</code>.</p>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-108-1.png" width="100%"></div>
 <p>You now know enough to make plots like this by yourself.</p>
 <p>It is important to know that we have only seen a small part of what R offers. For example, we can use the <strong>gganimate</strong> package to bring a slightly modified version of our gapminder plot to life:</p>
-<div class="sourceCode" id="cb125"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb124"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://gganimate.com">gganimate</a></span><span class="op">)</span>
 
 <span class="va">gap_anim</span> <span class="op">&lt;-</span> <span class="va">gapminder</span> <span class="op">%&gt;%</span>
@@ -1384,7 +1383,7 @@ We can also change labels inside the plots using <code>geom_text()</code>.</p>
 <span class="va">gap_anim</span></code></pre></div>
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-109-1.gif" width="100%"></div>
 <p>The <strong>plotly</strong> package makes our plot interactive. Click on it and explore!</p>
-<div class="sourceCode" id="cb126"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb125"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://plotly-r.com">plotly</a></span><span class="op">)</span>
 
 <span class="fu"><a href="https://docs.ropensci.org/plotly/reference/ggplotly.html">ggplotly</a></span><span class="op">(</span><span class="va">gap_p</span><span class="op">)</span></code></pre></div>

@@ -72,7 +72,7 @@
 <span class="header-section-number">3.1</span> Introduction<a class="anchor" aria-label="anchor" href="#introduction"><i class="fas fa-link"></i></a>
 </h2>
 <p>Start by loading the packages which we will need in this chapter.</p>
-<div class="sourceCode" id="cb400"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb399"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">primer.data</span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://lubridate.tidyverse.org">lubridate</a></span><span class="op">)</span>
@@ -88,7 +88,7 @@
 </h2>
 <p>The <code>read_csv()</code> function turns text files into tibbles. More specifically, it converts files whose values are separated by commas. Let’s import a <strong>c</strong>omma <strong>s</strong>eparated <strong>v</strong>alues (hence “csv”) file from the internet. The <code>read_csv()</code> function included in the <strong>readr</strong> package, which is one of the packages in the Tidyverse, is different than the <code><a href="https://rdrr.io/r/utils/read.table.html">read.csv()</a></code> function that comes installed with R. Always use Tidyverse functions, if possible.</p>
 <p>Each comma from the csv file corresponds to a column, and the column names are taken from the first line of the file. The function then “guesses” an appropriate data type for each of the columns. The link below is for a file containing faculty gender data across departments at Harvard University. Note, the <code>file</code> argument of the <code>read_csv()</code> function is very flexible. Below, it takes a url. <code>file</code> can also be the absolute or relative path for a file saved locally on your computer.</p>
-<div class="sourceCode" id="cb401"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb400"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">url</span> <span class="op">&lt;-</span> <span class="st">"https://raw.githubusercontent.com/PPBDS/primer/master/02-wrangling/data/faculty.csv"</span>
 
 <span class="va">fac</span> <span class="op">&lt;-</span> <span class="fu">read_csv</span><span class="op">(</span>file <span class="op">=</span> <span class="va">url</span>, 
@@ -100,7 +100,7 @@
 ##   `Professors M` = col_double(),
 ##   `Professors F` = col_double()
 ## )</code></pre>
-<div class="sourceCode" id="cb403"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb402"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fac</span></code></pre></div>
 <pre><code>## # A tibble: 45 x 3
 ##    Concentration                      `Professors M` `Professors F`
@@ -117,7 +117,7 @@
 ## 10 Sociology                                      11              7
 ## # … with 35 more rows</code></pre>
 <p>We need to “skip” the first row of the file because there is a code comment at the top, which has nothing to do with the actual data.</p>
-<div class="sourceCode" id="cb405"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb404"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">fac</span><span class="op">)</span></code></pre></div>
 <pre><code>##  Concentration       Professors M  Professors F
 ##  Length:45          Min.   :  0   Min.   :  0  
@@ -137,7 +137,7 @@
 <p>The data we need to answer a question is not always in a handy csv file. For example, we can find interesting data about murders in the US in <a href="https://en.wikipedia.org/w/index.php?title=Gun_violence_in_the_United_States_by_state">this Wikipedia page</a>:</p>
 <div class="inline-figure"><img src="03-data/images/murders-data-wiki-page.png" width="100%"></div>
 <p>To get this data, we need to do some web scraping, a process which begins with a URL, a <strong>u</strong>niform <strong>r</strong>esource <strong>l</strong>ocator.</p>
-<div class="sourceCode" id="cb407"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb406"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">url</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"https://en.wikipedia.org/w/index.php?title="</span>,
               <span class="st">"Gun_violence_in_the_United_States_by_state"</span>,
               <span class="st">"&amp;direction=prev&amp;oldid=810166167"</span><span class="op">)</span></code></pre></div>
@@ -183,46 +183,46 @@ title="List of U.S. states and territories by population"&gt;Population&lt;/a&gt
 <span class="header-section-number">3.2.2</span> The rvest package<a class="anchor" aria-label="anchor" href="#the-rvest-package"><i class="fas fa-link"></i></a>
 </h3>
 <p><strong>rvest</strong>, maintained by <a href="https://rvest.tidyverse.org/">the team at RStudio</a>, is the best package for getting data from the web. Although there are a bewildering array of R packages for every task, you should always start with one maintained by high quality people/organizations. <a href="https://www.tidyverse.org/packages/">RStudio maintained packages</a> are always good. A new version, 1.0, of <strong>rvest</strong> is imminent. Upgrade once it comes out.</p>
-<div class="sourceCode" id="cb409"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb408"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://rvest.tidyverse.org/">rvest</a></span><span class="op">)</span>
 <span class="va">h</span> <span class="op">&lt;-</span> <span class="fu">read_html</span><span class="op">(</span><span class="va">url</span><span class="op">)</span></code></pre></div>
 <p>Note that the entire Murders in the US Wikipedia webpage is now contained in <code>h</code>. The class of this object is:</p>
-<div class="sourceCode" id="cb410"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb409"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/class.html">class</a></span><span class="op">(</span><span class="va">h</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "xml_document" "xml_node"</code></pre>
 <p>The <strong>rvest</strong> package is actually more general; it handles XML documents. XML is a general markup language used to represent any kind of data. HTML is a specific type of XML developed for representing webpages. Here we focus on HTML documents.</p>
 <p>Now, how do we extract the table from the object <code>h</code>? If we print <code>h</code>, we don’t really see much:</p>
-<div class="sourceCode" id="cb412"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb411"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">h</span></code></pre></div>
 <pre><code>## {html_document}
 ## &lt;html class="client-nojs" lang="en" dir="ltr"&gt;
 ## [1] &lt;head&gt;\n&lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8 ...
 ## [2] &lt;body class="mediawiki ltr sitedir-ltr mw-hide-empty-elt ns-0 ns-subject  ...</code></pre>
 <p>We can see all the code that defines the downloaded webpage using the <code>html_text</code> function like this:</p>
-<div class="sourceCode" id="cb414"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb413"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rvest.tidyverse.org/reference/html_text.html">html_text</a></span><span class="op">(</span><span class="va">h</span><span class="op">)</span></code></pre></div>
 <p>We don’t show the output here because it includes thousands of characters, but if we look at it, we can see that the data is stored in an HTML table – note the line of the HTML code above <code>&lt;table class="wikitable sortable"&gt;</code>. The different parts of an HTML document, often defined with a message in between <code><a href="https://rdrr.io/r/base/Comparison.html">&lt;</a></code> and <code><a href="https://rdrr.io/r/base/Comparison.html">&gt;</a></code> are referred to as nodes. The <strong>rvest</strong> package includes functions to extract nodes of an HTML document: <code>html_nodes</code> extracts all nodes of different types and <code>html_node</code> extracts the first one. To extract the tables from the html code we use:</p>
-<div class="sourceCode" id="cb415"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb414"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">tab</span> <span class="op">&lt;-</span> <span class="va">h</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rvest.tidyverse.org/reference/html_nodes.html">html_nodes</a></span><span class="op">(</span><span class="st">"table"</span><span class="op">)</span></code></pre></div>
 <p>Now, instead of the entire webpage, we just have the html code for the tables in the page:</p>
-<div class="sourceCode" id="cb416"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb415"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">tab</span></code></pre></div>
 <pre><code>## {xml_nodeset (2)}
 ## [1] &lt;table class="wikitable sortable"&gt;&lt;tbody&gt;\n&lt;tr&gt;\n&lt;th&gt;State\n&lt;/th&gt;\n&lt;th&gt;\n ...
 ## [2] &lt;table class="nowraplinks hlist mw-collapsible mw-collapsed navbox-inner" ...</code></pre>
 <p>The table we are interested is the first one:</p>
-<div class="sourceCode" id="cb418"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb417"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">tab</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></code></pre></div>
 <pre><code>## {html_node}
 ## &lt;table class="wikitable sortable"&gt;
 ## [1] &lt;tbody&gt;\n&lt;tr&gt;\n&lt;th&gt;State\n&lt;/th&gt;\n&lt;th&gt;\n&lt;a href="/wiki/List_of_U.S._states ...</code></pre>
 <p>This is clearly not a tidy dataset, not even a data frame. In the code above, you can definitely see a pattern and writing code to extract just the data is very doable. In fact, <strong>rvest</strong> includes a function just for converting HTML tables into data frames:</p>
-<div class="sourceCode" id="cb420"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb419"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">tab</span> <span class="op">&lt;-</span> <span class="va">tab</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">%&gt;%</span> <span class="va">html_table</span>
 <span class="fu"><a href="https://rdrr.io/r/base/class.html">class</a></span><span class="op">(</span><span class="va">tab</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "data.frame"</code></pre>
 <p>We are now much closer to having a usable data table:</p>
-<div class="sourceCode" id="cb422"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb421"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">tab</span> <span class="op">&lt;-</span> <span class="va">tab</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html">setNames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"state"</span>, <span class="st">"population"</span>, 
                           <span class="st">"total"</span>, <span class="st">"murder_rate"</span><span class="op">)</span><span class="op">)</span> 
 
