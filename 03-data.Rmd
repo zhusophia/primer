@@ -18,7 +18,7 @@ library(gapminder)
 library(fivethirtyeight)
 ```
 
-## Data Gathering
+## Reading Files
 
 The `read_csv()` function turns text files into tibbles. More specifically, it converts files whose values are separated by commas. Let’s import a **c**omma **s**eparated **v**alues (hence "csv") file from the internet. The `read_csv()` function included in the **readr** package, which is one of the packages in the Tidyverse, is different than the `read.csv()` function that comes installed with R. Always use Tidyverse functions, if possible. 
 
@@ -44,6 +44,20 @@ You may notice that something appears to be wrong with this dataset. Which depar
 
 <!-- DK: Mention other read in functions, and packages like readxl. Connect it better to the tutorials. -->
 
+### JSON
+
+An increasingly common format for sharing data is JavaScript Object Notation or JSON. Because this format is very general, it is nothing like a spreadsheet. Consider an example of information stored in a JSON format:
+
+```{r, echo = FALSE}
+library(jsonlite)
+example <- data.frame(name= c("Miguel", "Sofia", "Aya", "Cheng"), student_id = 1:4, exam_1 = c(85, 94, 87, 90), exam_2 = c(86, 93, 88, 91))
+json <- toJSON(example, pretty = TRUE) 
+json
+```
+
+The file above actually represents a tibble. To read it, we can use the function `fromJSON` from the **jsonlite** package. Note that JSON files are often made available via the internet. Several organizations provide a JSON API or a web service that you can connect directly to and from which you can obtain data.
+
+## Webscraping
 
 ### HTML
 
@@ -188,16 +202,11 @@ In fact, the complexity of webpages has been increasing as they become more soph
 SelectorGadget^[http://selectorgadget.com/] is piece of software that allows you to interactively determine what CSS selector you need to extract specific components from the webpage. If you plan on scraping data other than tables from html pages, we highly recommend you install it. A Chrome extension is available which permits you to turn on the gadget and then, as you click through the page, it highlights parts and shows you the selector you need to extract these parts. There are various demos of how to do this including **rvest** author Hadley Wickham's
 vignette^[https://cran.r-project.org/web/packages/rvest/vignettes/selectorgadget.html] and other tutorials based on the vignette^[https://stat4701.github.io/edav/2015/04/02/rvest_tutorial/] ^[https://www.analyticsvidhya.com/blog/2017/03/beginners-guide-on-web-scraping-in-r-using-rvest-with-hands-on-knowledge/].
 
-### JSON
+ 
 
-An increasingly common format for sharing data is JavaScript Object Notation or JSON. Because this format is very general, it is nothing like a spreadsheet. Consider an example of information stored in a JSON format:
+## Working with APIs
 
-```{r, echo = FALSE}
-library(jsonlite)
-example <- data.frame(name= c("Miguel", "Sofia", "Aya", "Cheng"), student_id = 1:4, exam_1 = c(85, 94, 87, 90), exam_2 = c(86, 93, 88, 91))
-json <- toJSON(example, pretty = TRUE) 
-json
-```
+## Working with Databases
 
-The file above actually represents a tibble. To read it, we can use the function `fromJSON` from the **jsonlite** package. Note that JSON files are often made available via the internet. Several organizations provide a JSON API or a web service that you can connect directly to and from which you can obtain data. 
 
+## Summary
