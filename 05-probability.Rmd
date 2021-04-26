@@ -1328,7 +1328,7 @@ As you may have noticed, if you calculated the value using the first method, you
 
 The four [Cardinal Virtues](https://en.wikipedia.org/wiki/Cardinal_virtues) are Wisdom, Justice, Courage, and Temperance. Because data science is, ultimately, a moral act, we use these virtues to guide our work.  
 
-* *Wisdom* begins with the ideal Preceptor Table. What data, if we had it, would allow us to answer our question easily? We explore the data we have. Are the data we have close enough to the data we want that we can consider all the data as coming from the same *population*? If not, we can't proceed further. As John Tukey noted, "The combination of some data and an aching desire for an answer does not ensure that a reasonable answer can be extracted from a given body of data."
+* *Wisdom* begins with the ideal Preceptor Table. What data, if we had it, would allow us to answer our question easily? We explore the data we have. Are the data we have close enough to the data we want that we can consider all the data as coming from the same *population*? If not, we can't proceed further. 
 
 * *Justice* looks at the actual Preceptor Table, a structure which includes a row for every unit in the population -- the data we want to have and the data which we actually have. Is our data *representative* of the population? Is the meaning of the columns consistent, i.e., can we assume *validity*? We then make an assumption about the *data generating mechanism*. What mathematical formula connects the outcome variable we are interested in with the other data that we have?
 
@@ -1346,7 +1346,7 @@ knitr::include_graphics("other/images/Wisdom.jpg")
 
 Wisdom helps us decide if we can even hope to answer our question with the data we have.
 
-First, start with the ideal Preceptor Table. What rows and columns of data do you need such that, if you had them all, the calculation of the number of interest would be trivial? If you want to know the average height of an adult in India, then the ideal Preceptor Table would include a row for each adult and one column for their height. With no missing data, the average is easy to determine, as would a wide variety of other *estimands*, other unknown numbers. 
+First, start with the ideal Preceptor Table. What rows and columns of data do you need such that, if you had them all, the calculation of the number of interest would be trivial? If you want to know the average height of an adult in India, then the ideal Preceptor Table would include a row for each adult and a column for their height. With no missing data, the average is easy to determine, as would a wide variety of other *estimands*, other unknown numbers. 
 
 One key aspect of this ideal Preceptor Table is whether or not we need more than one potential outcome in order to calculate our estimand. For example, if we want to know the causal effect of exposure to Spanish-speakers on attitude toward immigration that we need a causal model, one which estimates that attitude under both treatment and control. The Preceptor Table would require two columns for the outcome. If, on the other hand, we only want to predict someone's attitude, or compare one person's attitide to another's, then we would only need a Preceptor Table with one column for the outcome. 
 
@@ -1360,21 +1360,23 @@ With causal inference, however, we can consider the case of Joe with $X = 5$ and
 
 *The difference between prediction models and causal models is that the former have one column for Y and the latter have more than one.* 
 
-Second, we look at the data we have and perform an exploratory data analysis, an EDA. You can never look at your data too much.
+Second, we look at the data we have and perform an exploratory data analysis, an EDA. You can never look at your data too much. The most important variable is the one we most want to understand/explain/predict/manipulate. In the models we create in later chapters. This variable will go on the lefthand side of our mathematical equations. Some academic fields refer to this as the "dependent variable." Others use terms like "regressor" or "outcome." Whatever the terminology, we need to explore the distribution of this variable, its min/max/range, its mean and median, its standard deviation.  
 
+@roas write:
 
+> Most important is that the data you are analyzing should map to the research question you are trying to answer. This sounds obvious but is often overlooked or ignored because it can be inconvenient. Optimally, this means that the outcome measure should accurately reflect the phenomenon of interest, the model should include all relevant predictors, and the model should generalize to the cases to which it will be applied.
 
-Third, a key concept is the "population," which is largely equivalent to the rows of the ideal Preceptor Table, as discussed in Chapter \@ref(rubin-causal-model). @roas write:
+> For example, with regard to the outcome variable, a model of incomes will not necessarily tell you about patterns of total assets. A model of test scores will not necessarily tell you about child intelligence or cognitive development. ...
 
-<!-- DK: This is not bad, but needs to be re-written. -->
+We care about other variables as well, especially those that are most correlated/connected with the outcome variable. The more time that we spend looking at these variables, the more likely we are to create a useful model.
 
-> A regression model is fit to data and is used to make inferences about a larger population, hence the implicit assumption in interpreting regression coefficients is that the sample is representative of the population.
+Third, a key concept is the "population." We need the data we want, the ideal Preceptor Table, and the data we have to be similar enough that we can consider them as all having come from the same statistical population. From [Wikipedia](https://en.wikipedia.org/wiki/Statistical_population):
 
-> To be more precise, the key assumption is that the data are representative of the distribution of the outcome $y$ given the predictors $x_1$, $x_2$, ..., that are included in the model. For example, in a regression of earnings on height and sex, it would be acceptable for women and tall people to be overrepresented in the sample, compared to the general population, but problems would arise if the sample includes too many rich people. Selection on x does not interfere with inferences from the regression model, but selection on y does. This is one motivation to include more predictors in our regressions, to allow the assumption of representativeness, conditional on X, to be more reasonable.
+> In statistics, a population is a set of similar items or events which is of interest for some question or experiment. A statistical population can be a group of existing objects (e.g. the set of all stars within the Milky Way galaxy) or a hypothetical and potentially infinite group of objects conceived as a generalization from experience (e.g. the set of all possible hands in a game of poker).
 
-> Representativeness is a concern even with data that would not conventionally be considered as a sample. For example, the forecasting model in Section 7.1 contains data from 16 consecutive elections, and these are not a sample from anything, but one purpose of the model is to predict future elections. Using the regression fit to past data to predict the next election is mathematically equivalent to considering the observed data and the new outcome as a random sample from a hypothetical superpopulation. Or, to be more precise, it is like treating the errors as a random sample from the normal error distribution. For another example, if a regression model is fit to data from the 50 states, we are not interested in making predictions for a hypothetical 51st state, but you may well be interested in the hypothetical outcome in the 50 states in a future year. As long as some generalization is involved, ideas of statistical sampling arise, and we need to think about representativeness of the sample to the implicit or explicit population about which inferences will be drawn. This is related to the idea of generative modeling, as discussed in Section 4.1.
+If we assume that the data we have is drawn from the same population as the data in the ideal Preceptor Table, then we can use information about the former to make inferences about the latter. We can combine the ideal Preceptor Table and the data into a single hypothetical data set. If we can't do that, if we can't assume that the two sources come from the same population, then we can't use our data to answer our questions. We have no choice but to walk away. The heart of Wisdom is knowing when to walk away. As John Tukey noted: 
 
-
+> The combination of some data and an aching desire for an answer does not ensure that a reasonable answer can be extracted from a given body of data.
 
 ### Justice
 
@@ -1382,60 +1384,33 @@ Third, a key concept is the "population," which is largely equivalent to the row
 knitr::include_graphics("other/images/Justice.jpg")
 ```
 
+After Wisdom, we have an *actual Preceptor Table.* It includes rows for the data we have and the data we want to have. It has missing values, most importantly for potential outcomes which were not observed. The central problem in inference is to fill in the question marks in the actual Preceptor Table.
+
 There are three key aspects of *Justice*: the data generating mechanism, representativeness and validity.
 
-First, the *data generating mechanism* is the mathematical formula, and associated error term, which relates covariates to our outcome variable.  
+First, the *data generating mechanism* is the mathematical formula, and associated error term, which relates  our outcome variable to our covariates.  
+
+*Justice requires math.* Consider a model of coin-tossing:
 
 
-*Justice* requires (simple) math. Consider a model of coin-tossing:
-
-
-$$ T_i  \sim B(p_H, n = 20) $$
-The total number $T$ of Heads in experiment $i$ with 20 flips of a single coin, $T_i$, is distributed as a binomial with $n = 20$ and an unknown probability $\rho_h$ of the coin coming up Heads. 
+$$ H_i  \sim B(\rho_H, n = 20) $$
+The total number $H$ of Heads in experiment $i$ with 20 flips of a single coin, $H_i$, is distributed as a binomial with $n = 20$ and an unknown probability $\rho_h$ of the coin coming up Heads. 
  
 Note:
 
-* This is a cheat and a simplification! We are Bayesians but we have not specified the full Bayesian machinery. We really need priors on the unknown parameter $\rho_h$ as well. But that is too complex for an introductory class, so we wave our hands, accept the default sensible parameters built into the functions we use and point readers to more advanced books, like @roas. 
+* This is a cheat and a simplification! We are Bayesians but we have not specified the full Bayesian machinery. We really need priors on the unknown parameter $\rho_h$ as well. But that is too complex for an introductory class, so we wave our hands, accept the default sensible parameters built into the R packages we use and point readers to more advanced books, like @roas. 
 
 * Defining $\rho_h$ as the "the probability that the coin comes up Heads" is a bit of a fudge. If you calculate that by hand and then compare it to what our tools produce, they won't be the same. Instead, the calculated value will be closer to zero. Why? $\rho_h$ is really the "long-run percentage of the time the coin comes up Heads." It is not just the percentage from this experiment. 
 
+<!-- DK: Unclear -->
 
 * In this simple case, we are fortunate that the parameter $\rho_h$ has such a (mostly!) simple analog to a real world quantity. Much of the time, parameters are not so easy to interpret. In a more complex model, especially with one with interaction terms, we focus less on parameters and more on actual predictions.
 
-Second,
+* Wisdom allowed us to assume that all the rows in the actual Preceptor Table come from the same population. If that is true, then it is also true that the mathematical relationship between outcomes and covariates is consistent across these rows.
 
+Second, we should check how "representative" the data we have is of the entire population. 
 
-Third, confirm that the data we have accurately capturing the concepts we care about. Is the data *valid*, given the problem we are trying to solve? @roas write:
-
-> Most important is that the data you are analyzing should map to the research question you are trying to answer. This sounds obvious but is often overlooked or ignored because it can be inconvenient. Optimally, this means that the outcome measure should accurately reflect the phenomenon of interest, the model should include all relevant predictors, and the model should generalize to the cases to which it will be applied.
-
-> For example, with regard to the outcome variable, a model of incomes will not necessarily tell you about patterns of total assets. A model of test scores will not necessarily tell you about child intelligence or cognitive development. ...
-
-> A sample that is representative of all mothers and children may not be the most appropriate for making inferences about mothers and children who participate in the Temporary Assistance for Needy Families program. ... Similarly, results regarding diet and exercise obtained from a study performed on patients at risk for heart disease may not be generally applicable to generally healthy individuals. 
-
-We want there to be a connection between the problem we face and the data we have. But desire is a poor replacement for substance. If the data we have is not relevant, then data science is useless.
-
-
-
-We want there to be a connection between the problem we face and the data we have. But desire is a poor replacement for substance. If the data we have is not relevant, then data science is useless.
-
-#### Preceptor Table
-
-<!-- DK: Could have more here. -->
-
-Precision matters. What do you know and what do you want to know? Creating a Preceptor Table forces you to be clear about what you are trying to accomplish and the problems you will face along the way.
-
-**A Preceptor Table is a table with rows and columns for all the data that we have and would (reasonably) like to have.** If we had a Preceptor Table with no questions marks --- which we describe below as the ideal Preceptor Table --- we could calculate the number we want without the need for any inference.
-
-First, the infinite Preceptor Table is well described in Chapter \@ref(rubin-causal-model). We never use these, but it useful to understand them, and the assumptions we must make to work with something simpler. 
-
-Second, the ideal Preceptor Table is the Preceptor Table with no question marks, and with a reasonable number of rows and columns. Conceptually, this is the heart of the analysis. 
-
-Third, the actual Preceptor Table is the Preceptor Table with all the annoying question marks which the real world saddles us with. 
-
-The central problem in inference is to fill in the question marks on the actual Preceptor Table.
-
-Note that the concept of a Preceptor Table is more subtle than it at first appears. For example, consider a problem in which we are using `party` to predict `income` with the `trains` data. Naively, it might look like we don't have any question marks. For all 115 rows in the data, we have `party` and `income`. But the Preceptor Table we really need has more than 115 rows because we are trying to draw inferences about people not in the sample of 115. What if a new person shows up, tells us their party, and asks us to guess their income? The ideal Preceptor Table would include their row, with the data for `party` present but the data for `income` a question mark.
+Third, confirm that the data we have accurately capturing the concepts we care about. Is the data *valid*, given the problem we are trying to solve? 
 
 
 
