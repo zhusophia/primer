@@ -18,68 +18,133 @@ library(gapminder)
 library(fivethirtyeight)
 ```
 
-## Reading Files
 
-The `read_csv()` function turns text files into tibbles. More specifically, it converts files whose values are separated by commas. Let’s import a **c**omma **s**eparated **v**alues (hence "csv") file from the internet. The `read_csv()` function included in the **readr** package, which is one of the packages in the Tidyverse, is different than the `read.csv()` function that comes installed with R. Always use Tidyverse functions, if possible. 
+## Writing and Reading Files
 
-Each comma from the csv file corresponds to a column, and the column names are taken from the first line of the file. The function then "guesses" an appropriate data type for each of the columns. The link below is for a file containing faculty gender data across departments at Harvard University. Note, the `file` argument of the `read_csv()` function is very flexible. Below, it takes a url. `file` can also be the absolute or relative path for a file saved locally on your computer. 
+Getting data into and out of R is a major part of any real world data science project. 
+
+
+### CSV files
+
+"CSV" stands for **c**omma **s**eparated **v**alue. In other words, csv files are files whose values are separated by commas. Each comma from the csv file corresponds to a column, and the column names are taken from the first line of the file. The function then "guesses" an appropriate data type for each of the columns.
+
+In the real word, you often want to write a data frame that has changed (either through filtering, selecting, mutating or summarizing) to a file to share it with others. We use `write_csv()` to save a data frame to a .csv file. `write_csv()` has two main arguments: `x` and `path`. The `x` argument is the data set that you want to save. The `file` argument is the file path where you want to save the file. The end of the path argument is the name that you want to use for the file. 
+
+<!-- Does there need to be an example here? -->
+
+We use `read_csv()` from the **readr** package to load the data into R, and in that call we specify the relative path to the file
+
+Consider the following csv file "test_2.csv". 
 
 ```{r}
-url <- "https://raw.githubusercontent.com/PPBDS/primer/master/02-wrangling/data/faculty.csv"
+file_1 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/test_2.csv"
 
-fac <- read_csv(file = url, 
-                skip = 1)
-fac
+read_csv(file_1)
 ```
 
-We need to "skip" the first row of the file because there is a code comment at the top, which has nothing to do with the actual data.
+As you can see, there is text at the top of this file. Often times information about how data was collected, or other relevant information, is included at the top of the data file. This does not allow us to correctly load the data into R, and it is not intended to be shown.
+
+We can use the `skip` argument to skip the text lines.
 
 ```{r}
-summary(fac)
+read_csv(file = file_1,
+         skip = 2)
 ```
 
-Don't confuse `summary()`, which is a built-in --- generally termed "base" --- R function for providing a summary of an object, with `summarize()`, which is one of the more important functions from **dplyr**, one of the Tidyverse packages.
+Do you see the column specification message? As of now, R "guesses" an appropriate data type for each of the columns. To get rid of this message, we use the `col_types()` argument and specify the data types.
 
-You may notice that something appears to be wrong with this dataset. Which department could have employed 644 male professors? We will explore this mystery later in the Chapter.
+```{r}
+read_csv(file = file_1,
+         skip = 1,
+         col_types = cols(a = col_double(),
+                          b = col_double(),
+                          c = col_double()))
 
-<!-- DK: Mention other read in functions, and packages like readxl. Connect it better to the tutorials. -->
+```
 
-### JSON
 
-An increasingly common format for sharing data is JavaScript Object Notation or JSON. Because this format is very general, it is nothing like a spreadsheet. Consider an example of information stored in a JSON format:
+When our tabular data comes in a different format, we can use the `read_delim()` function instead. For example, a different version of "test_2.csv" could exist that has no column names and uses tabs as the delimiter instead of commas.
+
+With `read_delim()`, we specify the first argument as the path to the file (as done with read_csv). Then we provide values to the `delim` argument (could be a tab, which we represent by "\t").
+
+### Excel Files
+
+Excel is a spreadsheet program that use tables to analyze, store, or manipulate data. The tables are composed of cells which include text, numbers, or formulas .Excel files have the filename extension .xlsx. They store additional things that you cannot store in a .csv file such as fonts, text formatting, graphics, etc.
+
+In order to write excel files you have to install complex packages, and they are hard to create. Writing excel files is beyond the scope of Primer. 
+
+Reading excel files is easy. To do so, we use the `read_excel()` function from the **readxl** package.
+
+
+<!-- How do we read in excel files? -->
+
+```{r}
+library(readxl)
+```
+
+If the .xlsx file has multiple sheets, you have to use the sheet argument to specify the sheet number or name. 
+
+
+### RDS
+
+rds files store a single R object within a file. 
+
+When we save to a rds file, we use the function `write_rds()`. Just like `write_csv()`, this function has two main arguments: `x` and `file`.  The `x` argument is the data set that you want to save. The `file` argument is the file path where you want to save the file. The end of the path argument is the name that you want to use for the file. 
+
+`read_rds()` reads the file back into R. Just like `read_csv()` `read_rds` has one main argument, which is the path to the file that you are wanting to read into R.
+
+```{r}
+# need example here
+```
+
+
+## JSON
+
+An increasingly common format for sharing data is **J**avaScript **O**bject **N**otation or JSON. Because this format is very general, it is nothing like a spreadsheet. Note that JSON files are often made available via the internet. Several organizations provide a JSON API or a web service that you can connect directly to and from which you can obtain data. 
+
+The functions `fromJSON()` and `toJSON()` allow you to convert between R objects and JSON. Both functions come from the **jsonlite** package. 
+
+The function `toJSON()` converts a tibble to JSON format.
 
 ```{r, echo = FALSE}
 library(jsonlite)
-example <- data.frame(name= c("Miguel", "Sofia", "Aya", "Cheng"), student_id = 1:4, exam_1 = c(85, 94, 87, 90), exam_2 = c(86, 93, 88, 91))
-json <- toJSON(example, pretty = TRUE) 
-json
+
+example_1 <- tibble(name= c("Miguel", "Sofia", "Aya", "Cheng"), student_id = 1:4, exam_1 = c(85, 94, 87, 90), exam_2 = c(86, 93, 88, 91))
+
+toJSON(example_1, pretty = TRUE) 
+
+# The pretty argument adds indentation and whitespace when TRUE. 
 ```
 
-The file above actually represents a tibble. To read it, we can use the function `fromJSON` from the **jsonlite** package. Note that JSON files are often made available via the internet. Several organizations provide a JSON API or a web service that you can connect directly to and from which you can obtain data.
+The function `fromJSON()` converts JSON format to a tibble.
+
+```{r, echo = FALSE}
+library(jsonlite)
+
+json_format_ex <-
+'[
+  {"Name" : "Mario", "Age" : 32, "Occupation" : "Plumber"}, 
+  {"Name" : "Peach", "Age" : 21, "Occupation" : "Princess"},
+  {},
+  {"Name" : "Bowser", "Occupation" : "Koopa"}
+]'
+
+fromJSON(json_format_ex) 
+```
+
 
 ## Webscraping
 
-### HTML
+Web scraping, or web harvesting, is the process of extracting data from a website. The information used by a browser to render web pages is received as a text file from a server. The text is code written in **H**yper **T**ext **M**arkup **L**anguage (HTML). HTML is the standard language behind almost every document on the Internet. It provides the structure of the page such as images, text, and hyperlinks.
 
-<!-- DK: Rewrite these sections. -->
-
-The data we need to answer a question is not always in a handy csv file. For example, we can find interesting data about murders in the US in [this Wikipedia page](https://en.wikipedia.org/w/index.php?title=Gun_violence_in_the_United_States_by_state): 
+Consider the following webpage that contains interesting data about murders in the US in [this Wikipedia page](https://en.wikipedia.org/w/index.php?title=Gun_violence_in_the_United_States_by_state): 
 
 
 ```{r, echo = FALSE}
 knitr::include_graphics("03-data/images/murders-data-wiki-page.png")
 ```
 
-To get this data, we need to do some web scraping, a process which begins with a URL, a **u**niform **r**esource **l**ocator. 
-
-```{r}
-url <- paste0("https://en.wikipedia.org/w/index.php?title=",
-              "Gun_violence_in_the_United_States_by_state",
-              "&direction=prev&oldid=810166167")
-```
-
-
-Web scraping, or web harvesting, is the process of extracting data from a website. The information used by a browser to render web pages is received as a text file from a server. The text is code written in **H**yper **T**ext **M**arkup **L**anguage (HTML). Every browser has a way to show the html source code for a page. 
+Every browser has a way to show the html source code for a page. Here is the HTML for the webpage shown above. 
 
 ```{r, echo = FALSE}
 knitr::include_graphics("03-data/images/html-code.png")
