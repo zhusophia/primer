@@ -73,10 +73,8 @@ Excel is a spreadsheet program that use tables to analyze, store, or manipulate 
 
 In order to write excel files you have to install complex packages, and they are hard to create. Writing excel files is beyond the scope of Primer. 
 
-Reading excel files is easy. To do so, we use the `read_excel()` function from the **readxl** package.
+Reading Excel files is easy. To do so, we use the `read_excel()` function from the **readxl** package.
 
-
-<!-- How do we read in excel files? -->
 
 ```{r}
 library(readxl)
@@ -98,7 +96,7 @@ When we save to a rds file, we use the function `write_rds()`. Just like `write_
 ```
 
 
-## JSON
+### JSON
 
 An increasingly common format for sharing data is **J**avaScript **O**bject **N**otation or JSON. Because this format is very general, it is nothing like a spreadsheet. Note that JSON files are often made available via the internet. Several organizations provide a JSON API or a web service that you can connect directly to and from which you can obtain data. 
 
@@ -189,72 +187,75 @@ title="List of U.S. states and territories by population">Population</a><br />
 ```
 
 
-### The rvest package
+<!-- ### The rvest package -->
 
-**rvest**, maintained by [the team at RStudio](https://rvest.tidyverse.org/), is the best package for getting data from the web. Although there are a bewildering array of R packages for every task, you should always start with one maintained by high quality people/organizations. [RStudio maintained packages](https://www.tidyverse.org/packages/) are always good. A new version, 1.0, of **rvest** is imminent. Upgrade once it comes out. 
+<!-- **rvest**, maintained by [the team at RStudio](https://rvest.tidyverse.org/), is the best package for getting data from the web. Although there are a bewildering array of R packages for every task, you should always start with one maintained by high quality people/organizations. [RStudio maintained packages](https://www.tidyverse.org/packages/) are always good. A new version, 1.0, of **rvest** is imminent. Upgrade once it comes out.  -->
 
-```{r, message=FALSE, warning=FALSE}
-library(rvest)
-h <- read_html(url)
-```
+<!-- ```{r, message=FALSE, warning=FALSE} -->
+<!-- library(rvest) -->
 
 
-Note that the entire Murders in the US Wikipedia webpage is now contained in `h`. The class of this object is:
 
-```{r}
-class(h)
-```
-
-The **rvest** package is actually more general; it handles XML documents. XML is a general markup language used to represent any kind of data. HTML is a specific type of XML developed for representing webpages. Here we focus on HTML documents.
-
-Now, how do we extract the table from the object `h`? If we print `h`, we don't really see much:
-
-```{r}
-h
-```
-
-We can see all the code that defines the downloaded webpage using the `html_text` function like this:
-
-```{r, eval=FALSE}
-html_text(h)
-```
-
-We don't show the output here because it includes thousands of characters, but if we look at it, we can see that the data is stored in an HTML table -- note the line of the HTML code above `<table class="wikitable sortable">`. The different parts of an HTML document, often defined with a message in between  `<` and `>`  are referred to as nodes. The **rvest** package includes functions to extract nodes of an HTML document: `html_nodes` extracts all nodes of different types and `html_node` extracts the first one. To extract the tables from the html code we use:
-
-```{r} 
-tab <- h %>% html_nodes("table")
-```
-
-Now, instead of the entire webpage, we just have the html code for the tables in the page:
-
-```{r}
-tab
-```
-
-The table we are interested is the first one:
-
-```{r}
-tab[[1]]
-```
-
-This is clearly not a tidy dataset, not even a data frame. In the code above, you can definitely see a pattern and writing code to extract just the data is very doable. In fact, **rvest** includes a function just for converting HTML tables into data frames:
+<!-- h <- read_html(url) -->
+<!-- ``` -->
 
 
-```{r}
-tab <- tab[[1]] %>% html_table
-class(tab)
-```
+<!-- Note that the entire Murders in the US Wikipedia webpage is now contained in `h`. The class of this object is: -->
 
-We are now much closer to having a usable data table:
+<!-- ```{r} -->
+<!-- class(h) -->
+<!-- ``` -->
 
-```{r}
-tab <- tab %>% setNames(c("state", "population", 
-                          "total", "murder_rate")) 
+<!-- The **rvest** package is actually more general; it handles XML documents. XML is a general markup language used to represent any kind of data. HTML is a specific type of XML developed for representing webpages. Here we focus on HTML documents. -->
 
-head(tab)
-```
+<!-- Now, how do we extract the table from the object `h`? If we print `h`, we don't really see much: -->
 
-We still have some wrangling to do. For example, we need to remove the commas and turn characters into numbers. Before continuing with this, we will learn a more general approach to extracting information from web sites.
+<!-- ```{r} -->
+<!-- h -->
+<!-- ``` -->
+
+<!-- We can see all the code that defines the downloaded webpage using the `html_text` function like this: -->
+
+<!-- ```{r, eval=FALSE} -->
+<!-- html_text(h) -->
+<!-- ``` -->
+
+<!-- We don't show the output here because it includes thousands of characters, but if we look at it, we can see that the data is stored in an HTML table -- note the line of the HTML code above `<table class="wikitable sortable">`. The different parts of an HTML document, often defined with a message in between  `<` and `>`  are referred to as nodes. The **rvest** package includes functions to extract nodes of an HTML document: `html_nodes` extracts all nodes of different types and `html_node` extracts the first one. To extract the tables from the html code we use: -->
+
+<!-- ```{r}  -->
+<!-- tab <- h %>% html_nodes("table") -->
+<!-- ``` -->
+
+<!-- Now, instead of the entire webpage, we just have the html code for the tables in the page: -->
+
+<!-- ```{r} -->
+<!-- tab -->
+<!-- ``` -->
+
+<!-- The table we are interested is the first one: -->
+
+<!-- ```{r} -->
+<!-- tab[[1]] -->
+<!-- ``` -->
+
+<!-- This is clearly not a tidy dataset, not even a data frame. In the code above, you can definitely see a pattern and writing code to extract just the data is very doable. In fact, **rvest** includes a function just for converting HTML tables into data frames: -->
+
+
+<!-- ```{r} -->
+<!-- tab <- tab[[1]] %>% html_table -->
+<!-- class(tab) -->
+<!-- ``` -->
+
+<!-- We are now much closer to having a usable data table: -->
+
+<!-- ```{r} -->
+<!-- tab <- tab %>% setNames(c("state", "population",  -->
+<!--                           "total", "murder_rate"))  -->
+
+<!-- head(tab) -->
+<!-- ``` -->
+
+<!-- We still have some wrangling to do. For example, we need to remove the commas and turn characters into numbers. Before continuing with this, we will learn a more general approach to extracting information from web sites. -->
 
 
 ### CSS selectors
