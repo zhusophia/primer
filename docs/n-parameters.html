@@ -100,7 +100,7 @@ FIGURE 11.1: Wisdom
 <span class="header-section-number">11.1.1</span> EDA of <code>shaming</code><a class="anchor" aria-label="anchor" href="#eda-of-shaming"><i class="fas fa-link"></i></a>
 </h3>
 <p>Let’s now do an EDA, starting off by running <code>glimpse()</code>.</p>
-<div class="sourceCode" id="cb751"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb759"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">primer.data</span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://mc-stan.org/rstanarm/">rstanarm</a></span><span class="op">)</span>
@@ -135,7 +135,7 @@ There are a few things to note while exploring this data set. You may – or may
 <!-- HV: Should I include discussion of the left-hand variable (treatment?) here? Or wait until we move into the regressions? -->
 <p>We have not yet discussed the most important variable of them all: <code>treatment</code>. The <code>treatment</code> variable is a factor variable with 5 levels, including the control. Since we are curious as to how sending mailings affects voter turnout, the treatment variable will tell us about the impact each type of mailing can make. Let’s start off by taking a broad look at the different treatments.</p>
 <!-- HV: Is it okay to say the first sentence of this paragraph? -->
-<div class="sourceCode" id="cb753"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb761"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">shaming</span> <span class="op">%&gt;%</span>
   <span class="fu">count</span><span class="op">(</span><span class="va">treatment</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 5 x 2
@@ -196,7 +196,7 @@ FIGURE 11.3: Courage
 <span class="header-section-number">11.2.1</span> Set-up<a class="anchor" aria-label="anchor" href="#set-up"><i class="fas fa-link"></i></a>
 </h3>
 <p>We start by creating a function named <code>fcn_1()</code> that takes in a vector of “Yes”/“No” responses and returns a binary integer vector where 1 replaces “Yes,” 0 replaces “No,” and anything else becomes <code>NA</code>. The function should alert the user if they are passing in a problematic vector, i.e. one that contains lowercase “yes” and/or “no.” It will also alert the user if there are not at least once observation equal to “Yes.” You may find the <code>case_when()</code> function to be useful. <code>NA</code> can take on different types depending on the classification of the vector. Read more on this at <code>?NA</code>.</p>
-<div class="sourceCode" id="cb755"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb763"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fcn_1</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span>
   
   <span class="co"># In effort to prevent people from mis-applying this function, we want to </span>
@@ -228,7 +228,7 @@ FIGURE 11.3: Courage
 <li><p>Create a column named <code>voter_class</code> that classifies voters into 3 bins: “Always Vote” for those who voted at least 5 times, “Sometimes Vote” for those who voted between 3 or 4 times, and “Rarely Vote” for those who voted 2 or fewer times. This variable should be classified as a factor.</p></li>
 <li><p>Create a column called <code>z_age</code> which is the z-score for <code>age</code>.</p></li>
 </ul>
-<div class="sourceCode" id="cb756"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb764"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">object_1</span> <span class="op">&lt;-</span> <span class="va">shaming</span> <span class="op">%&gt;%</span> 
   
   <span class="co"># Converting the Y/N columns to binaries with the function we made note that</span>
@@ -269,7 +269,7 @@ FIGURE 11.3: Courage
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>z_age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/scale.html">scale</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">primary_06</span>, <span class="va">treatment</span>, <span class="va">sex</span>, <span class="va">civ_engage</span>, <span class="va">voter_class</span>, <span class="va">z_age</span><span class="op">)</span></code></pre></div>
 <p>Let’s inspect our object:</p>
-<div class="sourceCode" id="cb757"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb765"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">object_1</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html">slice</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 3 x 6
@@ -293,12 +293,12 @@ With variable names:</p>
 <p>There are two ways to formalize the model used in <code>model_1</code>: with and without the variable names. The former is related to the concept of Justice as we acknowledge that the model is constructed via the linear sum of <code>n</code> parameters times the value for <code>n</code> variables, along with an error term. In other words, it is a linear model. The only other model we have learned this semester is a logistic model, but there are other kinds of models, each defined by the mathematics and the assumptions about the error term.
 The second type of formal notation, more associated with the virtue Courage, includes the actual variable names we are using. The trickiest part is the transformation of character/factor variables into indicator variables, meaning variables with 0/1 values. Because <code>treatment</code> has 5 levels, we need 4 indicator variables. The fifth level — which, by default, is the first variable alphabetically (for character variables) or the first level (for factor variables) — is incorporated in the intercept.</p>
 <p>Let’s translate the model into code.</p>
-<div class="sourceCode" id="cb759"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb767"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">model_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">object_1</span>,
                   formula <span class="op">=</span> <span class="va">primary_06</span> <span class="op">~</span> <span class="va">treatment</span> <span class="op">+</span> <span class="va">sex</span>,
                   refresh <span class="op">=</span> <span class="fl">0</span>,
                   seed <span class="op">=</span> <span class="fl">987</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb760"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb768"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://docs.ropensci.org/skimr/reference/print.html">print</a></span><span class="op">(</span><span class="va">model_1</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></code></pre></div>
 <pre><code>## stan_glm
 ##  family:       gaussian [identity]
@@ -322,7 +322,7 @@ The second type of formal notation, more associated with the virtue Courage, inc
 ## * For help interpreting the printed output see ?print.stanreg
 ## * For info on the priors used see ?prior_summary.stanreg</code></pre>
 <p>We will now create a table that nicely formats the results of <code>fit_1</code> using the <code><a href="http://www.danieldsjoberg.com/gtsummary//reference/tbl_regression.html">tbl_regression()</a></code> function from the <strong>gtsummary</strong> package. It will also display the associated 95% confidence interval for each coefficient.</p>
-<div class="sourceCode" id="cb762"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb770"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="http://www.danieldsjoberg.com/gtsummary//reference/tbl_regression.html">tbl_regression</a></span><span class="op">(</span><span class="va">model_1</span>, 
                intercept <span class="op">=</span> <span class="cn">TRUE</span>, 
                estimate_fun <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="http://www.danieldsjoberg.com/gtsummary//reference/style_sigfig.html">style_sigfig</a></span><span class="op">(</span><span class="va">x</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -766,14 +766,14 @@ not be manipulated (by assumption), we should not use a causal interpretation of
 <p>The math:
 <span class="math display">\[y_{i} = \beta_{0} + \beta_{1}z\_age + \beta_{2}male_i + \beta_{3}civic\_duty_i + \\ \beta_{4}hawthorne_i + \beta_{5}self_i + \beta_{6}neighbors_i + \\ \beta_{7}Sometimes\ vote_i + \beta_{8}Always\ vote_i + \\ \beta_{9}civic\_duty_i Sometimes\ vote_i + \beta_{10}hawthorne_i Sometimes\ vote_i + \\ \beta_{11}self_i Sometimes\ vote_i + \beta_{11}neighbors_i Sometimes\ vote_i + \\ \beta_{12}civic\_duty_i Always\ vote_i + \beta_{13}hawthorne_i Always\ vote_i + \\ \beta_{14}self_i Always\ vote_i + \beta_{15}neighbors_i Always\ vote_i + \epsilon_{i}\]</span>
 Translate into code:</p>
-<div class="sourceCode" id="cb763"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb771"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">object_1</span>,
                   formula <span class="op">=</span> <span class="va">primary_06</span> <span class="op">~</span> <span class="va">z_age</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">treatment</span> <span class="op">+</span> <span class="va">voter_class</span> <span class="op">+</span> 
                             <span class="va">treatment</span><span class="op">*</span><span class="va">voter_class</span>,
                   family <span class="op">=</span> <span class="va">gaussian</span>,
                   refresh <span class="op">=</span> <span class="fl">0</span>,
                   seed <span class="op">=</span> <span class="fl">789</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb764"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb772"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://docs.ropensci.org/skimr/reference/print.html">print</a></span><span class="op">(</span><span class="va">fit_2</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></code></pre></div>
 <pre><code>## stan_glm
 ##  family:       gaussian [identity]
@@ -809,7 +809,7 @@ Translate into code:</p>
 ## * For help interpreting the printed output see ?print.stanreg
 ## * For info on the priors used see ?prior_summary.stanreg</code></pre>
 <p>As we did with our first model, create a regression table to observe our findings:</p>
-<div class="sourceCode" id="cb766"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb774"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="http://www.danieldsjoberg.com/gtsummary//reference/tbl_regression.html">tbl_regression</a></span><span class="op">(</span><span class="va">fit_2</span>, 
                intercept <span class="op">=</span> <span class="cn">TRUE</span>, 
                estimate_fun <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="http://www.danieldsjoberg.com/gtsummary//reference/style_sigfig.html">style_sigfig</a></span><span class="op">(</span><span class="va">x</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -822,7 +822,7 @@ Translate into code:</p>
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#vtvdfylvgn .gt_table {
+#truqukjwbl .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -847,7 +847,7 @@ Translate into code:</p>
   border-left-color: #D3D3D3;
 }
 
-#vtvdfylvgn .gt_heading {
+#truqukjwbl .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -859,7 +859,7 @@ Translate into code:</p>
   border-right-color: #D3D3D3;
 }
 
-#vtvdfylvgn .gt_title {
+#truqukjwbl .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -869,7 +869,7 @@ Translate into code:</p>
   border-bottom-width: 0;
 }
 
-#vtvdfylvgn .gt_subtitle {
+#truqukjwbl .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -879,13 +879,13 @@ Translate into code:</p>
   border-top-width: 0;
 }
 
-#vtvdfylvgn .gt_bottom_border {
+#truqukjwbl .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#vtvdfylvgn .gt_col_headings {
+#truqukjwbl .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -900,7 +900,7 @@ Translate into code:</p>
   border-right-color: #D3D3D3;
 }
 
-#vtvdfylvgn .gt_col_heading {
+#truqukjwbl .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -920,7 +920,7 @@ Translate into code:</p>
   overflow-x: hidden;
 }
 
-#vtvdfylvgn .gt_column_spanner_outer {
+#truqukjwbl .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -932,15 +932,15 @@ Translate into code:</p>
   padding-right: 4px;
 }
 
-#vtvdfylvgn .gt_column_spanner_outer:first-child {
+#truqukjwbl .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#vtvdfylvgn .gt_column_spanner_outer:last-child {
+#truqukjwbl .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#vtvdfylvgn .gt_column_spanner {
+#truqukjwbl .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -952,7 +952,7 @@ Translate into code:</p>
   width: 100%;
 }
 
-#vtvdfylvgn .gt_group_heading {
+#truqukjwbl .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -974,7 +974,7 @@ Translate into code:</p>
   vertical-align: middle;
 }
 
-#vtvdfylvgn .gt_empty_group_heading {
+#truqukjwbl .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -989,15 +989,15 @@ Translate into code:</p>
   vertical-align: middle;
 }
 
-#vtvdfylvgn .gt_from_md > :first-child {
+#truqukjwbl .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#vtvdfylvgn .gt_from_md > :last-child {
+#truqukjwbl .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#vtvdfylvgn .gt_row {
+#truqukjwbl .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1016,7 +1016,7 @@ Translate into code:</p>
   overflow-x: hidden;
 }
 
-#vtvdfylvgn .gt_stub {
+#truqukjwbl .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1028,7 +1028,7 @@ Translate into code:</p>
   padding-left: 12px;
 }
 
-#vtvdfylvgn .gt_summary_row {
+#truqukjwbl .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1038,7 +1038,7 @@ Translate into code:</p>
   padding-right: 5px;
 }
 
-#vtvdfylvgn .gt_first_summary_row {
+#truqukjwbl .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1048,7 +1048,7 @@ Translate into code:</p>
   border-top-color: #D3D3D3;
 }
 
-#vtvdfylvgn .gt_grand_summary_row {
+#truqukjwbl .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1058,7 +1058,7 @@ Translate into code:</p>
   padding-right: 5px;
 }
 
-#vtvdfylvgn .gt_first_grand_summary_row {
+#truqukjwbl .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1068,11 +1068,11 @@ Translate into code:</p>
   border-top-color: #D3D3D3;
 }
 
-#vtvdfylvgn .gt_striped {
+#truqukjwbl .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#vtvdfylvgn .gt_table_body {
+#truqukjwbl .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1081,7 +1081,7 @@ Translate into code:</p>
   border-bottom-color: #D3D3D3;
 }
 
-#vtvdfylvgn .gt_footnotes {
+#truqukjwbl .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1095,13 +1095,13 @@ Translate into code:</p>
   border-right-color: #D3D3D3;
 }
 
-#vtvdfylvgn .gt_footnote {
+#truqukjwbl .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#vtvdfylvgn .gt_sourcenotes {
+#truqukjwbl .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1115,46 +1115,46 @@ Translate into code:</p>
   border-right-color: #D3D3D3;
 }
 
-#vtvdfylvgn .gt_sourcenote {
+#truqukjwbl .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#vtvdfylvgn .gt_left {
+#truqukjwbl .gt_left {
   text-align: left;
 }
 
-#vtvdfylvgn .gt_center {
+#truqukjwbl .gt_center {
   text-align: center;
 }
 
-#vtvdfylvgn .gt_right {
+#truqukjwbl .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#vtvdfylvgn .gt_font_normal {
+#truqukjwbl .gt_font_normal {
   font-weight: normal;
 }
 
-#vtvdfylvgn .gt_font_bold {
+#truqukjwbl .gt_font_bold {
   font-weight: bold;
 }
 
-#vtvdfylvgn .gt_font_italic {
+#truqukjwbl .gt_font_italic {
   font-style: italic;
 }
 
-#vtvdfylvgn .gt_super {
+#truqukjwbl .gt_super {
   font-size: 65%;
 }
 
-#vtvdfylvgn .gt_footnote_marks {
+#truqukjwbl .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="vtvdfylvgn" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><div class="inline-table"><table class="gt_table">
+<div id="truqukjwbl" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><div class="inline-table"><table class="gt_table">
 <thead class="gt_header">
 <tr>
 <th colspan="3" class="gt_heading gt_title gt_font_normal" style><strong>Likelihood of Voting in the Next Election</strong></th>
@@ -1330,7 +1330,7 @@ FIGURE 11.4: Temperance
 <p>Recall our initial question: <em>What is the causal effect, on the likelihood of voting, of different postcards on voters of different levels of political engagement?</em></p>
 <p>To answer the question, we want to look at different average treatment effects. In the real world, the treatment effect for person A is almost always different than the treatment effect for person B.</p>
 <p>Regardless, let’s create a plot that displays the posterior probability distributions of the average treatment effects for men of average age across all combinations of 4 treatments and 3 voter classifications:</p>
-<div class="sourceCode" id="cb767"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb775"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Recall that the z-scored age of 0 is ~50 yrs. old in this case. We could look</span>
 <span class="co"># at lots of ages and both Male and Female. But that would not change our</span>
 <span class="co"># estimates of the treatment effects. The model is linear, so terms associated</span>
@@ -1455,9 +1455,9 @@ average treatment effects, one for each possible combination of postcard and vot
 <p>These complications are why we must make inferences with a grain of salt. That is not to say that all data science is unhelpful! On the contrary, acknowledging our deficits will only make our inferences (and the actions we take because of them) stronger.</p>
 <!-- What we need to add: Preceptor table, causal explanation, math before models, posterior_epred. -->
 </div>
-<div id="summary-10" class="section level2" number="11.4">
+<div id="summary-11" class="section level2" number="11.4">
 <h2>
-<span class="header-section-number">11.4</span> Summary<a class="anchor" aria-label="anchor" href="#summary-10"><i class="fas fa-link"></i></a>
+<span class="header-section-number">11.4</span> Summary<a class="anchor" aria-label="anchor" href="#summary-11"><i class="fas fa-link"></i></a>
 </h2>
 <p><em>Key commands</em>:
 * Use the <code><a href="https://generics.r-lib.org/reference/tidy.html">tidy()</a></code> function from the <strong>broom.mixed</strong> package to make models with <span class="math inline">\(N\)</span> parameters easier to interpret.
@@ -1503,7 +1503,7 @@ average treatment effects, one for each possible combination of postcard and vot
 </ul>
 </li>
 <li><a class="nav-link" href="#temperance-8"><span class="header-section-number">11.3</span> Temperance</a></li>
-<li><a class="nav-link" href="#summary-10"><span class="header-section-number">11.4</span> Summary</a></li>
+<li><a class="nav-link" href="#summary-11"><span class="header-section-number">11.4</span> Summary</a></li>
 </ul>
 
       <div class="book-extra">
