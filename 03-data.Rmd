@@ -19,6 +19,57 @@ library(fivethirtyeight)
 ```
 
 
+## Absolute and relative file paths
+
+When you load a data set into R, you first need to tell R where those files live. The file could live on your computer (*local*) or somewhere on the internet (*remote*). In this section, we will discuss the case where the file lives on your computer.
+
+The place where the file lives on your computer is called the "path". You can think of the path as directions to the file. There are two kinds of paths: relative paths and absolute paths. A relative path is where the file is with respect to where you currently are on the computer (e.g., where the Jupyter notebook file that you're working in is). On the other hand, an absolute path is where the file is in respect to the base (or root) folder of the computer's filesystem.
+
+Suppose our computer's filesystem looks like the picture below, and we are working in the Jupyter notebook titled `worksheetk_02.ipynb`. If we want to  read in the `.csv` file named `happiness_report.csv` into our Jupyter notebook using R, we could do this using either a relative or an absolute path. We show both choices below.
+
+```{r, echo =FALSE, fig.cap = "Example file system"}
+knitr::include_graphics("03-data/images/file-system-for-export-to-intro-datascience.svg")
+```
+
+**Reading `happiness_report.csv` using a relative path:**
+
+```
+happiness_data <- read_csv("data/happiness_report.csv")
+```
+
+**Reading `happiness_report.csv` using an absolute path:**
+
+```
+happiness_data <- read_csv("/home/jupyter/dsci-100/worksheet_02/data/happiness_report.csv")
+```
+
+So which one should you use? Generally speaking, to ensure your code can be run 
+on a different computer, you should use relative paths. An added bonus is that 
+it's also less typing! This is because the absolute path of a file (the names of 
+folders between the computer's root `/` and the file) isn't usually the same 
+across different computers. For example, suppose Fatima and Jayden are working on a 
+project together on the `happiness_report.csv` data. Fatima's file is stored at 
+
+`/home/Fatima/project/data/happiness_report.csv`, 
+
+while Jayden's is stored at 
+
+`/home/Jayden/project/data/happiness_report.csv`.
+ 
+Even though Fatima and Jayden stored their files in the same place on their computers (in their home folders), the absolute paths are different due to their different usernames.
+If Jayden has code that loads the `happiness_report.csv` data using an absolute path, the code won't work on Fatima's computer.
+But the relative path from inside the `project` folder (`data/happiness_report.csv`) is the same on both computers; any code that uses relative paths will work on both!
+
+<!--Why would the absolute path not work on a different computer? The reason for this is that the names and the folder structure of the path between a computer's root 
+folder (named `/`) and any files and folders you are usually working with will be different depending on who owns the computer (usually there is a different user name 
+on each computer) and where the files and folders happen to be located on that particular computer. -->
+
+See this video for another explanation: 
+
+<iframe width="840" height="473" src="https://www.youtube.com/embed/ephId3mYu9o" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+*Source: [Udacity course "Linux Command Line Basics"](https://www.udacity.com/course/linux-command-line-basics--ud595)*
+
 ## Writing and Reading Files
 
 Getting data into and out of R is a major part of any real world data science project. 
@@ -78,7 +129,31 @@ Reading Excel files is easy. To do so, we use the `read_excel()` function from t
 
 ```{r}
 library(readxl)
+
+# Unfortunately, it is not possible to read Excel files directly from the web.
+# So we download the file by hand and then read it in from the current working
+# directory. Note that the "proper" way of handling this would be to create a
+# temp directory with tempdir(), download the file into that directory, read it,
+# and then delete the temp directory. That way, you would not have random
+# downloaed files hanging around.
+
+download.file(url = "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/excel_1.xlsx", 
+              destfile = "example_excel.xlsx")
+
+
+read_excel(path = "example_excel.xlsx")
 ```
+
+```{r, include = FALSE}
+# Just doing this to clean up the downlaoded file so that Git does not ask me
+# about it each time I build the book. Maybe we should be transparent and
+# include this code above, like we did with download.file(). (Or maybe we should
+# hide download.file() as well!) But this seems OK for now.
+
+file.remove("example_excel.xlsx")
+```
+
+
 
 If the .xlsx file has multiple sheets, you have to use the sheet argument to specify the sheet number or name. 
 
@@ -130,6 +205,82 @@ json_format_ex <-
 fromJSON(json_format_ex) 
 ```
 
+
+## Reading data from a database
+
+Another very common form of data storage is the relational database. There are many relational database management systems, such as
+[SQLite](https://www.sqlite.org/index.html), [MySQL](https://www.mysql.com/), [PostgreSQL](https://www.postgresql.org/), [Oracle](https://www.oracle.com/ca-en/index.html), and many more. These different relational database management systems each have their own advantages and limitations. Almost all employ SQL (*structured query language*) to pull data from the database. Thankfully, you don't need to know SQL
+to analyze data from a database; 
+several packages have been written 
+that allows R to connect to relational databases and use the R programming language as the front end (what the user types in) to pull data from them. These different relational database management systems have their own advantages, limitations, and excels in particular scenarios. In this book, we will 
+give examples of how to do this using R with SQLite and PostgreSQL databases.
+
+### Connecting to a database
+
+#### Reading data from a SQLite database
+
+SQLite is probably the simplest relational database that one can use in combination with R. SQLite databases are self-contained and usually stored and accessed locally on one computer. Data is usually stored in a file with a `.db` extension. Similar to Excel files, these are not plain text files and cannot be read in a plain text editor. 
+
+The first thing you need to do to read data into R from a database is to connect to the database. We do that using the `dbConnect` function from the `DBI` (database interface) package. This does not read in the data, but simply tells R where the database is and opens up a communication channel.
+
+```{r}
+library(DBI)
+con_lang_data <- dbConnect(RSQLite::SQLite(), "03-data/data/can_lang.db")
+```
+
+Often relational databases have many tables, and their power comes from the useful ways they can be joined. Thus anytime you want to access data from a relational database, you need to know the table names. You can get the names of all the tables in the database using the `dbListTables` function:
+
+```{r}
+tables <- dbListTables(con_lang_data)
+tables
+```
+
+We only get one table name returned from calling `dbListTables`, which tells us that there is only one table in this database. To reference a table in the database to do things like select columns and filter rows, we use the `tbl` function from the `dbplyr` package. The package `dbplyr` allows us to work with data stored in databases as if they were local data frames, which is useful because we can do a lot with big datasets without actually having to bring these vast amounts of data into your computer! 
+
+```{r}
+library(dbplyr)
+lang_db <- tbl(con_lang_data, "lang")
+lang_db
+```
+
+Although it looks like we just got a data frame from the database, we didn't! It's a *reference*, showing us data that is still in the SQLite database (note the first two lines of the output). 
+It does this because databases are often more efficient at selecting, filtering and joining large data sets than R. And typically, the database will not even be 
+stored on your computer, but rather a more powerful machine somewhere on the web. So R is lazy and waits to bring this data into memory until you explicitly tell 
+it to do so using the `collect` function from the `dbplyr` package. 
+
+Here we will filter for only rows in the Aboriginal languages category according to the 2016 Canada Census, and then use `collect` to finally bring this data into R as a data frame. 
+
+```{r}
+aboriginal_lang_db <- filter(lang_db, category == "Aboriginal languages")
+aboriginal_lang_db
+```
+
+```{r}
+aboriginal_lang_data <- collect(aboriginal_lang_db)
+aboriginal_lang_data
+```
+
+Why bother to use the `collect` function? The data looks pretty similar in both outputs shown above. And `dbplyr` provides lots of functions similar to `filter` that 
+you can use to directly feed the database reference (what `tbl` gives you) into downstream analysis functions (e.g., `ggplot2` for data visualization and `lm` for 
+linear regression modeling). However, this does not 
+work in *every* case; look what happens when we try to use `nrow` to count rows in a data frame:
+
+```{r}
+nrow(aboriginal_lang_db)
+```
+ 
+or `tail` to preview the last 6 rows of a data frame:
+
+```
+tail(aboriginal_lang_db)
+```
+```
+## Error: tail() is not supported by sql sources
+```
+Additionally, some operations will not work to extract columns or single values from the reference given by the `tbl` function. Thus, once you have finished your data wrangling of the `tbl` database reference object, it is advisable to bring it into your local machine's memory using `collect` as a data frame. 
+
+> Warning: Usually, databases are very big! Reading the object into your local machine may give an error or take a lot of time to run so be careful if you plan to do this! 
+ 
 
 ## Webscraping
 
