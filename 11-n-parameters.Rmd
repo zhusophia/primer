@@ -1,18 +1,22 @@
 # N Parameters {#n-parameters}
 
-<!-- MF: Need to replace hard coded numbers. --> 
-
-<!-- MF: Add a testing is nonsense section. --> 
-
-<!-- Intro before Wisdom talks in generalities and asks the key question, but does not discuss data. Phrase the question as coming from a normal person. -->
+<!-- Intro before Wisdom talks in generalities and asks the key question, but does not discuss data. Phrase the question as coming from a normal person. MF: Done. -->
 
 <!-- Two goals this week: -->
 
-<!-- Wisdom: Begin with the ideal Preceptor Table. Depends on the question. Might be all voters in Massachusetts. Might be just the Republican voters. This determines if we are causal or predictive.  Then look for data and explore that data. What must I assume about the population, to allow me to go forward? If the data is not "close enough" to my ideal Preceptor Table, I give up. Wisdom is about knowing when to quit.
+<!-- Wisdom: Begin with the ideal Preceptor Table. Depends on the question. Might be all voters in Massachusetts. Might be just the Republican voters. This determines if we are causal or predictive.  Then look for data and explore that data. What must I assume about the population, to allow me to go forward? If the data is not "close enough" to my ideal Preceptor Table, I give up. Wisdom is about knowing when to quit. MF: Done.
 
-Justice: Actual Preceptor Table. Then, representativeness (rows), validity (columns). Only the main functional form, with no variable names. Discussion of the error term. 
+Justice: Actual Preceptor Table. Then, representativeness (rows), validity (columns). Only the main functional form, with no variable names. Discussion of the error term. MF: Done. 
 
-Courage: For each model, write down the math, estimate the model, say something sensible about the regression table. 
+Courage: For each model, write down the math, estimate the model, say something sensible about the regression table. MF: done.
+
+<!-- Replace hard coded numbers. --> 
+
+<!-- Add a testing is nonsense section. --> 
+
+<!-- * Should start with  single variable which actually requires lots of parameters. For example, death_age as a function of state and come up with a different average death_age for each state. This is cheating in that it is too many parameters, or rather that some of the parameters need to be estimated for too little data.  But it would allow us to explain a bunch of stuff! Including Bayesian shrinkage. Saving this till the end of the model causes us to miss stuff. But the rest of the analysis used lived_after. Which is better. Yes? Should we discuss? Use both? -->
+
+<!-- Consider getting rid of state example, or moving it as a teaser to end of chapter 10. Could we make a similar point with an example from shaming? 
 
 Temperance. Answer the question. Be aware of the limits to the accuracy of your answer. Preceptor's Posterior. Testing. All the cool themes. Bring it all together. Make the students say "Ahhh!" -->
 
@@ -20,12 +24,13 @@ Temperance. Answer the question. Be aware of the limits to the accuracy of your 
 
 <!-- Use fit_ instead of model_. Think about other conventions you want enforce. -->
 
-
 *This chapter is still a DRAFT.*
 
 Having created models with one parameter in Chapter \@ref(one-parameter), two parameters in Chapter \@ref(two-parameters), three parameters in Chapter \@ref(three-parameters), four parameters in Chapter \@ref(four-parameters) and five parameters in Chapter \@ref(five-parameters), you are now ready to make the jump to $N$ parameters. 
 
-In this chapter, we will consider models with many parameters and the complexities that arise therefrom. 
+In this chapter, we will consider models with many parameters and the complexities that arise therefrom. As our models grow in complexity, we need to pay extra attention to basic considerations like validity, population, and representativeness. It is easy to jump right in and start interpreting! It is harder, but necessary, to ensure that our models are really answering our questions. 
+
+Imagine you are running for Governor and want to do a better job of getting your voters to vote. How can you encourage voters to go out to the polls on election day? 
 
 
 ## Wisdom
@@ -34,9 +39,13 @@ In this chapter, we will consider models with many parameters and the complexiti
 knitr::include_graphics("other/images/Wisdom.jpg")
 ```
 
-Imagine you are running for Governor and want to do a better job of getting your voters to vote. You recently read about a large-scale experiment showing the effect of sending out a voting reminder that "shames" citizens who do not vote. You are considering sending out a "shaming" voting reminder yourself. 
+As you research ways to increase voting, you come across a large-scale experiment showing the effect of sending out a voting reminder that "shames" citizens who do not vote. You are considering sending out a "shaming" voting reminder yourself. 
 
-We will be looking at the `shaming` dataset from the **primer.data** package. This is dataset is from "Social Pressure and Voter Turnout: Evidence from a Large-Scale Field Experiment" by Gerber, Green, and Larimer (2008). [Check out the paper here](https://github.com/PPBDS/primer.data/blob/master/inst/papers/shaming.pdf). You can, and should, familiarize yourself with the data by typing `?shaming`. Our question:
+We will be looking at the `shaming` dataset from the **primer.data** package. This is dataset is from "Social Pressure and Voter Turnout: Evidence from a Large-Scale Field Experiment" by Gerber, Green, and Larimer (2008). [Check out the paper here](https://github.com/PPBDS/primer.data/blob/master/inst/papers/shaming.pdf). You can, and should, familiarize yourself with the data by typing `?shaming`. 
+
+Recall our initial question: how can we encourage voters to go out to the polls on election day? We now need to translate this into a "data science" question. 
+
+Our question:
 
 *What is the causal effect, on the likelihood of voting, of different postcards on voters of different levels of political engagement?*
 
@@ -86,6 +95,46 @@ In the third treatment, Self, the mailing includes the recent voting record of e
 
 The fourth treatment, Neighbors, provides the household members' voting records, as well as the voting records of those who live nearby. This mailing also told recipients, "we intend to mail an updated chart" of who voted in the 2006 election to the entire neighborhood.
 
+### Ideal Preceptor Table
+
+Recall the ideal Preceptor Table. What rows and columns of data do you need such that, if you had them all, the calculation of the number of interest would be trivial? If you want to know the average height of an adult in India, then the ideal Preceptor Table would include a row for each adult and a column for their height. 
+
+One key aspect of this ideal Preceptor Table is whether or not we need more than one potential outcome in order to calculate our estimand. Mainly: do we need a causal model, one which estimates that attitude under both treatment and control? The Preceptor Table would require two columns for the outcome. In this case, where we are trying to see the **causal effect** of mailed voting reminders on voting. 
+
+Are we are modeling (just) for prediction or are we (also) modeling for causation? Predictive models care nothing about causation. Causal models are often also concerned with prediction, if only as a means of measuring the quality of the model. Here, we **are** looking at causation. 
+
+So, what would our ideal table look like? Assuming we are running for governor in the United States, we would ideally have data for every citizen of voting age. This means we would have approximately 200 million rows. 
+
+Because there is no missing data in an ideal Preceptor Table, we would also know the outcomes under both treatment (receiving a reminder) and control (not receiving a reminder). Here is a sample row from our table:
+
+```{r, echo = FALSE, fig.align = 'left'}
+# First, we create a tibble with the values we want for the table
+
+tibble(ID = "Citizen 1",
+       ytreat = "Did vote",
+       ycontrol = "Did not vote") %>%
+  
+  # Then, we use the gt function to make it pretty
+  
+  gt() %>%
+  cols_label(ID = md("ID"),
+                ytreat = "Behavior in Treatment",
+                ycontrol = "Behavior in Control") %>%
+  tab_style(cell_borders(sides = "right"),
+            location = cells_body(columns = vars(ID)))  %>%
+  tab_style(style = cell_text(align = "left", v_align = "middle"), 
+            locations = cells_column_labels(columns = vars(ID))) %>%
+  cols_align(align = "center", columns = TRUE) %>%
+  cols_align(align = "left", columns = vars(ID)) %>%
+  tab_spanner(label = "Outcomes", columns = vars(ytreat, ycontrol))
+```
+
+This is a good start! However, we may want even more information in our ideal Preceptor Table. Perhaps a column for sex would be informative. A column for age? Political affiliation? In a perfect world, we would know all of these pieces of information. In a perfect world, we could measure the *exact causal effect* of voting reminders for different subsets of the US population.
+
+We may also want to narrow our ideal Preceptor Table. If we are running for governor in Florida, we may only want to study citizens in Florida. If we are running as a Democrat, we may only want to study citizens who are registered Democrats. 
+
+However, the main point of this exercise is to see *what we want to know* compared with *what we actually do know*. 
+
 ### Population
 
 One of the most important components of Wisdom is the concept of the "population". Recall the questions we asked earlier:
@@ -113,17 +162,68 @@ Even though the original question is about “voters” in general, and does not
 <!-- DK: Note that this situation is different from Chapter 8 in that fitted values and predicted values are not the same thing! The fitted value, for a combination of values for treatment and solo, is something 0.30, meaning that 30% of the people in this bucket votes. But the predicted value must be 0 or 1. Either you voted or you didn't. This example is clearly causal and so you need a Rubin Table with 5 potential outcome columns. The key difference in this chapter is that we are using lots of right hand side variables, both continuous and discrete. -->
 
 
-## Justice and Courage
+## Justice 
 
 ```{r echo = FALSE, out.width="60%", fig.align='center', fig.cap = "Justice"}
 knitr::include_graphics("other/images/Justice.jpg")
 ```
 
+Justice emphasizes a few key concepts: 
+* 1) The actual Preceptor Table, a structure which includes a row for every unit in the population – the data we want to have and the data which we actually have. 
+2) Is our data representative of the population? 
+3) Is the meaning of the columns consistent, i.e., can we assume validity? 
+
+We then make an assumption about the data generating mechanism. 
+
+### Actual Preceptor Table
+
+Recall that in an actual Preceptor Table, we will have a bunch of missing data! We can not use simple arithmetic to calculate the causal effect of voting reminders on voting behavior. Instead, we will be required to estimate it. This is our estimand, a variable in the real world that we are trying to measure.An estimand is not the value you calculated, but is rather the unknown variable you want to estimate.
+
+Let's build a basic visualization for the actual Preceptor Table for this scenario:
+
+```{r, echo = FALSE}
+# First, we create a tibble with the values we want for the table
+
+tibble(subject = c("Citizen 1", "Citizen 23", "Citizen 40", "Citizen 53", "Citizen 80"),
+       ytreat = c("Voted", "Did not vote", "?", "?", "Voted"),
+       ycontrol = c("?", "?", "Voted", "Did not vote", "?"),
+       ydiff = c("?", "?", "?", "?", "?")) %>%
+  
+  # Then, we use the gt function to make it pretty
+  
+  gt() %>%
+  cols_label(subject = md("ID"),
+                ytreat = md("Treatment"),
+                ycontrol = md("Control"),
+                ydiff = md("Treatment - Control")) %>%
+  cols_move(columns = vars(ytreat, ycontrol), after = vars(subject)) %>%
+  tab_style(cell_borders(sides = "right"),
+            location = cells_body(columns = vars(subject))) %>%
+  tab_style(style = cell_text(align = "left", v_align = "middle", size = "large"), 
+            locations = cells_column_labels(columns = vars(subject))) %>%
+  cols_align(align = "center", columns = TRUE) %>%
+  cols_align(align = "left", columns = vars(subject)) %>%
+  fmt_markdown(columns = TRUE)  %>%
+  tab_spanner(label = "$$\\text{Outcomes}$$", vars(ytreat, ycontrol))  %>%
+  tab_spanner(label = "$$\\text{Estimand}$$", vars(ydiff))
+```
+
+
+Here, there are two possible outcomes: did vote or did not vote. What we really want to know is the Average Treatment Effect (ATE) of the treatment, the voting reminder. We want to estimate how much the voting reminder impacts the odds of someone voting. 
+
+Note that this is a simplified version of the actual Preceptor Table. In this dataset, we have a number of other columns that we know about each of our subjects: age, sex, past voting history. In an expanded actual Preceptor Table, these columns would be included. 
+
+Now, how can we fill in the question marks? Because of the Fundamental Problem of Causal Inference, we can never know the missing values. Because we can never know the missing values, we must make assumptions. “Assumption” just means that we need a “model,” and all models have parameters.
+
+To fill in these blanks, we need to perform some datascience. This part of the process is included in courage. Let's take a look!
+
+<!-- Justice: Actual Preceptor Table. Then, representativeness (rows), validity (columns). Only the main functional form, with no variable names. Discussion of the error term. --> 
+
+## Courage
 ```{r echo = FALSE, out.width="60%", fig.align='center', fig.cap = "Courage"}
 knitr::include_graphics("other/images/Courage.jpg")
 ```
 
-Because we will be going through a series of models in this chapter, it is useful to combine the virtues of Justice and Courage. 
 
 ### Set-up
 
@@ -267,10 +367,9 @@ tbl_regression(model_1,
 ```
 
 Interpretation: 
-* The intercept of this model is the expected value of the probability of someone voting in the 2006 primary given that they are part of the control group and are female. In this case, we estimate that women in the control group will vote ~29% of the time. 
-* The coefficient for `sexMale` indicates the difference in likelihood of voting between a male and female. In other words, when comparing men and women, the 0.012 implies that men are ~1.2%  more likely to vote than women. Note that, because this is a linear model with no interactions between sex and other variables, this 1.2% difference applies to any male, regardless of the treatment he received. We are 95% certain that this difference is between 0.9% of 1.5%. Because sex can
-not be manipulated (by assumption), we should not use a causal interpretation of the 1.2%. 
-* The coefficients of the treatments, on the other hand, do have a causal interpretation. For a single individual, of either sex, being sent the Self postcard increases your probability of voting by 4.8%. We are 95% certain that the true value for the average treatment effect of Self postcards is between 4.4% and 5.4%. It appears that the `Neighbors` treatment is the most effective at ~8.1% and `Civic Duty` is the least effective at ~1.8%. 
+* The intercept of this model is the expected value of the probability of someone voting in the 2006 primary given that they are part of the control group and are female. In this case, we estimate that women in the control group will vote ~`r round((coef(model_1)["(Intercept)"] * 100), 1)`% of the time. 
+* The coefficient for `sexMale` indicates the difference in likelihood of voting between a male and female. In other words, when comparing men and women, the `r round(coef(model_1)["sexMale"], 3)` implies that men are ~`r round((coef(model_1)["sexMale"] * 100), 1)`%  more likely to vote than women. Note that, because this is a linear model with no interactions between sex and other variables, this difference applies to any male, regardless of the treatment he received. Because sex can not be manipulated (by assumption), we should not use a causal interpretation of the coefficient. 
+* The coefficients of the treatments, on the other hand, do have a causal interpretation. For a single individual, of either sex, being sent the Self postcard increases your probability of voting by `r round((coef(model_1)["treatmentSelf"] * 100), 1)`%. It appears that the `Neighbors` treatment is the most effective at ~`r round((coef(model_1)["treatmentNeighbors"] * 100), 1)`% and `Civic Duty` is the least effective at ~`r round((coef(model_1)["treatmentCivic Duty"] * 100), 1)`%. 
 
 
 ### primary_06 ~ z_age + sex + treatment + voter_class + voter_class*treatment
@@ -311,12 +410,11 @@ tbl_regression(fit_2,
 
 Now that we have a summarized visual for our data, let's interpret the findings: 
 * The intercept of `fit_2` is the expected probability of voting in the upcoming election for a woman of average age  (~ 50 years old in this data), who is assigned to the Control group, and is a Rarely Voter. The
-estimate is 15.3% with a 95% confidence interval of 14.7% to 15.9%. 
-* The coefficient of z_age, 0.035, implies a change of ~ 3.5% in likelihood of voting for each increment of one standard deviation (~ 14.45
-years). For example: when comparing someone 50 years old with someone 65, the latter is about 3.5% more likely to vote.
-* Exposure to the Neighbors treatment shows a ~4.4% increase in voting likelihood for someone in the Rarely Vote category. Because of random assignment of treatment, we can interpret that coefficient as an estimate
+estimate is `r round((coef(fit_2)["(Intercept)"] * 100), 1)`%. 
+* The coefficient of z_age, `r round(coef(fit_2)["z_age"], 1)`, implies a change of ~`r round((coef(fit_2)["z_age"] * 100), 1)`% in likelihood of voting for each increment of one standard deviation (~ 14.45 years). For example: when comparing someone 50 years old with someone 65, the latter is about `r round((coef(fit_2)["z_age"] * 100), 1)`% more likely to vote.
+* Exposure to the Neighbors treatment shows a ~`r round((coef(fit_2)["treatmentNeighbors"] * 100), 1)`% increase in voting likelihood for someone in the Rarely Vote category. Because of random assignment of treatment, we can interpret that coefficient as an estimate
 of the average treatment effect. 
-* If someone were from a different voter classification, the calculation is more complex because we need to account for the interaction term. For example, for individuals who Sometimes Vote, the treatment effect of Neighbors is 8.6%. For Always Vote Neighbors, it is 9.0%. 
+* If someone were from a different voter classification, the calculation is more complex because we need to account for the interaction term. For example, for individuals who Sometimes Vote, the treatment effect of Neighbors is `r round(coef(fit_2)["treatmentNeighbors"] + coef(fit_2)["treatmentNeighbors:voter_classSometimes Vote"], 1)`%. For Always Vote Neighbors, it is `r round(coef(fit_2)["treatmentNeighbors"] + coef(fit_2)["treatmentNeighbors:voter_classAlways Vote"], 1)`%. 
 
 ## Temperance
 
