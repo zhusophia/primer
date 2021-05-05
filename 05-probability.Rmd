@@ -1,14 +1,11 @@
 # Probability {#probability}
 
-<!-- New comments: -->
+<!-- Explain map_* functions. -->
 
 <!-- Prevent the rayshader images from popping up when Chapter 5 is knitted. -->
 
-<!-- Comments for TW: -->
 
-<!-- I cleaned up the Two Models section quite a bit. If you want, you can just work on the rayshader stuff. -->
-
-<!-- Let's discuss the parallel structure of the 2-model, 3-model, and n-model case. First, we should always begin by discussing how to create the joint distribution of possible models and possible experimental results. This is done by, first, assuming that one of the models is true and then, second, show the variation in the world which results. That is, even if we know for a fact that you do not have the disease, there is still a chance that you test will come back positive. So, we should do that for one model. Then, we create the joint distribution by doing that same thing for all models. (We show all this code.) The joint distribution is a tibble which we are happy to look at. It always has two columns: the first is the possible models and the second is one possible result (which will vary) if that model is true. So, each possible model will have 1,000 (or at least 100) rows in the joint distribution. -->
+<!-- Consider the parallel structure of the 2-model, 3-model, and n-model case. First, we should always begin by discussing how to create the joint distribution of possible models and possible experimental results. This is done by, first, assuming that one of the models is true and then, second, show the variation in the world which results. That is, even if we know for a fact that you do not have the disease, there is still a chance that you test will come back positive. So, we should do that for one model. Then, we create the joint distribution by doing that same thing for all possible models. (We show all this code.) The joint distribution is a tibble which we are happy to look at. It always has two columns: the first is the possible models and the second is one possible result (which will vary) if that model is true. So, each possible model will have 1,000 (or at least 100) rows in the joint distribution. -->
 
 <!-- Having create the joint distribution, we graph it in two dimensions. (We show the code for that.) Then, we graph it in three dimensions with rayshader. (Maybe there is a movie. Maybe we swoop in and fly around it.) Then, we take a "slice" of that joint distribution via rayshader. Move that slice around. Et cetera. Not sure how to do all that . . . Note that you can make rayshader objects interactive with rgl::rglwidget(). The ggral (sp?) package might also be useful. -->
 
@@ -16,8 +13,6 @@
 
 <!-- Should each section also do something with the resulting posterior? Use it to answer a question. Yes! Again, the N Model example is currently the best example. -->
 
-
-<!-- Older comments: -->
 
 <!-- Maybe add, after N models, a section on Infinity models, meaning a continuous parameter p. Note that we have a continuous distribution section now. No reason to wait till Chapter 6 to dive into this. -->
 
@@ -39,7 +34,7 @@
 
 The central tension, and opportunity, in data science is the interplay between the *data* and the *science*, between our empirical observations and the models which we use to understand them. Probability is the language we use to explore that interplay; it connects models to data, and data to models.
 
-The only package students need in this chapter is **tidyverse**.
+The only package we need in this chapter is **tidyverse**.
 
 ```{r, message = FALSE}
 library(tidyverse)
@@ -54,6 +49,103 @@ library(tidyverse)
 library(rayshader)
 library(rgl)
 ```
+
+## List-columns and map functions
+
+Before learning about probability, we need to expand our collection of R tricks by understanding list-columns and `map_*` functions. Recall that a list is different from an atomic vector. In atomic vectors, each element of the vector has one value.  Lists, however, can contain vectors, and even more complex objects, as elements.
+
+```{r}
+x <- list(c(4, 16, 9), c("A", "Z"))
+x
+```
+
+`x` is a list with two elements. The first element is a numeric vector of length 3. The second element is a character vector of length 2. We use `[[]]` to extract specific elements.
+
+```{r}
+x[[1]]
+```
+
+There are a number of built-in R functions that output lists. For example, the ***ggplot*** objects you have been making store all of the plot information in lists. Any function that returns multiple values can be used to create a list output by wrapping that returned object with `list()`.
+
+```{r}
+x <- rnorm(10)
+
+# range() returns the min and max of the argument 
+
+tibble(col_1 = list(range(x))) 
+```
+
+Notice this is a 1-by-1 tibble with one observation, which is a list of one element. Voila! You have just created a **list-column**.
+
+*If a function returns multiple values as a vector, like `range()` does, you must use `list()` as a wrapper if you want to create a list-column.*
+
+A list column is a column of your data which is a [list](https://adv-r.hadley.nz/vectors-chap.html#lists) rather than an atomic vector.  As with stand-alone list objects, you can pipe to `str()` to examine the column.
+
+```{r}
+tibble(col_1 = list(range(x))) %>%
+  str()
+```
+
+
+We can use `map_*` functions to both create a list-column and then, much more importantly, work with that list-column afterwards. 
+
+```{r}
+tibble(col_1 = list(range(x))) %>%
+  mutate(col_2 = map_dbl(col_1, ~ sum(.))) %>% 
+  str()
+```
+
+`map_*` functions, like `map_dbl()` in this example, take two key arguments, `.x` (the data which will be acted on) and `.f` (the function which will act on this data). Here, `.x` is the data in `col_1`, which is a list-column. `.f` is the function `sum()`. However, we can not simply write `map_dbl(col_1, sum)`. Instead, each use of `map_*` functions requires the use of a tilde --- a `~` --- to indicate the start of the function and the use of a dot --- a `.` --- to specify where the data goes in the function.
+
+`map_*` functions are a family of functions, with the suffix specifying the type of the object to be returned. `map()` itself returns a list. `map_dbl()` returns a double. `map_int()` returns an integer. `map_chr()` returns a character, and so on.
+
+
+```{r}
+tibble(ID = 1) %>% 
+  mutate(col_1 = map(ID, ~range(rnorm(10)))) %>%
+  mutate(col_2 = map_dbl(col_1, ~ sum(.))) %>% 
+  mutate(col_3 = map_int(col_1, ~ length(.))) %>% 
+  mutate(col_4 = map_chr(col_1, ~ sum(.))) %>% 
+  str()
+```
+
+Consider a more detailed example:
+
+
+```{r}
+# This simple example demonstrates the workflow which we will often follow.
+# Start by creating a tibble which will be used to store the results. (Or start
+# with a tibble which already exists and to which you will be adding more
+# columns.) It is often convenient to get all the code working with just a few
+# rows. Once it is working, we increase the number of rows to a thousand or
+# million or whatever we need.
+
+tibble(ID = 1:3) %>% 
+  
+  # The big convenience is being able to store a list in each row of the tibble.
+  # Note that we are not using the value of ID in the call to rnorm(). (That is
+  # why we don't have a "." anywhere.) But we are still using ID as a way of
+  # iterating through each row; ID is keeping count for us, in a sense.
+  
+  mutate(draws = map(ID, ~ rnorm(10))) %>% 
+  
+  # Each succeeding step of the pipe works with columns already in the tibble
+  # while, in general, adding more columns. The next step calculates the max
+  # value in each of the draw vectors. We use map_dbl() because we know that
+  # max() will returns a single number.
+  
+  mutate(max = map_dbl(draws, ~ max(.))) %>% 
+  
+  # We will often need to calculate more than one item from a given column like
+  # draws. For example, in addition to knowing the max value, we would like to
+  # know the range. Because the range is a vector, we need to store the result
+  # in a list column. map() does that for us automatically.
+  
+  mutate(min_max = map(draws, ~ range(.)))
+
+```
+
+This flexibility is only possible via the use of list-columns and  `map_*` functions. This workflow is extremely common. We start with an empty tibble, using ID to specify the number of rows. With that skeleton, each step of the pipe adds a new column, working off a column which already exists. 
 
 
 ## Probability distributions
@@ -206,9 +298,7 @@ We get an *empirical distribution* by rolling two dice a hundred times, either b
 ```{r}
 # In the coin example, we create the vector ahead of time, and then assigned
 # that vector to a tibble. There was nothing wrong with that approach. And we
-# could do the same thing here. But the use of map_* functions is more powerful
-# and will be necessary in later chapters. Still need set.seed(), as we almost
-# always will when creating random objects.
+# could do the same thing here. But the use of map_* functions is more powerful.
 
 set.seed(1)
 
@@ -1330,7 +1420,7 @@ The four [Cardinal Virtues](https://en.wikipedia.org/wiki/Cardinal_virtues) are 
 
 * *Wisdom* begins with the ideal Preceptor Table. What data, if we had it, would allow us to answer our question easily? We explore the data we have. Are the data we have close enough to the data we want that we can consider all the data as coming from the same *population*? If not, we can't proceed further. 
 
-* *Justice* looks at the actual Preceptor Table, a structure which includes a row for every unit in the population -- the data we want to have and the data which we actually have. Is our data *representative* of the population? Is the meaning of the columns consistent, i.e., can we assume *validity*? We then make an assumption about the *data generating mechanism*. What mathematical formula connects the outcome variable we are interested in with the other data that we have?
+* *Justice* looks at the actual Preceptor Table, a structure which includes a row for every unit in the population -- the data we want to have and the data which we actually have. Is our data *representative* of the population? Is the meaning of the columns consistent, i.e., can we assume *validity*? We then make an assumption about the *data generating mechanism*. What general mathematical formula connects the outcome variable we are interested in with the other data that we have?
 
 * *Courage* allows us to explore different models. Even though Justice has provided the basic mathematical structure of the model, we still need to decide which variables to include and to estimate the values of unknown parameters. We avoid hypothesis tests. We check our models for consistency with the data we have. We select one model. 
 
