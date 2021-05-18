@@ -1,22 +1,17 @@
 # N Parameters {#n-parameters}
 
-<!-- Put ideal Preceptor table ahead of EDA. MF: Done. -->
 
-<!-- Replace hard coded numbers. MF: Done --> 
+<!-- Temperance. Answer the question. Be aware of the limits to the accuracy of your answer. Testing. All the cool themes. Bring it all together. Make the students say "Ahhh!" Revisit the three levels of possible knowledge:
 
-<!-- Consider getting rid of state example, or moving it as a teaser to end of chapter 10. Could we make a similar point with an example from shaming? MF: Done.
+First, God knows the ideal Preceptor Table, and so can calculate each individual's treatment effect, and any summary measure like the average. 
 
-<!-- p_00 = fcn_1(primary_00), should be p_00 = primary_00 == "Yes", MF: Done-->
+Second, we have DGM Posterior, which is the posterior you would calculate if you had perfect knowledge of the data generating mechanism, meaning you have the correct model structure and exact beta values. With that, you could not be certain about any individual's causal effect, because of the Fundamental Problem of Causal Inference. But, you can still calculate posterior's for unknown numbers, and those posteriors would be perfect. 
 
-<!-- Use fit_ instead of model_. Think about other conventions you want enforce. MF: Done.-->
-
-<!-- Temperance. Answer the question. Be aware of the limits to the accuracy of your answer. Preceptor's Posterior. Testing. All the cool themes. Bring it all together. Make the students say "Ahhh!" -->
+Third, we have Your Posterior. It is not perfect! Be humble. Use with discretion. Don't be surprised when results are outside your 95% confidence intervals. In your mind, expand the confidence intervals. But this model is still better than hunches. ->
 
 <!-- Add a testing is nonsense section. --> 
 
-<!-- * Should start with  single variable which actually requires lots of parameters. For example, death_age as a function of state and come up with a different average death_age for each state. This is cheating in that it is too many parameters, or rather that some of the parameters need to be estimated for too little data.  But it would allow us to explain a bunch of stuff! Including Bayesian shrinkage. Saving this till the end of the model causes us to miss stuff. But the rest of the analysis used lived_after. Which is better. Yes? Should we discuss? Use both? -->
 
-<!-- End of Wisdom, slap ideal and data together. Call it the population table. Add variable for year. -->
 
 
 *This chapter is still a DRAFT.*
@@ -56,7 +51,9 @@ So, what would our ideal table look like? Assuming we are running for governor i
 
 Because there is no missing data in an ideal Preceptor Table, we would also know the outcomes under both treatment (receiving a reminder) and control (not receiving a reminder). Here is a sample row from our table:
 
-```{r, echo = FALSE, fig.align = 'left'}
+```{r, echo = FALSE, message = FALSE, fig.align = 'left'}
+library(tidyverse)
+
 # First, we create a tibble with the values we want for the table
 
 tibble(ID = c("Citizen 1", "Citizen 2"),
@@ -89,9 +86,9 @@ However, the main point of this exercise is to see *what we want to know* compar
 
 ### EDA of `shaming`
 
-Let's now do an EDA, starting off by running `glimpse()`.
+After loading the packages we need, let's perform an EDA, starting off by running `glimpse()` on the `shaming` tibble from the **primer.data** package. 
 
-```{r}
+```{r, message = FALSE}
 library(tidyverse)
 library(primer.data)
 library(rstanarm)
@@ -101,8 +98,12 @@ library(gt)
 library(janitor)
 library(broom.mixed)
 library(gtsummary)
+```
+
+```{r}
 glimpse(shaming)
 ```
+
 
 `glimpse()` gives us a look at the raw data contained within the `shaming` data set. At the very top of the output, we can see the number of rows and columns, or observations and variables respectively. We see that there are 344,084 observations, with each row corresponding to a unique respondent. This summary provides an idea of some of the variables we will be working with. 
 
@@ -137,17 +138,9 @@ The fourth treatment, Neighbors, provides the household members' voting records,
 
 One of the most important components of Wisdom is the concept of the "population". Recall the questions we asked earlier:
 
-*What will happen if we do send a voting reminder today? Will more voters show up to the polls? Additionally, on the day of the election, a female citizen is randomly selected. What is the probability she will vote?*
 
-As we have discussed before, the population *is not* the set of people, or voters, for which we have data. This is the dataset. The population is the larger --- potentially much larger --- set of individuals about whom we want to make inferences. 
 
-There are many different populations, each with its own $\mu$, in which we might be interested. For instance:
-
-* The population for registered voters that voted in the 2004 election in the United States. This is the population for our dataset. 
-* The population for registered voters that voted in any election from 1970 to 2040. We are often interested in the future. We want to make predictions about what *will* happen to voter habits, not what has already happened. 
-* The population for registered **and** non-registered voters in the United States. Though it is helpful to look at registered voters, candidates also want to get non-registered voters to vote for them!
-* The population for voters --- registered or not-registered --- around the world. We might expect the habits of Americans to be similar to the habits of people in other countries. We might also believe that this is too broad a group to make inferences about.
-* Many more!
+As we have discussed before, the population *is not* the set of people, or voters, for which we have data. This is the dataset. Nor is it the set of voters about whol we would like to have data. Those are the rows in the ideal Preceptor Table. The population is the larger --- potentially much larger --- set of individuals which include both the data we have and the data we want. Generally, the population will be much larger than either the data we have and the data we want.  
 
 In this case, we are viewing the data from the perspective of someone running for Governor this year that wants to increase voter turnout. We want to increase turnout **now**, not for people voting in 2006! We also may want to increase turnout in those citizens who are not registered to vote, a group that is excluded from our dataset. Is it reasonable to generate conclusions for this group? Most likely, no. However, we have limited data to work with and we have to determine how far we are willing to generalize to other groups. 
 
@@ -156,6 +149,10 @@ It is a judgment call, a matter of Wisdom, as to whether or not that data we hav
 Even though the original question is about “voters” in general, and does not specifically refer to specific states in which we might be interested, we will assume that the data we have for random voters is, uh, representative enough of the population we are interested in. If we did not believe that, then we should stop right now. *The major part of Wisdom is deciding what questions you can’t answer because of the data you just don’t have.*
 
 ### Can we answer this question?
+
+<!-- DK: Shouldn't the key points here be moved into Justice? Delete the rest? We end Wisdom by making our population assumption, and stating that population cleanly. "The population of interest" is all registered voters for Gubernatorial elections in US states from 2000 through 2030. -->
+
+<!-- Answering questions about representativeness and validity is only possible if you have specified your population precisely. The more narrow the population you choose, the easier it is to make assumptions about representativeness and validity. The more broad your population, the more useful your model. -->
 
 Often in Wisdom, we consider the failings of our data and press on. However, this is a good time to consider what it really means to accept that our data is relevant to our question. With that in mind, let's break down our real, current question: 
 
@@ -174,7 +171,7 @@ So, how similar are these groups? Let's start with some differences.
 
 These are not small issues. These are big, in-our-face issues. If we say that data from voters in 2006 and data from voters in 2021 is exchangeable --- meaning that they represent the same thing --- we also have to consider what that means for other time frames. Can data from 2006 be used to predict for 2030, 2040, and beyond? What makes 2021 an acceptable option specifically?
 
-It can be helpful in cases like these to make data exchangeable conditional on another assumption. For instance, if there was a trend of less voting behavior in 2021 compared with 2006, we may need to account for that in order for our predictions to be helpful. Alternatively, if we were studying a state that has historically more voting participation than Michigan, we may want to make our predictions based on the assumption that "people, on average, vote more in State X."
+It can be helpful in cases like these to make data exchangeable conditional on another assumption. For instance, if there was a trend of less voting in 2021 compared with 2006, we may need to account for that in order for our predictions to be helpful. Alternatively, if we were studying a state that has historically more voting participation than Michigan, we may want to make our predictions based on the assumption that "people, on average, vote more in State X."
 
 The purpose of this section is to make us think critically about the assumptions we are making and whether those assumptions can be reasonably made. Though we will continue using this dataset in the remainder of the chapter, it is clear that we must make our predictions with caution.  
 
@@ -192,9 +189,10 @@ knitr::include_graphics("other/images/Justice.jpg")
 ```
 
 Justice emphasizes a few key concepts: 
-* 1) The actual Preceptor Table, a structure which includes a row for every unit in the population – the data we want to have and the data which we actually have. 
-2) Is our data representative of the population? 
-3) Is the meaning of the columns consistent, i.e., can we assume validity? 
+
+* The actual Preceptor Table, a structure which includes a row for every unit in the population. We generally break the rows in the actual Preceptor Table into three categories: the data for units we want to have, the data for units which we actually have, and the data for units we do not care about. 
+* Is our data representative of the population? 
+* Is the meaning of the columns consistent, i.e., can we assume validity? 
 
 We then make an assumption about the data generating mechanism. 
 
