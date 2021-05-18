@@ -154,7 +154,7 @@ rds files store a single R object within a file.
 
 When we save to a rds file, we use the function `write_rds()`. Just like `write_csv()`, this function has two main arguments: `x` and `file`.  The `x` argument is the data set that you want to save. The `file` argument is the file path where you want to save the file. The end of the path argument is the name that you want to use for the file. 
 
-`read_rds()` reads the file back into R. Just like `read_csv()` `read_rds` has one main argument, which is the path to the file that you are wanting to read into R.
+`read_rds()` reads the file back into R. Just like `read_csv()` `read_rds()` has one main argument, which is the path to the file that you are wanting to read into R.
 
 ```{r}
 # need example here
@@ -484,13 +484,13 @@ So what to do now? Well, we shouldn't scrape Craigslist! Let's instead scrape so
 
 Now that we have our CSS selectors we can use the **rvest** R package to scrape our desired data from the website. First we start by loading the **rvest** package:
 
-```{r 01-load-rvest}
+```{r, message = FALSE}
 library(rvest)
 ```
 
 Next, we tell R what page we want to scrape by providing the webpage's URL in quotations to the function `read_html`:
 
-```{r 01-specify-page}
+```{r}
 page <- read_html("https://en.wikipedia.org/wiki/Canada")
 ```
 
@@ -498,15 +498,17 @@ Then we send the page object to the `html_nodes()` function. We also provide tha
 
 We will use `head()` here to limit the print output of these vectors to 6 lines.
 
-```{r 01-select-nodes}
+```{r}
 population_nodes <- html_nodes(page, "td:nth-child(5) , td:nth-child(7) , .infobox:nth-child(122) td:nth-child(1) , .infobox td:nth-child(3)")
+
 head(population_nodes)
 ```
 
 Next we extract the meaningful data from the HTML nodes using the `html_text()` function. For our example, this functions only required argument is the an html_nodes object, which we named `rent_nodes`. In the case of this example node: `<td style="text-align:left;background:#f0f0f0;"><a href="/wiki/London,_Ontario" title="London, Ontario">London</a></td>`, the `html_text` function would return `London`.
 
-```{r 01-get-text}
+```{r}
 population_text <- html_text(population_nodes)
+
 head(population_text)
 ```
 
@@ -560,7 +562,9 @@ denver <- GET(url = meso_url,
   content() %>% 
   read_csv(skip = 5, na = "M")
 
-# There are 9,106 rows of data to look at! Let's just look at subset for our purposes.
+# There are 9,106 rows of data to look at! Let's just look at subset for our
+# purposes.
+
 denver %>% 
   slice(1:3)
 
