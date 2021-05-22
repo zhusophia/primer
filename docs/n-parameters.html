@@ -36,7 +36,7 @@
         <ul class="book-toc list-unstyled">
 <li><a class="" href="index.html">Welcome</a></li>
 <li><a class="" href="preamble.html">Preamble</a></li>
-<li><a class="" href="shopping-week.html">Shopping Week</a></li>
+<li><a class="" href="getting-started.html">Getting Started</a></li>
 <li><a class="" href="visualization.html"><span class="header-section-number">1</span> Visualization</a></li>
 <li><a class="" href="wrangling.html"><span class="header-section-number">2</span> Wrangling</a></li>
 <li><a class="" href="data.html"><span class="header-section-number">3</span> Data</a></li>
@@ -66,16 +66,15 @@
 <h1>
 <span class="header-section-number">11</span> N Parameters<a class="anchor" aria-label="anchor" href="#n-parameters"><i class="fas fa-link"></i></a>
 </h1>
-<!-- Put ideal Preceptor table ahead of EDA. -->
-<!-- End of Wisdom, slap ideal and data together. Call it the population table. Add variable for year. -->
-<!-- Replace hard coded numbers. -->
-<!-- Add a testing is nonsense section. -->
-<!-- * Should start with  single variable which actually requires lots of parameters. For example, death_age as a function of state and come up with a different average death_age for each state. This is cheating in that it is too many parameters, or rather that some of the parameters need to be estimated for too little data.  But it would allow us to explain a bunch of stuff! Including Bayesian shrinkage. Saving this till the end of the model causes us to miss stuff. But the rest of the analysis used lived_after. Which is better. Yes? Should we discuss? Use both? -->
-<!-- Consider getting rid of state example, or moving it as a teaser to end of chapter 10. Could we make a similar point with an example from shaming? 
+<!-- Temperance. Answer the question. Be aware of the limits to the accuracy of your answer. Testing. All the cool themes. Bring it all together. Make the students say "Ahhh!" Revisit the three levels of possible knowledge:
 
-Temperance. Answer the question. Be aware of the limits to the accuracy of your answer. Preceptor's Posterior. Testing. All the cool themes. Bring it all together. Make the students say "Ahhh!" -->
-<!-- p_00 = fcn_1(primary_00), should be p_00 = primary_00 == "Yes", -->
-<!-- Use fit_ instead of model_. Think about other conventions you want enforce. -->
+First, God knows the ideal Preceptor Table, and so can calculate each individual's treatment effect, and any summary measure like the average. 
+
+Second, we have DGM Posterior, which is the posterior you would calculate if you had perfect knowledge of the data generating mechanism, meaning you have the correct model structure and exact beta values. With that, you could not be certain about any individual's causal effect, because of the Fundamental Problem of Causal Inference. But, you can still calculate posterior's for unknown numbers, and those posteriors would be perfect. 
+
+Third, we have Your Posterior. It is not perfect! Be humble. Use with discretion. Don't be surprised when results are outside your 95% confidence intervals. In your mind, expand the confidence intervals. But this model is still better than hunches. ->
+
+<!-- Add a testing is nonsense section. -->
 <p><em>This chapter is still a DRAFT.</em></p>
 <p>Having created models with one parameter in Chapter <a href="one-parameter.html#one-parameter">6</a>, two parameters in Chapter <a href="two-parameters.html#two-parameters">7</a>, three parameters in Chapter <a href="three-parameters.html#three-parameters">8</a>, four parameters in Chapter <a href="four-parameters.html#four-parameters">9</a> and five parameters in Chapter <a href="five-parameters.html#five-parameters">10</a>, you are now ready to make the jump to <span class="math inline">\(N\)</span> parameters.</p>
 <p>In this chapter, we will consider models with many parameters and the complexities that arise therefrom. As our models grow in complexity, we need to pay extra attention to basic considerations like validity, population, and representativeness. It is easy to jump right in and start interpreting! It is harder, but necessary, to ensure that our models are really answering our questions.</p>
@@ -85,83 +84,26 @@ Temperance. Answer the question. Be aware of the limits to the accuracy of your 
 <span class="header-section-number">11.1</span> Wisdom<a class="anchor" aria-label="anchor" href="#wisdom-8"><i class="fas fa-link"></i></a>
 </h2>
 <div class="figure">
-<span id="fig:unnamed-chunk-634"></span>
+<span id="fig:unnamed-chunk-638"></span>
 <img src="other/images/Wisdom.jpg" alt="Wisdom" width="100%"><p class="caption">
 FIGURE 11.1: Wisdom
 </p>
 </div>
 <p>As you research ways to increase voting, you come across a large-scale experiment showing the effect of sending out a voting reminder that “shames” citizens who do not vote. You are considering sending out a “shaming” voting reminder yourself.</p>
 <p>We will be looking at the <code>shaming</code> dataset from the <strong>primer.data</strong> package. This is dataset is from “Social Pressure and Voter Turnout: Evidence from a Large-Scale Field Experiment” by Gerber, Green, and Larimer (2008). <a href="https://github.com/PPBDS/primer.data/blob/master/inst/papers/shaming.pdf">Check out the paper here</a>. You can, and should, familiarize yourself with the data by typing <code><a href="https://rdrr.io/pkg/primer.data/man/shaming.html">?shaming</a></code>.</p>
-<p>Recall our initial question: how can we encourage voters to go out to the polls on election day? We now need to translate this into a “data science” question.</p>
+<p>Recall our initial question: how can we encourage voters to go out to the polls on election day? We now need to translate this into a more precise question, one that we can answer with data.</p>
 <p>Our question:</p>
 <p><em>What is the causal effect, on the likelihood of voting, of different postcards on voters of different levels of political engagement?</em></p>
-<div id="eda-of-shaming" class="section level3" number="11.1.1">
+<div id="ideal-preceptor-table" class="section level3" number="11.1.1">
 <h3>
-<span class="header-section-number">11.1.1</span> EDA of <code>shaming</code><a class="anchor" aria-label="anchor" href="#eda-of-shaming"><i class="fas fa-link"></i></a>
+<span class="header-section-number">11.1.1</span> Ideal Preceptor Table<a class="anchor" aria-label="anchor" href="#ideal-preceptor-table"><i class="fas fa-link"></i></a>
 </h3>
-<p>Let’s now do an EDA, starting off by running <code>glimpse()</code>.</p>
-<div class="sourceCode" id="cb786"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">primer.data</span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://mc-stan.org/rstanarm/">rstanarm</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://github.com/jrnold/ggthemes">ggthemes</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://mjskay.github.io/ggdist/">ggdist</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rstudio/gt">gt</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/sfirke/janitor">janitor</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://github.com/bbolker/broom.mixed">broom.mixed</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ddsjoberg/gtsummary">gtsummary</a></span><span class="op">)</span>
-<span class="fu">glimpse</span><span class="op">(</span><span class="va">shaming</span><span class="op">)</span></code></pre></div>
-<pre><code>## Rows: 344,084
-## Columns: 15
-## $ cluster       &lt;chr&gt; "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", …
-## $ primary_06    &lt;int&gt; 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 1…
-## $ treatment     &lt;fct&gt; Civic Duty, Civic Duty, Hawthorne, Hawthorne, Hawthorne…
-## $ sex           &lt;chr&gt; "Male", "Female", "Male", "Female", "Female", "Male", "…
-## $ age           &lt;int&gt; 65, 59, 55, 56, 24, 25, 47, 50, 38, 39, 65, 61, 57, 37,…
-## $ primary_00    &lt;chr&gt; "No", "No", "No", "No", "No", "No", "No", "No", "No", "…
-## $ general_00    &lt;chr&gt; "Yes", "Yes", "Yes", "Yes", "Yes", "No", "Yes", "Yes", …
-## $ primary_02    &lt;chr&gt; "Yes", "Yes", "Yes", "Yes", "Yes", "No", "Yes", "Yes", …
-## $ general_02    &lt;chr&gt; "Yes", "Yes", "Yes", "Yes", "Yes", "No", "Yes", "Yes", …
-## $ primary_04    &lt;chr&gt; "No", "No", "No", "No", "No", "No", "No", "No", "No", "…
-## $ general_04    &lt;chr&gt; "Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "Yes",…
-## $ hh_size       &lt;int&gt; 2, 2, 3, 3, 3, 3, 3, 3, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 1…
-## $ hh_primary_04 &lt;dbl&gt; 0.095, 0.095, 0.048, 0.048, 0.048, 0.048, 0.048, 0.048,…
-## $ hh_general_04 &lt;dbl&gt; 0.86, 0.86, 0.86, 0.86, 0.86, 0.90, 0.90, 0.90, 0.90, 0…
-## $ neighbors     &lt;int&gt; 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21,…</code></pre>
-<p><code>glimpse()</code> gives us a look at the raw data contained within the <code>shaming</code> data set. At the very top of the output, we can see the number of rows and columns, or observations and variables respectively. We see that there are 344,084 observations, with each row corresponding to a unique respondent. This summary provides an idea of some of the variables we will be working with.</p>
-<p>Variables of particular interest to us are <code>sex</code>, <code>hh_size</code>, and <code>primary_06</code>. The variable <code>hh_size</code> tells us the size of the respondent’s household, <code>sex</code> tells us the sex of the respondent, and <code>primary_06</code> tells us whether or not the respondent voted in the 2006 Primary election.
-There are a few things to note while exploring this data set. You may – or may not – have noticed that the only response to the <code>general_04</code> variable is “Yes.” In their published article, the authors note that “Only registered voters who voted in November 2004 were selected for our sample” (Gerber, Green, Larimer, 2008). After this, the authors found their history then sent out the mailings. Thus, non-registered voters are excluded from our data.</p>
-<p>It is also important to identify the dependent variable and its meaning. In this shaming experiment, the dependent variable is <code>primary_06</code>, which is a variable coded either 0 or 1 for whether or not the respondent voted in the 2006 primary election. This is the dependent variable because the authors are trying to measure the <strong>effect</strong> that the treatments have on voting behavior in the 2006 general election.</p>
-<!-- HV: Should I include discussion of the left-hand variable (treatment?) here? Or wait until we move into the regressions? -->
-<p>We have not yet discussed the most important variable of them all: <code>treatment</code>. The <code>treatment</code> variable is a factor variable with 5 levels, including the control. Since we are curious as to how sending mailings affects voter turnout, the treatment variable will tell us about the impact each type of mailing can make. Let’s start off by taking a broad look at the different treatments.</p>
-<!-- HV: Is it okay to say the first sentence of this paragraph? -->
-<div class="sourceCode" id="cb788"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">shaming</span> <span class="op">%&gt;%</span>
-  <span class="fu">count</span><span class="op">(</span><span class="va">treatment</span><span class="op">)</span></code></pre></div>
-<pre><code>## # A tibble: 5 x 2
-##   treatment       n
-##   &lt;fct&gt;       &lt;int&gt;
-## 1 Control    191243
-## 2 Civic Duty  38218
-## 3 Hawthorne   38204
-## 4 Self        38218
-## 5 Neighbors   38201</code></pre>
-<p>Four types of treatments were used in the experiment, with voters receiving one of the four types of mailing. All of the mailing treatments carried the message, “DO YOUR CIVIC DUTY - VOTE!”</p>
-<p>The first treatment, Civic Duty, also read, “Remember your rights and responsibilities as a citizen. Remember to vote.” This message acted as a baseline for the other treatments, since it carried a message very similar to the one displayed on all the mailings.</p>
-<p>In the second treatment, Hawthorne, households received a mailing which told the voters that they were being studied and their voting behavior would be examined through public records. This adds a small amount of social pressure to the households receiving this mailing.</p>
-<p>In the third treatment, Self, the mailing includes the recent voting record of each member of the household, placing the word “Voted” next to their name if they did in fact vote in the 2004 election or a blank space next to the name if they did not. In this mailing, the households were also told, “we intend to mail an updated chart” with the voting record of the household members after the 2006 primary. By emphasizing the public nature of voting records, this type of mailing exerts more social pressure on voting than the Hawthorne treatment.</p>
-<p>The fourth treatment, Neighbors, provides the household members’ voting records, as well as the voting records of those who live nearby. This mailing also told recipients, “we intend to mail an updated chart” of who voted in the 2006 election to the entire neighborhood.</p>
-</div>
-<div id="ideal-preceptor-table" class="section level3" number="11.1.2">
-<h3>
-<span class="header-section-number">11.1.2</span> Ideal Preceptor Table<a class="anchor" aria-label="anchor" href="#ideal-preceptor-table"><i class="fas fa-link"></i></a>
-</h3>
-<p>Recall the ideal Preceptor Table. What rows and columns of data do you need such that, if you had them all, the calculation of the number of interest would be trivial? If you want to know the average height of an adult in India, then the ideal Preceptor Table would include a row for each adult and a column for their height.</p>
-<p>One key aspect of this ideal Preceptor Table is whether or not we need more than one potential outcome in order to calculate our estimand. Mainly: do we need a causal model, one which estimates that attitude under both treatment and control? The Preceptor Table would require two columns for the outcome. In this case, where we are trying to see the <strong>causal effect</strong> of mailed voting reminders on voting.</p>
+<p>Recall the ideal Preceptor Table. What rows and columns of data do you need such that, if you had them all, the calculation of the number of interest would be trivial? If you want to know the average height of an adult in India, then the ideal Preceptor Table would include a row for each adult in India and a column for their height.</p>
+<p>One key aspect of this ideal Preceptor Table is whether or not we need more than one potential outcome in order to calculate our estimand. Mainly: do we need a causal model, one which estimates that attitude under both treatment and control? The Preceptor Table would require two columns for the outcome. In this case, we are trying to see the <strong>causal effect</strong> of mailed voting reminders on voting.</p>
 <p>Are we are modeling (just) for prediction or are we (also) modeling for causation? Predictive models care nothing about causation. Causal models are often also concerned with prediction, if only as a means of measuring the quality of the model. Here, we <strong>are</strong> looking at causation.</p>
 <p>So, what would our ideal table look like? Assuming we are running for governor in the United States, we would ideally have data for every citizen of voting age. This means we would have approximately 200 million rows.</p>
 <p>Because there is no missing data in an ideal Preceptor Table, we would also know the outcomes under both treatment (receiving a reminder) and control (not receiving a reminder). Here is a sample row from our table:</p>
-<style>html {
+<p><style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
@@ -496,48 +438,132 @@ There are a few things to note while exploring this data set. You may – or may
   font-style: italic;
   font-size: 65%;
 }
-</style>
+</style></p>
 <div id="hnzjywwynd" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><div class="inline-table"><table class="gt_table">
 <thead class="gt_col_headings">
 <tr>
 <th class="gt_col_heading gt_center gt_columns_bottom_border" rowspan="2" colspan="1" style="text-align: left; vertical-align: middle;">ID</th>
-      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2">
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="3">
         <span class="gt_column_spanner">Outcomes</span>
       </th>
     </tr>
 <tr>
 <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">Behavior in Treatment</th>
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">Behavior in Control</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">Treatment effect</th>
     </tr>
 </thead>
-<tbody class="gt_table_body"><tr>
+<tbody class="gt_table_body">
+<tr>
 <td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;">Citizen 1</td>
-      <td class="gt_row gt_center">Did vote</td>
-      <td class="gt_row gt_center">Did not vote</td>
-    </tr></tbody>
+      <td class="gt_row gt_center">0</td>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">+1</td>
+    </tr>
+<tr>
+<td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;">Citizen 2</td>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">0</td>
+    </tr>
+</tbody>
 </table></div></div>
-<p>This is a good start! However, we may want even more information in our ideal Preceptor Table. Perhaps a column for sex would be informative. A column for age? Political affiliation? In a perfect world, we would know all of these pieces of information. In a perfect world, we could measure the <em>exact causal effect</em> of voting reminders for different subsets of the US population.</p>
+In our ideal table, we have rows for <strong>all American citizens of voting age</strong>. This is a good start! However, we may want even more information in our ideal Preceptor Table. Perhaps a column for sex would be informative. A column for age? Political affiliation? In a perfect world, we would know all of these pieces of information. In a perfect world, we could measure the <em>exact causal effect</em> of voting reminders for different subsets of the US population.
 <p>We may also want to narrow our ideal Preceptor Table. If we are running for governor in Florida, we may only want to study citizens in Florida. If we are running as a Democrat, we may only want to study citizens who are registered Democrats.</p>
+<p>There’s also the fact that even the ideal Preceptor Table is subject to errors. For instance, by the time we actually <em>do</em> the simple math to calculate the exact treatment effect of our reminders, lots of people in our table would have died — yet they are included! Lots of people also would have crossed over into the voting age — yet they are excluded.</p>
 <p>However, the main point of this exercise is to see <em>what we want to know</em> compared with <em>what we actually do know</em>.</p>
+</div>
+<div id="eda-of-shaming" class="section level3" number="11.1.2">
+<h3>
+<span class="header-section-number">11.1.2</span> EDA of <code>shaming</code><a class="anchor" aria-label="anchor" href="#eda-of-shaming"><i class="fas fa-link"></i></a>
+</h3>
+<p>After loading the packages we need, let’s perform an EDA, starting off by running <code>glimpse()</code> on the <code>shaming</code> tibble from the <strong>primer.data</strong> package.</p>
+<div class="sourceCode" id="cb784"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">primer.data</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://mc-stan.org/rstanarm/">rstanarm</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://github.com/jrnold/ggthemes">ggthemes</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://mjskay.github.io/ggdist/">ggdist</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rstudio/gt">gt</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/sfirke/janitor">janitor</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://github.com/bbolker/broom.mixed">broom.mixed</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ddsjoberg/gtsummary">gtsummary</a></span><span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb785"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">glimpse</span><span class="op">(</span><span class="va">shaming</span><span class="op">)</span></code></pre></div>
+<pre><code>## Rows: 344,084
+## Columns: 15
+## $ cluster       &lt;chr&gt; "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", …
+## $ primary_06    &lt;int&gt; 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 1…
+## $ treatment     &lt;fct&gt; Civic Duty, Civic Duty, Hawthorne, Hawthorne, Hawthorne…
+## $ sex           &lt;chr&gt; "Male", "Female", "Male", "Female", "Female", "Male", "…
+## $ age           &lt;int&gt; 65, 59, 55, 56, 24, 25, 47, 50, 38, 39, 65, 61, 57, 37,…
+## $ primary_00    &lt;chr&gt; "No", "No", "No", "No", "No", "No", "No", "No", "No", "…
+## $ general_00    &lt;chr&gt; "Yes", "Yes", "Yes", "Yes", "Yes", "No", "Yes", "Yes", …
+## $ primary_02    &lt;chr&gt; "Yes", "Yes", "Yes", "Yes", "Yes", "No", "Yes", "Yes", …
+## $ general_02    &lt;chr&gt; "Yes", "Yes", "Yes", "Yes", "Yes", "No", "Yes", "Yes", …
+## $ primary_04    &lt;chr&gt; "No", "No", "No", "No", "No", "No", "No", "No", "No", "…
+## $ general_04    &lt;chr&gt; "Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "Yes",…
+## $ hh_size       &lt;int&gt; 2, 2, 3, 3, 3, 3, 3, 3, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 1…
+## $ hh_primary_04 &lt;dbl&gt; 0.095, 0.095, 0.048, 0.048, 0.048, 0.048, 0.048, 0.048,…
+## $ hh_general_04 &lt;dbl&gt; 0.86, 0.86, 0.86, 0.86, 0.86, 0.90, 0.90, 0.90, 0.90, 0…
+## $ neighbors     &lt;int&gt; 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21,…</code></pre>
+<p><code>glimpse()</code> gives us a look at the raw data contained within the <code>shaming</code> data set. At the very top of the output, we can see the number of rows and columns, or observations and variables respectively. We see that there are 344,084 observations, with each row corresponding to a unique respondent. This summary provides an idea of some of the variables we will be working with.</p>
+<p>Variables of particular interest to us are <code>sex</code>, <code>hh_size</code>, and <code>primary_06</code>. The variable <code>hh_size</code> tells us the size of the respondent’s household, <code>sex</code> tells us the sex of the respondent, and <code>primary_06</code> tells us whether or not the respondent voted in the 2006 Primary election.
+There are a few things to note while exploring this data set. You may – or may not – have noticed that the only response to the <code>general_04</code> variable is “Yes.” In their published article, the authors note that “Only registered voters who voted in November 2004 were selected for our sample” (Gerber, Green, Larimer, 2008). After this, the authors found their history then sent out the mailings. Thus, non-registered voters are excluded from our data.</p>
+<p>It is also important to identify the dependent variable and its meaning. In this shaming experiment, the dependent variable is <code>primary_06</code>, which is a variable coded either 0 or 1 for whether or not the respondent voted in the 2006 primary election. This is the dependent variable because the authors are trying to measure the <strong>effect</strong> that the treatments have on voting behavior in the 2006 general election.</p>
+<!-- HV: Should I include discussion of the left-hand variable (treatment?) here? Or wait until we move into the regressions? -->
+<p>We have not yet discussed the most important variable of them all: <code>treatment</code>. The <code>treatment</code> variable is a factor variable with 5 levels, including the control. Since we are curious as to how sending mailings affects voter turnout, the treatment variable will tell us about the impact each type of mailing can make. Let’s start off by taking a broad look at the different treatments.</p>
+<!-- HV: Is it okay to say the first sentence of this paragraph? -->
+<div class="sourceCode" id="cb787"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">shaming</span> <span class="op">%&gt;%</span>
+  <span class="fu">count</span><span class="op">(</span><span class="va">treatment</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 5 x 2
+##   treatment       n
+##   &lt;fct&gt;       &lt;int&gt;
+## 1 Control    191243
+## 2 Civic Duty  38218
+## 3 Hawthorne   38204
+## 4 Self        38218
+## 5 Neighbors   38201</code></pre>
+<p>Four types of treatments were used in the experiment, with voters receiving one of the four types of mailing. All of the mailing treatments carried the message, “DO YOUR CIVIC DUTY - VOTE!”</p>
+<p>The first treatment, Civic Duty, also read, “Remember your rights and responsibilities as a citizen. Remember to vote.” This message acted as a baseline for the other treatments, since it carried a message very similar to the one displayed on all the mailings.</p>
+<p>In the second treatment, Hawthorne, households received a mailing which told the voters that they were being studied and their voting behavior would be examined through public records. This adds a small amount of social pressure to the households receiving this mailing.</p>
+<p>In the third treatment, Self, the mailing includes the recent voting record of each member of the household, placing the word “Voted” next to their name if they did in fact vote in the 2004 election or a blank space next to the name if they did not. In this mailing, the households were also told, “we intend to mail an updated chart” with the voting record of the household members after the 2006 primary. By emphasizing the public nature of voting records, this type of mailing exerts more social pressure on voting than the Hawthorne treatment.</p>
+<p>The fourth treatment, Neighbors, provides the household members’ voting records, as well as the voting records of those who live nearby. This mailing also told recipients, “we intend to mail an updated chart” of who voted in the 2006 election to the entire neighborhood.</p>
 </div>
 <div id="population-1" class="section level3" number="11.1.3">
 <h3>
 <span class="header-section-number">11.1.3</span> Population<a class="anchor" aria-label="anchor" href="#population-1"><i class="fas fa-link"></i></a>
 </h3>
 <p>One of the most important components of Wisdom is the concept of the “population.” Recall the questions we asked earlier:</p>
-<p><em>What will happen if we do send a voting reminder today? Will more voters show up to the polls? Additionally, on the day of the election, a female citizen is randomly selected. What is the probability she will vote?</em></p>
-<p>As we have discussed before, the population <em>is not</em> the set of people, or voters, for which we have data. This is the dataset. The population is the larger — potentially much larger — set of individuals about whom we want to make inferences.</p>
-<p>There are many different populations, each with its own <span class="math inline">\(\mu\)</span>, in which we might be interested. For instance:</p>
-<ul>
-<li>The population for registered voters that voted in the 2004 election in the United States. This is the population for our dataset.</li>
-<li>The population for registered voters that voted in any election from 1970 to 2040. We are often interested in the future. We want to make predictions about what <em>will</em> happen to voter habits, not what has already happened.</li>
-<li>The population for registered <strong>and</strong> non-registered voters in the United States. Though it is helpful to look at registered voters, candidates also want to get non-registered voters to vote for them!</li>
-<li>The population for voters — registered or not-registered — around the world. We might expect the habits of Americans to be similar to the habits of people in other countries. We might also believe that this is too broad a group to make inferences about.</li>
-<li>Many more!</li>
-</ul>
+<p>As we have discussed before, the population <em>is not</em> the set of people, or voters, for which we have data. This is the dataset. Nor is it the set of voters about whol we would like to have data. Those are the rows in the ideal Preceptor Table. The population is the larger — potentially much larger — set of individuals which include both the data we have and the data we want. Generally, the population will be much larger than either the data we have and the data we want.</p>
 <p>In this case, we are viewing the data from the perspective of someone running for Governor this year that wants to increase voter turnout. We want to increase turnout <strong>now</strong>, not for people voting in 2006! We also may want to increase turnout in those citizens who are not registered to vote, a group that is excluded from our dataset. Is it reasonable to generate conclusions for this group? Most likely, no. However, we have limited data to work with and we have to determine how far we are willing to generalize to other groups.</p>
 <p>It is a judgment call, a matter of Wisdom, as to whether or not that data we have is “close enough” to the population we are interested in to justify making a model.</p>
 <p>Even though the original question is about “voters” in general, and does not specifically refer to specific states in which we might be interested, we will assume that the data we have for random voters is, uh, representative enough of the population we are interested in. If we did not believe that, then we should stop right now. <em>The major part of Wisdom is deciding what questions you can’t answer because of the data you just don’t have.</em></p>
+</div>
+<div id="can-we-answer-this-question" class="section level3" number="11.1.4">
+<h3>
+<span class="header-section-number">11.1.4</span> Can we answer this question?<a class="anchor" aria-label="anchor" href="#can-we-answer-this-question"><i class="fas fa-link"></i></a>
+</h3>
+<!-- DK: Shouldn't the key points here be moved into Justice? Delete the rest? We end Wisdom by making our population assumption, and stating that population cleanly. "The population of interest" is all registered voters for Gubernatorial elections in US states from 2000 through 2030. -->
+<!-- Answering questions about representativeness and validity is only possible if you have specified your population precisely. The more narrow the population you choose, the easier it is to make assumptions about representativeness and validity. The more broad your population, the more useful your model. -->
+<p>Often in Wisdom, we consider the failings of our data and press on. However, this is a good time to consider what it really means to accept that our data is relevant to our question. With that in mind, let’s break down our real, current question:</p>
+<ul>
+<li>We are running for governor in the year 2021. In this year and in the United States, we consider sending out a voting reminder postcard to citizens of voting age. Will this reminder encourage voting, and by how much?</li>
+</ul>
+<p>Now, let’s break down our data from the <code>shaming</code> dataset:</p>
+<ul>
+<li>The data was gathered in Michigan prior to the August 2006 primary election. The population for the experiment was 180,002 households in the state of Michigan. The data only included those who <em>had</em> voted in the 2004 general election. Therefore, it did not include non-voters. The reminders were mailed to households at random.</li>
+</ul>
+<p>So, how similar are these groups? Let’s start with some differences.
+* The data is from 2006. Our question is asking for answers from 2021. This is not a small gap in time. A lot changes in a decade and a half!
+* The data excludes all non-voters in the last election. Our question, which seeks to increase voting turnout <em>in all citizens</em>, would want for non-voters to be included. So, can we make any claims about those citizens? Probably not.
+* The data only includes voters from Michigan. We may want to make inferences about other states, or the United States as a whole. Is it within reason to do that?
+* The voting reminders in the data were sent by mail. Is this the most practical option in 2021, where it may be easier to send an electronic notice?
+* The contents of voting reminders in 2006 are going to differ from voting reminders sent in 2021. Thus, our “treatments” are fundamentally different.</p>
+<p>These are not small issues. These are big, in-our-face issues. If we say that data from voters in 2006 and data from voters in 2021 is exchangeable — meaning that they represent the same thing — we also have to consider what that means for other time frames. Can data from 2006 be used to predict for 2030, 2040, and beyond? What makes 2021 an acceptable option specifically?</p>
+<p>It can be helpful in cases like these to make data exchangeable conditional on another assumption. For instance, if there was a trend of less voting in 2021 compared with 2006, we may need to account for that in order for our predictions to be helpful. Alternatively, if we were studying a state that has historically more voting participation than Michigan, we may want to make our predictions based on the assumption that “people, on average, vote more in State X.”</p>
+<p>The purpose of this section is to make us think critically about the assumptions we are making and whether those assumptions can be reasonably made. Though we will continue using this dataset in the remainder of the chapter, it is clear that we must make our predictions with caution.</p>
 <!-- DK: Add discussion of what you see here. No need to drop missing values since there aren't any. I think this next discussion can be dropped. -->
 <!-- DK: Note that this situation is different from Chapter 8 in that fitted values and predicted values are not the same thing! The fitted value, for a combination of values for treatment and solo, is something 0.30, meaning that 30% of the people in this bucket votes. But the predicted value must be 0 or 1. Either you voted or you didn't. This example is clearly causal and so you need a Rubin Table with 5 potential outcome columns. The key difference in this chapter is that we are using lots of right hand side variables, both continuous and discrete. -->
 </div>
@@ -547,15 +573,17 @@ There are a few things to note while exploring this data set. You may – or may
 <span class="header-section-number">11.2</span> Justice<a class="anchor" aria-label="anchor" href="#justice-7"><i class="fas fa-link"></i></a>
 </h2>
 <div class="figure" style="text-align: center">
-<span id="fig:unnamed-chunk-638"></span>
+<span id="fig:unnamed-chunk-643"></span>
 <img src="other/images/Justice.jpg" alt="Justice" width="60%"><p class="caption">
 FIGURE 11.2: Justice
 </p>
 </div>
-<p>Justice emphasizes a few key concepts:
-* 1) The actual Preceptor Table, a structure which includes a row for every unit in the population – the data we want to have and the data which we actually have.
-2) Is our data representative of the population?
-3) Is the meaning of the columns consistent, i.e., can we assume validity?</p>
+<p>Justice emphasizes a few key concepts:</p>
+<ul>
+<li>The actual Preceptor Table, a structure which includes a row for every unit in the population. We generally break the rows in the actual Preceptor Table into three categories: the data for units we want to have, the data for units which we actually have, and the data for units we do not care about.</li>
+<li>Is our data representative of the population?</li>
+<li>Is the meaning of the columns consistent, i.e., can we assume validity?</li>
+</ul>
 <p>We then make an assumption about the data generating mechanism.</p>
 <div id="actual-preceptor-table" class="section level3" number="11.2.1">
 <h3>
@@ -1001,7 +1029,7 @@ FIGURE 11.2: Justice
 <span class="header-section-number">11.3</span> Courage<a class="anchor" aria-label="anchor" href="#courage-7"><i class="fas fa-link"></i></a>
 </h2>
 <div class="figure" style="text-align: center">
-<span id="fig:unnamed-chunk-640"></span>
+<span id="fig:unnamed-chunk-645"></span>
 <img src="other/images/Courage.jpg" alt="Courage" width="60%"><p class="caption">
 FIGURE 11.3: Courage
 </p>
@@ -1010,52 +1038,26 @@ FIGURE 11.3: Courage
 <h3>
 <span class="header-section-number">11.3.1</span> Set-up<a class="anchor" aria-label="anchor" href="#set-up"><i class="fas fa-link"></i></a>
 </h3>
-<p>We start by creating a function named <code>fcn_1()</code> that takes in a vector of “Yes”/“No” responses and returns a binary integer vector where 1 replaces “Yes,” 0 replaces “No,” and anything else becomes <code>NA</code>. The function should alert the user if they are passing in a problematic vector, i.e. one that contains lowercase “yes” and/or “no.” It will also alert the user if there are not at least once observation equal to “Yes.” You may find the <code>case_when()</code> function to be useful. <code>NA</code> can take on different types depending on the classification of the vector. Read more on this at <code>?NA</code>.</p>
-<div class="sourceCode" id="cb790"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">fcn_1</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span>
-  
-  <span class="co"># In effort to prevent people from mis-applying this function, we want to </span>
-  <span class="co"># force users to confront the precise state of their data. This function will</span>
-  <span class="co"># properly encode capitalized "Yes", capitalized "No" as 0, and will code </span>
-  <span class="co"># anything else as NA. We check that there are no lowercase "yes" or "no" </span>
-  <span class="co"># instances and that the column provided has at least 1 instance of the</span>
-  <span class="co"># properly formatted "Yes" so that there are no missed y/n values and to</span>
-  <span class="co"># ensure that the function is being usefully applied.</span>
-  
-  <span class="co"># We can't check for at least 1 "No" due to the fact that the group was</span>
-  <span class="co"># selected such that everyone voted in the 04 general election, so checking</span>
-  <span class="co"># for at least 1 "Yes" will have to suffice.</span>
-  
-  <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">x</span> <span class="op">==</span> <span class="st">"yes"</span><span class="op">)</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span>,
-            <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">x</span> <span class="op">==</span> <span class="st">"Yes"</span><span class="op">)</span>  <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span>,
-            <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">x</span> <span class="op">==</span> <span class="st">"no"</span><span class="op">)</span>  <span class="op">==</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span>
-  
-  <span class="co"># You can use an orphaned case_when here or you can assign to an object and </span>
-  <span class="co"># return. It works both ways.</span>
-  
-  <span class="fu">case_when</span><span class="op">(</span><span class="va">x</span> <span class="op">==</span> <span class="st">"Yes"</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html">as.integer</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>,
-            <span class="va">x</span> <span class="op">==</span> <span class="st">"No"</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html">as.integer</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,
-            <span class="cn">TRUE</span> <span class="op">~</span> <span class="cn">NA_integer_</span><span class="op">)</span><span class="op">}</span></code></pre></div>
 <p>Now, we will create an object named <code>object_1</code> that includes a 3-level factor classifying voters by level of civic engagement.</p>
 <ul>
-<li><p>Using the function we just created, convert all primary and general election variables <em>that are not already 1/0 binary</em> to binary format.</p></li>
+<li><p>Convert all primary and general election variables <em>that are not already 1/0 binary</em> to binary format.</p></li>
 <li><p>Create a new column named <code>civ_engage</code> that sums up each person’s voting behavior up to, but not including, the 2006 primary.</p></li>
 <li><p>Create a column named <code>voter_class</code> that classifies voters into 3 bins: “Always Vote” for those who voted at least 5 times, “Sometimes Vote” for those who voted between 3 or 4 times, and “Rarely Vote” for those who voted 2 or fewer times. This variable should be classified as a factor.</p></li>
 <li><p>Create a column called <code>z_age</code> which is the z-score for <code>age</code>.</p></li>
 </ul>
-<div class="sourceCode" id="cb791"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb789"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">object_1</span> <span class="op">&lt;-</span> <span class="va">shaming</span> <span class="op">%&gt;%</span> 
   
   <span class="co"># Converting the Y/N columns to binaries with the function we made note that</span>
   <span class="co"># primary_06 is already binary and also that we don't need it to predict</span>
   <span class="co"># construct previous voter behavior status variable.</span>
   
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>p_00 <span class="op">=</span> <span class="fu">fcn_1</span><span class="op">(</span><span class="va">primary_00</span><span class="op">)</span>,
-         p_02 <span class="op">=</span> <span class="fu">fcn_1</span><span class="op">(</span><span class="va">primary_02</span><span class="op">)</span>,
-         p_04 <span class="op">=</span> <span class="fu">fcn_1</span><span class="op">(</span><span class="va">primary_04</span><span class="op">)</span>,
-         g_00 <span class="op">=</span> <span class="fu">fcn_1</span><span class="op">(</span><span class="va">general_00</span><span class="op">)</span>,
-         g_02 <span class="op">=</span> <span class="fu">fcn_1</span><span class="op">(</span><span class="va">general_02</span><span class="op">)</span>,
-         g_04 <span class="op">=</span> <span class="fu">fcn_1</span><span class="op">(</span><span class="va">general_04</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>p_00 <span class="op">=</span> <span class="op">(</span><span class="va">primary_00</span> <span class="op">==</span> <span class="st">"Yes"</span><span class="op">)</span>,
+         p_02 <span class="op">=</span> <span class="op">(</span><span class="va">primary_02</span> <span class="op">==</span> <span class="st">"Yes"</span><span class="op">)</span>,
+         p_04 <span class="op">=</span> <span class="op">(</span><span class="va">primary_04</span> <span class="op">==</span> <span class="st">"Yes"</span><span class="op">)</span>,
+         g_00 <span class="op">=</span> <span class="op">(</span><span class="va">general_00</span> <span class="op">==</span> <span class="st">"Yes"</span><span class="op">)</span>,
+         g_02 <span class="op">=</span> <span class="op">(</span><span class="va">general_02</span> <span class="op">==</span> <span class="st">"Yes"</span><span class="op">)</span>,
+         g_04 <span class="op">=</span> <span class="op">(</span><span class="va">general_04</span> <span class="op">==</span> <span class="st">"Yes"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   
   <span class="co"># A sum of the voting action records across the election cycle columns gives</span>
   <span class="co"># us an idea (though not weighted for when across the elections) of the voters</span>
@@ -1084,7 +1086,7 @@ FIGURE 11.3: Courage
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>z_age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/scale.html">scale</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">primary_06</span>, <span class="va">treatment</span>, <span class="va">sex</span>, <span class="va">civ_engage</span>, <span class="va">voter_class</span>, <span class="va">z_age</span><span class="op">)</span></code></pre></div>
 <p>Let’s inspect our object:</p>
-<div class="sourceCode" id="cb792"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb790"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">object_1</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html">slice</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 3 x 6
@@ -1105,16 +1107,16 @@ FIGURE 11.3: Courage
 <p><span class="math display">\[ y_{i} = \beta_{0} + \beta_{1}x_{i, 1} + \beta_{2}x_{i,2} ... + \beta_{n}x_{i,n} + \epsilon_{i} \]</span>
 With variable names:</p>
 <p><span class="math display">\[ y_{i} = \beta_{0} + \beta_{1}civic\_duty_i + \beta_{2}hawthorne_i + \beta_{3}self_i + \beta_{4}neighbors_i + \beta_{5}male_i + \epsilon_{i} \]</span></p>
-<p>There are two ways to formalize the model used in <code>model_1</code>: with and without the variable names. The former is related to the concept of Justice as we acknowledge that the model is constructed via the linear sum of <code>n</code> parameters times the value for <code>n</code> variables, along with an error term. In other words, it is a linear model. The only other model we have learned this semester is a logistic model, but there are other kinds of models, each defined by the mathematics and the assumptions about the error term.
+<p>There are two ways to formalize the model used in <code>fit_1</code>: with and without the variable names. The former is related to the concept of Justice as we acknowledge that the model is constructed via the linear sum of <code>n</code> parameters times the value for <code>n</code> variables, along with an error term. In other words, it is a linear model. The only other model we have learned this semester is a logistic model, but there are other kinds of models, each defined by the mathematics and the assumptions about the error term.
 The second type of formal notation, more associated with the virtue Courage, includes the actual variable names we are using. The trickiest part is the transformation of character/factor variables into indicator variables, meaning variables with 0/1 values. Because <code>treatment</code> has 5 levels, we need 4 indicator variables. The fifth level — which, by default, is the first variable alphabetically (for character variables) or the first level (for factor variables) — is incorporated in the intercept.</p>
 <p>Let’s translate the model into code.</p>
-<div class="sourceCode" id="cb794"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">object_1</span>,
+<div class="sourceCode" id="cb792"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">fit_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">object_1</span>,
                   formula <span class="op">=</span> <span class="va">primary_06</span> <span class="op">~</span> <span class="va">treatment</span> <span class="op">+</span> <span class="va">sex</span>,
                   refresh <span class="op">=</span> <span class="fl">0</span>,
                   seed <span class="op">=</span> <span class="fl">987</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb795"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://docs.ropensci.org/skimr/reference/print.html">print</a></span><span class="op">(</span><span class="va">model_1</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb793"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://docs.ropensci.org/skimr/reference/print.html">print</a></span><span class="op">(</span><span class="va">fit_1</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></code></pre></div>
 <pre><code>## stan_glm
 ##  family:       gaussian [identity]
 ##  formula:      primary_06 ~ treatment + sex
@@ -1137,8 +1139,8 @@ The second type of formal notation, more associated with the virtue Courage, inc
 ## * For help interpreting the printed output see ?print.stanreg
 ## * For info on the priors used see ?prior_summary.stanreg</code></pre>
 <p>We will now create a table that nicely formats the results of <code>fit_1</code> using the <code><a href="http://www.danieldsjoberg.com/gtsummary//reference/tbl_regression.html">tbl_regression()</a></code> function from the <strong>gtsummary</strong> package. It will also display the associated 95% confidence interval for each coefficient.</p>
-<div class="sourceCode" id="cb797"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="http://www.danieldsjoberg.com/gtsummary//reference/tbl_regression.html">tbl_regression</a></span><span class="op">(</span><span class="va">model_1</span>, 
+<div class="sourceCode" id="cb795"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="http://www.danieldsjoberg.com/gtsummary//reference/tbl_regression.html">tbl_regression</a></span><span class="op">(</span><span class="va">fit_1</span>, 
                intercept <span class="op">=</span> <span class="cn">TRUE</span>, 
                estimate_fun <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="http://www.danieldsjoberg.com/gtsummary//reference/style_sigfig.html">style_sigfig</a></span><span class="op">(</span><span class="va">x</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
   
@@ -1580,14 +1582,14 @@ The second type of formal notation, more associated with the virtue Courage, inc
 <p>The math:
 <span class="math display">\[y_{i} = \beta_{0} + \beta_{1}z\_age + \beta_{2}male_i + \beta_{3}civic\_duty_i + \\ \beta_{4}hawthorne_i + \beta_{5}self_i + \beta_{6}neighbors_i + \\ \beta_{7}Sometimes\ vote_i + \beta_{8}Always\ vote_i + \\ \beta_{9}civic\_duty_i Sometimes\ vote_i + \beta_{10}hawthorne_i Sometimes\ vote_i + \\ \beta_{11}self_i Sometimes\ vote_i + \beta_{11}neighbors_i Sometimes\ vote_i + \\ \beta_{12}civic\_duty_i Always\ vote_i + \beta_{13}hawthorne_i Always\ vote_i + \\ \beta_{14}self_i Always\ vote_i + \beta_{15}neighbors_i Always\ vote_i + \epsilon_{i}\]</span>
 Translate into code:</p>
-<div class="sourceCode" id="cb798"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb796"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">object_1</span>,
                   formula <span class="op">=</span> <span class="va">primary_06</span> <span class="op">~</span> <span class="va">z_age</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">treatment</span> <span class="op">+</span> <span class="va">voter_class</span> <span class="op">+</span> 
                             <span class="va">treatment</span><span class="op">*</span><span class="va">voter_class</span>,
                   family <span class="op">=</span> <span class="va">gaussian</span>,
                   refresh <span class="op">=</span> <span class="fl">0</span>,
                   seed <span class="op">=</span> <span class="fl">789</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb799"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb797"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://docs.ropensci.org/skimr/reference/print.html">print</a></span><span class="op">(</span><span class="va">fit_2</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></code></pre></div>
 <pre><code>## stan_glm
 ##  family:       gaussian [identity]
@@ -1623,7 +1625,7 @@ Translate into code:</p>
 ## * For help interpreting the printed output see ?print.stanreg
 ## * For info on the priors used see ?prior_summary.stanreg</code></pre>
 <p>As we did with our first model, create a regression table to observe our findings:</p>
-<div class="sourceCode" id="cb801"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb799"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="http://www.danieldsjoberg.com/gtsummary//reference/tbl_regression.html">tbl_regression</a></span><span class="op">(</span><span class="va">fit_2</span>, 
                intercept <span class="op">=</span> <span class="cn">TRUE</span>, 
                estimate_fun <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="http://www.danieldsjoberg.com/gtsummary//reference/style_sigfig.html">style_sigfig</a></span><span class="op">(</span><span class="va">x</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -2134,7 +2136,7 @@ of the average treatment effect.
 <span class="header-section-number">11.4</span> Temperance<a class="anchor" aria-label="anchor" href="#temperance-8"><i class="fas fa-link"></i></a>
 </h2>
 <div class="figure">
-<span id="fig:unnamed-chunk-646"></span>
+<span id="fig:unnamed-chunk-651"></span>
 <img src="other/images/Temperance.jpg" alt="Temperance" width="100%"><p class="caption">
 FIGURE 11.4: Temperance
 </p>
@@ -2143,7 +2145,7 @@ FIGURE 11.4: Temperance
 <p>Recall our initial question: <em>What is the causal effect, on the likelihood of voting, of different postcards on voters of different levels of political engagement?</em></p>
 <p>To answer the question, we want to look at different average treatment effects. In the real world, the treatment effect for person A is almost always different than the treatment effect for person B.</p>
 <p>Regardless, let’s create a plot that displays the posterior probability distributions of the average treatment effects for men of average age across all combinations of 4 treatments and 3 voter classifications:</p>
-<div class="sourceCode" id="cb802"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb800"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Recall that the z-scored age of 0 is ~50 yrs. old in this case. We could look</span>
 <span class="co"># at lots of ages and both Male and Female. But that would not change our</span>
 <span class="co"># estimates of the treatment effects. The model is linear, so terms associated</span>
@@ -2304,9 +2306,10 @@ average treatment effects, one for each possible combination of postcard and vot
 <li><a class="nav-link" href="#n-parameters"><span class="header-section-number">11</span> N Parameters</a></li>
 <li>
 <a class="nav-link" href="#wisdom-8"><span class="header-section-number">11.1</span> Wisdom</a><ul class="nav navbar-nav">
-<li><a class="nav-link" href="#eda-of-shaming"><span class="header-section-number">11.1.1</span> EDA of shaming</a></li>
-<li><a class="nav-link" href="#ideal-preceptor-table"><span class="header-section-number">11.1.2</span> Ideal Preceptor Table</a></li>
+<li><a class="nav-link" href="#ideal-preceptor-table"><span class="header-section-number">11.1.1</span> Ideal Preceptor Table</a></li>
+<li><a class="nav-link" href="#eda-of-shaming"><span class="header-section-number">11.1.2</span> EDA of shaming</a></li>
 <li><a class="nav-link" href="#population-1"><span class="header-section-number">11.1.3</span> Population</a></li>
+<li><a class="nav-link" href="#can-we-answer-this-question"><span class="header-section-number">11.1.4</span> Can we answer this question?</a></li>
 </ul>
 </li>
 <li>
