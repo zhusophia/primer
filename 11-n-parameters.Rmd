@@ -1,14 +1,29 @@
 # N Parameters {#n-parameters}
 
-<!-- Temperance. Answer the question. Be aware of the limits to the accuracy of your answer. Testing. All the cool themes. Bring it all together. Make the students say "Ahhh!" Revisit the three levels of possible knowledge:
 
-First, God knows the ideal Preceptor Table, and so can calculate each individual's treatment effect, and any summary measure like the average. MF: Done 
+<!-- Start the Justice section with The Population Table, which consists of rows from three sources: the ideal Preceptor Table, the data, and other rows from the population (rows which exist but for which we have no data). The Population Table only includes data that we actually have. For the rows from the ideal Preceptor Table, it will generally include the covariate data, but no outcome data. For the rows from the data, it will include all the data, which is generally everything except counter-factual outcomes. For the rows from the larger population, everything is missing. There should be year and  state columns. -->
 
-Second, we have DGM Posterior, which is the posterior you would calculate if you had perfect knowledge of the data generating mechanism, meaning you have the correct model structure and exact beta values. With that, you could not be certain about any individual's causal effect, because of the Fundamental Problem of Causal Inference. But, you can still calculate posterior's for unknown numbers, and those posteriors would be perfect. MF: Done
+<!-- In Justice, discuss representativeness and validity. And then, what assumption do we make about the form of the model. (Meaning linear, logistic and so on.) Also, discuss the fact that we have assuming that the unknown joint distribution is consistent for the whole population. That is, there is a formula which works for all the rows in the Population Table. -->
 
-Third, we have Your Posterior. It is not perfect! Be humble. Use with discretion. Don't be surprised when results are outside your 95% confidence intervals. In your mind, expand the confidence intervals. But this model is still better than hunches. MF: DONE.->
+<!-- Once you assume there is a single population, are you making any other assumptions? Especially with regard to the relationships among the columns? Yes! But in Justice? Connected to validity because, if the joint distribution is the same, it must be the case that the variables mean the same things across the whole population. Key: the joint distribution is the same throughout the population. -->
+
+<!-- Temperance. Answer the question. Be aware of the limits to the accuracy of your answer. Testing. All the cool themes. Bring it all together. Make the students say "Ahhh!" Revisit the three levels of possible knowledge: -->
+
+<!-- In any *one* problem, it is hard to know if we were "right," if our posterior was similar to the DGM posterior. After all, 5% of the time the answer is outside the 95% confidence interval. But, first, if the truth ends up very, very far away from the median of our posterior, our boss will be rightly suspicious. How many MAD SDs away do you have to be before you are obviously a fool? Or standard erros? Maybe 3? Certainly 4? Second, if we answer many questions (by creating many posteriors for different problems) then, over time, our boss will get a sense of our actual skill, both because our median should be above and below the truth about the same proportion and because our confidence intervals should be correctly calibrated. -->
+
+<!-- Walk through the details of MAD SD and standard error in answering the question: How wrong do we have to be in a one-off for our boss to be suspicious? When is "bad luck" as sign of stupidity? Equivalent of how many heads in a row? If the truth is 4 standard errors away from your best estimate, that is the equivalent and you flipping heads 10 times in a row. -->
+
+<!-- Add three paragraphs about this: https://projects.fivethirtyeight.com/checking-our-work/. -->
+
+<!-- And then discuss how we know, from experience, that our posteriors are too narrow. They assume that we have the DGM when, in fact, we know that we do not. What to do? One, warn your boss (and yourself) about this fact. Be humble. That is Temperance. Second, estimate dozens of different models and combine their posteriors. The result might very well have the same median as your correct posterior, but the confidence intervals would be much wider. Doing this is beyond the scope of this Primer. -->
+
+<!-- Fix DK comment. -->
 
 <!-- Add a testing is nonsense section. --> 
+
+<!-- Expand ideal Preceptor Table for extra rows. -->
+
+<!-- Make warning "The `.dots` argument of `group_by()` is deprecated a" go away if you can. -->
 
 
 *This chapter is still a DRAFT.*
@@ -78,8 +93,6 @@ In our ideal table, we have rows for **all American citizens of voting age**. Th
 
 We may also want to narrow our ideal Preceptor Table. If we are running for governor in Florida, we may only want to study citizens in Florida. If we are running as a Democrat, we may only want to study citizens who are registered Democrats. 
 
-There's also the fact that even the ideal Preceptor Table is subject to errors. For instance, by the time we actually *do* the simple math to calculate the exact treatment effect of our reminders, lots of people in our table would have died --- yet they are included! Lots of people also would have crossed over into the voting age --- yet they are excluded. 
-
 However, the main point of this exercise is to see *what we want to know* compared with *what we actually do know*. 
 
 ### EDA of `shaming`
@@ -139,7 +152,9 @@ As we have discussed before, the population *is not* the set of people, or voter
 
 In this case, we are viewing the data from the perspective of someone running for Governor this year that wants to increase voter turnout. We want to increase turnout **now**, not for people voting in 2006! We also may want to increase turnout in those citizens who are not registered to vote, a group that is excluded from our dataset. Is it reasonable to generate conclusions for this group? Most likely, no. However, we have limited data to work with and we have to determine how far we are willing to generalize to other groups. 
 
-It is a judgment call, a matter of Wisdom, as to whether or not that data we have is “close enough” to the population we are interested in to justify making a model.
+It is a judgment call, a matter of Wisdom, as to whether or not we may *assume* that the data we have and the data we want to have (i.e., the ideal Preceptor Table) are drawn from the same population.
+
+<!-- DK: Add table with both our data and ideal Preceptor table and other data (other states, other years). That is our population. In this case, our population is all voters in all states in Gubernatorial elections from 2000 through 2030. Or whatever? Not the only possible population! Could do different years. Could do only a subset of states (big states, competitive states, continental states). Could do other election types.  -->
 
 Even though the original question is about “voters” in general, and does not specifically refer to specific states in which we might be interested, we will assume that the data we have for random voters is, uh, representative enough of the population we are interested in. If we did not believe that, then we should stop right now. *The major part of Wisdom is deciding what questions you can’t answer because of the data you just don’t have.*
 
@@ -227,8 +242,9 @@ It can be helpful in cases like these to make data exchangeable conditional on a
 
 The purpose of this section is to make us think critically about the assumptions we are making and whether those assumptions can be reasonably made. Though we will continue using this dataset in the remainder of the chapter, it is clear that we must make our predictions with caution.  
 
+### Functional form
 
-<!-- Justice: Actual Preceptor Table. Then, representativeness (rows), validity (columns). Only the main functional form, with no variable names. Discussion of the error term. --> 
+<!-- DK: Discuss functional form. --> 
 
 ## Courage
 ```{r echo = FALSE, out.width="60%", fig.align='center', fig.cap = "Courage"}
@@ -557,24 +573,24 @@ How confident are we in these findings? If we needed to convince our boss that t
 
 ### The Three Levels of Knowledge 
 
-There exist three primary levels of knowledge possible knowledge in our scenario: God's Posterior (the ideal Preceptor Table), the DGM Posterior, and Our Posterior. 
+There exist three primary levels of knowledge possible knowledge in our scenario: the Truth (the ideal Preceptor Table), the DGM Posterior, and Our Posterior. 
 
-#### God's Posterior
+#### The Truth
 
-God's Posterior is the posterior if we had all the knowledge we need to *directly* answer our question. In short, God's posterior is built with the ideal Preceptor Table. God, equipped with the ideal Preceptor Table, can calculate each individual's treatment effect, and any summary measure we might be interested in, like the average treatment effect. 
+If we know the Truth (with a captial "T"), then we know the ideal Preceptor Table. With that tknowledge, we can *directly* answer our question precisely. We can calculate each individual's treatment effect, and any summary measure we might be interested in, like the average treatment effect. 
 
-This posterior represents the highest level of knowledge one can have --- with it, our questions merely require math. No estimation. 
+The Truth represents the highest level of knowledge one can have --- with it, our questions merely require algebra. No estimation needed. 
 
-#### DGM Posterior
+#### DGM posterior
 
-The DGM Posterior is the posterior we would calculate if we had perfect knowledge of the data generating mechanism, meaning you have the correct model structure and exact beta values. 
+The DGM posterior is the posterior we would calculate if we had perfect knowledge of the data generating mechanism, meaning we have the correct model structure and exact parameter values. 
 
-With that, you could not be certain about any individual's causal effect, because of the Fundamental Problem of Causal Inference. As a brief reminder: we can never measure any one person's causal effect because we are unable to see a person's resulting behavior under treatment *and* control; we only have data on one of the two conditions. 
-Regardless, we can still calculate posterior's for unknown numbers, and those posteriors would be perfect. If we went to our boss with our estimates from this posterior, we would expect our 95% confidence interval to be perfect. We would not expect for the resulting treatment effects to be far from our estimates at all.
+With that, we could not be certain about any individual's causal effect, because of the Fundamental Problem of Causal Inference. We can never measure any one person's causal effect because we are unable to see a person's resulting behavior under treatment *and* control; we only have data on one of the two conditions. 
+Regardless, we can still calculate posterior's for unknown numbers, and those posteriors would be perfect. If we went to our boss with our estimates from this posterior, we would expect our 95% confidence interval to be perfectly calibrated. That is, we would expect the true value to lie within the 95% confidence interval 95% of the time. 
 
 #### Our posterior
 
-Unfortunately, our posterior possesses even less certainty! In the real world, we *don't* have perfect knowledge of the DGM, the model structure, or the exact beta values. What does this mean? 
+Unfortunately, our posterior possesses even less certainty! In the real world, we *don't* have perfect knowledge of the DGM: the model structure and the exact parameter values. What does this mean? 
 
 When we go to our boss, we tell them that this is our *best guess*. It is an informed estimate based on the most relevant data possible. From that data, we have created a 95% confidence interval for the treatment effect of various postcards. We estimate that the treatment effect of the Neighbors postcard to be between 8% to 10%. 
 
