@@ -28,7 +28,7 @@ gap_p <- gapminder %>%
     facet_wrap(~continent, nrow = 2) +
     labs(title = "Life Expectancy and GDP per Capita",
          subtitle = "Connection between GDP and life expectancy is weakest in Africa",
-         x = "GDP per Capita in USD",
+         x = "GDP per Capita",
          y = "Life Expectancy") +
     scale_x_log10(breaks = c(500, 5000, 50000),
                   labels = scales::dollar_format(accuracy = 1)) + 
@@ -69,7 +69,7 @@ Then, run `library(tidyverse)` once again.
 
 ### How do I code in R?
 
-Unlike other statistical software programs like Excel, SPSS, or Minitab that provide [point-and-click](https://en.wikipedia.org/wiki/Point_and_click) interfaces, R is an [interpreted language](https://en.wikipedia.org/wiki/Interpreted_language). This means you have to type in commands written in *R code*. In other words, you have to code/program in R. Note that we'll use the terms "coding" and "programming" interchangeably.
+Unlike other statistical software programs like Excel, SPSS, or Minitab that provide [point-and-click](https://en.wikipedia.org/wiki/Point_and_click) interfaces, R is an [interpreted language](https://en.wikipedia.org/wiki/Interpreted_language). This means you have to type in commands written in *R code*. In other words, you have to code/program in R. We use the terms "coding" and "programming" interchangeably.
 
 <!-- DK: This is awkward. When are we teaching about R Markdown? -->
 
@@ -117,7 +117,7 @@ c(1, 2, 3, 4)
 
 * *Factors*: used to represent "categorical data." We will go into detail about these and other variable types in Chapter \@ref(wrangling).
 
-* *Data frames*: rectangular spreadsheets of data. Rows correspond to *units*. Columns correspond to *variables*. Modern data frames are called *tibbles*.  
+* *Data frames*: rectangular arrangements of data. Think of a [spreadsheet](https://en.wikipedia.org/wiki/Spreadsheet). Rows correspond to *units*. Columns correspond to *variables*. Modern data frames are called *tibbles*.  
 
 * *Boolean algebra*: `TRUE/FALSE` statements and mathematical operators such as `<` (less than), `<=` (less than or equal to), and `!=` (not equal to). For example, `4 + 2 >= 3` will return `TRUE`, but `3 + 5 <= 1` will return `FALSE`. 
 
@@ -125,19 +125,19 @@ c(1, 2, 3, 4)
 
 * *Equality*: Tested for using `==`. For example, `2 + 1 == 3` compares `2 + 1` to `3` and is legal R code, returning `TRUE`. On the other hand, `2 + 1 = 3` will return an error because we can not assign one number to another. 
 
-* *Logical operators*: `&` representing "and" as well as `|` representing "or." For example, `(2 + 1 == 3) & (2 + 1 == 4)` returns `FALSE` since at least one of the parts is not `TRUE`. On the other hand, `(2 + 1 == 3) | (2 + 1 == 4)` returns `TRUE` since at least one of the two parts is `TRUE`. 
+* *Logical operators*: `&` representing "and" as well as `|` representing "or." For example, `(2 + 1 == 3) & (2 + 1 == 4)` returns `FALSE` since at least one of the two parts is not `TRUE`. On the other hand, `(2 + 1 == 3) | (2 + 1 == 4)` returns `TRUE` since at least one of the two parts is `TRUE`. 
 
 * *Functions*: perform tasks, and are also called *commands*. They take in inputs called *arguments* and return outputs. You can either manually specify a function's arguments or use the function's *default values*. 
 
-For example, `sqrt(64)` will return the square root of its argument 64.
+For example, `sqrt(64)` is the function `sqrt()` with 64 as its argument. 
 
 ```{r}
 sqrt(64)
 ```
 
-* *Help files*: provide documentation for various functions and datasets. You can bring up help files by adding a `?` before the name of a function or data frame and then run this in the console.
+* *Help files*: provide documentation for functions and datasets. You can bring up help files by adding a `?` before the name of the object then run this in the console.
 
-* *Code comments*: are text placed after a `#` symbol. Nothing will be run after a `#` symbol, which is useful when you include human readable comments in your code, as you always should.
+* *Code comments*: are text placed after a `#` symbol. Nothing will be run after a `#` symbol, which is useful when you include comments in your code, as you always should.
 
 * *Errors, warnings, and messages*: generally reported in a red font. When there is an error, the code will not run. Read (and/or google) the message and try fix it. Warnings don't prevent code from completing. For example, if you create a scatterplot based on data with two missing values, you will see this warning: 
 
@@ -164,7 +164,7 @@ Let's unpack this output:
 
 * A `tibble` is a specific kind of data frame. This particular data frame has `r nrow(trains)` rows corresponding to different *units*, meaning people in this case. 
 
-* The tibble also has `r ncol(trains)` columns corresponding to *variables* which describe each observation. 
+* The tibble also has `r ncol(trains)` columns corresponding to *variables* which describe each unit or observation. 
 
 * We see, by default, the top 10 rows and some of the columns. You can see more (or fewer) rows and columns by using the `print()` command:
 
@@ -178,17 +178,18 @@ The `n` argument to `print()` tells R the number of rows you want to see. `width
 print(trains, n = Inf, width = Inf)
 ```
 
+`Inf` is an R object which means "infinity".
 
-### Exploring data frames
+### Exploring tibbles
 
 There are many ways to get a feel for the data contained in a tibble like `trains`. 
 
 
 #### `view()`
 
-Run `view(trains)` in the Console in RStudio, either by typing it or cutting-and-pasting it into the Console pane. Explore this data frame in the resulting pop up viewer. 
+Run `view(trains)` in the Console in RStudio, either by typing it or cutting-and-pasting it into the Console pane. Explore this tibble in the resulting pop up viewer. 
 
-`view()` allows us to explore the different *variables* listed in the columns. Observe that there are many different types of variables.  Some of the variables are *quantitative*. These variables are numerical in nature.  Other variables here, including `gender` and  `treatment`, are *categorical*.
+`view()` allows us to explore the different variables listed in the columns. Observe that there are many different types of variables.  Some of the variables are *quantitative*. These variables are numerical in nature.  Other variables here, including `gender` and  `treatment`, are *categorical*.
 
 
 #### `glimpse()`
@@ -199,9 +200,9 @@ We can also explore a tibble by using `glimpse()`.
 glimpse(trains)
 ```
 
-Observe that `glimpse()` will give you the first few entries of each variable in a row after the variable name.  In addition, the *data type* of the variable is given immediately after each variable's name, inside `< >`. 
+We see the first few values for each variable in a row after the variable name.  In addition, the *data type* of the variable is given immediately after each variable's name, inside `< >`. 
 
-`dbl` refers to "double", which is computer coding terminology for quantitative/numerical variables. `int` refers to "integer" and is another data type that also represents quantitative/numerical variables. `fct` refers to "factor" and describes a variable that is nominal, meaning a member of a smallish number of categories. `chr` is for character data.
+`dbl` refers to "double", which is computer terminology for quantitative/numerical variables. `int` is for  "integer." `fct` is refers to a "factor," a variable that is "nominal," meaning a member of a smallish number of categories. `chr` is for character data.
 
 
 #### `$` operator
@@ -212,9 +213,6 @@ The `$` operator allows us to extract a single variable from a tibble and return
 trains$age
 ```
 
-
-
-<!-- DK: Other stuff? Or save $ for elsewhere? -->
 
 
 ## Basic Plots
@@ -238,7 +236,7 @@ Notice how `data` and `aes` are specified in the call to `ggplot()`, followed by
 
 Plots are composed of *layers*, combined using the `+` sign. The most essential layer specifies which type of `geom`etric object we want the plot to involve: points, lines, bars, and others. In our graph above, the geom we used is `geom_point()`.  
 
-If you look at the code above, you will notice the `+` sign comes at the end of the code line and not at the beginning. When adding layers to a plot, start a new line after the `+` so that the code for each layer is on a new line.
+The `+` sign comes at the end of the code line and not at the beginning. When adding layers to a plot, start a new line after the `+` so that the code for each layer is on a new line.
 
 ### `geom_point()`
 
