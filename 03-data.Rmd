@@ -61,15 +61,15 @@ Getting data into and out of R is a major part of any real world data science pr
 
 ### CSV files
 
-"CSV" stands for **c**omma **s**eparated **v**alue. In other words, csv files are files whose values are separated by commas. Each comma from the csv file corresponds to a column, and the column names are taken from the first line of the file. The function then "guesses" an appropriate data type for each of the columns.
+"CSV" stands for **c**omma **s**eparated **v**alue. In other words, csv files are files whose values are separated by commas. Each comma from the csv file corresponds to a column, and the column names are, by default, taken from the first line of the file. 
 
-In the real word, you often want to write a data frame that has changed (either through filtering, selecting, mutating or summarizing) to a file to share it with others. We use `write_csv()` to save a data frame to a .csv file. `write_csv()` has two main arguments: `x` and `path`. The `x` argument is the data set that you want to save. The `file` argument is the file path where you want to save the file. The end of the path argument is the name that you want to use for the file. 
+Use `write_csv()` to save a tibble to a csv file. `write_csv()` has two main arguments: `x` and `path`. The `x` argument is the data set that you want to save. The `path` argument is the file path to which you want to save the file. The end of the `path` argument is the name that you want to use for the file. 
 
 <!-- Does there need to be an example here? -->
 
-We use `read_csv()` from the **readr** package to load the data into R, and in that call we specify the relative path to the file
+Use `read_csv()` from the **readr** package --- which is one of the main packages within the **tidyverse** collection of packages --- to load the data into R.
 
-Consider the following csv file "test_2.csv". 
+Consider the following csv file: `test_2.csv`. We set `file_1` to be the full path to `test_2.csv`'s location on the web.
 
 ```{r}
 file_1 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/test_2.csv"
@@ -77,7 +77,7 @@ file_1 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/
 read_csv(file_1)
 ```
 
-As you can see, there is text at the top of this file. Often times information about how data was collected, or other relevant information, is included at the top of the data file. This does not allow us to correctly load the data into R, and it is not intended to be shown.
+As you can see, there is text at the top of this file. Often times information about how data was collected, or other relevant information, is included at the top of the data file. This use of `read_csv()` obviously fails to read in the data correctly.
 
 We can use the `skip` argument to skip the text lines.
 
@@ -90,17 +90,18 @@ Do you see the column specification message? As of now, R "guesses" an appropria
 
 ```{r}
 read_csv(file = file_1,
-         skip = 1,
+         skip = 2,
          col_types = cols(a = col_double(),
                           b = col_double(),
                           c = col_double()))
 
 ```
 
+<!-- DK: Need a better discussion of col_types. -->
 
-When our tabular data comes in a different format, we can use the `read_delim()` function instead. For example, a different version of "test_2.csv" could exist that has no column names and uses tabs as the delimiter instead of commas.
+When our tabular data comes in a different format, we can use the `read_delim()` function instead. For example, a different version of `test_2.csv` could exist that has no column names and uses tabs as the delimiter instead of commas.
 
-With `read_delim()`, we specify the first argument as the path to the file (as done with read_csv). Then we provide values to the `delim` argument (could be a tab, which we represent by "\t").
+With `read_delim()`, we specify the first argument as the path to the file, as done with `read_csv()`. Then we provide values to the `delim` argument (could be a tab, which we represent by "\\t").
 
 ### Excel Files
 
@@ -381,7 +382,7 @@ For example, [there are billions of Google searches conducted daily](https://www
 
 ## Webscraping
 
-In the first part of this chapter, we learned how to read in data from plain text files that are usually "rectangular" in shape using the `tidyverse` `read_*` functions. Sadly, not all data comes in this simple format, but we can happily use many other tools to read in more messy/wild data formats. The formal name for gathering non-rectangular data from the web and transforming it into a more useful format for data analysis is **web scraping**.
+In the first part of this chapter, we learned how to read in data from plain text files that are usually "rectangular" in shape using the **tidyverse** `read_*` functions. Sadly, not all data comes in this simple format, but we can happily use many other tools to read in more messy/wild data formats. The formal name for gathering non-rectangular data from the web and transforming it into a more useful format for data analysis is **web scraping**.
 
 
 ### HTML and CSS selectors
