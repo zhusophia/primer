@@ -132,13 +132,13 @@ tibble(ID = c("1", "2", "...", "473", "474",
   gt() %>%
   cols_label(ID = md("ID"),Party = "Political Party", Age = "Age") %>%
   tab_style(cell_borders(sides = "right"),
-            location = cells_body(columns = vars(ID))) %>%
+            location = cells_body(columns = c(ID))) %>%
   tab_style(style = cell_text(align = "left", v_align = "middle"), 
-            locations = cells_column_labels(columns = vars(ID))) %>%
-  cols_align(align = "center", columns = TRUE) %>%
-  cols_align(align = "left", columns = vars(ID)) %>%
-  tab_spanner(label = "Outcome", columns = vars(Age)) %>%
-  tab_spanner(label = "Predictor", columns = vars(Party))
+            locations = cells_column_labels(columns = c(ID))) %>%
+  cols_align(align = "center", columns = everything()) %>%
+  cols_align(align = "left", columns = c(ID)) %>%
+  tab_spanner(label = "Outcome", columns = c(Age)) %>%
+  tab_spanner(label = "Predictor", columns = c(Party))
 ```
 
 &nbsp;
@@ -266,9 +266,9 @@ trains %>%
              party = md("**Party**"),
              fitted = md("**Fitted**"),
              residual = md("**Residual**")) %>%
-  fmt_number(columns = vars(fitted), decimals = 2) %>% 
+  fmt_number(columns = c(fitted), decimals = 2) %>% 
   tab_header("8 Observations from Trains Dataset") %>%
-  cols_align(align = "center", columns = TRUE) 
+  cols_align(align = "center", columns = everything()) 
 
 
 ```

@@ -67,12 +67,12 @@ tibble(ID = c("Citizen 1", "Citizen 2"),
                 ycontrol = "Behavior in Control",
                 yeffect = "Treatment effect") %>%
   tab_style(cell_borders(sides = "right"),
-            location = cells_body(columns = vars(ID)))  %>%
+            location = cells_body(columns = c(ID)))  %>%
   tab_style(style = cell_text(align = "left", v_align = "middle"), 
-            locations = cells_column_labels(columns = vars(ID))) %>%
-  cols_align(align = "center", columns = TRUE) %>%
-  cols_align(align = "left", columns = vars(ID)) %>%
-  tab_spanner(label = "Outcomes", columns = vars(ytreat, ycontrol, yeffect))
+            locations = cells_column_labels(columns = c(ID))) %>%
+  cols_align(align = "center", columns = everything()) %>%
+  cols_align(align = "left", columns = c(ID)) %>%
+  tab_spanner(label = "Outcomes", columns = c(ytreat, ycontrol, yeffect))
 ```
 In our ideal table, we have rows for **all American citizens of voting age**. This is a good start! However, we may want even more information in our ideal Preceptor Table. Perhaps a column for sex would be informative. A column for age? Political affiliation? In a perfect world, we would know all of these pieces of information. In a perfect world, we could measure the *exact causal effect* of voting reminders for different subsets of the US population.
 
@@ -179,16 +179,16 @@ tibble(subject = c("Citizen 1", "Citizen 23", "Citizen 40", "Citizen 53", "Citiz
                 ytreat = md("Treatment"),
                 ycontrol = md("Control"),
                 ydiff = md("Treatment - Control")) %>%
-  cols_move(columns = vars(ytreat, ycontrol), after = vars(subject)) %>%
+  cols_move(columns = c(ytreat, ycontrol), after = c(subject)) %>%
   tab_style(cell_borders(sides = "right"),
-            location = cells_body(columns = vars(subject))) %>%
+            location = cells_body(columns = c(subject))) %>%
   tab_style(style = cell_text(align = "left", v_align = "middle", size = "large"), 
-            locations = cells_column_labels(columns = vars(subject))) %>%
-  cols_align(align = "center", columns = TRUE) %>%
-  cols_align(align = "left", columns = vars(subject)) %>%
-  fmt_markdown(columns = TRUE)  %>%
-  tab_spanner(label = "$$\\text{Outcomes}$$", vars(ytreat, ycontrol))  %>%
-  tab_spanner(label = "$$\\text{Estimand}$$", vars(ydiff))
+            locations = cells_column_labels(columns = c(subject))) %>%
+  cols_align(align = "center", columns = everything()) %>%
+  cols_align(align = "left", columns = c(subject)) %>%
+  fmt_markdown(columns = everything())  %>%
+  tab_spanner(label = "$$\\text{Outcomes}$$", c(ytreat, ycontrol))  %>%
+  tab_spanner(label = "$$\\text{Estimand}$$", c(ydiff))
 ```
 
 
@@ -244,14 +244,14 @@ tibble(source = c("ideal Preceptor Table", "ideal Preceptor Table", "...",
              ycontrol = md("Control"),
              ydiff = md("Treatment - Control")) %>%
   tab_style(cell_borders(sides = "right"),
-            location = cells_body(columns = vars(source))) %>%
+            location = cells_body(columns = c(source))) %>%
   tab_style(style = cell_text(align = "left", v_align = "middle", size = "large"), 
-            locations = cells_column_labels(columns = vars(source))) %>%
-  cols_align(align = "center", columns = TRUE) %>%
-  cols_align(align = "left", columns = vars(source)) %>%
-  fmt_markdown(columns = TRUE)  %>%
-  tab_spanner(label = "$$\\text{Outcomes}$$", vars(ytreat, ycontrol))  %>%
-  tab_spanner(label = "$$\\text{Estimand}$$", vars(ydiff))
+            locations = cells_column_labels(columns = c(source))) %>%
+  cols_align(align = "center", columns = everything()) %>%
+  cols_align(align = "left", columns = c(source)) %>%
+  fmt_markdown(columns = everything())  %>%
+  tab_spanner(label = "$$\\text{Outcomes}$$", c(ytreat, ycontrol))  %>%
+  tab_spanner(label = "$$\\text{Estimand}$$", c(ydiff))
 ```
 
 ### Representativeness/validity
@@ -662,11 +662,12 @@ We know, from experience, that our posteriors are often too narrow. They assume 
 
 ## Summary
 
-*Key commands*:
 * Use the `tidy()` function from the **broom.mixed** package to make models with $N$ parameters easier to interpret. 
+
 * A function we are familiar with, `stan_glm()`, is used to create models with $N$ parameters. 
 
-*Remember*:
 * It is important to remember that the data does not equal the truth. 
+
 * The population we would like to make inferences about *is not the population for which we have data*. It is a matter of wisdom whether the data we do have maps closely enough to the population we are studying.
+
 * When dealing with models with many parameters, double check that you know how to find the true slope and intercepts --- often, this requires adding numerous values to the coefficient you are studying. 
