@@ -65,22 +65,15 @@
 <h1>
 <span class="header-section-number">11</span> N Parameters<a class="anchor" aria-label="anchor" href="#n-parameters"><i class="fas fa-link"></i></a>
 </h1>
-<!-- Start the Justice section with The Population Table, which consists of rows from three sources: the ideal Preceptor Table, the data, and other rows from the population (rows which exist but for which we have no data). The Population Table only includes data that we actually have. For the rows from the ideal Preceptor Table, it will generally include the covariate data, but no outcome data. For the rows from the data, it will include all the data, which is generally everything except counter-factual outcomes. For the rows from the larger population, everything is missing. There should be year and  state columns. -->
-<!-- In Justice, discuss representativeness and validity. And then, what assumption do we make about the form of the model. (Meaning linear, logistic and so on.) Also, discuss the fact that we have assuming that the unknown joint distribution is consistent for the whole population. That is, there is a formula which works for all the rows in the Population Table. -->
-<!-- Once you assume there is a single population, are you making any other assumptions? Especially with regard to the relationships among the columns? Yes! But in Justice? Connected to validity because, if the joint distribution is the same, it must be the case that the variables mean the same things across the whole population. Key: the joint distribution is the same throughout the population. -->
+<!-- Continuing in Justice, what assumption do we make about the form of the model? (Meaning linear, logistic and so on.) Also, discuss the fact that we have assuming that the unknown joint distribution is consistent for the whole population. That is, there is a formula which works for all the rows in the Population Table. This may require removing some rows from the Population Table. JUst because Wisdom handed us a Population Table with X rows does not mean we need to keep all X rows, especially if creating a model which covers all rows is hard/impossible. We can just simplify the claims we are making about the world by removing some rows. But we better not remove the rows we need to answer the question we started with. Justice finishes with a generic model form, but not with a decision about which variables to include.
+-->
 <!-- Temperance. Answer the question. Be aware of the limits to the accuracy of your answer. Testing. All the cool themes. Bring it all together. Make the students say "Ahhh!" Revisit the three levels of possible knowledge: -->
-<!-- In any *one* problem, it is hard to know if we were "right," if our posterior was similar to the DGM posterior. After all, 5% of the time the answer is outside the 95% confidence interval. But, first, if the truth ends up very, very far away from the median of our posterior, our boss will be rightly suspicious. How many MAD SDs away do you have to be before you are obviously a fool? Or standard erros? Maybe 3? Certainly 4? Second, if we answer many questions (by creating many posteriors for different problems) then, over time, our boss will get a sense of our actual skill, both because our median should be above and below the truth about the same proportion and because our confidence intervals should be correctly calibrated. -->
-<!-- Walk through the details of MAD SD and standard error in answering the question: How wrong do we have to be in a one-off for our boss to be suspicious? When is "bad luck" as sign of stupidity? Equivalent of how many heads in a row? If the truth is 4 standard errors away from your best estimate, that is the equivalent and you flipping heads 10 times in a row. -->
-<!-- Add three paragraphs about this: https://projects.fivethirtyeight.com/checking-our-work/. -->
-<!-- And then discuss how we know, from experience, that our posteriors are too narrow. They assume that we have the DGM when, in fact, we know that we do not. What to do? One, warn your boss (and yourself) about this fact. Be humble. That is Temperance. Second, estimate dozens of different models and combine their posteriors. The result might very well have the same median as your correct posterior, but the confidence intervals would be much wider. Doing this is beyond the scope of this Primer. -->
 <!-- Fix DK comment. -->
 <!-- Add a testing is nonsense section. -->
-<!-- Expand ideal Preceptor Table for extra rows. -->
-<!-- Make warning "The `.dots` argument of `group_by()` is deprecated a" go away if you can. -->
 <p><em>This chapter is still a DRAFT.</em></p>
 <p>Having created models with one parameter in Chapter <a href="one-parameter.html#one-parameter">6</a>, two parameters in Chapter <a href="two-parameters.html#two-parameters">7</a>, three parameters in Chapter <a href="three-parameters.html#three-parameters">8</a>, four parameters in Chapter <a href="four-parameters.html#four-parameters">9</a> and five parameters in Chapter <a href="five-parameters.html#five-parameters">10</a>, you are now ready to make the jump to <span class="math inline">\(N\)</span> parameters.</p>
 <p>In this chapter, we will consider models with many parameters and the complexities that arise therefrom. As our models grow in complexity, we need to pay extra attention to basic considerations like validity, population, and representativeness. It is easy to jump right in and start interpreting! It is harder, but necessary, to ensure that our models are really answering our questions.</p>
-<p>Imagine you are running for Governor and want to do a better job of getting your voters to vote. How can you encourage voters to go out to the polls on election day?</p>
+<p>Imagine you are running for Governor in Texas and want to do a better job of getting your voters to vote. How can you encourage voters to go out to the polls on election day?</p>
 <div id="wisdom-8" class="section level2" number="11.1">
 <h2>
 <span class="header-section-number">11.1</span> Wisdom<a class="anchor" aria-label="anchor" href="#wisdom-8"><i class="fas fa-link"></i></a>
@@ -105,18 +98,6 @@ FIGURE 11.1: Wisdom
 <p>Are we are modeling (just) for prediction or are we (also) modeling for causation? Predictive models care nothing about causation. Causal models are often also concerned with prediction, if only as a means of measuring the quality of the model. Here, we <strong>are</strong> looking at causation.</p>
 <p>So, what would our ideal table look like? Assuming we are running for governor in the United States, we would ideally have data for every citizen of voting age. This means we would have approximately 200 million rows.</p>
 <p>Because there is no missing data in an ideal Preceptor Table, we would also know the outcomes under both treatment (receiving a reminder) and control (not receiving a reminder). Here is a sample row from our table:</p>
-<pre><code>## Warning: `columns = vars(...)` has been deprecated in gt 0.3.0:
-## * please use `columns = c(...)` instead
-
-## Warning: `columns = vars(...)` has been deprecated in gt 0.3.0:
-## * please use `columns = c(...)` instead</code></pre>
-<pre><code>## Warning: `columns = TRUE` has been deprecated in gt 0.3.0:
-## * please use `columns = everything()` instead</code></pre>
-<pre><code>## Warning: `columns = vars(...)` has been deprecated in gt 0.3.0:
-## * please use `columns = c(...)` instead
-
-## Warning: `columns = vars(...)` has been deprecated in gt 0.3.0:
-## * please use `columns = c(...)` instead</code></pre>
 <div id="hnzjywwynd" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
@@ -494,7 +475,7 @@ FIGURE 11.1: Wisdom
 <span class="header-section-number">11.1.2</span> EDA of <code>shaming</code><a class="anchor" aria-label="anchor" href="#eda-of-shaming"><i class="fas fa-link"></i></a>
 </h3>
 <p>After loading the packages we need, let’s perform an EDA, starting off by running <code>glimpse()</code> on the <code>shaming</code> tibble from the <strong>primer.data</strong> package.</p>
-<div class="sourceCode" id="cb912"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb811"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">primer.data</span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://mc-stan.org/rstanarm/">rstanarm</a></span><span class="op">)</span>
@@ -504,7 +485,7 @@ FIGURE 11.1: Wisdom
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/sfirke/janitor">janitor</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://github.com/bbolker/broom.mixed">broom.mixed</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ddsjoberg/gtsummary">gtsummary</a></span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb913"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb812"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">glimpse</span><span class="op">(</span><span class="va">shaming</span><span class="op">)</span></code></pre></div>
 <pre><code>## Rows: 344,084
 ## Columns: 15
@@ -530,7 +511,7 @@ There are a few things to note while exploring this data set. You may – or may
 <!-- HV: Should I include discussion of the left-hand variable (treatment?) here? Or wait until we move into the regressions? -->
 <p>We have not yet discussed the most important variable of them all: <code>treatment</code>. The <code>treatment</code> variable is a factor variable with 5 levels, including the control. Since we are curious as to how sending mailings affects voter turnout, the treatment variable will tell us about the impact each type of mailing can make. Let’s start off by taking a broad look at the different treatments.</p>
 <!-- HV: Is it okay to say the first sentence of this paragraph? -->
-<div class="sourceCode" id="cb915"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb814"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">shaming</span> <span class="op">%&gt;%</span>
   <span class="fu">count</span><span class="op">(</span><span class="va">treatment</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 5 x 2
@@ -555,7 +536,7 @@ There are a few things to note while exploring this data set. You may – or may
 <p>As we have discussed before, the population <em>is not</em> the set of people, or voters, for which we have data. This is the dataset. Nor is it the set of voters about whom we would like to have data. Those are the rows in the ideal Preceptor Table. The population is the larger — potentially much larger — set of individuals which include both the data we have and the data we want. Generally, the population will be much larger than either the data we have and the data we want.</p>
 <p>In this case, we are viewing the data from the perspective of someone running for Governor this year that wants to increase voter turnout. We want to increase turnout <strong>now</strong>, not for people voting in 2006! We also may want to increase turnout in those citizens who are not registered to vote, a group that is excluded from our dataset. Is it reasonable to generate conclusions for this group? Most likely, no. However, we have limited data to work with and we have to determine how far we are willing to generalize to other groups.</p>
 <p>It is a judgment call, a matter of Wisdom, as to whether or not we may <em>assume</em> that the data we have and the data we want to have (i.e., the ideal Preceptor Table) are drawn from the same population.</p>
-<!-- DK: Add table with both our data and ideal Preceptor table and other data (other states, other years). That is our population. In this case, our population is all voters in all states in Gubernatorial elections from 2000 through 2030. Or whatever? Not the only possible population! Could do different years. Could do only a subset of states (big states, competitive states, continental states). Could do other election types.  -->
+<!-- DK: Add table with both our data and ideal Preceptor table and other data (other states, other years). That is our population. In this case, our population is all voters in all states in Gubernatorial elections from 2000 through 2030. Or whatever? Not the only possible population! Could do different years. Could do only a subset of states (big states, competitive states, continental states). Could do other election types. MF: Done, in justice. -->
 <p>Even though the original question is about “voters” in general, and does not specifically refer to specific states in which we might be interested, we will assume that the data we have for random voters is, uh, representative enough of the population we are interested in. If we did not believe that, then we should stop right now. <em>The major part of Wisdom is deciding what questions you can’t answer because of the data you just don’t have.</em></p>
 </div>
 </div>
@@ -564,7 +545,7 @@ There are a few things to note while exploring this data set. You may – or may
 <span class="header-section-number">11.2</span> Justice<a class="anchor" aria-label="anchor" href="#justice-7"><i class="fas fa-link"></i></a>
 </h2>
 <div class="figure" style="text-align: center">
-<span id="fig:unnamed-chunk-643"></span>
+<span id="fig:unnamed-chunk-644"></span>
 <img src="other/images/Justice.jpg" alt="Justice" width="60%"><p class="caption">
 FIGURE 11.2: Justice
 </p>
@@ -582,28 +563,6 @@ FIGURE 11.2: Justice
 </h3>
 <p>Recall that in an actual Preceptor Table, we will have a bunch of missing data! We can not use simple arithmetic to calculate the causal effect of voting reminders on voting behavior. Instead, we will be required to estimate it. This is our estimand, a variable in the real world that we are trying to measure.An estimand is not the value you calculated, but is rather the unknown variable you want to estimate.</p>
 <p>Let’s build a basic visualization for the actual Preceptor Table for this scenario:</p>
-<pre><code>## Warning: `columns = vars(...)` has been deprecated in gt 0.3.0:
-## * please use `columns = c(...)` instead
-
-## Warning: `columns = vars(...)` has been deprecated in gt 0.3.0:
-## * please use `columns = c(...)` instead
-
-## Warning: `columns = vars(...)` has been deprecated in gt 0.3.0:
-## * please use `columns = c(...)` instead
-
-## Warning: `columns = vars(...)` has been deprecated in gt 0.3.0:
-## * please use `columns = c(...)` instead</code></pre>
-<pre><code>## Warning: `columns = TRUE` has been deprecated in gt 0.3.0:
-## * please use `columns = everything()` instead</code></pre>
-<pre><code>## Warning: `columns = vars(...)` has been deprecated in gt 0.3.0:
-## * please use `columns = c(...)` instead</code></pre>
-<pre><code>## Warning: `columns = TRUE` has been deprecated in gt 0.3.0:
-## * please use `columns = everything()` instead</code></pre>
-<pre><code>## Warning: `columns = vars(...)` has been deprecated in gt 0.3.0:
-## * please use `columns = c(...)` instead
-
-## Warning: `columns = vars(...)` has been deprecated in gt 0.3.0:
-## * please use `columns = c(...)` instead</code></pre>
 <div id="rogehjzgka" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
@@ -1036,17 +995,616 @@ FIGURE 11.2: Justice
 <p>Here, there are two possible outcomes: did vote or did not vote. What we really want to know is the Average Treatment Effect (ATE) of the treatment, the voting reminder. We want to estimate how much the voting reminder impacts the odds of someone voting.</p>
 <p>Note that this is a simplified version of the actual Preceptor Table. In this dataset, we have a number of other columns that we know about each of our subjects: age, sex, past voting history. In an expanded actual Preceptor Table, these columns would be included.</p>
 <p>Now, how can we fill in the question marks? Because of the Fundamental Problem of Causal Inference, we can never know the missing values. Because we can never know the missing values, we must make assumptions. “Assumption” just means that we need a “model,” and all models have parameters.</p>
-<p>Now, let’s examine the validity of our model.</p>
 </div>
-<div id="validity-can-we-answer-this-question" class="section level3" number="11.2.2">
+<div id="the-population-table" class="section level3" number="11.2.2">
 <h3>
-<span class="header-section-number">11.2.2</span> Validity: can we answer this question?<a class="anchor" aria-label="anchor" href="#validity-can-we-answer-this-question"><i class="fas fa-link"></i></a>
+<span class="header-section-number">11.2.2</span> The Population Table<a class="anchor" aria-label="anchor" href="#the-population-table"><i class="fas fa-link"></i></a>
 </h3>
-<!-- DK: Shouldn't the key points here be moved into Justice? Delete the rest? We end Wisdom by making our population assumption, and stating that population cleanly. "The population of interest" is all registered voters for Gubernatorial elections in US states from 2000 through 2030.-->
+<p>The Population Table shows the data that we <em>actually</em> have in our desired population. It shows rows from three sources: the ideal Preceptor Table, the data, and the population outside of the data (rows which exist but for which we have no data).</p>
+<p>In our ideal Preceptor rows, we have information for our covariates of sex, year, and state. However, because those rows are not included in our data, we do not have any outcome results. Since our scenario pertains to an upcoming election in Texas, the state column will read Texas and the year column will read 2021.</p>
+<p>The rows from our data have everything: the covariates and the outcomes. The covariates here will be Michigan for state and 2006 for year, since these are the pieces of information that are included in our data. Of course, we still do not have values for Treatment minus Control, since we cannot observe one subject under two conditions.</p>
+<p>The rows from the population have no data. These are subjects which fall under our desired population, but for which we have no data. As such, all rows are missing.</p>
+<div id="uxqrbofcup" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#uxqrbofcup .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#uxqrbofcup .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#uxqrbofcup .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#uxqrbofcup .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 4px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#uxqrbofcup .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#uxqrbofcup .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#uxqrbofcup .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#uxqrbofcup .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#uxqrbofcup .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#uxqrbofcup .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#uxqrbofcup .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#uxqrbofcup .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#uxqrbofcup .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#uxqrbofcup .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#uxqrbofcup .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#uxqrbofcup .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#uxqrbofcup .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#uxqrbofcup .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#uxqrbofcup .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#uxqrbofcup .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#uxqrbofcup .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#uxqrbofcup .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#uxqrbofcup .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#uxqrbofcup .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#uxqrbofcup .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#uxqrbofcup .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#uxqrbofcup .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#uxqrbofcup .gt_left {
+  text-align: left;
+}
+
+#uxqrbofcup .gt_center {
+  text-align: center;
+}
+
+#uxqrbofcup .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#uxqrbofcup .gt_font_normal {
+  font-weight: normal;
+}
+
+#uxqrbofcup .gt_font_bold {
+  font-weight: bold;
+}
+
+#uxqrbofcup .gt_font_italic {
+  font-style: italic;
+}
+
+#uxqrbofcup .gt_super {
+  font-size: 65%;
+}
+
+#uxqrbofcup .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 65%;
+}
+</style>
+<div class="inline-table"><table class="gt_table">
+<thead class="gt_col_headings">
+<tr>
+<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1" style="font-size: large; text-align: left; vertical-align: middle;">Source</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="2" colspan="1">Sex</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="2" colspan="1">Year</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="2" colspan="1">State</th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2">
+        <span class="gt_column_spanner">$$\text{Outcomes}$$</span>
+      </th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="1">
+        <span class="gt_column_spanner">$$\text{Estimand}$$</span>
+      </th>
+    </tr>
+<tr>
+<th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">Treatment</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">Control</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">Treatment - Control</th>
+    </tr>
+</thead>
+<tbody class="gt_table_body">
+<tr>
+<td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;"><div class="gt_from_md">
+<p>ideal Preceptor Table</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>Female</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>2021</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>Texas</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+</tr>
+<tr>
+<td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;"><div class="gt_from_md">
+<p>ideal Preceptor Table</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>Male</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>2021</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>Texas</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+</tr>
+<tr>
+<td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;"><div class="gt_from_md">
+<p>...</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>...</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>...</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>...</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>...</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>...</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>...</p>
+</div></td>
+</tr>
+<tr>
+<td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;"><div class="gt_from_md">
+<p>Data</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>Male</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>2006</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>Michigan</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>Did not vote</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+</tr>
+<tr>
+<td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;"><div class="gt_from_md">
+<p>Data</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>Female</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>2006</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>Michigan</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>Voted</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+</tr>
+<tr>
+<td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;"><div class="gt_from_md">
+<p>Data</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>Female</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>2006</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>Michigan</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>Voted</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+</tr>
+<tr>
+<td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;"><div class="gt_from_md">
+<p>...</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>...</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>...</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>...</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>...</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>...</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>...</p>
+</div></td>
+</tr>
+<tr>
+<td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;"><div class="gt_from_md">
+<p>Population</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+</tr>
+<tr>
+<td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;"><div class="gt_from_md">
+<p>Population</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+</tr>
+<tr>
+<td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;"><div class="gt_from_md">
+<p>Population</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<div id="representativenessvalidity" class="section level3" number="11.2.3">
+<h3>
+<span class="header-section-number">11.2.3</span> Representativeness/validity<a class="anchor" aria-label="anchor" href="#representativenessvalidity"><i class="fas fa-link"></i></a>
+</h3>
 <!-- Answering questions about representativeness and validity is only possible if you have specified your population precisely. The more narrow the population you choose, the easier it is to make assumptions about representativeness and validity. The more broad your population, the more useful your model. -->
-<p>This is a good time to consider what it really means to accept that our data is relevant to our question. With that in mind, let’s break down our real, current question:</p>
+<p>This is a good time to consider what it really means to accept that our data is representative of our population. With that in mind, let’s break down our real, current question:</p>
 <ul>
-<li>We are running for governor in the year 2021. In this year and in the United States, we consider sending out a voting reminder postcard to citizens of voting age. Will this reminder encourage voting, and by how much?</li>
+<li>We are running for governor in Texas in the year 2021. In this year and in the United States, we consider sending out a voting reminder postcard to citizens of voting age. Will this reminder encourage voting, and by how much?</li>
 </ul>
 <p>Now, let’s break down our data from the <code>shaming</code> dataset:</p>
 <ul>
@@ -1055,16 +1613,16 @@ FIGURE 11.2: Justice
 <p>So, how similar are these groups? Let’s start with some differences.
 * The data is from 2006. Our question is asking for answers from 2021. This is not a small gap in time. A lot changes in a decade and a half!
 * The data excludes all non-voters in the last election. Our question, which seeks to increase voting turnout <em>in all citizens</em>, would want for non-voters to be included. So, can we make any claims about those citizens? Probably not.
-* The data only includes voters from Michigan. We may want to make inferences about other states, or the United States as a whole. Is it within reason to do that?
+* The data only includes voters from Michigan. We want to make inferences about Texas, or perhaps the United States as a whole. Is it within reason to do that?
 * The voting reminders in the data were sent by mail. Is this the most practical option in 2021, where it may be easier to send an electronic notice?
 * The contents of voting reminders in 2006 are going to differ from voting reminders sent in 2021. Thus, our “treatments” are fundamentally different.</p>
 <p>These are not small issues. These are big, in-our-face issues. If we say that data from voters in 2006 and data from voters in 2021 is exchangeable — meaning that they represent the same thing — we also have to consider what that means for other time frames. Can data from 2006 be used to predict for 2030, 2040, and beyond? What makes 2021 an acceptable option specifically?</p>
 <p>It can be helpful in cases like these to make data exchangeable conditional on another assumption. For instance, if there was a trend of less voting in 2021 compared with 2006, we may need to account for that in order for our predictions to be helpful. Alternatively, if we were studying a state that has historically more voting participation than Michigan, we may want to make our predictions based on the assumption that “people, on average, vote more in State X.”</p>
 <p>The purpose of this section is to make us think critically about the assumptions we are making and whether those assumptions can be reasonably made. Though we will continue using this dataset in the remainder of the chapter, it is clear that we must make our predictions with caution.</p>
 </div>
-<div id="functional-form" class="section level3" number="11.2.3">
+<div id="functional-form" class="section level3" number="11.2.4">
 <h3>
-<span class="header-section-number">11.2.3</span> Functional form<a class="anchor" aria-label="anchor" href="#functional-form"><i class="fas fa-link"></i></a>
+<span class="header-section-number">11.2.4</span> Functional form<a class="anchor" aria-label="anchor" href="#functional-form"><i class="fas fa-link"></i></a>
 </h3>
 <!-- DK: Discuss functional form. -->
 </div>
@@ -1074,7 +1632,7 @@ FIGURE 11.2: Justice
 <span class="header-section-number">11.3</span> Courage<a class="anchor" aria-label="anchor" href="#courage-7"><i class="fas fa-link"></i></a>
 </h2>
 <div class="figure" style="text-align: center">
-<span id="fig:unnamed-chunk-645"></span>
+<span id="fig:unnamed-chunk-647"></span>
 <img src="other/images/Courage.jpg" alt="Courage" width="60%"><p class="caption">
 FIGURE 11.3: Courage
 </p>
@@ -1090,12 +1648,12 @@ FIGURE 11.3: Courage
 <li><p>Create a column named <code>voter_class</code> that classifies voters into 3 bins: “Always Vote” for those who voted at least 5 times, “Sometimes Vote” for those who voted between 3 or 4 times, and “Rarely Vote” for those who voted 2 or fewer times. This variable should be classified as a factor.</p></li>
 <li><p>Create a column called <code>z_age</code> which is the z-score for <code>age</code>.</p></li>
 </ul>
-<div class="sourceCode" id="cb922"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb816"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">object_1</span> <span class="op">&lt;-</span> <span class="va">shaming</span> <span class="op">%&gt;%</span> 
   
-  <span class="co"># Converting the Y/N columns to binaries with the function we made note that</span>
-  <span class="co"># primary_06 is already binary and also that we don't need it to predict</span>
-  <span class="co"># construct previous voter behavior status variable.</span>
+  <span class="co"># Converting the Y/N columns to binaries with the function we made </span>
+  <span class="co"># note that primary_06 is already binary and also that we don't </span>
+  <span class="co"># need it to predict construct previous voter behavior status variable.</span>
   
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>p_00 <span class="op">=</span> <span class="op">(</span><span class="va">primary_00</span> <span class="op">==</span> <span class="st">"Yes"</span><span class="op">)</span>,
          p_02 <span class="op">=</span> <span class="op">(</span><span class="va">primary_02</span> <span class="op">==</span> <span class="st">"Yes"</span><span class="op">)</span>,
@@ -1131,7 +1689,7 @@ FIGURE 11.3: Courage
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>z_age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/scale.html">scale</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">primary_06</span>, <span class="va">treatment</span>, <span class="va">sex</span>, <span class="va">civ_engage</span>, <span class="va">voter_class</span>, <span class="va">z_age</span><span class="op">)</span></code></pre></div>
 <p>Let’s inspect our object:</p>
-<div class="sourceCode" id="cb923"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb817"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">object_1</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html">slice</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 3 x 6
@@ -1155,12 +1713,12 @@ With variable names:</p>
 <p>There are two ways to formalize the model used in <code>fit_1</code>: with and without the variable names. The former is related to the concept of Justice as we acknowledge that the model is constructed via the linear sum of <code>n</code> parameters times the value for <code>n</code> variables, along with an error term. In other words, it is a linear model. The only other model we have learned this semester is a logistic model, but there are other kinds of models, each defined by the mathematics and the assumptions about the error term.
 The second type of formal notation, more associated with the virtue Courage, includes the actual variable names we are using. The trickiest part is the transformation of character/factor variables into indicator variables, meaning variables with 0/1 values. Because <code>treatment</code> has 5 levels, we need 4 indicator variables. The fifth level — which, by default, is the first variable alphabetically (for character variables) or the first level (for factor variables) — is incorporated in the intercept.</p>
 <p>Let’s translate the model into code.</p>
-<div class="sourceCode" id="cb925"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb819"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">object_1</span>,
                   formula <span class="op">=</span> <span class="va">primary_06</span> <span class="op">~</span> <span class="va">treatment</span> <span class="op">+</span> <span class="va">sex</span>,
                   refresh <span class="op">=</span> <span class="fl">0</span>,
                   seed <span class="op">=</span> <span class="fl">987</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb926"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb820"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://docs.ropensci.org/skimr/reference/print.html">print</a></span><span class="op">(</span><span class="va">fit_1</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></code></pre></div>
 <pre><code>## stan_glm
 ##  family:       gaussian [identity]
@@ -1184,7 +1742,7 @@ The second type of formal notation, more associated with the virtue Courage, inc
 ## * For help interpreting the printed output see ?print.stanreg
 ## * For info on the priors used see ?prior_summary.stanreg</code></pre>
 <p>We will now create a table that nicely formats the results of <code>fit_1</code> using the <code><a href="http://www.danieldsjoberg.com/gtsummary//reference/tbl_regression.html">tbl_regression()</a></code> function from the <strong>gtsummary</strong> package. It will also display the associated 95% confidence interval for each coefficient.</p>
-<div class="sourceCode" id="cb928"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb822"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="http://www.danieldsjoberg.com/gtsummary//reference/tbl_regression.html">tbl_regression</a></span><span class="op">(</span><span class="va">fit_1</span>, 
                intercept <span class="op">=</span> <span class="cn">TRUE</span>, 
                estimate_fun <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="http://www.danieldsjoberg.com/gtsummary//reference/style_sigfig.html">style_sigfig</a></span><span class="op">(</span><span class="va">x</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -1630,14 +2188,14 @@ The second type of formal notation, more associated with the virtue Courage, inc
 <p>The math:
 <span class="math display">\[y_{i} = \beta_{0} + \beta_{1}z\_age + \beta_{2}male_i + \beta_{3}civic\_duty_i + \\ \beta_{4}hawthorne_i + \beta_{5}self_i + \beta_{6}neighbors_i + \\ \beta_{7}Sometimes\ vote_i + \beta_{8}Always\ vote_i + \\ \beta_{9}civic\_duty_i Sometimes\ vote_i + \beta_{10}hawthorne_i Sometimes\ vote_i + \\ \beta_{11}self_i Sometimes\ vote_i + \beta_{11}neighbors_i Sometimes\ vote_i + \\ \beta_{12}civic\_duty_i Always\ vote_i + \beta_{13}hawthorne_i Always\ vote_i + \\ \beta_{14}self_i Always\ vote_i + \beta_{15}neighbors_i Always\ vote_i + \epsilon_{i}\]</span>
 Translate into code:</p>
-<div class="sourceCode" id="cb929"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb823"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">object_1</span>,
                   formula <span class="op">=</span> <span class="va">primary_06</span> <span class="op">~</span> <span class="va">z_age</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">treatment</span> <span class="op">+</span> <span class="va">voter_class</span> <span class="op">+</span> 
                             <span class="va">treatment</span><span class="op">*</span><span class="va">voter_class</span>,
                   family <span class="op">=</span> <span class="va">gaussian</span>,
                   refresh <span class="op">=</span> <span class="fl">0</span>,
                   seed <span class="op">=</span> <span class="fl">789</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb930"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb824"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://docs.ropensci.org/skimr/reference/print.html">print</a></span><span class="op">(</span><span class="va">fit_2</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></code></pre></div>
 <pre><code>## stan_glm
 ##  family:       gaussian [identity]
@@ -1673,7 +2231,7 @@ Translate into code:</p>
 ## * For help interpreting the printed output see ?print.stanreg
 ## * For info on the priors used see ?prior_summary.stanreg</code></pre>
 <p>As we did with our first model, create a regression table to observe our findings:</p>
-<div class="sourceCode" id="cb932"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb826"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="http://www.danieldsjoberg.com/gtsummary//reference/tbl_regression.html">tbl_regression</a></span><span class="op">(</span><span class="va">fit_2</span>, 
                intercept <span class="op">=</span> <span class="cn">TRUE</span>, 
                estimate_fun <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="http://www.danieldsjoberg.com/gtsummary//reference/style_sigfig.html">style_sigfig</a></span><span class="op">(</span><span class="va">x</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -2187,7 +2745,7 @@ of the average treatment effect.
 <span class="header-section-number">11.4</span> Temperance<a class="anchor" aria-label="anchor" href="#temperance-8"><i class="fas fa-link"></i></a>
 </h2>
 <div class="figure">
-<span id="fig:unnamed-chunk-651"></span>
+<span id="fig:unnamed-chunk-656"></span>
 <img src="other/images/Temperance.jpg" alt="Temperance" width="100%"><p class="caption">
 FIGURE 11.4: Temperance
 </p>
@@ -2198,7 +2756,7 @@ FIGURE 11.4: Temperance
 <p>In this section, we will create a plot that displays the posterior probability distributions of the average treatment effects for men of average age across all combinations of 4 treatments and 3 voter classifications. This means that we are making a total of <em>12</em> inferences.</p>
 <p><em>Important note</em>: We could look at lots of ages and both Male and Female subjects. However, that would not change our estimates of the treatment effects. The model is linear, so terms associated with <code>z_age</code> and <code>sex</code> disappear when we do the subtraction. This is one of the great advantages of linear models.</p>
 <p>To begin, we will need to create our <code>newobs</code> object.</p>
-<div class="sourceCode" id="cb933"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb827"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Because our model is linear, the terms associated with z_age and sex disappear</span>
 <span class="co"># when we perform subtraction. The treatment effects calculated thereafter will</span>
 <span class="co"># not only apply to males of the z-scored age of ~ 50 years. The treatment</span>
@@ -2244,7 +2802,7 @@ FIGURE 11.4: Temperance
 <p>Now that we have our <code>newobs</code> to work with, we will need to create an object named <code>plot_data</code> that collects the treatment effect calculations.</p>
 <p>Recall that, when calculating a treatment effect, we need to subtract the estimate for each category from the control group for that category. For example, if we wanted to find the treatment effect for the Always Vote Neighbors group, we would need: Always Vote Neighbors - Always Vote Control.</p>
 <p>Therefore, we will use <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> twelve times, for each of the treatments and voting frequencies. After, we will <code>pivot_longer</code> in order for the treatment effects to be sensibly categorized for plotting. If any of this sounds confusing, read the code comments carefully.</p>
-<div class="sourceCode" id="cb934"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb828"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">plot_data</span> <span class="op">&lt;-</span> <span class="va">pe</span> <span class="op">%&gt;%</span> 
   
   <span class="co"># Using our cleaned naming system, ATE calculations are simple enough. Note</span>
@@ -2282,7 +2840,7 @@ FIGURE 11.4: Temperance
                                        <span class="st">"Sometimes"</span>,
                                        <span class="st">"Always"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>Finally, we will plot our data! Read the code comments for explanations on aesthetic choices, as well as a helpful discussion on <code>fct_reorder()</code>.</p>
-<div class="sourceCode" id="cb935"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb829"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">plot_data</span>  <span class="op">%&gt;%</span> 
   
   <span class="co"># Reordering the y axis values allows a smoother visual interpretation - </span>
@@ -2309,7 +2867,7 @@ FIGURE 11.4: Temperance
          caption <span class="op">=</span> <span class="st">"Source: Gerber, Green, and Larimer (2008)"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu"><a href="https://rdrr.io/pkg/ggthemes/man/theme_clean.html">theme_clean</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">theme</span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-653-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-659-1.png" width="100%"></div>
 <p>This is interesting! It shows us a few valuable bits of information:</p>
 <ul>
 <li>We are interested in the average treatment effect of postcards. There are 4 different postcards, each of which can be compared to what would have happened if the voter did not receive any postcard.</li>
@@ -2332,26 +2890,41 @@ average treatment effects, one for each possible combination of postcard and vot
 <h4>
 <span class="header-section-number">11.4.1.1</span> The Truth<a class="anchor" aria-label="anchor" href="#the-truth"><i class="fas fa-link"></i></a>
 </h4>
-<p>If we know the Truth (with a captial “T”), then we know the ideal Preceptor Table. With that tknowledge, we can <em>directly</em> answer our question precisely. We can calculate each individual’s treatment effect, and any summary measure we might be interested in, like the average treatment effect.</p>
-<p>The Truth represents the highest level of knowledge one can have — with it, our questions merely require algebra. No estimation needed.</p>
+<p>If we know the Truth (with a capital “T”), then we know the ideal Preceptor Table. With that knowledge, we can <em>directly</em> answer our question precisely. We can calculate each individual’s treatment effect, and any summary measure we might be interested in, like the average treatment effect.</p>
+<p>This level of knowledge is possible only under an omniscient power, one who can see every outcome in every individual under every treatment. The Truth would show, for any given individual, their actions under control, their actions under treatment, and each little factor that impacted those decisions.</p>
+<p>The Truth represents the highest level of knowledge one can have — with it, our questions merely require algebra. There is no need to estimate a treatment effect, or the different treatment effects for different groups of people. We would not need to predict at all — we would <strong>know</strong>.</p>
 </div>
 <div id="dgm-posterior" class="section level4" number="11.4.1.2">
 <h4>
 <span class="header-section-number">11.4.1.2</span> DGM posterior<a class="anchor" aria-label="anchor" href="#dgm-posterior"><i class="fas fa-link"></i></a>
 </h4>
-<p>The DGM posterior is the posterior we would calculate if we had perfect knowledge of the data generating mechanism, meaning we have the correct model structure and exact parameter values.</p>
-<p>With that, we could not be certain about any individual’s causal effect, because of the Fundamental Problem of Causal Inference. We can never measure any one person’s causal effect because we are unable to see a person’s resulting behavior under treatment <em>and</em> control; we only have data on one of the two conditions.
-Regardless, we can still calculate posterior’s for unknown numbers, and those posteriors would be perfect. If we went to our boss with our estimates from this posterior, we would expect our 95% confidence interval to be perfectly calibrated. That is, we would expect the true value to lie within the 95% confidence interval 95% of the time.</p>
+<p>The DGM posterior is the next level of knowledge, which lacks the omniscient quality of The Truth. This posterior is the posterior we would calculate if we had perfect knowledge of the data generating mechanism, meaning we have the correct model structure and exact parameter values. This is often falsely conflated with “Our posterior,” which is subject to error in model structure and parameter value estimations.</p>
+<p>With the DGM posterior, we could not be certain about any individual’s causal effect, because of the Fundamental Problem of Causal Inference. In other words, we can never measure any one person’s causal effect because we are unable to see a person’s resulting behavior under treatment <em>and</em> control; we only have data on one of the two conditions.</p>
+<p>What we do with the DGM posterior is the same as Our posterior — we estimate parameters based on data and predict the future with the latest and most relevant information possible. The difference is that, when we calculate posteriors for an unknown value in the DGM posterior, we expect those posteriors to be perfect.</p>
+<p>If we go to our boss with our estimates from this posterior, we would expect our 95% confidence interval to be perfectly calibrated. That is, we would expect the true value to lie within the 95% confidence interval 95% of the time. In this world, we would be surprised to see values outside of the confidence interval more than 5% of the time.</p>
 </div>
 <div id="our-posterior" class="section level4" number="11.4.1.3">
 <h4>
 <span class="header-section-number">11.4.1.3</span> Our posterior<a class="anchor" aria-label="anchor" href="#our-posterior"><i class="fas fa-link"></i></a>
 </h4>
-<p>Unfortunately, our posterior possesses even less certainty! In the real world, we <em>don’t</em> have perfect knowledge of the DGM: the model structure and the exact parameter values. What does this mean?</p>
+<p>Unfortunately, Our posterior possesses even less certainty! In the real world, we <em>don’t</em> have perfect knowledge of the DGM: the model structure and the exact parameter values. What does this mean?</p>
 <p>When we go to our boss, we tell them that this is our <em>best guess</em>. It is an informed estimate based on the most relevant data possible. From that data, we have created a 95% confidence interval for the treatment effect of various postcards. We estimate that the treatment effect of the Neighbors postcard to be between 8% to 10%.</p>
 <p>Does this mean we are certain that the treatment effect of Neighbors is between these values? Of course not! As we would tell our boss, it would not be shocking to find out that the actual treatment effect was less or more than our estimate.</p>
-<p>The truth is: our boss will never know if we were right, because in the real world — you’d send it to all the people. There would be no baseline for comparison. Would we be shocked if we got 7%? 12%? No, of course not! But, because the real world won’t be designed as an experiment, that doesn’t matter. What matters is that, based on the best information available to us, we believe that we have found a way to increase voter turnout.</p>
-<!-- What we need to add: Preceptor table, causal explanation, math before models, posterior_epred. -->
+<p>This is because a lot of the assumptions we make during the process of building a model, the processes in Wisdom, are subject to error. Perhaps our data did not match the future as well as we had hoped. Ultimately, we try to account for our uncertainty in our estimates. Even with this safeguard, we aren’t surprised if we are a bit off.</p>
+<p>For instance, would we be shocked if the treatment effect of the Neighbors postcard to be 7%? 12%? Of course not! That is only slightly off, and we know that Our posterior is subject to error. Would we be surprised if the treatment effect was found to be 20%? Yes. That is a large enough difference to suggest a real problem with our model, or some real world change that we forgot to factor into our predictions.</p>
+<p>But, what amounts to a large enough difference to be a cause for concern? In other words, how wrong do we have to be in a one-off for our boss to be suspicious? When is “bad luck” a sign of stupidity? We will delve into this question in the next section of our chapter.</p>
+</div>
+<div id="bad-luck-or-bad-work" class="section level4" number="11.4.1.4">
+<h4>
+<span class="header-section-number">11.4.1.4</span> Bad luck or bad work?<a class="anchor" aria-label="anchor" href="#bad-luck-or-bad-work"><i class="fas fa-link"></i></a>
+</h4>
+<p>In any <em>one</em> problem, it is hard to know if we were “right,” if our posterior was similar to the DGM posterior. After all, 5% of the time the answer is outside the 95% confidence interval. But if the truth ends up very, very far away from the median of our posterior, our boss will be rightly suspicious. How many MAD SDs or standard errors away do we have to be from the truth before we are obviously a fool?</p>
+<p>There are many ways to judge a forecast. Here, we’re looking at two main things: the calibration of a forecast — that is, whether events that we said would happen 30 percent of the time actually happened about 30 percent of the time — and how our forecast compared with an unskilled estimate that relies solely on historical averages. We can answer those questions using calibration plots and skill scores, respectively. These concepts are a bit too advanced for this course, but their foundations are important to understand.</p>
+<p>Calibration plots compare what we predicted with what actually happened. Single predictions can be difficult to judge on their own, so we often want to group many predictions together in bins and plot the averages of each bin’s forecasted increase in voting against the actual increase in voting. If our forecasts are well-calibrated, then all of the bins on the calibration plot will be close to the 45 degree line; if our forecast was poorly calibrated, the bins will be further away. Our second tool, skill scores, lets us evaluate our forecasts even further, combining accuracy and an appetite for risk into a single number.</p>
+<p>Brier skill scores tell us how much more valuable our forecasts are than an unskilled estimate, one that is informed by historical averages — e.g., a guess that a postcard will increase voting by 5%.</p>
+<p>These are the <em>technical</em> ways that we can judge our own work’s accuracy. Our boss will likely judge using other methods.</p>
+<p>For instance, if we answer many questions (by creating many posteriors for different problems) then, over time, our boss will get a sense of our actual skill, both because our median should be above and below the truth about the same proportion and because our confidence intervals should be correctly calibrated.</p>
+<p>We know, from experience, that our posteriors are often too narrow. They assume that we know the DGM when, in fact, we know that we do not. What do we do with that knowledge? First, we prepare our boss for this fact. This is the humility in Temperance. Second, we estimate <em>dozens</em> of different models and combine their posteriors. The result might very well have the same median as your correct posterior, but the confidence intervals would be much wider. These concepts are more advanced than the Primer, but they are important to consider when making predictions.</p>
 </div>
 </div>
 </div>
@@ -2359,27 +2932,14 @@ Regardless, we can still calculate posterior’s for unknown numbers, and those 
 <h2>
 <span class="header-section-number">11.5</span> Summary<a class="anchor" aria-label="anchor" href="#summary-11"><i class="fas fa-link"></i></a>
 </h2>
-<p><em>Key commands</em>:
-* Use the <code><a href="https://generics.r-lib.org/reference/tidy.html">tidy()</a></code> function from the <strong>broom.mixed</strong> package to make models with <span class="math inline">\(N\)</span> parameters easier to interpret.
-* A function we are familiar with, <code><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm()</a></code>, is used to create models with <span class="math inline">\(N\)</span> parameters.</p>
-<p><em>Remember</em>:
-* It is important to remember that the data does not equal the truth.
-* The population we would like to make inferences about <em>is not the population for which we have data</em>. It is a matter of wisdom whether the data we do have maps closely enough to the population we are studying.
-* When dealing with models with many parameters, double check that you know how to find the true slope and intercepts — often, this requires adding numerous values to the coefficient you are studying.</p>
-
-<!-- Fix images in UNIX section so that they use 1005 instead, to match the new text. -->
-<!-- Explain importance of scripting versus click-and-drag and copy-pasting. Add section about useful keyboard shortcuts. -->
-<!-- Add material about file organization. -->
-<!-- Find a place to mention all the high quality sources listed below. Maybe with a webshot of their title pages?  -->
-<!-- Happy Git for the R User. -->
-<!-- Anything associated with RStudio. -->
-<!-- [The UNIX Workbench](https://seankross.com/the-unix-workbench/), but with all the work done form the terminal window in RStudio.  -->
-<!-- [What They Forgot to Teach You About R](https://rstats.wtf/) -->
-<!-- https://usethis.r-lib.org/articles/articles/usethis-setup. Might just pull out the key sections of this. We can't just link to it since some of it --- like devtools --- is too confusing. -->
-<!-- https://merely-useful.github.io/py-rse/ -->
-<!-- Consider making the **fs** package a major part of the presentation. This helps avoid dealing with cross-OS issues ourselves. Also teaches students that there is more than one way to interact with the file system. -->
-<!-- Add some optional videos, especially the ones from RStudio which give nice tours of RStudio stuff. -->
-<!-- Buttons we press should be bolded, not wrapped with backticks. -->
+<ul>
+<li><p>Use the <code><a href="https://generics.r-lib.org/reference/tidy.html">tidy()</a></code> function from the <strong>broom.mixed</strong> package to make models with <span class="math inline">\(N\)</span> parameters easier to interpret.</p></li>
+<li><p>A function we are familiar with, <code><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm()</a></code>, is used to create models with <span class="math inline">\(N\)</span> parameters.</p></li>
+<li><p>It is important to remember that the data does not equal the truth.</p></li>
+<li><p>The population we would like to make inferences about <em>is not the population for which we have data</em>. It is a matter of wisdom whether the data we do have maps closely enough to the population we are studying.</p></li>
+<li><p>When dealing with models with many parameters, double check that you know how to find the true slope and intercepts — often, this requires adding numerous values to the coefficient you are studying.</p></li>
+</ul>
+<!-- Fix images in UNIX section so that they use 1005 instead, to match the new text. --><!-- Explain importance of scripting versus click-and-drag and copy-pasting. Add section about useful keyboard shortcuts. --><!-- Add material about file organization. --><!-- Find a place to mention all the high quality sources listed below. Maybe with a webshot of their title pages?  --><!-- Happy Git for the R User. --><!-- Anything associated with RStudio. --><!-- [The UNIX Workbench](https://seankross.com/the-unix-workbench/), but with all the work done form the terminal window in RStudio.  --><!-- [What They Forgot to Teach You About R](https://rstats.wtf/) --><!-- https://usethis.r-lib.org/articles/articles/usethis-setup. Might just pull out the key sections of this. We can't just link to it since some of it --- like devtools --- is too confusing. --><!-- https://merely-useful.github.io/py-rse/ --><!-- Consider making the **fs** package a major part of the presentation. This helps avoid dealing with cross-OS issues ourselves. Also teaches students that there is more than one way to interact with the file system. --><!-- Add some optional videos, especially the ones from RStudio which give nice tours of RStudio stuff. --><!-- Buttons we press should be bolded, not wrapped with backticks. -->
 </div>
 </div>
   <div class="chapter-nav">
@@ -2399,8 +2959,9 @@ Regardless, we can still calculate posterior’s for unknown numbers, and those 
 <li>
 <a class="nav-link" href="#justice-7"><span class="header-section-number">11.2</span> Justice</a><ul class="nav navbar-nav">
 <li><a class="nav-link" href="#actual-preceptor-table"><span class="header-section-number">11.2.1</span> Actual Preceptor Table</a></li>
-<li><a class="nav-link" href="#validity-can-we-answer-this-question"><span class="header-section-number">11.2.2</span> Validity: can we answer this question?</a></li>
-<li><a class="nav-link" href="#functional-form"><span class="header-section-number">11.2.3</span> Functional form</a></li>
+<li><a class="nav-link" href="#the-population-table"><span class="header-section-number">11.2.2</span> The Population Table</a></li>
+<li><a class="nav-link" href="#representativenessvalidity"><span class="header-section-number">11.2.3</span> Representativeness/validity</a></li>
+<li><a class="nav-link" href="#functional-form"><span class="header-section-number">11.2.4</span> Functional form</a></li>
 </ul>
 </li>
 <li>
