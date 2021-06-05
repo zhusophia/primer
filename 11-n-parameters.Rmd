@@ -47,11 +47,13 @@ So, what would our ideal table look like? Assuming we are running for governor i
 
 Because there is no missing data in an ideal Preceptor Table, we would also know the outcomes under both treatment (receiving a reminder) and control (not receiving a reminder). Here is a sample row from our table:
 
-<!-- We have message = FALSE below (and in three other places) because we were getting a weird message about group_by. Not sure why. Perhaps a bug in gt(). Maybe this will fix itself in a few months. -->
 
-```{r, echo = FALSE, message = FALSE, fig.align = 'left'}
+```{r, echo = FALSE, message = FALSE}
 library(tidyverse)
+```
 
+
+```{r, echo = FALSE, fig.align = 'left'}
 # First, we create a tibble with the values we want for the table
 
 tibble(ID = c("Citizen 1", "Citizen 2"),
@@ -74,6 +76,7 @@ tibble(ID = c("Citizen 1", "Citizen 2"),
   cols_align(align = "left", columns = c(ID)) %>%
   tab_spanner(label = "Outcomes", columns = c(ytreat, ycontrol, yeffect))
 ```
+
 In our ideal table, we have rows for **all American citizens of voting age**. This is a good start! However, we may want even more information in our ideal Preceptor Table. Perhaps a column for sex would be informative. A column for age? Political affiliation? In a perfect world, we would know all of these pieces of information. In a perfect world, we could measure the *exact causal effect* of voting reminders for different subsets of the US population.
 
 We may also want to narrow our ideal Preceptor Table. If we are running for governor in Florida, we may only want to study citizens in Florida. If we are running as a Democrat, we may only want to study citizens who are registered Democrats. 
@@ -164,7 +167,7 @@ Recall that in an actual Preceptor Table, we will have a bunch of missing data! 
 
 Let's build a basic visualization for the actual Preceptor Table for this scenario:
 
-```{r, echo = FALSE, message = FALSE}
+```{r, echo = FALSE}
 # First, we create a tibble with the values we want for the table
 
 tibble(subject = c("Citizen 1", "Citizen 23", "Citizen 40", "Citizen 53", "Citizen 80"),
@@ -208,7 +211,7 @@ The rows from our data have everything: the covariates and the outcomes. The cov
 
 The rows from the population have no data. These are subjects which fall under our desired population, but for which we have no data. As such, all rows are missing. 
 
-```{r, echo = FALSE, message = FALSE}
+```{r, echo = FALSE}
 # First, we create a tibble with the values we want for the table
 
 tibble(source = c("ideal Preceptor Table", "ideal Preceptor Table", "...",
@@ -384,7 +387,7 @@ print(fit_1, digits = 3)
 
 We will now create a table that nicely formats the results of `fit_1` using the `tbl_regression()` function from the **gtsummary** package. It will also display the associated 95% confidence interval for each coefficient.
 
-```{r, message = FALSE}
+```{r}
 tbl_regression(fit_1, 
                intercept = TRUE, 
                estimate_fun = function(x) style_sigfig(x, digits = 3)) %>%
@@ -412,7 +415,7 @@ The math:
 $$y_{i} = \beta_{0} + \beta_{1}z\_age + \beta_{2}male_i + \beta_{3}civic\_duty_i + \\ \beta_{4}hawthorne_i + \beta_{5}self_i + \beta_{6}neighbors_i + \\ \beta_{7}Sometimes\ vote_i + \beta_{8}Always\ vote_i + \\ \beta_{9}civic\_duty_i Sometimes\ vote_i + \beta_{10}hawthorne_i Sometimes\ vote_i + \\ \beta_{11}self_i Sometimes\ vote_i + \beta_{11}neighbors_i Sometimes\ vote_i + \\ \beta_{12}civic\_duty_i Always\ vote_i + \beta_{13}hawthorne_i Always\ vote_i + \\ \beta_{14}self_i Always\ vote_i + \beta_{15}neighbors_i Always\ vote_i + \epsilon_{i}$$
 Translate into code: 
 
-```{r fit_2, cache = TRUE}
+```{r, cache = TRUE}
 
 fit_2 <- stan_glm(data = object_1,
                   formula = primary_06 ~ z_age + sex + treatment + voter_class + 
@@ -429,7 +432,7 @@ print(fit_2, digits = 3)
 
 As we did with our first model, create a regression table to observe our findings: 
 
-```{r table_2}
+```{r}
 tbl_regression(fit_2, 
                intercept = TRUE, 
                estimate_fun = function(x) style_sigfig(x, digits = 3)) %>%
@@ -466,7 +469,7 @@ In this section, we will create a plot that displays the posterior probability d
 
 To begin, we will need to create our `newobs` object. 
 
-```{r plot_2}
+```{r}
 # Because our model is linear, the terms associated with z_age and sex disappear
 # when we perform subtraction. The treatment effects calculated thereafter will
 # not only apply to males of the z-scored age of ~ 50 years. The treatment
