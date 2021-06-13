@@ -1,10 +1,14 @@
 # Two Parameters {#two-parameters}
 
-<!-- MF: In wisdom, added ideal Preceptor Table and population sections. -->
+<!-- Remove ideal from ideal Preceptor Table. -->
 
-<!-- MF: In justice, added Population Table. We need to add representativeness and validity. -->
+<!-- Clean up the plots. (Labels and such.) -->
 
-<!-- MF: In Temperance, added Three Levels of Knowledge. --> 
+<!-- Two plots which start Courage section should be redone so as to just refer to mu and sigma. Yes, there is an interpretation we can give to the values of those parameters. And that is sort of cool. But, most times parameters have no useful interpretation. So, don't spend time on them! Spend time on what matters: the results of (interesting!) calls to posterior_epred and posterior_predict. -->
+
+<!-- Courage section should end with a summary of the model which we have accepted as true. This is our data generating mechanism. -->
+
+<!-- Put Population Table at the end of Wisdom. It is always how Wisdom ends. Then Justice starts with the Population Table and asks abiout validity, representativeness and assumes a functional relationship. -->
 
 <!-- Get axis labels and titles to use \sigma and \mu -->
 
@@ -12,7 +16,7 @@
 
 In Chapter \@ref(one-parameter), we learned how to do inference. We created a joint distribution of the models under consideration and the data which might be observed. Once we observed the data, we went from the joint distribution to the conditional distribution of possible models given the data which we did, in fact, observe. That conditional distribution, suitably normalized, was our posterior probability distribution over the space of possible models. With that distribution, we can answer any question we might (reasonably) ask.
 
-<!-- DK: Need a gif here. -->
+<!-- DK: Need a gif here. Like Hunger Games in Chapter 6. -->
 
 *But what a pain in the ass that whole process was!* Do professionals actually go through all those steps every time they work on a data science problem? No! That would be absurd. Instead, professionals use standard tools which, in an automated fashion, take care of those steps, taking us directly from assumptions and data to the posterior:
 
@@ -69,10 +73,15 @@ So, what would our ideal table look like? Assuming we are predicting height for 
 
 Here is a sample from our ideal Preceptor Table: 
 
-```{r, echo = FALSE, fig.align = 'left'}
-# First, we create a tibble with the values we want for the table
+```{r, include=FALSE}
 library(tidyverse)
 library(gt)
+```
+
+
+```{r, echo = FALSE, fig.align = 'left'}
+# First, we create a tibble with the values we want for the table
+
 
 tibble(ID = c("Person 1", "Person 2", "...", "Person 45000", "Person 45001", "..."),
        sex = c("Male", "Male", "...", "Male", "Male", "..."),
@@ -206,7 +215,7 @@ For now, we will accept that our data works.
 knitr::include_graphics("other/images/Justice.jpg")
 ```
 
-<!-- MF: If we are building to the version of Justice in CH11, should this section not include all of the new elements (population table, representativeness, validity)? Or should it include them, but in a more limited capacity? --> 
+<!-- Should include all of the new elements (population table, representativeness, validity), but in the simplest possible way.  --> 
 
 Having looked at our data and decided that it is "close enough" to our questions that creating a model will help us come up with better answers, we move on to Justice. 
 
@@ -249,17 +258,17 @@ tibble(source = c("ideal Preceptor Table", "ideal Preceptor Table", "...",
              year = md("Year"),
              height = md("Height")) %>%
   tab_style(cell_borders(sides = "right"),
-            location = cells_body(columns = vars(source))) %>%
+            location = cells_body(columns = c(source))) %>%
   tab_style(style = cell_text(align = "left", v_align = "middle", size = "large"), 
-            locations = cells_column_labels(columns = vars(source))) %>%
-  cols_align(align = "center", columns = TRUE) %>%
-  cols_align(align = "left", columns = vars(source)) %>%
-  fmt_markdown(columns = TRUE)  
+            locations = cells_column_labels(columns = c(source))) %>%
+  cols_align(align = "center", columns = everything()) %>%
+  cols_align(align = "left", columns = c(source)) %>%
+  fmt_markdown(columns = everything())  
 ```
 
 
 
- <!-- MF: Is math staying in Justice? How should it be incorporated? --> 
+ <!-- Math is in Justice, but just the functional form, not the exact variables. Leave it to you to write about this sensibly. Focus on the functional form. We are choosing linear, not logistic. Why? --> 
  
 However, a little mathematical notation will make our modeling assumptions clear, will bring some precision to our approach. In this case:
 
@@ -272,7 +281,7 @@ This is the simplest model we can construct. Note:
 
 
 
-<!-- DK: Box quote. -->
+<!-- Add Dr. Box quote. All models are wrong, some are useful. And a photo. -->
 
 * The model is wrong, as are all models. 
 
@@ -284,8 +293,6 @@ This is the simplest model we can construct. Note:
 
 <!-- You can show students the sample estimate of that with something like this (or sd(resid(fit_obj)) -->
 
-<!-- DK: Should we discuss what a superpopulation is? -->
-
 Consider:
 
 $$\text{outcome} = \text{model} + \text{what is not in the model}$$
@@ -293,32 +300,6 @@ In this case, the *outcome* is the height of an individual male. This variable, 
 
 What is the difference between the *outcome* and the *model*? By definition, it is *what is not in the model*, all the blooming and buzzing complexity of the real world. The model will always be incomplete in that it won't capture everything. Whatever the model misses is thrown into the error term. 
 
-The Preceptor Table for this problem is almost identical to the one we saw in Chapter \@ref(rubin-causal-model):
-
-```{r echo = FALSE}
-tibble(ID = c("1", "2", "...", "473", "474",
-              "...", "3,258", "3,259", "...", "N"),
-       Height = c("?", "?", "...", "172", "?", "...", "?", "162", "...", "?")) %>%
-  
-  # Then, we use the gt function to make it pretty
-  
-  gt() %>%
-  cols_label(ID = md("ID"),
-                Height = "Heights (cm)") %>%
-  tab_style(cell_borders(sides = "right"),
-            location = cells_body(columns = c(ID))) %>%
-  tab_style(style = cell_text(align = "left", v_align = "middle"), 
-            locations = cells_column_labels(columns = c(ID))) %>%
-  cols_align(align = "center", columns = everything()) %>%
-  cols_align(align = "left", columns = c(ID)) %>%
-  tab_spanner(label = "Outcome", columns = c(Height))
-```
-
-&nbsp;
-
-Since this is not a causal model, there is only one potential outcome --- which is to say, only one outcome: an individual's height. 
-
-<!-- DK: To set the stage for the next chapter, might show an equation a math equation in which mu is a parameter multiplied times an columns of 1s. Maybe? -->
 
 
 ## Courage
@@ -392,9 +373,7 @@ We see the output for the two parameters of the model: "(Intercept)" and "sigma"
 
 At this point, `stan_glm()` --- or rather the `print()` method for objects created with `stan_glm()` --- has a problem. We have full posteriors for both $\mu$ and $\sigma$. But this is a simple printed summary. We can't show the entire distribution. So, what are the best few numbers to provide? There is no right answer to this question! Here, the choice is to provide the "Median" of the posterior and the "MAD_SD". 
 
-* Anytime you have a distribution, whether posterior probability or otherwise, the most important single number associated with it is some measure of its *location*. Where is the data? The two most common choices for this measure are the mean and median. We use the median here because posterior distributions can often be quite skewed, making the mean a less reliable measure.
-
-<!-- DK: Is "reliable" the best word? I think ROAS uses "stable." -->
+* Anytime you have a distribution, whether posterior probability or otherwise, the most important single number associated with it is some measure of its *location*. Where is the data? The two most common choices for this measure are the mean and median. We use the median here because posterior distributions can often be quite skewed, making the mean a less stable measure.
 
 * The second most important number for summarizing a distribution concerns its *spread*. How far is the data spread around its center? The most common measure used for this is the standard deviation. MAD SD, the scaled median absolute deviation, is another. If the variable has a normal distribution, then the standard deviation and the MAD SD will be very similar. But the MAD SD is much more robust to outliers, which is why it is used here. (Note that MAD SD is the same measure as what we have referred to as *mad* up till now. The measure is calculated with the `mad()` command in R. Terminology is confusing, as usual.)
 
@@ -405,7 +384,7 @@ We can also change the number of digits shown:
 print(fit_obj, detail = FALSE, digits = 1)
 ```
 
-<!-- DK: Are we sure that coef() and sigma() give us the median values?  -->
+<!-- DK: Are we sure that coef() and sigma() give us the median values? Please investigate. -->
 
 Now that we understand the meaning of Median and MAD_SD in the above display, we can interpret the actual numbers. The median of the intercept, `r round(coef(fit_obj), 1)`, is the median of our posterior distribution for $\mu$, the average height of all men in the population. The median of sigma, `r round(sigma(fit_obj), 1)`, is the median of our posterior distribution for the true $\sigma$, which can be roughly understood as the variability in the height of men, once we account for our estimate of $\mu$.
 
@@ -413,7 +392,7 @@ Now that we understand the meaning of Median and MAD_SD in the above display, we
 ```{r, echo = FALSE}
 ## DK: Seems like there ought to be a better way of doing this. Aren't there
 ## ways for pulling at the median and mad_sd directly, rather than calculating
-## them ourselves?
+## them ourselves? Please investigate.
 
 median_fit <- fit_obj %>% 
   as_tibble() %>% 
