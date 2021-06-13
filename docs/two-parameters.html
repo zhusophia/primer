@@ -65,14 +65,19 @@
 <h1>
 <span class="header-section-number">7</span> Two Parameters<a class="anchor" aria-label="anchor" href="#two-parameters"><i class="fas fa-link"></i></a>
 </h1>
+<!-- Remove ideal from ideal Preceptor Table. -->
+<!-- Clean up the plots. (Labels and such.) -->
+<!-- Two plots which start Courage section should be redone so as to just refer to mu and sigma. Yes, there is an interpretation we can give to the values of those parameters. And that is sort of cool. But, most times parameters have no useful interpretation. So, don't spend time on them! Spend time on what matters: the results of (interesting!) calls to posterior_epred and posterior_predict. -->
+<!-- Courage section should end with a summary of the model which we have accepted as true. This is our data generating mechanism. -->
+<!-- Put Population Table at the end of Wisdom. It is always how Wisdom ends. Then Justice starts with the Population Table and asks abiout validity, representativeness and assumes a functional relationship. -->
 <!-- Get axis labels and titles to use \sigma and \mu -->
 <!-- Show posterior_interval() -->
 <p>In Chapter <a href="one-parameter.html#one-parameter">6</a>, we learned how to do inference. We created a joint distribution of the models under consideration and the data which might be observed. Once we observed the data, we went from the joint distribution to the conditional distribution of possible models given the data which we did, in fact, observe. That conditional distribution, suitably normalized, was our posterior probability distribution over the space of possible models. With that distribution, we can answer any question we might (reasonably) ask.</p>
-<!-- DK: Need a gif here. -->
-<p><em>But what a pain in the ass that whole process was!</em> Do professionals actually go through all those steps every time they work on a data science problem? No! Don’t be absurd. Instead, professionals use standard tools which, in an automated fashion, take care of those steps, taking us directly from assumptions and data to the posterior:</p>
+<!-- DK: Need a gif here. Like Hunger Games in Chapter 6. -->
+<p><em>But what a pain in the ass that whole process was!</em> Do professionals actually go through all those steps every time they work on a data science problem? No! That would be absurd. Instead, professionals use standard tools which, in an automated fashion, take care of those steps, taking us directly from assumptions and data to the posterior:</p>
 <p><span class="math display">\[\text{Prob}(\text{models} | \text{data} = \text{data we observed})\]</span></p>
-<p>Even then, however, the relative likelihood of different models is not that important. Models are invisible, mental entities with no more physical presence than unicorns or leprechauns. In the world itself, we make and test predictions. How many red beads will come from the urn the next time we use our shovel? People with better models make better predictions. That is what matters.</p>
-<p>In addition to a change in tools, there are two more differences in this chapter. First, Chapter <a href="one-parameter.html#one-parameter">6</a> used models with just one parameter: the number of red beads, which we can also transform into a parameter, <span class="math inline">\(p\)</span>, the number of red beads divided by 1,000. The model in Chapter <a href="one-parameter.html#one-parameter">6</a> was binomial, and there is only one unknown parameter <span class="math inline">\(p\)</span> in such models. In this chapter, we have two unknown parameters: the mean <span class="math inline">\(\mu\)</span> height in the US and the standard deviation, <span class="math inline">\(\sigma\)</span>, of the normally distributed error term.</p>
+<p>Even then, however, the relative likelihood of different models is not that important. Models are invisible, mental entities with no more physical presence than unicorns or leprechauns. In the world itself, we make and test predictions. <em>People with better models make better predictions. That is what matters.</em></p>
+<p>In addition to a change in tools, there are two key differences in this chapter. First, Chapter <a href="one-parameter.html#one-parameter">6</a> used models with just one parameter: the number of red beads, which we can also transform into a parameter, <span class="math inline">\(p\)</span>, the number of red beads divided by 1,000. The model in Chapter <a href="one-parameter.html#one-parameter">6</a> was binomial, and there is only one unknown parameter <span class="math inline">\(p\)</span> in such models. In this chapter, we have two unknown parameters: the mean <span class="math inline">\(\mu\)</span> height in the US and the standard deviation, <span class="math inline">\(\sigma\)</span>, of the normally distributed error term.</p>
 <p>Second, Chapter <a href="one-parameter.html#one-parameter">6</a> dealt with a limited set of specific models: 1,001 of them, to be precise. The procedure used was just what we saw in Chapter <a href="probability.html#probability">5</a>. In this chapter, on the other hand, we have continuous parameters.</p>
 <p>The purpose of this chapter is to demonstrate, slowly and thoroughly, how professionals do data science.</p>
 <div class="inline-figure"><img src="07-two-parameters/images/learn_the%20ways.gif" width="100%"></div>
@@ -82,9 +87,9 @@
 <span class="header-section-number">7.1</span> Wisdom<a class="anchor" aria-label="anchor" href="#wisdom-1"><i class="fas fa-link"></i></a>
 </h2>
 <div class="inline-figure"><img src="other/images/Wisdom.jpg" width="100%"></div>
-<p>What decision do we face? The reason for making models is not, primarily that making models is fun, although it is! The reason is that we face a decision. We must decide between X or Y. We must choose from A, B and C. We must set D to a specific numeric value. Confronted by a decision, we should make a model of the world to help us.</p>
+<p>The reason for making models is not, primarily, that making models is fun (although it is)! The reason is that, when confronted with a question, we face decisions. We must decide between variables X or Y. We must choose from datasets A, B and C. Confronted by a decision, we need to make a model of the world to help us.</p>
 <!-- DK: Add back reference to ch 12 when it shows up again. -->
-<p>In any textbook, it will be tough to avoid the “toy problem” trap. The real world is complex. Any substantive decision problem includes a great deal of complexity and requires even more context. We do not have the time to get into that level of detail now. So, we simplify. We are going to create a model of height for adult men. We will then use that model to answer four questions:</p>
+<p>The real world is complex. Any substantive decision problem includes a great deal of complexity and requires even more context. We do not have the time to get into that level of detail now. So, we simplify. We are going to create a model of height for adult men. We will then use that model to answer four questions:</p>
 <ul>
 <li><p>What is the average height of men?</p></li>
 <li><p>What is the probability that the next man we meet will be taller than 180 centimeters?</p></li>
@@ -92,14 +97,402 @@
 <li><p>What is our posterior probability distribution for the height of the 3rd tallest man out of the next 100 we meet?</p></li>
 </ul>
 <!-- DK: This is awkward. Why not just ppd everywhere? --><p>The first and fourth questions require a full scale posterior probability distribution as an answer. The middle two questions have a single number as their answer, but we first create a posterior probability distribution in order to derive that number.</p>
-<p>Before starting that process, however, we need to look at the data we have.</p>
-<div id="eda-for-nhanes" class="section level3" number="7.1.1">
+<div id="ideal-preceptor-table" class="section level3" number="7.1.1">
 <h3>
-<span class="header-section-number">7.1.1</span> EDA for <code>nhanes</code><a class="anchor" aria-label="anchor" href="#eda-for-nhanes"><i class="fas fa-link"></i></a>
+<span class="header-section-number">7.1.1</span> Ideal Preceptor Table<a class="anchor" aria-label="anchor" href="#ideal-preceptor-table"><i class="fas fa-link"></i></a>
+</h3>
+<p>What rows and columns of data do you need such that, if you had them all, the calculation of the number of interest would be trivial? If you want to know the average height of an adult in India, then the ideal Preceptor Table would include a row for each adult in India and a column for their height. In this scenario, we want to know the average height for men, where “men” includes all males on Earth that are over the age of 18.</p>
+<p>One key aspect of this ideal Preceptor Table is whether or not we need more than one potential outcome in order to calculate our estimand. Mainly: are we are modeling (just) for prediction or are we (also) modeling for causation? Do we need a causal model, one which estimates that attitude under both treatment and control? In a causal model, the Preceptor Table would require two columns for the outcome. In this case, we are not modeling for causation; thus, we do not need two outcome columns.</p>
+<p>Predictive models care nothing about causation. Causal models are often also concerned with prediction, if only as a means of measuring the quality of the model. Here, we are looking at <em>prediction</em>.</p>
+<p>So, what would our ideal table look like? Assuming we are predicting height for every male on planet Earth at this moment in time, we would have height data for every male person above 18 years of age. This means that we would have almost 4 billion rows, one for each male person, which includes a column for height.</p>
+<p>Here is a sample from our ideal Preceptor Table:</p>
+<div id="uinatpgndb" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#uinatpgndb .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#uinatpgndb .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#uinatpgndb .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#uinatpgndb .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 4px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#uinatpgndb .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#uinatpgndb .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#uinatpgndb .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#uinatpgndb .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#uinatpgndb .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#uinatpgndb .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#uinatpgndb .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#uinatpgndb .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#uinatpgndb .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#uinatpgndb .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#uinatpgndb .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#uinatpgndb .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#uinatpgndb .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#uinatpgndb .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#uinatpgndb .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#uinatpgndb .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#uinatpgndb .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#uinatpgndb .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#uinatpgndb .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#uinatpgndb .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#uinatpgndb .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#uinatpgndb .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#uinatpgndb .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#uinatpgndb .gt_left {
+  text-align: left;
+}
+
+#uinatpgndb .gt_center {
+  text-align: center;
+}
+
+#uinatpgndb .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#uinatpgndb .gt_font_normal {
+  font-weight: normal;
+}
+
+#uinatpgndb .gt_font_bold {
+  font-weight: bold;
+}
+
+#uinatpgndb .gt_font_italic {
+  font-style: italic;
+}
+
+#uinatpgndb .gt_super {
+  font-size: 65%;
+}
+
+#uinatpgndb .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 65%;
+}
+</style>
+<div class="inline-table"><table class="gt_table">
+<thead class="gt_col_headings"><tr>
+<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">ID</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">Sex</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">Height (cm)</th>
+    </tr></thead>
+<tbody class="gt_table_body">
+<tr>
+<td class="gt_row gt_left">Person 1</td>
+<td class="gt_row gt_left">Male</td>
+<td class="gt_row gt_left">150</td>
+</tr>
+<tr>
+<td class="gt_row gt_left">Person 2</td>
+<td class="gt_row gt_left">Male</td>
+<td class="gt_row gt_left">172</td>
+</tr>
+<tr>
+<td class="gt_row gt_left">...</td>
+<td class="gt_row gt_left">...</td>
+<td class="gt_row gt_left">...</td>
+</tr>
+<tr>
+<td class="gt_row gt_left">Person 45000</td>
+<td class="gt_row gt_left">Male</td>
+<td class="gt_row gt_left">160</td>
+</tr>
+<tr>
+<td class="gt_row gt_left">Person 45001</td>
+<td class="gt_row gt_left">Male</td>
+<td class="gt_row gt_left">142</td>
+</tr>
+<tr>
+<td class="gt_row gt_left">...</td>
+<td class="gt_row gt_left">...</td>
+<td class="gt_row gt_left">...</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p>This table would extend all the way until person 4 billion-and-something. If we had this table, all of our questions could be answered with basic math. No inference necessary. Now that we’ve seen our ideal dataset, what does our actual data look like?</p>
+</div>
+<div id="eda-for-nhanes" class="section level3" number="7.1.2">
+<h3>
+<span class="header-section-number">7.1.2</span> EDA for <code>nhanes</code><a class="anchor" aria-label="anchor" href="#eda-for-nhanes"><i class="fas fa-link"></i></a>
 </h3>
 <!-- DK: This EDA is not very good and does not build naturally to where we want to be. -->
-<p>Let’s look at the <code>nhanes</code> dataset from the National Health and Nutrition Examination Survey conducted from 2009 to 2011 by the Centers for Disease Control and Prevention and covering children and adults in the United States.</p>
-<div class="sourceCode" id="cb583"><pre class="downlit sourceCode r">
+<p>In our quest to find suitable data, we find the <code>nhanes</code> dataset from the National Health and Nutrition Examination Survey conducted from 2009 to 2011 by the Centers for Disease Control and Prevention, which examines health and other pieces of data for children and adults in the United States.</p>
+<div class="sourceCode" id="cb574"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">primer.data</span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://docs.ropensci.org/skimr/">skimr</a></span><span class="op">)</span>
@@ -121,8 +514,8 @@
 ## $ depressed      &lt;fct&gt; Several, Several, Several, NA, Several, NA, NA, None, N…
 ## $ pregnancies    &lt;int&gt; NA, NA, NA, NA, 2, NA, NA, 1, 1, 1, NA, NA, NA, NA, NA,…
 ## $ sleep          &lt;int&gt; 4, 4, 4, NA, 8, NA, NA, 8, 8, 8, 7, 5, 4, NA, 5, 7, NA,…</code></pre>
-<p><code>nhanes</code> include 15 variables, including physical attributes like weight and height. Let’s restrict our attention to a subset, focusing on age, gender and height.</p>
-<div class="sourceCode" id="cb585"><pre class="downlit sourceCode r">
+<p><code>nhanes</code> includes 15 variables, including physical attributes like weight and height. Let’s restrict our attention to a subset, focusing on age, gender and height.</p>
+<div class="sourceCode" id="cb576"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">nhanes</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">gender</span>, <span class="va">height</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 10,000 x 3
@@ -139,22 +532,22 @@
 ##  9    45 Female   167.
 ## 10    45 Female   167.
 ## # … with 9,990 more rows</code></pre>
-<p>Look at a random sample of our data:</p>
-<div class="sourceCode" id="cb587"><pre class="downlit sourceCode r">
+<p>Now, let’s examine a random sample of our data:</p>
+<div class="sourceCode" id="cb578"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">nhanes</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">gender</span>, <span class="va">height</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">slice_sample</span><span class="op">(</span>n <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 5 x 3
 ##     age gender height
 ##   &lt;int&gt; &lt;chr&gt;   &lt;dbl&gt;
-## 1    56 Female   155.
-## 2    33 Female   167.
-## 3    80 Female   158.
-## 4    29 Female   161.
-## 5    40 Male     171.</code></pre>
+## 1    30 Male     179.
+## 2    50 Male     175.
+## 3    32 Male     175.
+## 4    16 Female   166.
+## 5     4 Male     109.</code></pre>
 <p>Notice how there is a decimal in the <code>height</code> column of <code>ch7</code>. This is because <code>height</code> is a <code>&lt;dbl&gt;</code> and not an <code>&lt;int&gt;</code>.</p>
 <p>Let’s also run <code>glimpse()</code> on our new data.</p>
-<div class="sourceCode" id="cb589"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb580"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">nhanes</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">gender</span>, <span class="va">height</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">glimpse</span><span class="op">(</span><span class="op">)</span></code></pre></div>
@@ -166,13 +559,13 @@
 <p>Be on the lookout for anything suspicious. Are there any NA’s in your data set? What types of data are the columns, i.e. why is <code>age</code> characterized as integer instead of double? Are there more females than males?</p>
 <p><strong>You can never look at your data too closely.</strong></p>
 <p>In addition to <code>glimpse()</code>, we can run <code><a href="https://docs.ropensci.org/skimr/reference/skim.html">skim()</a></code>, from the <strong>skimr</strong> package, to calculate some summary statistics.</p>
-<div class="sourceCode" id="cb591"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb582"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">nhanes</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">gender</span>, <span class="va">height</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://docs.ropensci.org/skimr/reference/skim.html">skim</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <div class="inline-table"><table class="table table-sm">
 <caption>
-<span id="tab:unnamed-chunk-446">TABLE 7.1: </span>Data summary</caption>
+<span id="tab:unnamed-chunk-444">TABLE 7.1: </span>Data summary</caption>
 <tbody>
 <tr class="odd">
 <td align="left">Name</td>
@@ -279,25 +672,26 @@
 </tr>
 </tbody>
 </table></div>
-<p>Interesting! There are 353 missing values of height in our subset of data. Just using <code>glimpse()</code> does not show us that. Let’s filter out the NA’s using <code>drop_na()</code>. This will delete the rows in which the value of any variable is missing. For simplicity, let’s only consider adults.</p>
-<div class="sourceCode" id="cb592"><pre class="downlit sourceCode r">
+<p>Interesting! There are 353 missing values of height in our subset of data. Just using <code>glimpse()</code> does not show us that. Let’s filter out the NA’s using <code>drop_na()</code>. This will delete the rows in which the value of any variable is missing. For simplicity, and because we want to examine height in men (not boys), let’s limit our data to only include adults.</p>
+<div class="sourceCode" id="cb583"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch7</span> <span class="op">&lt;-</span> <span class="va">nhanes</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">gender</span>, <span class="va">height</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">age</span> <span class="op">&gt;=</span> <span class="fl">18</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">drop_na</span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p>Plot your data. <code>geom_density()</code> is a smooth version of <code>geom_histogram()</code>. With <code>geom_density()</code>, the y-axis is scaled so that the area under the curve equals 1.</p>
 <!-- DK: Delete females and make a better plot. Add discussion about 95% interval. Connect to posterior_predict later. More or less: posterior_predict makes the same histogram as the raw data. Teach that! -->
-<div class="sourceCode" id="cb593"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb584"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch7</span> <span class="op">%&gt;%</span>
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">height</span>, color <span class="op">=</span> <span class="va">gender</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">geom_density</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Height"</span>,
-       title <span class="op">=</span> <span class="st">"Height by Gender in NHANES Dataset"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-448-1.png" width="100%"></div>
-<p>We can see the the most probable heights for both genders and that men are generally taller than women.</p>
+  <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Height (cm)"</span>,
+       title <span class="op">=</span> <span class="st">"Height by Gender in NHANES Dataset"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu">theme_classic</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-446-1.png" width="100%"></div>
+<p>We see the most probable heights for both genders and that men are generally taller than women.</p>
 <p>Let’s focus on a subset of the <code>nhanes</code> data, designed to answer our questions. And, instead of using all the data, let’s just use 50 randomly selected observations. (The <code><a href="https://rdrr.io/r/base/Random.html">set.seed()</a></code> function ensures that the same 50 observations are selected every time this code is run.)</p>
 <!-- DK: Make the above flow more smoothly. -->
-<div class="sourceCode" id="cb594"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb585"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch7_all</span> <span class="op">&lt;-</span> <span class="va">nhanes</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">gender</span> <span class="op">==</span> <span class="st">"Male"</span>, <span class="va">age</span> <span class="op">&gt;=</span> <span class="fl">18</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">height</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -306,13 +700,21 @@
 <span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">9</span><span class="op">)</span>
 <span class="va">ch7</span> <span class="op">&lt;-</span> <span class="va">ch7_all</span> <span class="op">%&gt;%</span> 
   <span class="fu">slice_sample</span><span class="op">(</span>n <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></code></pre></div>
-<p>Will the data we have — which is only for a sample of adult American men more than a decade ago — allow us to answer our questions, however roughly?</p>
-<p>That is where Wisdom comes in. In the social sciences, <em>there is never a perfect relationship between the data you have and the question you are trying to answer.</em> Data for American males in the past is not the same thing as data for American males today. Nor is it the same as the data for men in France or Mexico. Moreover, the problem hasn’t specified where on Earth we are, nor who we are near. Walking by a basketball tournament will generate different answers than walking around Times Square.</p>
-<p>Yet, this data is relevant. Right? It is certainly better than nothing. <em>Using not-perfect data is generally better than using no data at all.</em></p>
+<p>Will the data we have — which is only for a sample of adult American men more than a decade ago — allow us to answer our questions, however roughly? This is where the notion of <strong>population</strong> comes into play.</p>
+</div>
+<div id="population" class="section level3" number="7.1.3">
+<h3>
+<span class="header-section-number">7.1.3</span> Population<a class="anchor" aria-label="anchor" href="#population"><i class="fas fa-link"></i></a>
+</h3>
+<p>One of the most important components of Wisdom is the concept of the “population.”</p>
+<p>The population is not the set of people for which we have data — the participants in the CDC’s Health and Nutrition Examination Survey conducted from 2009 to 2011. This is the dataset. Nor is it the set of voters about whom we would like to have data. Those are the rows in the ideal Preceptor Table. The population is the larger — potentially much larger — set of individuals which include both the data we have and the data we want. Generally, the population will be much larger than either the data we have and the data we want.</p>
+<p>In this case, we want to predict average height for males <em>today</em>, not for people in 2009-2011! We also want to predict height for males outside the United States, a group that is excluded from our dataset. Is it reasonable to generate conclusions for the world from this group? Most likely, no. However, we have limited data to work with and we have to determine how far we are willing to generalize to other groups.</p>
+<p>It is a judgment call, a matter of Wisdom, as to whether or not we may assume that the data we have and the data we want to have (i.e., the ideal Preceptor Table) are drawn from the same population.</p>
+<p>Even though the original question is about “males” in general, and does not specifically refer to those males in the United States, we will assume that the data we have for United States citizens is, uh, representative enough of the population we are interested in. If we did not believe that, then we should stop right now. The major part of Wisdom is deciding what questions you can’t answer because of the data you just don’t have.</p>
+<p>In the social sciences, <em>there is never a perfect relationship between the data you have and the question you are trying to answer.</em> Data for American males in the past is not the same thing as data for American males today. Nor is it the same as the data for men in France or Mexico.Yet, this data is relevant. Right? It is certainly better than nothing.</p>
+<p><em>Using not-perfect data is generally better than using no data at all.</em></p>
 <p>Is not-perfect data <em>always</em> better? No! If your problem is estimating the median height of 5th grade girls in Tokyo, we doubt that our data is at all relevant. Wisdom recognizes the danger of using non-relevant data to build a model and then mistakenly using that model in a way which will only make the situation worse. If the data won’t help, don’t use the data, don’t build a model. Better to just use your common sense and experience. Or find better data.</p>
-<!-- DK: More on population. -->
-<p>The statistical term “population” is often relevant here. Recall from Chapter <a href="one-parameter.html#one-parameter">6</a> that the “population” is the set of units which we are interested in. <em>To perform inference, there must be a population which includes both the data that we have and the data that we want to have.</em> The population is all the rows in the ideal Preceptor Table.</p>
-<p>Wisdom asks: <em>Is there really a single population which includes both the data that we have and the data we need to answer our questions?</em> If there is, then we can proceed. If not, we must find another approach.</p>
+<p>For now, we will accept that our data works.</p>
 </div>
 </div>
 <div id="justice-1" class="section level2" number="7.2">
@@ -320,26 +722,23 @@
 <span class="header-section-number">7.2</span> Justice<a class="anchor" aria-label="anchor" href="#justice-1"><i class="fas fa-link"></i></a>
 </h2>
 <div class="inline-figure"><img src="other/images/Justice.jpg" width="100%"></div>
-<p>Having looked at our data and decided that it is “close enough” to our questions that creating a model will help us come up with better answers, we move on to Justice. A mathematical model and a Preceptor Table are the two components of Justice.</p>
-<p>Mathematical knowledge is the least important skill for a data scientist.</p>
-<p>However, a little mathematical notation will make our modeling assumptions clear, will bring some precision to our approach. In this case:</p>
-<p><span class="math display">\[ y_i =  \mu + \epsilon_i \]</span>
-with <span class="math inline">\(\epsilon_i \sim N(0, \sigma^2)\)</span>. <span class="math inline">\(y_i\)</span> is the height of male <span class="math inline">\(i\)</span>. <span class="math inline">\(\mu\)</span> is the average height of all males in the population. <span class="math inline">\(\epsilon_i\)</span> is the “error term,” the difference between the height of male <span class="math inline">\(i\)</span> and the average height of all males. <span class="math inline">\(\epsilon_i\)</span> is, by assumption, normally distributed with a mean of 0 and a standard deviation of <span class="math inline">\(\sigma\)</span>.</p>
-<p>This is the simplest model we can construct. Note:</p>
+<!-- Should include all of the new elements (population table, representativeness, validity), but in the simplest possible way.  -->
+<p>Having looked at our data and decided that it is “close enough” to our questions that creating a model will help us come up with better answers, we move on to Justice.</p>
+<p>Justice emphasizes a few key concepts:</p>
 <ul>
-<li>The model has two unknown parameters: <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\sigma\)</span>. Before we can do anything else we need to estimate the values of these parameters. Can we ever know their exact value? No! Perfection lies only in God’s own R code. But, by using a Bayesian approach similar to what we used in Chapters <a href="probability.html#probability">5</a> and <a href="one-parameter.html#one-parameter">6</a>, we will be able to create a <em>posterior probability distribution</em> for each parameter.</li>
+<li>The Population Table, a structure which includes a row for every unit in the population. We generally break the rows in the Population Table into three categories: the data for units we want to have, the data for units which we actually have, and the data for units we do not care about.</li>
+<li>Is our data representative of the population?</li>
+<li>Is the meaning of the columns consistent, i.e., can we assume validity?
+We then make an assumption about the data generating mechanism.</li>
 </ul>
-<!-- DK: Box quote. --><ul>
-<li><p>The model is wrong, as are all models.</p></li>
-<li><p>The parameter we most care about is <span class="math inline">\(\mu\)</span>. That is the parameter with a substantively meaningful interpretation. Not only is the meaning of <span class="math inline">\(\sigma\)</span> difficult to describe, we also don’t particular care about its value. Parameters like <span class="math inline">\(\sigma\)</span> in this context are <em>nuisance</em> or <em>auxiliary</em> parameters. We still estimate their posterior distributions, but we don’t really care what those posteriors look like.</p></li>
-<li><p><span class="math inline">\(\mu\)</span> is not the average height of the men in the sample. We can calculate that directly. It is 175.61. No estimation required! Instead, <span class="math inline">\(\mu\)</span> is the average height of men in the <em>population</em>. Recall from the discussions in Chapter <a href="one-parameter.html#one-parameter">6</a> that the population is the universe of people/units/whatever about which we seek to draw conclusions. On some level, this seems simple. On a deeper level, it is very subtle. For example, if we are walking around Copenhagen, then the population we really care about, in order to answer our three questions, is the set of adult men which we might meet today. This is not the same as the population of adult men in the US in 2010. But is it close enough? Is it better than nothing? We want to assume that both men from <code>nhanes</code> (the data we have) and men we meet in Copenhagen today (the data we want to have) are drawn from the same <em>population</em>. Each case is a different and the details matter.</p></li>
-<li><p><span class="math inline">\(\sigma\)</span> is an estimate for the standard deviation of the errors, i.e., variability in height after accounting for the mean.</p></li>
-</ul>
-<!-- You can show students the sample estimate of that with something like this (or sd(resid(fit_obj)) --><!-- DK: Should we discuss what a superpopulation is? --><p>Consider:</p>
-<p><span class="math display">\[\text{outcome} = \text{model} + \text{what is not in the model}\]</span>
-In this case, the <em>outcome</em> is the height of an individual male. This variable, also called the “response,” is what we are trying to understand and/or explain and/or predict. The <em>model</em> is our creation, a mixture of data and parameters, an attempt to capture the underlying structure in the world which generates the outcome.</p>
-<p>What is the difference between the <em>outcome</em> and the <em>model</em>? By definition, it is <em>what is not in the model</em>, all the blooming and buzzing complexity of the real world. The model will always be incomplete in that it won’t capture everything. Whatever the model misses is thrown into the error term.</p>
-<p>The Preceptor Table for this problem is almost identical to the one we saw in Chapter <a href="rubin-causal-model.html#rubin-causal-model">4</a>:</p>
+<div id="the-population-table" class="section level3" number="7.2.1">
+<h3>
+<span class="header-section-number">7.2.1</span> The Population Table<a class="anchor" aria-label="anchor" href="#the-population-table"><i class="fas fa-link"></i></a>
+</h3>
+<p>The Population Table shows the data that we actually have in our desired population. It shows rows from three sources: the ideal Preceptor Table, the data, and the population outside of the data (rows which exist but for which we have no data).</p>
+<p>In our ideal Preceptor rows, we have information for our covariates of sex and year. However, because those rows are not included in our data, we do not have any outcome results (height). Since our scenario pertains to a prediction for average height in 2021, the year column will read “2021” and the sex column will read “male.”</p>
+<p>The rows from our data have everything: the covariates and the outcomes. The covariates here will be 2009-2011 for year and male for sex, since these are the pieces of information that are included in our data. We <em>will</em> have outcome results in these rows.</p>
+<p>The rows from the population have no data. These are subjects which fall under our desired population, but for which we have no data. As such, all rows are missing.</p>
 <div id="jghbgqokwz" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
@@ -679,64 +1078,175 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
 }
 </style>
 <div class="inline-table"><table class="gt_table">
-<thead class="gt_col_headings">
-<tr>
-<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1" style="text-align: left; vertical-align: middle;">ID</th>
-      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="1">
-        <span class="gt_column_spanner">Outcome</span>
-      </th>
-    </tr>
-<tr>
-<th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">Heights (cm)</th>
-    </tr>
-</thead>
+<thead class="gt_col_headings"><tr>
+<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="font-size: large; text-align: left; vertical-align: middle;">Source</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">Sex</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">Year</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">Height</th>
+    </tr></thead>
 <tbody class="gt_table_body">
 <tr>
-<td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;">1</td>
-<td class="gt_row gt_center">?</td>
+<td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;"><div class="gt_from_md">
+<p>ideal Preceptor Table</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>Male</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>2021</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;">2</td>
-<td class="gt_row gt_center">?</td>
+<td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;"><div class="gt_from_md">
+<p>ideal Preceptor Table</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>Male</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>2021</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;">...</td>
-<td class="gt_row gt_center">...</td>
+<td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;"><div class="gt_from_md">
+<p>...</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>...</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>...</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>...</p>
+</div></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;">473</td>
-<td class="gt_row gt_center">172</td>
+<td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;"><div class="gt_from_md">
+<p>Data</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>Male</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>2009</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>180</p>
+</div></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;">474</td>
-<td class="gt_row gt_center">?</td>
+<td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;"><div class="gt_from_md">
+<p>Data</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>Male</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>2010</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>160</p>
+</div></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;">...</td>
-<td class="gt_row gt_center">...</td>
+<td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;"><div class="gt_from_md">
+<p>Data</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>Male</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>2009</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>168</p>
+</div></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;">3,258</td>
-<td class="gt_row gt_center">?</td>
+<td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;"><div class="gt_from_md">
+<p>...</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>...</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>...</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>...</p>
+</div></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;">3,259</td>
-<td class="gt_row gt_center">162</td>
+<td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;"><div class="gt_from_md">
+<p>Population</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;">...</td>
-<td class="gt_row gt_center">...</td>
+<td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;"><div class="gt_from_md">
+<p>Population</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
 </tr>
 <tr>
-<td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;">N</td>
-<td class="gt_row gt_center">?</td>
+<td class="gt_row gt_left" style="border-right-width: 1px; border-right-style: solid; border-right-color: #000000;"><div class="gt_from_md">
+<p>Population</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
+<td class="gt_row gt_center"><div class="gt_from_md">
+<p>?</p>
+</div></td>
 </tr>
 </tbody>
 </table></div>
 </div>
-<p> </p>
-<p>Since this is not a causal model, there is only one potential outcome — which is to say, only one outcome: an individual’s height.</p>
-<!-- DK: To set the stage for the next chapter, might show an equation a math equation in which mu is a parameter multiplied times an columns of 1s. Maybe? -->
+<p><!-- Math is in Justice, but just the functional form, not the exact variables. Leave it to you to write about this sensibly. Focus on the functional form. We are choosing linear, not logistic. Why? --></p>
+<p>However, a little mathematical notation will make our modeling assumptions clear, will bring some precision to our approach. In this case:</p>
+<p><span class="math display">\[ y_i =  \mu + \epsilon_i \]</span>
+with <span class="math inline">\(\epsilon_i \sim N(0, \sigma^2)\)</span>. <span class="math inline">\(y_i\)</span> is the height of male <span class="math inline">\(i\)</span>. <span class="math inline">\(\mu\)</span> is the average height of all males in the population. <span class="math inline">\(\epsilon_i\)</span> is the “error term,” the difference between the height of male <span class="math inline">\(i\)</span> and the average height of all males. <span class="math inline">\(\epsilon_i\)</span> is, by assumption, normally distributed with a mean of 0 and a standard deviation of <span class="math inline">\(\sigma\)</span>.</p>
+<p>This is the simplest model we can construct. Note:</p>
+<ul>
+<li>The model has two unknown parameters: <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\sigma\)</span>. Before we can do anything else we need to estimate the values of these parameters. Can we ever know their exact value? No! Perfection lies only in God’s own R code. But, by using a Bayesian approach similar to what we used in Chapters <a href="probability.html#probability">5</a> and <a href="one-parameter.html#one-parameter">6</a>, we will be able to create a <em>posterior probability distribution</em> for each parameter.</li>
+</ul>
+<!-- Add Dr. Box quote. All models are wrong, some are useful. And a photo. --><ul>
+<li><p>The model is wrong, as are all models.</p></li>
+<li><p>The parameter we most care about is <span class="math inline">\(\mu\)</span>. That is the parameter with a substantively meaningful interpretation. Not only is the meaning of <span class="math inline">\(\sigma\)</span> difficult to describe, we also don’t particular care about its value. Parameters like <span class="math inline">\(\sigma\)</span> in this context are <em>nuisance</em> or <em>auxiliary</em> parameters. We still estimate their posterior distributions, but we don’t really care what those posteriors look like.</p></li>
+<li><p><span class="math inline">\(\mu\)</span> is not the average height of the men in the sample. We can calculate that directly. It is 175.61. No estimation required! Instead, <span class="math inline">\(\mu\)</span> is the average height of men in the <em>population</em>. Recall from the discussions in Chapter <a href="one-parameter.html#one-parameter">6</a> that the population is the universe of people/units/whatever about which we seek to draw conclusions. On some level, this seems simple. On a deeper level, it is very subtle. For example, if we are walking around Copenhagen, then the population we really care about, in order to answer our three questions, is the set of adult men which we might meet today. This is not the same as the population of adult men in the US in 2010. But is it close enough? Is it better than nothing? We want to assume that both men from <code>nhanes</code> (the data we have) and men we meet in Copenhagen today (the data we want to have) are drawn from the same <em>population</em>. Each case is a different and the details matter.</p></li>
+<li><p><span class="math inline">\(\sigma\)</span> is an estimate for the standard deviation of the errors, i.e., variability in height after accounting for the mean.</p></li>
+</ul>
+<!-- You can show students the sample estimate of that with something like this (or sd(resid(fit_obj)) --><p>Consider:</p>
+<p><span class="math display">\[\text{outcome} = \text{model} + \text{what is not in the model}\]</span>
+In this case, the <em>outcome</em> is the height of an individual male. This variable, also called the “response,” is what we are trying to understand and/or explain and/or predict. The <em>model</em> is our creation, a mixture of data and parameters, an attempt to capture the underlying structure in the world which generates the outcome.</p>
+<p>What is the difference between the <em>outcome</em> and the <em>model</em>? By definition, it is <em>what is not in the model</em>, all the blooming and buzzing complexity of the real world. The model will always be incomplete in that it won’t capture everything. Whatever the model misses is thrown into the error term.</p>
+</div>
 </div>
 <div id="courage-1" class="section level2" number="7.3">
 <h2>
@@ -749,10 +1259,10 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
 <span class="header-section-number">7.3.0.1</span> stan_glm<a class="anchor" aria-label="anchor" href="#stan_glm-1"><i class="fas fa-link"></i></a>
 </h4>
 <p>Bayesian models are not hard to create in R. The <strong>rstanarm</strong> package provides the tools we need, most importantly the function <code><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm()</a></code>.</p>
-<div class="sourceCode" id="cb595"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb586"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://mc-stan.org/rstanarm/">rstanarm</a></span><span class="op">)</span></code></pre></div>
 <p>The first argument in <code><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm()</a></code> is <code>data</code>, which in our case is the filtered <code>ch7</code> tibble which contains 50 observations. The only other mandatory argument is the <code>formula</code> that we want to use to build the model. In this case, since we have no predictor variables, our formula is <code>height ~ 1</code>.</p>
-<div class="sourceCode" id="cb596"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb587"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">ch7</span>, 
                     formula <span class="op">=</span> <span class="va">height</span> <span class="op">~</span> <span class="fl">1</span>, 
                     family <span class="op">=</span> <span class="va">gaussian</span>, 
@@ -773,7 +1283,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
 <span class="header-section-number">7.3.0.1.1</span> Printed model<a class="anchor" aria-label="anchor" href="#printed-model"><i class="fas fa-link"></i></a>
 </h5>
 <p>There are several ways to examine the fitted model. The simplest is to print it. Recall that just typing <code>x</code> at the prompt is the same as writing <code><a href="https://docs.ropensci.org/skimr/reference/print.html">print(x)</a></code>.</p>
-<div class="sourceCode" id="cb597"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb588"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_obj</span></code></pre></div>
 <pre><code>## stan_glm
 ##  family:       gaussian [identity]
@@ -796,7 +1306,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
 <p>The third line gives us back the formula we provided. We are creating a model predicting height with a constant — which is just about the simplest model you can create. Formulas in R are constructed in two parts. First, on the left side of the tilde (the “~” symbol) is the “response” or “dependent” variable, the thing which we are trying to explain. Since this is a model about <code>height</code>, <code>height</code> goes on the lefthand side. Second, we have the “explanatory” or “independent” or “predictor” variables on the righthand side of the tilde. There will often be many such variables but in this, the simplest possible model, there is only one, a single constant. (The number <code>1</code> indicates that constant. It does not mean that we think that everyone is height <code>1</code>.)</p>
 <p>The fourth and fifth lines of the output tell us that we have 50 observations and that we only have one predictor (the constant). Again, the terminology is a bit confusing. What does it mean to suggest that <span class="math inline">\(\mu\)</span> is “constant?” It means that, although <span class="math inline">\(\mu\)</span>’s value is unknown, it is <em>fixed</em>. It does not change from person to person. The <code>1</code> in the formula corresponds to the parameter <span class="math inline">\(\mu\)</span> in our mathematical definition of the model.</p>
 <p>We knew all this information before we fit the model. R records it in the <code>fit_obj</code> because we don’t want to forget what we did. The second half of the display gives a summary of the parameter values. We can look at just the second half with the <code>detail</code> argument:</p>
-<div class="sourceCode" id="cb599"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb590"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://docs.ropensci.org/skimr/reference/print.html">print</a></span><span class="op">(</span><span class="va">fit_obj</span>, detail <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 <pre><code>##             Median MAD_SD
 ## (Intercept) 175.6    1.2 
@@ -807,13 +1317,11 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
 <p>We see the output for the two parameters of the model: “(Intercept)” and “sigma.” This can be confusing! Recall that the thing we care most about is <span class="math inline">\(\mu\)</span>, the average height in the population. If we had the ideal Preceptor Table — with a row for every adult male in the population we care about and no missing data — <span class="math inline">\(\mu\)</span> would be trivial to calculate, and with no uncertainty. But only we know that we named that parameter <span class="math inline">\(\mu\)</span>. All that R sees is the <code>1</code> in the formula. In most fields of statistics, this constant term is called the “intercept.” So, now we have three things — <span class="math inline">\(\mu\)</span> (from the math), <code>1</code> (from the code), and “(Intercept)” (from the output) — all of which refer to the exact same concept. This will not be the last time that terminology will be confusing.</p>
 <p>At this point, <code><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm()</a></code> — or rather the <code><a href="https://docs.ropensci.org/skimr/reference/print.html">print()</a></code> method for objects created with <code><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm()</a></code> — has a problem. We have full posteriors for both <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\sigma\)</span>. But this is a simple printed summary. We can’t show the entire distribution. So, what are the best few numbers to provide? There is no right answer to this question! Here, the choice is to provide the “Median” of the posterior and the “MAD_SD.”</p>
 <ul>
-<li>Anytime you have a distribution, whether posterior probability or otherwise, the most important single number associated with it is some measure of its <em>location</em>. Where is the data? The two most common choices for this measure are the mean and median. We use the median here because posterior distributions can often be quite skewed, making the mean a less reliable measure.</li>
-</ul>
-<!-- DK: Is "reliable" the best word? I think ROAS uses "stable." --><ul>
-<li>The second most important number for summarizing a distribution concerns its <em>spread</em>. How far is the data spread around its center? The most common measure used for this is the standard deviation. MAD SD, the scaled median absolute deviation, is another. If the variable has a normal distribution, then the standard deviation and the MAD SD will be very similar. But the MAD SD is much more robust to outliers, which is why it is used here. (Note that MAD SD is the same measure as what we have referred to as <em>mad</em> up till now. The measure is calculated with the <code><a href="https://rdrr.io/r/stats/mad.html">mad()</a></code> command in R. Terminology is confusing, as usual.)</li>
+<li><p>Anytime you have a distribution, whether posterior probability or otherwise, the most important single number associated with it is some measure of its <em>location</em>. Where is the data? The two most common choices for this measure are the mean and median. We use the median here because posterior distributions can often be quite skewed, making the mean a less stable measure.</p></li>
+<li><p>The second most important number for summarizing a distribution concerns its <em>spread</em>. How far is the data spread around its center? The most common measure used for this is the standard deviation. MAD SD, the scaled median absolute deviation, is another. If the variable has a normal distribution, then the standard deviation and the MAD SD will be very similar. But the MAD SD is much more robust to outliers, which is why it is used here. (Note that MAD SD is the same measure as what we have referred to as <em>mad</em> up till now. The measure is calculated with the <code><a href="https://rdrr.io/r/stats/mad.html">mad()</a></code> command in R. Terminology is confusing, as usual.)</p></li>
 </ul>
 <p>We can also change the number of digits shown:</p>
-<div class="sourceCode" id="cb601"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb592"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://docs.ropensci.org/skimr/reference/print.html">print</a></span><span class="op">(</span><span class="va">fit_obj</span>, detail <span class="op">=</span> <span class="cn">FALSE</span>, digits <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></code></pre></div>
 <pre><code>##             Median MAD_SD
 ## (Intercept) 175.6    1.2 
@@ -821,7 +1329,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
 ## Auxiliary parameter(s):
 ##       Median MAD_SD
 ## sigma 8.5    0.9</code></pre>
-<!-- DK: Are we sure that coef() and sigma() give us the median values?  -->
+<!-- DK: Are we sure that coef() and sigma() give us the median values? Please investigate. -->
 <p>Now that we understand the meaning of Median and MAD_SD in the above display, we can interpret the actual numbers. The median of the intercept, 175.6, is the median of our posterior distribution for <span class="math inline">\(\mu\)</span>, the average height of all men in the population. The median of sigma, 8.5, is the median of our posterior distribution for the true <span class="math inline">\(\sigma\)</span>, which can be roughly understood as the variability in the height of men, once we account for our estimate of <span class="math inline">\(\mu\)</span>.</p>
 <p>The MAD SD for each parameter is a measure of the variability of our posterior distributions for that parameter. How spread out are they? Speaking roughly, 95% of the mass of a posterior probability distribution is located within +/- 2 MAD SDs from the median. For example, we would be about 95% confident that the true value of <span class="math inline">\(\mu\)</span> is somewhere between 173.2 and 178.</p>
 </div>
@@ -831,7 +1339,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
 </h5>
 <p>Instead of doing this math in our heads, we can display both posterior probability distributions. <em>Pictures speak where math mumbles.</em> Fortunately, getting draws from those posteriors is easy:</p>
 <!-- as_tibble() is just trying to make things "pretty", for certain meanings of that word. This causes the decimals for the intercept to vanish when this chapter is knit. The decimals are present when I run it here. Worth worrying about? -->
-<div class="sourceCode" id="cb603"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb594"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_obj</span> <span class="op">%&gt;%</span> 
   <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 4,000 x 2
@@ -850,7 +1358,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
 ## # … with 3,990 more rows</code></pre>
 <p>These 4,000 rows are draws from the estimated posteriors, each in its own column. These are like the vectors which result from calling functions like <code><a href="https://rdrr.io/r/stats/Normal.html">rnorm()</a></code> or <code><a href="https://rdrr.io/r/stats/Binomial.html">rbinom()</a></code>. We can create the plot in a similar way:</p>
 <!-- DK: More here. Drawing the connection to what we have done in earlier chapters. -->
-<div class="sourceCode" id="cb605"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb596"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_obj</span> <span class="op">%&gt;%</span> 
   <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span><span class="op">(</span>mu <span class="op">=</span> <span class="va">`(Intercept)`</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -864,12 +1372,12 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
          caption <span class="op">=</span> <span class="st">"Data source: NHANES"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_y_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/label_percent.html">percent_format</a></span><span class="op">(</span>accuracy <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">theme_classic</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-460-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-458-1.png" width="100%"></div>
 <p>Although it is possible to have variable names like “(Intercept),” it is not recommended. Avoid weird names! When you are stuck with them, place them in backticks. Even better, rename them, as we do above.</p>
 <p>Note that the title includes the word “Posterior” and not the complete term “Posterior Probability Distribution.” This will be our practice going forward. “Posterior” means “Posterior Distribution” and, any posterior distribution in which the sum of the range is 1 is a “posterior probability distribution.” In most or our plots, “posterior” implies “posterior probability distribution.”</p>
 <p>Always go back to first principles. There is some “<em>truth</em>, an unknown number, a fact about the world. If we knew everything, if we had the ideal Preceptor Table, inference would not be necessary. Algebra would suffice. Alas, in this imperfect world, we have no choice but to be data scientist. We are always uncertain. We summarize our knowledge of unknown numbers with posterior probability distributions, or”posteriors" for short.</p>
 <!-- DK: Add more discussion about what this plot means. -->
-<div class="sourceCode" id="cb606"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb597"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_obj</span> <span class="op">%&gt;%</span> 
   <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">sigma</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
@@ -882,7 +1390,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
          caption <span class="op">=</span> <span class="st">"Data source: NHANES"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_y_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/label_percent.html">percent_format</a></span><span class="op">(</span>accuracy <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">theme_classic</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-461-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-459-1.png" width="100%"></div>
 <p>Again, <span class="math inline">\(\sigma\)</span> is usually a nuisance parameter. We don’t really care what its value is, so we rarely plot it.</p>
 <!-- DK: Discuss the meaning in more detail. -->
 <!-- DK: Fun problem set exercise is to pull this data, pivot it, and then create one graphic with both distributions on the same scale. Then you could . . . -->
@@ -893,7 +1401,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
 <span class="header-section-number">7.3.0.2</span> Decomposing the outcome<a class="anchor" aria-label="anchor" href="#decomposing-the-outcome"><i class="fas fa-link"></i></a>
 </h4>
 <p>Two other important concepts in model creation are fitted values and residuals.</p>
-<div class="sourceCode" id="cb607"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb598"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch7</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>fitted_value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html">fitted</a></span><span class="op">(</span><span class="va">fit_obj</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>residual <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/residuals.html">residuals</a></span><span class="op">(</span><span class="va">fit_obj</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -907,7 +1415,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
 ## 4   175.         176.   -0.311
 ## 5   170.         176.   -5.21</code></pre>
 <p>The fitted value represents the model’s best guess at to what the true value of the outcome should be for that individual, given information about any covariates. This is a tricky concept since, after all, <em>we already know what the actual value is.</em> We commonly use “hat” notation for fitted values. <span class="math inline">\(y_i\)</span> is the actual height for man <span class="math inline">\(i\)</span>. <span class="math inline">\(\hat{y_i}\)</span> is the fitted (or predicted or modeled) height for man <span class="math inline">\(i\)</span>. It is the height we would guess if we did not know his true height. The residual, <span class="math inline">\(r_i\)</span>, is the difference between the outcome (<span class="math inline">\(y_i\)</span>) and the fitted value <span class="math inline">\(\hat{y_i}\)</span>. These definitions lead to a natural decomposition of the outcome data:</p>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-463-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-461-1.png" width="100%"></div>
 <!-- DK: More details. Can we add $y_i$ and other math terms to these graphs? And do a posterior predictive check! Need to discuss how the unique values are because we only have 50 observations. Maybe show all observations? -->
 <!-- DK: Is there other stuff to do within Courage? Might show how to make a regression table. Should discuss how there is only one model and that we have different views of that model by looking at the printed output, the posterior probability distributions of the parameters and graphics of the fitted values and residuals.  -->
 <!-- Discuss testing for the first time? Yes! Takes Courage to Not Test! Also, foreshadow the difficulties we will have in deciding what to include in the model. And transformations. Or maybe discuss transformations now? -->
@@ -928,7 +1436,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
 <li>What is the average height of men?</li>
 </ul>
 <p>If we had the ideal Preceptor Table, one with a row for every man alive, and with their actual height, we could calculate this number easily. Just take the average of those 3 billion or so rows! Alas, in our actual Preceptor Table, the vast majority of heights are missing. Question marks make simple algebra impossible. So, as with any unknown number, we need to estimate a posterior probability distribution. Objects created by <code><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm()</a></code> make this easy to do.</p>
-<div class="sourceCode" id="cb609"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb600"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">newobs</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>constant <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
 
 <span class="va">pe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/posterior_linpred.stanreg.html">posterior_epred</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit_obj</span>,
@@ -954,7 +1462,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
 <!-- DK: Tell the story about "mathematical hope." Maybe give more details on what the tibble is doing. Once new version comes out, replace with tibble(.rows = 1). -->
 <p>We use <code>as_tibble()</code> to convert the matrix which is returned by <code><a href="https://mc-stan.org/rstanarm/reference/posterior_linpred.stanreg.html">posterior_epred()</a></code>. We have a tibble with 1 column and 4,000 rows. The column, unhelpfully named <code>1</code>, is 4,000 draws from the posterior probability distribution for the expected height of a random male. Recall from earlier chapters how a posterior probability distribution and the draws from a posterior probability distribution are, more or less, the same thing. Or, rather, a posterior probability distribution, its ownself, is hard to work with. Draws from that distribution, on the other hand, are easy to manipulate. We use draws to answer our questions.</p>
 <p>Converting these 4,000 draws into a posterior probability distribution is straightforward.</p>
-<div class="sourceCode" id="cb611"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb602"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pe</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">`1`</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">geom_histogram</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y <span class="op">=</span> <span class="fu">after_stat</span><span class="op">(</span><span class="va">count</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">count</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
@@ -967,7 +1475,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
     <span class="fu">scale_x_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/label_number.html">number_format</a></span><span class="op">(</span>accuracy <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_y_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/label_percent.html">percent_format</a></span><span class="op">(</span>accuracy <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">theme_classic</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-466-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-464-1.png" width="100%"></div>
 <p>The rest of the <em>Primer</em> will be filled with graphics like this one. You will make dozens of them yourself. The fundamental structure for doing algebra is the real number. The fundamental structure for data science is the posterior probability distribution. You need to be able to create and interpret them.</p>
 </div>
 <div id="question-2" class="section level3" number="7.4.2">
@@ -981,7 +1489,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
 <p>Recall the mathematics:</p>
 <p><span class="math display">\[ y_i =  \mu + \epsilon_i \]</span></p>
 <p>With expected values or averages, we can ignore the <span class="math inline">\(\epsilon_i\)</span> term in this formula. The expected value of <span class="math inline">\(\epsilon_i\)</span> is zero since, by assumption, <span class="math inline">\(\epsilon_i \sim N(0, \sigma^2)\)</span>. However, we can’t ignore <span class="math inline">\(\epsilon_i\)</span> when predicting the height for a single individual.</p>
-<div class="sourceCode" id="cb612"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb603"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">newobs</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>constant <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
 
 <span class="va">pp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit_obj</span>,
@@ -1004,7 +1512,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
 ## 10 175  
 ## # … with 3,990 more rows</code></pre>
 <p>As before, it is straightforward to turn draws from the posterior probability distribution into a graphic:</p>
-<div class="sourceCode" id="cb614"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb605"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pp</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">`1`</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">geom_histogram</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y <span class="op">=</span> <span class="fu">after_stat</span><span class="op">(</span><span class="va">count</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">count</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
@@ -1017,14 +1525,14 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
     <span class="fu">scale_x_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/label_number.html">number_format</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_y_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/label_percent.html">percent_format</a></span><span class="op">(</span>accuracy <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">theme_classic</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-468-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-466-1.png" width="100%"></div>
 <p>Note:</p>
 <ul>
 <li><p>The posterior for an individual is much wider than the posterior for the expected value.</p></li>
 <li><p>Eyeballing, seems like there is a 1 out of 3 chance that the next man we meet, or any randomly chosen man, is taller than 180 cm.</p></li>
 <li><p>We can calculate the exact probability by manipulating the tibble of draws directly.</p></li>
 </ul>
-<div class="sourceCode" id="cb615"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb606"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">pp</span><span class="op">$</span><span class="va">`1`</span> <span class="op">&gt;</span> <span class="fl">180</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">pp</span><span class="op">$</span><span class="va">`1`</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 0.32</code></pre>
 <p>If 30% or so of the draws from the posterior probability distribution are greater than 180 cm, then there is about a 30% chance that the next individual will be taller than 180 cm.</p>
@@ -1040,7 +1548,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
 <li>What is the probability that, among the next 4 men we meet, the tallest is at least 10 cm taller than the shortest?</li>
 </ul>
 <p>Bayesian models are beautiful because, via the magic of simulation, we can answer (almost!) any question. Because the question is about four random individuals, we need <code><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict()</a></code> to give us four sets of draws from four identical posterior probability distributions. Start with a new <code>newobs</code>:</p>
-<div class="sourceCode" id="cb617"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb608"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">newobs</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>constant <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span>
 
 <span class="va">newobs</span></code></pre></div>
@@ -1052,13 +1560,13 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
 ## 3        1
 ## 4        1</code></pre>
 <p>If you need to predict X individuals, then you need a tibble with X rows, regardless of whether or not those rows are otherwise identical.</p>
-<div class="sourceCode" id="cb619"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb610"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit_obj</span>,
                         newdata <span class="op">=</span> <span class="va">newobs</span><span class="op">)</span> <span class="op">%&gt;%</span> 
         <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
         <span class="fu">mutate_all</span><span class="op">(</span><span class="va">as.numeric</span><span class="op">)</span></code></pre></div>
 <p>Note we need to add <code>mutate_all(as.numeric)</code> to the end of the pipe. This is caused by a bug — or at least an awkwardness — whereby the variable type provided by <code><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict()</a></code> is <code>ppd</code> rather than <code>dbl</code>. Using <code>mutate_all(as.numeric)</code> makes each column of type double. Avoid working with columns of type <code>ppd</code>. Doing so will only lead to heartache.</p>
-<div class="sourceCode" id="cb620"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb611"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pp</span></code></pre></div>
 <pre><code>## # A tibble: 4,000 x 4
 ##      `1`   `2`   `3`   `4`
@@ -1075,7 +1583,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
 ## 10  170.  166.  172.  165.
 ## # … with 3,990 more rows</code></pre>
 <p>The next step is to calculate the number of interest. We can not, directly, draw the height of the tallest or shortest out of 4 random men. However, having drawn 4 random men, we can calculate those numbers, and the difference between them.</p>
-<div class="sourceCode" id="cb622"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb613"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># First part of the code is the same as we did above.</span>
 
 <span class="va">pp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit_obj</span>,
@@ -1109,7 +1617,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
 <p>These steps serve as a template for much of the analysis we do later. It is often very hard to create a model <em>directly</em> of the thing we want to know. There is no <em>easy</em> way to create a model which estimates this height difference <em>directly</em>. It is easy, however, to create a model which allows for random draws.</p>
 <p><em>Give us enough random draws, and a tibble in which to store them, and we can estimate the world.</em></p>
 <p>Once we have random draws from the posterior distribution we care about, graphing the posterior probability distribution is the same-old, same-old.</p>
-<div class="sourceCode" id="cb624"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb615"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pp</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">diff</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">geom_histogram</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y <span class="op">=</span> <span class="fu">after_stat</span><span class="op">(</span><span class="va">count</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">count</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
@@ -1122,9 +1630,9 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
     <span class="fu">scale_x_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">50</span>, <span class="fl">10</span><span class="op">)</span>,
                        labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/label_number.html">number_format</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_y_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/label_percent.html">percent_format</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> </code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-474-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-472-1.png" width="100%"></div>
 <p>There is about an 84% chance that, when meeting 4 random men, the tallest will be at least 10 cm taller than the shortest. Exact calculation:</p>
-<div class="sourceCode" id="cb625"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb616"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">pp</span><span class="op">$</span><span class="va">diff</span> <span class="op">&gt;</span> <span class="fl">10</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">pp</span><span class="op">$</span><span class="va">diff</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 0.84</code></pre>
 <!-- DK: Discuss all the reasons why this might not be true. Show how to give the exact answer. -->
@@ -1137,7 +1645,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
 <li>What is our posterior probability distribution of the height of the 3rd tallest man out of the next 100 we meet?</li>
 </ul>
 <p>The same approach will work for almost any question.</p>
-<div class="sourceCode" id="cb627"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb618"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">newobs</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>constant <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">100</span><span class="op">)</span><span class="op">)</span>
 
 <span class="va">pp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit_obj</span>,
@@ -1148,7 +1656,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>third_tallest <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html">sort</a></span><span class="op">(</span><span class="fu">c_across</span><span class="op">(</span><span class="op">)</span>, 
                               decreasing <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span></code></pre></div>
 <p>Explore the <code>pp</code> object. It has 101 columns: one hundred for the 100 individual heights and one column for the 3rd tallest among them. Having done the hard work, plotting is easy:</p>
-<div class="sourceCode" id="cb628"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb619"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pp</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">third_tallest</span>, y <span class="op">=</span> <span class="fu">after_stat</span><span class="op">(</span><span class="va">count</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">count</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">geom_histogram</span><span class="op">(</span>bins <span class="op">=</span> <span class="fl">100</span><span class="op">)</span> <span class="op">+</span>
@@ -1159,8 +1667,39 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
          caption <span class="op">=</span> <span class="st">"Data source: NHANES"</span><span class="op">)</span> <span class="op">+</span> 
     <span class="fu">scale_x_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/label_number.html">number_format</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_y_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/label_percent.html">percent_format</a></span><span class="op">(</span>accuracy <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> </code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-477-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-475-1.png" width="100%"></div>
+</div>
+<div id="three-levels-of-knowledge" class="section level3" number="7.4.5">
+<h3>
+<span class="header-section-number">7.4.5</span> Three Levels of Knowledge<a class="anchor" aria-label="anchor" href="#three-levels-of-knowledge"><i class="fas fa-link"></i></a>
+</h3>
+<p>When answering questions as we have been, it can be easy to falsely believe that we are delivering <em>the truth</em>. This is not the case. In fact, there are three primary levels of knowledge which we need to understand in order to account for our uncertainty.</p>
+<p>The three primary levels of knowledge possible knowledge in our scenario include: the Truth (the ideal Preceptor Table), the DGM Posterior, and Our Posterior.</p>
+<div id="the-truth" class="section level4" number="7.4.5.1">
+<h4>
+<span class="header-section-number">7.4.5.1</span> The Truth<a class="anchor" aria-label="anchor" href="#the-truth"><i class="fas fa-link"></i></a>
+</h4>
+<p>If we know the Truth (with a capital “T”), then we know the ideal Preceptor Table. With that knowledge, we can directly answer our question precisely. We can calculate each individual’s height, and any summary measure we might be interested in, like the average height for different ages or countries.</p>
+<p>This level of knowledge is possible only under an omniscient power, one who can see every outcome in every individual under every treatment. The Truth would show, for any given individual, their actions under control, their actions under treatment, and each little factor that impacted those decisions.</p>
+<p>The Truth represents the highest level of knowledge one can have — with it, our questions merely require algebra. There is no need to estimate a treatment effect, or the different treatment effects for different groups of people. We would not need to predict at all — we would know.</p>
+</div>
+<div id="dgm-posterior" class="section level4" number="7.4.5.2">
+<h4>
+<span class="header-section-number">7.4.5.2</span> DGM posterior<a class="anchor" aria-label="anchor" href="#dgm-posterior"><i class="fas fa-link"></i></a>
+</h4>
+<p>The DGM posterior is the next level of knowledge, which lacks the omniscient quality of The Truth. This posterior is the posterior we would calculate if we had perfect knowledge of the data generating mechanism, meaning we have the correct model structure and exact parameter values. This is often falsely conflated with “our posterior,” which is subject to error in model structure and parameter value estimations.</p>
+<p>What we do with the DGM posterior is the same as our posterior — we estimate parameters based on data and predict the future with the latest and most relevant information possible. The difference is that, when we calculate posteriors for an unknown value in the DGM posterior, we expect those posteriors to be perfect.</p>
+</div>
+<div id="our-posterior" class="section level4" number="7.4.5.3">
+<h4>
+<span class="header-section-number">7.4.5.3</span> Our posterior<a class="anchor" aria-label="anchor" href="#our-posterior"><i class="fas fa-link"></i></a>
+</h4>
+<p>Unfortunately, our posterior possesses even less certainty! In the real world, we don’t have perfect knowledge of the DGM: the model structure and the exact parameter values. What does this mean?</p>
+<p>When we go to our boss, we tell them that this is our best guess. It is an informed estimate based on the most relevant data possible. From that data, we have created a posterior for the average height of males.</p>
+<p>Does this mean we are certain that the average height lies is the most probable outcome in our posterior? Of course not! As we would tell our boss, it would not be shocking to find out that the actual average height was less or more than our estimate.</p>
+<p>This is because a lot of the assumptions we make during the process of building a model, the processes in Wisdom, are subject to error. Perhaps our data did not match the future as well as we had hoped. Ultimately, we try to account for our uncertainty in our estimates. Even with this safeguard, we aren’t surprised if we are a bit off.</p>
 <!-- DK: Need more text. Explain all the things that could be wrong with the model. Explain what is going on in different columns. Explain all the cool R code tricks. Discuss difference between predict and epred.  -->
+</div>
 </div>
 </div>
 <div id="zero-one-outcomes" class="section level2" number="7.5">
@@ -1170,7 +1709,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
 <p>Variables with well-behaved, continuous ranges are the easiest to handle. We started with <code>height</code> because it was simple. Sadly, however, many variables are not like <code>height</code>. Consider <code>gender</code>, a variable in <code>nhanes</code> which takes on two possible values: “Male” and “Female.” In the same way that we would like to construct a model which explains or predicts <code>height</code>, we would like to build a model which explains or predicts <code>gender</code>. We want to answer questions like:</p>
 <p><em>What is the probability that a random person who is 180 cm tall is female?</em></p>
 <p><em>Wisdom</em> suggests we start by looking at the data. Because models use numbers, we need to create a new variable, <code>female</code>, which is 1 for Females and 0 for Males.</p>
-<div class="sourceCode" id="cb629"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb620"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch7_b</span> <span class="op">&lt;-</span> <span class="va">nhanes</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">gender</span>, <span class="va">height</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>female <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">gender</span> <span class="op">==</span> <span class="st">"Female"</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -1193,7 +1732,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
 ##  9      0   182.
 ## 10      0   169.
 ## # … with 7,414 more rows</code></pre>
-<div class="sourceCode" id="cb631"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb622"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch7_b</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">height</span>, y <span class="op">=</span> <span class="va">female</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_jitter</span><span class="op">(</span>height <span class="op">=</span> <span class="fl">0.1</span>, alpha <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span> <span class="op">+</span>
@@ -1204,16 +1743,16 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
        caption <span class="op">=</span> <span class="st">"Data from NHANES"</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">scale_y_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,
                      labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Male"</span>, <span class="st">"Female"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-479-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-477-1.png" width="100%"></div>
 <p>Why not just fit a linear model, as we did above? Consider:</p>
-<div class="sourceCode" id="cb632"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb623"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_gender_linear</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">ch7_b</span>,
                               formula <span class="op">=</span> <span class="va">female</span> <span class="op">~</span> <span class="va">height</span>,
                               family <span class="op">=</span> <span class="va">gaussian</span>,
                               refresh <span class="op">=</span> <span class="fl">0</span>,
                               seed <span class="op">=</span> <span class="fl">82</span><span class="op">)</span> </code></pre></div>
 <p>Recall that the default value for <code>family</code> is <code>gaussian</code>, so we did not need to include it here. Initially, the fitted model seems OK.</p>
-<div class="sourceCode" id="cb633"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb624"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://docs.ropensci.org/skimr/reference/print.html">print</a></span><span class="op">(</span><span class="va">fit_gender_linear</span>, digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
 <pre><code>## stan_glm
 ##  family:       gaussian [identity]
@@ -1233,7 +1772,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
 ## * For help interpreting the printed output see ?print.stanreg
 ## * For info on the priors used see ?prior_summary.stanreg</code></pre>
 <p>Comparing two individuals who differ in <code>height</code> by 1 cm, we expect the taller individual to have a 3% lower probability of being female. That is not unreasonable. The problems show up at the extremes. Consider the fitted values across the range of our data.</p>
-<div class="sourceCode" id="cb635"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb626"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ch7_b</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">height</span>, y <span class="op">=</span> <span class="va">female</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_jitter</span><span class="op">(</span>height <span class="op">=</span> <span class="fl">0.1</span>, alpha <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span> <span class="op">+</span>
@@ -1250,7 +1789,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
                      labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"-50%"</span>, <span class="st">"0% (Male)"</span>, 
                                 <span class="st">"50%"</span>, <span class="st">"100% (Female)"</span>,
                                 <span class="st">"150%"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-482-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-480-1.png" width="100%"></div>
 <p>Using 1 for Female and 0 for Male allows us to interpret fitted values as <em>the probability that a person is female or male</em>. That is a handy and natural interpretation. The problem with a linear model arises when, as in this case, the model suggests values outside 0 to 1. Such values are, by definition, impossible. People who are 190 cm tall do not have a -25% chance of being female.</p>
 <p><em>Justice</em> suggests a different functional form, one which restricts fitted values to the acceptable range. Look closely at the math:</p>
 <p><span class="math display">\[  p(\text{Female} = 1) = \frac{\text{exp}(\beta_0 + \beta_1 \text{height})}{1 + \text{exp}(\beta_0 + \beta_1 \text{height})} \]</span></p>
@@ -1258,13 +1797,13 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
 <p>Whenever you have two categories as the outcome, you should use <code>family = binomial</code>.</p>
 <!-- DK: Footnote to discuss that often linear regression is used and also works. Show that you get the same answer for the 180 question, but not for 200! -->
 <p><em>Courage</em> allows us to use the same tools for fitting this logistic regression as we did above in fitting linear models.</p>
-<div class="sourceCode" id="cb636"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb627"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">ch7_b</span>,
                   formula <span class="op">=</span> <span class="va">female</span> <span class="op">~</span> <span class="va">height</span>,
                   family <span class="op">=</span> <span class="va">binomial</span>,
                   refresh <span class="op">=</span> <span class="fl">0</span>,
                   seed <span class="op">=</span> <span class="fl">27</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb637"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb628"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://docs.ropensci.org/skimr/reference/print.html">print</a></span><span class="op">(</span><span class="va">fit_2</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></code></pre></div>
 <pre><code>## stan_glm
 ##  family:       binomial [logit]
@@ -1283,7 +1822,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
 <!-- DK: Footnote to discuss? -->
 <p>Fortunately, parameters are not what we care about. They are epiphenomenon, unicorns of our imagination. Instead, we want answers to our questions, for which <em>Temperance</em> — and the functions in <strong>rstanarm</strong> — is our guide. Recall our question:</p>
 <p><em>What is the probability that a random person who is 180 cm tall is female?</em></p>
-<div class="sourceCode" id="cb639"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb630"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">newobs</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>height <span class="op">=</span> <span class="fl">180</span><span class="op">)</span>
 
 <span class="va">pe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/posterior_linpred.stanreg.html">posterior_epred</a></span><span class="op">(</span><span class="va">fit_2</span>, newdata <span class="op">=</span> <span class="va">newobs</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -1300,12 +1839,12 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
          caption <span class="op">=</span> <span class="st">"Data source: NHANES"</span><span class="op">)</span> <span class="op">+</span> 
     <span class="fu">scale_x_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/label_percent.html">percent_format</a></span><span class="op">(</span>accuracy <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_y_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/label_percent.html">percent_format</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> </code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-485-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-483-1.png" width="100%"></div>
 <p>There is only about a 1 in 20 chance that a 180 centimeter tall person is female.</p>
 <p>Note that both the x and y axes are probabilities. Whenever we create a posterior probability distribution then, by definition, the y-axis is a probability. The x-axis is the unknown number we do not know. That unknown number can be anything — the weight of the average male, the height of 3rd tallest out of 100 men, the probability that a 180 cm tall person is female. A probability is just another number. The interpretation is the same as always.</p>
 <p>Another major difference with logistic models is that <code><a href="https://mc-stan.org/rstanarm/reference/posterior_linpred.stanreg.html">posterior_epred()</a></code> and <code><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict()</a></code> return different types of objects. <code><a href="https://mc-stan.org/rstanarm/reference/posterior_linpred.stanreg.html">posterior_epred()</a></code> returns probabilities, as above. <code><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict()</a></code>, on the other hand, returns predictions, as its name suggests. In other words, it returns zeros and ones. Consider another question:</p>
 <p><em>In a group of 100 people who are 180 centimeters tall, how many will be women?</em></p>
-<div class="sourceCode" id="cb640"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb631"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">newobs</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>height <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">180</span>, <span class="fl">100</span><span class="op">)</span><span class="op">)</span>
 
 <span class="va">pp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict</a></span><span class="op">(</span><span class="va">fit_2</span>, newdata <span class="op">=</span> <span class="va">newobs</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -1330,7 +1869,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
 <!-- DK: I am confused! Is this a posterior predictive distribution or a posterior predictive probability distribution? -->
 <p>We show just the first 4 columns for convenience. Each column is 4,000 draws from the posterior predictive distribution for the gender of a person who is 180 cm tall. (Since all 100 people have the same height, all the columns are draws from the same distribution.)</p>
 <p>We can manipulate this object on a row-by-row basis.</p>
-<div class="sourceCode" id="cb642"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb633"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict</a></span><span class="op">(</span><span class="va">fit_2</span>, newdata <span class="op">=</span> <span class="va">newobs</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">as_tibble</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate_all</span><span class="op">(</span><span class="va">as.numeric</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -1355,7 +1894,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
 ## # … with 3,990 more rows</code></pre>
 <p><code>total</code> is the number of women in each row. Manipulating draws on a row-by-row basis is very common.</p>
 <!-- DK: Add more here. -->
-<div class="sourceCode" id="cb644"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb635"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pp</span> <span class="op">%&gt;%</span> 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">total</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">geom_histogram</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y <span class="op">=</span> <span class="fu">after_stat</span><span class="op">(</span><span class="va">count</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">count</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
@@ -1367,7 +1906,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
          caption <span class="op">=</span> <span class="st">"Data source: NHANES"</span><span class="op">)</span> <span class="op">+</span> 
     <span class="fu">scale_x_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/label_number.html">number_format</a></span><span class="op">(</span>accuracy <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_y_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/label_percent.html">percent_format</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> </code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-488-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-486-1.png" width="100%"></div>
 <p>That 5 or 6 women is the most likely number is very consistent with the answer to the first question. There we found that a random person who is 180 cm tall has a 5% or 6% chance of being female. So, with 100 such people, 5 or 6 seems a reasonable total. But the <em>expected value</em> from <code><a href="https://mc-stan.org/rstanarm/reference/posterior_linpred.stanreg.html">posterior_epred()</a></code>, although it does provide a sense of where the center of the predictive distribution will be, does not tell us much about the range of possible outcomes. For that, we need <code><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict()</a></code>.</p>
 </div>
 <div id="summary-7" class="section level2" number="7.6">
@@ -1396,9 +1935,15 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
       <ul class="nav navbar-nav">
 <li><a class="nav-link" href="#two-parameters"><span class="header-section-number">7</span> Two Parameters</a></li>
 <li>
-<a class="nav-link" href="#wisdom-1"><span class="header-section-number">7.1</span> Wisdom</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#eda-for-nhanes"><span class="header-section-number">7.1.1</span> EDA for nhanes</a></li></ul>
+<a class="nav-link" href="#wisdom-1"><span class="header-section-number">7.1</span> Wisdom</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#ideal-preceptor-table"><span class="header-section-number">7.1.1</span> Ideal Preceptor Table</a></li>
+<li><a class="nav-link" href="#eda-for-nhanes"><span class="header-section-number">7.1.2</span> EDA for nhanes</a></li>
+<li><a class="nav-link" href="#population"><span class="header-section-number">7.1.3</span> Population</a></li>
+</ul>
 </li>
-<li><a class="nav-link" href="#justice-1"><span class="header-section-number">7.2</span> Justice</a></li>
+<li>
+<a class="nav-link" href="#justice-1"><span class="header-section-number">7.2</span> Justice</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#the-population-table"><span class="header-section-number">7.2.1</span> The Population Table</a></li></ul>
+</li>
 <li><a class="nav-link" href="#courage-1"><span class="header-section-number">7.3</span> Courage</a></li>
 <li>
 <a class="nav-link" href="#temperance-1"><span class="header-section-number">7.4</span> Temperance</a><ul class="nav navbar-nav">
@@ -1406,6 +1951,7 @@ In this case, the <em>outcome</em> is the height of an individual male. This var
 <li><a class="nav-link" href="#question-2"><span class="header-section-number">7.4.2</span> Question 2</a></li>
 <li><a class="nav-link" href="#question-3"><span class="header-section-number">7.4.3</span> Question 3</a></li>
 <li><a class="nav-link" href="#question-4"><span class="header-section-number">7.4.4</span> Question 4</a></li>
+<li><a class="nav-link" href="#three-levels-of-knowledge"><span class="header-section-number">7.4.5</span> Three Levels of Knowledge</a></li>
 </ul>
 </li>
 <li><a class="nav-link" href="#zero-one-outcomes"><span class="header-section-number">7.5</span> 0/1 Outcomes</a></li>
