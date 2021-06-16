@@ -43,6 +43,8 @@ gap_p
 
 Once you have read this chapter, and completed the associated tutorials, you will be able to create graphics like this one with your data. Join us on the journey.
 
+<!-- HL: is it possible to fix the graph? the subtitle overlapping with the title isn't great aesthetically and also probably isn't the best "hey look pretty graphs" appeal -->
+
 
 ## Getting Started
 
@@ -75,6 +77,7 @@ Then, run `library(tidyverse)` once again.
 Unlike other statistical software programs like Excel, SPSS, or Minitab that provide [point-and-click](https://en.wikipedia.org/wiki/Point_and_click) interfaces, R is an [interpreted language](https://en.wikipedia.org/wiki/Interpreted_language). This means you have to type in commands written in *R code*. In other words, you have to code/program in R. We use the terms "coding" and "programming" interchangeably.
 
 <!-- DK: This is awkward. When are we teaching about R Markdown? -->
+<!-- HL: we could probably just skip the whole "this isn't like Excel" and just say "we'll be teaching you the coding language R, it's a language like python or javascript" and then move on -->
 
 If you want a slower introduction than we are providing here, check out the short book, [*Getting Used to R, RStudio, and R Markdown*](https://rbasics.netlify.com/). @usedtor2016 include screencast recordings that you can follow along and pause as you learn. They include an introduction to R Markdown, a tool used for reproducible research in R.
 
@@ -109,6 +112,8 @@ x
 
 * *Data types*: integers, doubles/numerics, logicals, and characters. Integers are values like -1, 0, 2, 4092. Doubles or numerics are a larger set of values containing both the integers but also fractions and decimal values like -24.932 and 0.8. Logicals are either `TRUE` or `FALSE`. Characters are text like "cabbage", "Hamilton", or "The Wire is the greatest TV show ever." Characters are often denoted with the quotation marks around them.
 
+<!-- HL: could we maybe separate this into individual bullet points explaining each one? it looks rather crowded just shoved under the "data types" header -->
+
 * *Vectors*: a collection of values. These are created using the `c()` function, where the `c` stands for **c**ombine. 
 
 For example, `c(2, 4, 6, 8)` creates a four element vector of numeric values.
@@ -120,7 +125,11 @@ c(1, 2, 3, 4)
 
 * *Factors*: used to represent "categorical data." We will go into detail about these and other variable types in Chapter \@ref(wrangling).
 
+<!-- HL: i think we could probably explain factors and categorical data more, even after reading wrangling I'm still somewhat unsure what it means and it might be good to have a more in-depth explanation here for those of us who aren't super familiar with data terms -->
+
 * *Data frames*: rectangular arrangements of data. Think of a [spreadsheet](https://en.wikipedia.org/wiki/Spreadsheet). Rows correspond to *units*. Columns correspond to *variables*. Modern data frames are called *tibbles*.  
+
+<!-- HL: I think it's somewhat unclear what "modern data frame" means, maybe elaborate? -->
 
 * *Boolean algebra*: `TRUE/FALSE` statements and mathematical operators such as `<` (less than), `<=` (less than or equal to), and `!=` (not equal to). For example, `4 + 2 >= 3` will return `TRUE`, but `3 + 5 <= 1` will return `FALSE`. 
 
@@ -194,6 +203,8 @@ Run `view(trains)` in the Console in RStudio, either by typing it or cutting-and
 
 `view()` allows us to explore the different variables listed in the columns. Observe that there are many different types of variables.  Some of the variables are *quantitative*. These variables are numerical in nature.  Other variables here, including `gender` and  `treatment`, are *categorical*.
 
+<!-- HL: can we explain the difference between categorical and quantitative variables? -->
+
 
 #### `glimpse()`
 
@@ -206,6 +217,8 @@ glimpse(trains)
 We see the first few values for each variable in a row after the variable name.  In addition, the *data type* of the variable is given immediately after each variable's name, inside `< >`. 
 
 `dbl` refers to "double", which is computer terminology for quantitative/numerical variables. `int` is for  "integer." `fct` is refers to a "factor," a variable that is "nominal," meaning a member of a smallish number of categories. `chr` is for character data.
+
+<!-- HL: the definitions for these terms feel sort of all over the place, maybe the terms + the abbreviations R uses should just all be in the glossary so people have one place to reference when they're confused -->
 
 
 #### `$` operator
@@ -319,6 +332,8 @@ ggplot(data = trains,
 
 The problem with this display is "overplotting." Because attitudes are measured as integers, we do not not know if a given point represents just one person or a dozen. There are two methods we can use to address overplotting: transparency and jitter.
 
+<!-- HL: provide a more concrete definition of what overplotting is + why that's bad for visual representation of data? -->
+
 **Method 1: Changing the transparency**
 
 We can change the transparency/opacity of the points by using the `alpha` argument within `geom_point()`. The `alpha` argument can be set to any value between `0` and `1`, where `0` sets the points to be 100% transparent and `1` sets the points to be 100% opaque. By default, `alpha` is set to `1`. 
@@ -343,6 +358,8 @@ Note that there is no `aes()` surrounding `alpha = 0.2`. This is because we are 
 
 We can also decide to jitter the points on the plot. We do this by replacing `geom_point()` with `geom_jitter()`. Keep in mind that jittering is strictly a visualization tool; even after creating a jittered scatterplot, the original values saved in the data frame remain unchanged. 
 
+<!-- HL: maybe add a concrete definition of what jittering is? it's sort of implied in the paragraph below but maybe defining it specifically would be good -->
+
 In order to specify how much jitter to add, we use the `width` and `height` arguments to `geom_jitter()`. This corresponds to how hard you'd like to shake the plot in horizontal x-axis units and vertical y-axis units, respectively. It is important to add just enough jitter to break any overlap in points, but not to the extent where you alter the original pattern in points.
 
 ```{r}
@@ -362,6 +379,8 @@ When deciding whether to jitter a scatterplot or use the `alpha` argument to `ge
 ### `geom_line()`
 
 Linegraphs show the relationship between two numerical variables when the variable on the x-axis, also called the *explanatory* or *predictive* variable, is of a sequential nature. In other words, there is an inherent ordering to the variable. 
+
+<!-- HL: maybe it's just a Canadian thing, but I think a decent amount of high schoolers are taught that it's called the dependent/independent variable? would that be good to include so hs students can relate to terms they learned in stat class? or is this something different -->
 
 ```{r, echo = FALSE}
 knitr::include_graphics("https://imgs.xkcd.com/comics/decline.png")
@@ -395,6 +414,8 @@ A histogram is a plot that visualizes the *distribution* of a numerical value.
 1. We first cut up the x-axis into a series of *bins*, where each bin represents a range of values. 
 1. For each bin, we count the number of observations that fall in the range corresponding to that bin.
 1. We draw a bar whose height indicates the corresponding count.
+
+<!-- HL: I feel like this stuff below about you not needing to specify the arguments is sort of randomly dropped in the middle here, maybe this could be added to an "additional info" section at the bottom? isn't really crucial to the lesson after all -->
 
 Let's consider the `income` variable from the the `trains` tibble. Pay attention to how we have changed the two arguments to `ggplot()`. We have removed `data = ` and `mapping = `. The code still works because R functions allow for passing in arguments by *position*. The first argument to `ggplot()` is the `data`. We don't need to tell R that `trains` is the value for `data`. R assumes that it is because we passed it in as the first argument. Similarly, the second argument to `ggplot()` is `mapping`, so R assumes that `aes(x = income)` is the value we want for `mapping` because it is the second item passed in.
 
@@ -449,6 +470,8 @@ We can also adjust the number of bins in our histogram in one of two ways:
 
 2. By adjusting the width of the bins via the `binwidth` argument to `geom_histogram()`. 
 
+<!-- HL: give an example of the binwidth argument and how to use it? -->
+
 In this data, however, there are not many unique values for `income`, so neither approach will have much effect. Replace `income` with `age` if you want to experiment with these options.
 
 
@@ -466,6 +489,8 @@ ggplot(data = trains,
 
 `geom_col()` is very similar to `geom_bar()`, except that `geom_col()` requires you to calculate the number of observations in each category ahead of time. `geom_bar()` does the calculation for you.
 
+<!-- HL: could we elaborate on geom_col() more? give it its own mini section bc I think it's distinct enough and people might not understand why you need to use geom_col if it's so similar to geom_bar -->
+
 
 #### No pie charts!
 
@@ -475,6 +500,8 @@ One of the most common plots used to visualize the distribution of categorical d
 #### Two categorical variables
 
 Another use of barplots is to visualize the *joint* distribution of two categorical variables. Let's look at `race`, as well as `treatment`, in the `trains` data by using the `fill` argument inside the `aes()` aesthetic mapping. Recall the `fill` aesthetic corresponds to the color used to fill the bars.
+
+<!-- HL: define what joint distribution means? -->
 
 ```{r}
 ggplot(trains, 
@@ -534,6 +561,8 @@ Note the message. R is telling us that we need to specify the `method` and `form
 
 Let's add the argument `method = "lm"`, where "lm" stands for **l**inear **m**odel. This causes the fitted line to be straight rather than curved. Let's also add the argument `formula = y ~ x`. This makes both messages go away. Again, R was not giving us an error before. It was simply telling us what options it was using since we did not specify the options ourselves.
 
+<!-- HL: should we explain why we make the argument formula = y~x? -->
+
 *Always include enough detail in your code to make those messages disappear.*
 
 ```{r}
@@ -584,6 +613,8 @@ The values on the y-axis are scaled so that the total area under the curve equal
 
 <!-- DK: Other stuff to finish this section with? -->
 
+<!-- HL: could we just list other uncommonly used geom functions that people have the option of using if they want to and point them to another resource that they can learn from if they want? -->
+
 
 ## The Tidyverse
 
@@ -609,6 +640,8 @@ We can't use all the beautiful plots that we learned in the previous chapter unt
 ### The pipe operator: `%>%`
 
 The pipe operator (`%>%`) allows us to combine multiple operations in R into a single sequential *chain* of actions. Much like how the `+` sign has to come at the end of the line when constructing plots --- because we are building the plot layer-by-layer --- the pipe operator `%>%` has to come at the end of the line because we are building a data wrangling pipeline step-by-step.
+
+<!-- HL: could maybe include smth like "The pipe operator tells R to go to the next step. If you don't include the pipe operator, R assumes the next command has nothing to do with the changes you made before and you'll get an error"  -->
 
 
 ### `filter()` rows
@@ -814,6 +847,8 @@ trains %>%
 
 Another function similar to `ifelse()`, is `dplyr::case_when()`. `case_when()` is particularly useful inside mutate when you want to create a new variable that relies on a complex combination of existing variables. Note that there is a different version of `ifelse()` in **dplyr**: `if_else()`. This works exactly the same as the standard version but is somewhat more robust. 
 
+<!-- HL: what does somewhat more robust mean, also why do we teach ifelse() first if if_else() is the "robust" version and presumably if it's stronger it's the one people should use? -->
+
 <!-- DK: More details? -->
 
 
@@ -839,8 +874,11 @@ trains %>%
 
 The `mean()` and `sd()` summary functions go inside the `summarize()`  function. The `summarize()` function takes in a tibble and returns a tibbles with only one row corresponding to the summary statistics. Remember: Tibbles go in and tibble come out.
 
+<!-- HL: can we specify why we're assigned mean(age) to mn_age? just to clarify that it gives them proper column headings -->
 
 ### Statistics for distributions
+
+<!-- HL: should we include this at the beginning? up with terminology and such. We use means and summarize before we actually introduce what they mean, so it feels a little out of place to be introducing them after we've used them already -->
 
 A variable in a tibble is a column, a vector of values. We sometimes refer to this vector as a "distribution." This is somewhat sloppy in that a distribution can be many things, most commonly a mathematical formula. But, strictly speaking, a "frequency distribution" or an "empirical distribution" is a list of values, so this usage is not unreasonable.
 
@@ -889,6 +927,8 @@ The *quantile* of a distribution is the value of that distribution which occupie
 
 The 5th percentile distribution is the point below which 5% of the data falls. The 95th percentile is, similarly, the point below which 95% of the data falls. The 50th percentile, the median, splits the data into two separate, and equal, parts. The minimum is at the 0th percentile. The maximum is at the 100th percentile.
 
+<!-- HL: it's kinda unclear what the relationship between this paragraph and quantiles is? Also I sort of think the definition of quantile is rather wordy and not super clear -->
+
 Let's take a look at the `poverty` variable in the `kenya` tibble from the **primer.data** package. `poverty` is the percentage of residents in each community with incomes below the poverty line. Let's first confirm that  `quantile()` works by comparing its output with that from simpler functions.
 
 ```{r}
@@ -929,6 +969,8 @@ kenya %>%
 These intervals are similar to each other and similar to the 95% interval calculated above. The match is only roughly true, but it is good enough for most applied work.
 
 If there is an `NA` value in the variable, any statistical function like `mean()` will return `NA`. You can fix this by using `na.rm = TRUE` with the statistical function.
+
+<!-- HL: can we give an example of using na.rm = TRUE? -->
 
 <!-- DK: Might make a nice looking plot. -->
 
@@ -1059,6 +1101,8 @@ ggplot(data = gapminder_filt,
 
 It is difficult to compare the continents despite the colors. It would be much easier if we could "split" this scatterplot by the 4 continents. In other words, we would create plots of `gdpPercap` and `lifeExp` for each `continent` separately. We do this by using the function `facet_wrap()` with the argument `~ continent`.
 
+<!-- HL: I feel like we should highlight the fact you need a squiggly thing (what is that called) in front of the name bc I forgot it several times while I was trying to use facet_wrap -->
+
 ```{r}
 ggplot(data = gapminder_filt, 
        mapping = aes(x = gdpPercap, 
@@ -1097,6 +1141,8 @@ ggplot(data = gapminder,
 ```
 
 Recall that the y-aesthetic of a histogram --- the count of the observations in each bin --- gets computed automatically. We can use the  `after_stat()` argument within `geom_histogram()` to generate percent values as our y-aesthetic. 
+
+<!-- HL: should probably explain what after_stat does -->
 
 
 ```{r}
@@ -1308,6 +1354,8 @@ gap_p
 ```
 
 You now know enough to make plots like this by yourself.
+
+<!-- HL: maybe we should just leave a link to other areas of the primer where they can explore the annimate and plotly stuff? feels sort of wrong to just leave it dangling here and then not explain it. Maybe we can include the pretty graphs as a teaser and then redirect them to where they should actually learn about it bc the code feels awkwardly plopped here -->
 
 It is important to know that we have only seen a small part of what R offers. For example, we can use the **gganimate** package to bring a slightly modified version of our gapminder plot to life:
 
