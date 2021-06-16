@@ -10,7 +10,7 @@
 
 <!-- Move paths section to tools.Rmd. -->
 
-<!-- Explain that parsing failure is designed to be a failure. -->
+<!-- Explain that parsing failure is designed to be a failure. DONE -->
 
 
 Start by loading the packages which we will need in this chapter.
@@ -21,56 +21,14 @@ Start by loading the packages which we will need in this chapter.
 library(tidyverse)
 library(primer.data)
 library(lubridate)
+library(dbplyr)
 library(janitor)
 library(skimr)
 ```
 
-
-<!-- DK: Move this section to tools.Rmd. -->
-
-## Absolute and relative file paths
-
-When you read data into R, you first need to tell R where that data lives. Most times, the data will be in a file. The file could live on your computer (local) or somewhere on the internet (remote). 
-
-The place where the file lives on your computer is called the "path". You can think of the path as directions to the file. The path includes both the location of the file and the name of the file itself. There are two kinds of paths: relative and absolute. A *relative* path describes the location of the file relative to where you currently are on the computer. An *absolute* path is where the file is in respect to the base (or root) folder of the computer's filesystem. Absolute paths always start with a forward slash, a "/". 
-
-Consider a file called `report.csv`. Read the file using a relative path:
-
-```
-x <- read_csv("data/report.csv")
-```
-
-Read `report.csv` using an absolute path:
-
-```
-x <- read_csv("/home/preceptor/desktop/projects/data/report.csv")
-```
-
-To ensure your code can be run on a different computer, you should use relative paths. An added bonus is that it's also less typing! This is because the absolute path of a file (the names of folders between the computer's root `/` and the file) isn't usually the same across different computers. For example, suppose Fatima and Jayden are working on a project together on the `report.csv` data. Fatima's file is stored at 
-
-`/home/Fatima/files/report.csv`, 
-
-while Jayden's is stored at 
-
-`/home/Jayden/files/report.csv`.
- 
-Even though Fatima and Jayden stored their files in the same place on their computers, the absolute paths are different due to their different usernames. If Jayden has code that loads the `report.csv` data using an absolute path, the code won't work on Fatima's computer. But the relative path from inside the `files` folder (`files/report.csv`) is the same on both computers; any code that uses relative paths will work on both!
-
-<!-- Include a section about how you're supposed to put \ whenever there's a space, since 90% of people will have a space in their file name. However, because we don't have a section about it, we get a lot of confusion about why somebody's thing isn't working. -->
-
-<!-- DK: Video includes a bunch of good stuff, like ~, ., .., and /. All that should be mentioned here and connected to the terminal tutorial. -->
-
-See this video for another explanation: 
-
-<iframe width="840" height="473" src="https://www.youtube.com/embed/ephId3mYu9o" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-*Source: [Udacity course "Linux Command Line Basics"](https://www.udacity.com/course/linux-command-line-basics--ud595)*
-
-
 ## Writing and Reading Files
 
-Getting data into and out of R is a major part of any real world data science project. 
-
+Getting data into and out of R is a major part of any real world data science project. There are multiple data formats that you use to transport this data, each with their own positives and negatives.
 
 ### CSV files
 
@@ -82,9 +40,25 @@ Use `write_csv()` to save a tibble to a csv file. `write_csv()` has two main arg
 
 Use `read_csv()` from the **readr** package --- which is one of the main packages within the **tidyverse** collection of packages --- to load the data into R.
 
-Consider the following csv file: `test_2.csv`. We set `file_1` to be the full path to `test_2.csv`'s location on the web.
+Consider the following csv file: `test_2.csv`. 
 
-<!-- This looks really ugly on the actual website because we have parsing failures just out in the open. It looks like a column vs rowwise parsing failure, and it's really confusing if you see this kind of junk. -->
+<!-- This looks really ugly on the actual website because we have parsing failures just out in the open. It looks like a column vs rowwise parsing failure, and it's really confusing if you see this kind of junk. Fixed by AG. -->
+
+Here's what `test_2.csv` looks like as a text file:
+
+```{r, echo = FALSE}
+# I made it so that it doesn\'t show this line of code 
+# This is so it doesn't confuse the readers
+# And it lines up with the introduction that I used without looking weird
+# We set `file_1` to be the full path to `test_2.csv`'s location on the web.
+file_1 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/test_2.csv"
+  
+readLines(file_1)
+```
+
+As you can see, there is text at the top of this file. Often times information about how data was collected, or other relevant information, is included at the top of the data file. However, `read_csv()` can't differentiate between this text and the data that we want to read, causing it to fail.
+
+<!-- AG: I'm debating whether I should hide the message by using message = FALSE in this line. On one hand, it's easier to understand within the text, on the other people are going to start panicking when they see a message that wasn't in the primer. I'm not hiding it for now because people panicking is a lot worse than people understanding.-->
 
 ```{r}
 file_1 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/test_2.csv"
@@ -92,16 +66,15 @@ file_1 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/
 read_csv(file_1)
 ```
 
-As you can see, there is text at the top of this file. Often times information about how data was collected, or other relevant information, is included at the top of the data file. This use of `read_csv()` obviously fails to read in the data correctly.
-
-We can use the `skip` argument to skip the text lines.
+We can use the `skip` argument to skip the first 2 text lines and allow `read_csv()` to work.
 
 ```{r}
 read_csv(file = file_1,
          skip = 2)
 ```
 
-Do you see the column specification message? As of now, R "guesses" an appropriate data type for each of the columns. To get rid of this message, we use the `col_types()` argument and specify the data types.
+Now that we've gotten rid of the warnings, let's look at the other message R sends us, the column specification message. 
+As of now, R "guesses" an appropriate data type for each of the columns. To get rid of this message, we use the `col_types()` argument and specify the data types.
 
 ```{r}
 read_csv(file = file_1,
@@ -114,11 +87,35 @@ read_csv(file = file_1,
 
 <!-- DK: Need a better discussion of col_types. -->
 
+
+
 When our tabular data comes in a different format, we can use the `read_delim()` function instead. For example, a different version of `test_2.csv` could exist that has no column names and uses tabs as the delimiter instead of commas.
 
-<!-- This needs an example, it's weird if we just have the text open like this. -->
+<!-- This needs an example, it's weird if we just have the text open like this. Fixed - AG -->
+Here's another file named `delim_1`, which uses the `|` to separate the lines instead of a `,` like a normal CSV file.
 
-With `read_delim()`, we specify the first argument as the path to the file, as done with `read_csv()`. Then we provide values to the `delim` argument (could be a tab, which we represent by "\\t").
+```{r, echo = FALSE}
+delim_1 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/delim_1.txt"
+
+readLines(delim_1)
+```
+
+With `read_delim()`, we specify the first argument as the path to the file, as done with `read_csv()`. Then we provide values to the `delim` argument to have the code use `|` as the separator instead of the `,`.
+
+```{r}
+# Because delim_1 uses pipes to separate values, 
+# we can just use that as our delim value.
+# However, for more complex symbols like tab, 
+# we use something different like "\\t"
+# This varies for every symbol, but you can 
+# find most delim values on the internet.
+
+delim_1 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/delim_1.txt"
+
+read_delim(delim_1, delim = "|", col_types = cols(population = col_double(),
+                                                  town = col_character()))
+```
+Both CSV files and their text counterparts are easily transferable between computers and programming languages, but due to their simple nature CSV files are only able to move basic data and only as text values. They also have poor support for special characters like commas, which create a column and end up breaking the table in the end.
 
 ### Excel Files
 
@@ -128,7 +125,7 @@ In order to write excel files you have to install complex packages, and they are
 
 Reading Excel files is easy. To do so, we use the `read_excel()` function from the **readxl** package.
 
-<!-- Add mode = "wb". I got this fix from https://github.com/tidyverse/readxl/issues/374#issuecomment-336597554. You may want to include this, especially since people are just going to copy-paste it into their own PCs to test it out. My PC is a Windows 64-bit if it matters. Additionally, shouldn't the commented portion be out with the rest of the text? I feel like it's pretty important, especially with the "we cannot read". The tempdir() part is also very confusing if you don't have an example as a companion. Agreed! -->
+<!-- Add mode = "wb". I got this fix from https://github.com/tidyverse/readxl/issues/374#issuecomment-336597554. You may want to include this, especially since people are just going to copy-paste it into their own PCs to test it out. My PC is a Windows 64-bit if it matters. Additionally, shouldn't the commented portion be out with the rest of the text? I feel like it's pretty important, especially with the "we cannot read". The tempdir() part is also very confusing if you don't have an example as a companion. Agreed! Fixed- AG.-->
 
 ```{r}
 library(readxl)
@@ -138,17 +135,18 @@ library(readxl)
 # directory. Note that the "proper" way of handling this would be to create a
 # temp directory with tempdir(), download the file into that directory, read it,
 # and then delete the temp directory. That way, you would not have random
-# downloaed files hanging around.
-
+# downloaded files hanging around.
+# The mode = "wb" is a necessary addition for Windows users because Windows is
+# weird. It's not necessary on MacOS and may cause an error as well.
 download.file(url = "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/excel_1.xlsx", 
-              destfile = "example_excel.xlsx")
+              destfile = "example_excel.xlsx", mode = "wb")
 
 
 read_excel(path = "example_excel.xlsx")
 ```
 
 ```{r, include = FALSE}
-# Just doing this to clean up the downlaoded file so that Git does not ask me
+# Just doing this to clean up the downloaded file so that Git does not ask me
 # about it each time I build the book. Maybe we should be transparent and
 # include this code above, like we did with download.file(). (Or maybe we should
 # hide download.file() as well!) But this seems OK for now.
@@ -163,18 +161,65 @@ If the .xlsx file has multiple sheets, you have to use the sheet argument to spe
 
 ### RDS
 
-<!-- This is very undescriptive, and since people are unfamiliar with .rds files they may not understand fully. Maybe a sentence like "These files are much more efficient when loading the data back into R and keeps R-specific information such as variable types and attributes." It might also be worth putting in a section about .Rdata files, which allow you to save multiple R objects. So fix it! -->
+<!-- This is very undescriptive, and since people are unfamiliar with .rds files they may not understand fully. Maybe a sentence like "These files are much more efficient when loading the data back into R and keeps R-specific information such as variable types and attributes." It might also be worth putting in a section about .Rdata files, which allow you to save multiple R objects. So fix it! Fixed - AG-->
 
-rds files store a single R object within a file. 
+One very important aspect of R is saving objects into rds files, which store a single R object into a file.
+These files allow us to save R objects such as plots and tibbles into R and then reload the object that it contains later without re-running the code that made it.
+This is especially useful for when you're dealing with bulk data and want to save the plot that comes with it for later.
+With a rds file, you save the entire object, allowing you to do more things with it later without having to go through all of the code.
 
-When we save to a rds file, we use the function `write_rds()`. Just like `write_csv()`, this function has two main arguments: `x` and `file`.  The `x` argument is the data set that you want to save. The `file` argument is the file path where you want to save the file. The end of the path argument is the name that you want to use for the file. 
+Take the following R object, a graph of the `iris` data set.
+
+```{r}
+iris_p <- iris %>% 
+  ggplot(aes(x = Sepal.Length, y = Sepal.Width)) +
+  geom_jitter() +
+  labs(title = "Sepal Dimensions of Various Species of Iris",
+       x = "Sepal Length",
+       y = "Sepal Width")
+iris_p
+```
+
+When we save to a rds file, we use the function `write_rds()`. Just like `write_csv()`, this function has two main arguments: `x` and `file`.  The `x` argument is the object that you want to save. The `file` argument is the file path where you want to save the file. The end of the path argument is the name that you want to use for the file.
+
+<!-- AG: I've noticed that we never really write any information into the textbook, 
+however I'm demonstrating reading and writing from an rds file. This may not be good
+practice, so I'm commenting out all of the code that involves it but leaving it in for 
+future revision. -->
+
+```{r}
+# Technically, it's incorrect to save a ggplot plot as a rds file because it has
+# no real benefit. It still just acts as a plot and restricts the user to only
+# using ggplot functions. It's more practical to save the data set itself.
+# We're using a graph here to better show how the rds file is unique from other
+# data formats like CSV files.
+
+# write_rds(x = iris_p, file = "iris_p.rds")
+```
 
 `read_rds()` reads the file back into R. Just like `read_csv()` `read_rds()` has one main argument, which is the path to the file that you are wanting to read into R.
 
 ```{r}
-# need example here
+# read_rds(file = "iris_p.rds")
 ```
 
+We can then use that R object in more operations, such as adding a trend line.
+
+```{r}
+# iris_p <- read_rds(file = "iris_p.rds")
+iris_p + 
+  geom_smooth(method = "loess",
+              formula = y ~ x,
+              se = FALSE)
+```
+
+By saving the `iris_p` plot in a rds file, we eliminate the time needed to calculate and generate that plot again because we can use the saved information. We can then use the object by reading the file back into r and using it like any normal plot, adding new layers and doing new operations.
+
+```{r, include = FALSE}
+# file.remove("iris_p.rds")
+```
+
+There are also Rdata files which can store multiple objects.
 
 ### JSON
 
@@ -227,50 +272,52 @@ SQLite is probably the simplest relational database that one can use in combinat
 
 The first thing you need to do to read data into R from a database is to connect to the database. We do that using `dbConnect()` function from the **DBI** (database interface) package. This does not read in the data, but simply tells R where the database is and opens up a communication channel.
 
-<!-- Why is all of this code commented out? This passage is incomprehensible without it. Because this whole section sucks! Get this to work. -->
+<!-- Why is all of this code commented out? This passage is incomprehensible without it. Because this whole section sucks! Get this to work. Fixed - AG -->
 
+```{r}
+library(DBI)
+library(RSQLite)
+download.file(url = "https://github.com/PPBDS/primer/blob/master/03-data/data/can_lang.db?raw=true",
+              destfile = "example_db.db", mode = "wb")
 
-<!-- ```{r, eval = FALSE} -->
-<!-- library(DBI) -->
-
-<!-- con_lang_data <- dbConnect(RSQLite::SQLite(), "data/can_lang.db") -->
-<!-- ``` -->
-
+con_lang_data <- dbConnect(RSQLite::SQLite(), "example_db.db")
+```
 
 Often relational databases have many tables, and their power comes from the useful ways they can be joined. Thus anytime you want to access data from a relational database, you need to know the table names. You can get the names of all the tables in the database using `dbListTables()`.
 
-<!-- ```{r} -->
-<!-- tables <- dbListTables(con_lang_data) -->
-<!-- tables -->
-<!-- ``` -->
+```{r, con_lang_data}
+library(DBI)
+library(RSQLite)
+tables <- dbListTables(con_lang_data)
+tables
+```
 
 We only get one table name returned,  which tells us that there is only one table in this database. To reference a table in the database to do things like select columns and filter rows, we use the `tbl()` function from the **dbplyr** package. The package **dbplyr** allows us to work with data stored in databases as if they were local data frames, which is useful because we can do a lot with big datasets without actually having to bring these vast amounts of data into your computer! 
 
-<!-- ```{r} -->
-<!-- library(dbplyr) -->
-<!-- lang_db <- tbl(con_lang_data, "lang") -->
-<!-- lang_db -->
-<!-- ``` -->
+```{r}
+lang_db <- tbl(con_lang_data, "lang")
+lang_db
+```
 
 Although it looks like we just got a data frame from the database, we didn't! It's a *reference*, showing us data that is still in the SQLite database (note the first two lines of the output). It does this because databases are often more efficient at selecting, filtering and joining large data sets than R. And typically, the database will not even be stored on your computer, but rather a more powerful machine somewhere on the web. So R is lazy and waits to bring this data into memory until you explicitly tell it. To do so, we use the `collect()` function. 
 
 Here we will filter for only rows in the Aboriginal languages category according to the 2016 Canada Census, and then use `collect()` to finally bring this data into R as a data frame. 
 
-<!-- ```{r} -->
-<!-- aboriginal_lang_db <- filter(lang_db, category == "Aboriginal languages") -->
-<!-- aboriginal_lang_db -->
-<!-- ``` -->
+```{r}
+aboriginal_lang_db <- filter(lang_db, category == "Aboriginal languages")
+aboriginal_lang_db
+```
 
-<!-- ```{r} -->
-<!-- aboriginal_lang_data <- collect(aboriginal_lang_db) -->
-<!-- aboriginal_lang_data -->
-<!-- ``` -->
+```{r}
+aboriginal_lang_data <- collect(aboriginal_lang_db)
+aboriginal_lang_data
+```
 
 Why bother to use the `collect()` function? The data looks pretty similar in both outputs shown above. And **dbplyr** provides lots of functions similar to `filter()` that you can use to directly feed the database reference (i.e. what `tbl()` gives you) into downstream analysis functions (e.g., `ggplot2` for data visualization and `lm` for linear regression modeling). However, this does not work in every case; look what happens when we try to use `nrow` to count rows in a data frame:
 
-<!-- ```{r} -->
-<!-- nrow(aboriginal_lang_db) -->
-<!-- ``` -->
+```{r}
+nrow(aboriginal_lang_db)
+```
 
 or `tail` to preview the last 6 rows of a data frame:
 
@@ -280,6 +327,16 @@ tail(aboriginal_lang_db)
 ```
 ## Error: tail() is not supported by sql sources
 ```
+
+In order to delete and stop using an SQLite server, you need to first disconnect the file from the connection be using `dbDisconnect()` and passing in the connection object as an argument. You can then safely delete the database file from your computer by using `file.remove()`.
+
+```{r, results = "hide"}
+library(DBI)
+library(RSQLite)
+dbDisconnect(con_lang_data)
+file.remove("example_db.db")
+```
+
 Additionally, some operations will not work to extract columns or single values from the reference given by the `tbl` function. Thus, once you have finished your data wrangling of the `tbl()` database reference object, it is advisable to bring it into your local machine's memory using `collect()` as a data frame. 
 
 > Warning: Usually, databases are very big! Reading the object into your local machine may give an error or take a lot of time to run so be careful if you plan to do this! 
@@ -298,6 +355,7 @@ PostgreSQL (also called Postgres) is a very popular and open-source option for r
 Additionally, we must use the **RPostgres** package instead of **RSQLite** in the `dbConnect()` function call. Below we demonstrate how to connect to a version of the `can_mov_db` database, which contains information about Canadian movies (*note - this is a synthetic, or artificial, database*).
 
 <!-- I think this database is broken. When I tried to run it, it gave me a Connection timed out error. So what should we do? -->
+<!-- AG: This is likely because we were previously pulling from a dead server. We may need to choose a different database, but I'm not sure which one to choose. I'm leaning towards an Amazon or Google database, but there are test databases like the Pagila test database. -->
 
 ```
 library(RPostgres)
@@ -414,7 +472,7 @@ In the first part of this chapter, we learned how to read in data from plain tex
 
 ### HTML and CSS selectors
 
-<!-- AG: I realize that there's probably been a lot of work put into this, but if we're not allowed to web scrape off Craigslist why bother using it as an example? Just use Wikipedia as the example and show how the TOS differ. -->
+<!-- AG: I'm thinking of just using Wikipedia as the example and show how the TOS differs from Craigslist to show whether something is legal or not. This is fine too, and it actually has some advantages as well. -->
 
 Before we jump into scraping, let's learn a little bit about what the "source code" of a website looks like. Say we are interested in knowing the average rental price (per square footage) of the most recently available one-bedroom apartments in Vancouver from https://vancouver.craigslist.org. When we visit the Vancouver Craigslist website and search for one-bedroom apartments, this is what we are shown:
 

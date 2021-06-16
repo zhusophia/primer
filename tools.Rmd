@@ -24,6 +24,7 @@
 
 The chapter will be broken into the following sections. Read whichever ones are relevant.
 
+* [Absolute and relative file paths](#absolute-and-relative-file-paths)
 * [Working with the terminal](#working-with-the-terminal)
 * [Git, GitHub, and RStudio](#git-github-and-rstudio)
 * [PDF](#pdf)
@@ -32,12 +33,66 @@ The chapter will be broken into the following sections. Read whichever ones are 
 * [How to get help](#how-to-get-help)
 * [How to make a table](#how-to-make-a-table)
 
+## Absolute and relative file paths
+
+<!-- DK: Move this section to tools.Rmd. -->
+<!-- AG: I added this as another section because it's important enough to stand on its own. This also serves as a great way to introduce the Terminal.-->
+
+When you read data into R, you first need to tell R where that data lives. Most times, the data will be in a file. The file could live on your computer (local) or somewhere on the internet (remote). 
+
+The place where the file lives on your computer is called the "path". You can think of the path as directions to the file. The path includes both the location of the file and the name of the file itself. There are two kinds of paths: relative and absolute. A *relative* path describes the location of the file relative to where you currently are on the computer. An *absolute* path is where the file is in respect to the base (or root) folder of the computer's filesystem. Absolute paths always start with a forward slash, a "/". 
+
+Consider a file called `report.csv`. Read the file using a relative path:
+
+```
+x <- read_csv("data/report.csv")
+```
+
+Read `report.csv` using an absolute path:
+
+```
+x <- read_csv("/home/preceptor/desktop/projects/data/report.csv")
+```
+
+To ensure your code can be run on a different computer, you should use relative paths. An added bonus is that it's also less typing! This is because the absolute path of a file (the names of folders between the computer's root `/` and the file) isn't usually the same across different computers. For example, suppose Fatima and Jayden are working on a project together on the `report.csv` data. Fatima's file is stored at 
+
+`/home/Fatima/files/report.csv`, 
+
+while Jayden's is stored at 
+
+`/home/Jayden/files/report.csv`.
+ 
+Even though Fatima and Jayden stored their files in the same place on their computers, the absolute paths are different due to their different usernames. If Jayden has code that loads the `report.csv` data using an absolute path, the code won't work on Fatima's computer. But the relative path from inside the `files` folder (`files/report.csv`) is the same on both computers; any code that uses relative paths will work on both!
+
+<!-- Include a section about how you're supposed to put \ whenever there's a space, since 90% of people will have a space in their file name. However, because we don't have a section about it, we get a lot of confusion about why somebody's thing isn't working. Fixed - AG -->
+
+One important part of using paths is recognizing when there are spaces in the file name. For example, trying to use the path
+
+`/home/preceptor/desktop/projects/important data/report.csv`
+
+does not work because it includes a space the file name, with "important data". Instead, the path
+
+`/home/preceptor/desktop/projects/important\ data/report.csv`
+
+is valid and allows you to access the `report.csv` data. This is because the `\` tells the computer to treat the next character only as a character instead of something special. For example, the space character is normally used to show a break in the code, so the computer treats it as a break point whenever it sees a space. However, `\ ` tells the computer that the space isn't a break point and is instead part of the file path, solving the issue.
+
+<!-- DK: Video includes a bunch of good stuff, like ~, ., .., and /. All that should be mentioned here and connected to the terminal tutorial. -->
+
+See this video for another explanation: 
+
+<iframe width="840" height="473" src="https://www.youtube.com/embed/ephId3mYu9o" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+*Source: [Udacity course "Linux Command Line Basics"](https://www.udacity.com/course/linux-command-line-basics--ud595)*
+
+
 ## Working with the terminal {-}
 
 <!-- DK: Could rework everything to use this:  -->
 <!-- https://merely-useful.github.io/py-rse/bash-basics.html -->
 
-The Terminal is a very powerful window because it allows you to interact with your computer's filesystem directly. Let's open up the Terminal tab on the left window and start learning how to use the Terminal.
+The Terminal is a very powerful window because it allows you to interact with your computer's filesystem directly, and it uses file paths to find the files that you want to interact with.
+
+Let's open up the Terminal tab on the left window and start learning how to use the Terminal.
 
 ### `pwd`: Working directory {-}
 
