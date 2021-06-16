@@ -6,6 +6,13 @@
 
 ## Introduction
 
+<!-- TODO: -->
+
+<!-- Move paths section to tools.Rmd. -->
+
+<!-- Explain that parsing failure is designed to be a failure. -->
+
+
 Start by loading the packages which we will need in this chapter.
 
 <!-- DK: Do we need all these packages? Only these packages? -->
@@ -18,6 +25,8 @@ library(janitor)
 library(skimr)
 ```
 
+
+<!-- DK: Move this section to tools.Rmd. -->
 
 ## Absolute and relative file paths
 
@@ -47,7 +56,7 @@ while Jayden's is stored at
  
 Even though Fatima and Jayden stored their files in the same place on their computers, the absolute paths are different due to their different usernames. If Jayden has code that loads the `report.csv` data using an absolute path, the code won't work on Fatima's computer. But the relative path from inside the `files` folder (`files/report.csv`) is the same on both computers; any code that uses relative paths will work on both!
 
-<!-- AG: We may want to include a section about how you're supposed to put \ whenever there's a space, since 90% of people will have a space in their file name. However, because we don't have a section about it, we get a lot of confusion about why somebody's thing isn't working. -->
+<!-- Include a section about how you're supposed to put \ whenever there's a space, since 90% of people will have a space in their file name. However, because we don't have a section about it, we get a lot of confusion about why somebody's thing isn't working. -->
 
 <!-- DK: Video includes a bunch of good stuff, like ~, ., .., and /. All that should be mentioned here and connected to the terminal tutorial. -->
 
@@ -75,7 +84,8 @@ Use `read_csv()` from the **readr** package --- which is one of the main package
 
 Consider the following csv file: `test_2.csv`. We set `file_1` to be the full path to `test_2.csv`'s location on the web.
 
-<!-- AG: This looks really ugly on the actual website because we have parsing failures just out in the open. It looks like a column vs rowwise parsing failure, and it's really confusing if you see this kind of junk. -->
+<!-- This looks really ugly on the actual website because we have parsing failures just out in the open. It looks like a column vs rowwise parsing failure, and it's really confusing if you see this kind of junk. -->
+
 ```{r}
 file_1 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/test_2.csv"
 
@@ -106,7 +116,8 @@ read_csv(file = file_1,
 
 When our tabular data comes in a different format, we can use the `read_delim()` function instead. For example, a different version of `test_2.csv` could exist that has no column names and uses tabs as the delimiter instead of commas.
 
-<!-- AG: This needs an example, it's weird if we just have the text open like this. -->
+<!-- This needs an example, it's weird if we just have the text open like this. -->
+
 With `read_delim()`, we specify the first argument as the path to the file, as done with `read_csv()`. Then we provide values to the `delim` argument (could be a tab, which we represent by "\\t").
 
 ### Excel Files
@@ -117,7 +128,8 @@ In order to write excel files you have to install complex packages, and they are
 
 Reading Excel files is easy. To do so, we use the `read_excel()` function from the **readxl** package.
 
-<!-- AG: Just to note, this did not knit on my PC until I added mode = "wb". I got this fix from https://github.com/tidyverse/readxl/issues/374#issuecomment-336597554. You may want to include this, especially since people are just going to copy-paste it into their own PCs to test it out. My PC is a Windows 64-bit if it matters. Additionally, shouldn't the commented portion be out with the rest of the text? I feel like it's pretty important, especially with the "we cannot read". The tempdir() part is also very confusing if you don't have an example as a companion. -->
+<!-- Add mode = "wb". I got this fix from https://github.com/tidyverse/readxl/issues/374#issuecomment-336597554. You may want to include this, especially since people are just going to copy-paste it into their own PCs to test it out. My PC is a Windows 64-bit if it matters. Additionally, shouldn't the commented portion be out with the rest of the text? I feel like it's pretty important, especially with the "we cannot read". The tempdir() part is also very confusing if you don't have an example as a companion. Agreed! -->
+
 ```{r}
 library(readxl)
 
@@ -144,13 +156,15 @@ read_excel(path = "example_excel.xlsx")
 file.remove("example_excel.xlsx")
 ```
 
-<!-- AG: Again, I would like to use an example. Examples make everything better, but they do mean more work on our part.-->
+<!-- AG: Again, I would like to use an example. Examples make everything better, but they do mean more work on our part. Yes! Maybe? -->
+
 If the .xlsx file has multiple sheets, you have to use the sheet argument to specify the sheet number or name. 
 
 
 ### RDS
 
-<!-- AG: This is very undescriptive, and since people are unfamiliar with .rds files they may not understand fully. Maybe a sentence like "These files are much more efficient when loading the data back into R and keeps R-specific information such as variable types and attributes." It might also be worth putting in a section about .Rdata files, which allow you to save multiple R objects.-->
+<!-- This is very undescriptive, and since people are unfamiliar with .rds files they may not understand fully. Maybe a sentence like "These files are much more efficient when loading the data back into R and keeps R-specific information such as variable types and attributes." It might also be worth putting in a section about .Rdata files, which allow you to save multiple R objects. So fix it! -->
+
 rds files store a single R object within a file. 
 
 When we save to a rds file, we use the function `write_rds()`. Just like `write_csv()`, this function has two main arguments: `x` and `file`.  The `x` argument is the data set that you want to save. The `file` argument is the file path where you want to save the file. The end of the path argument is the name that you want to use for the file. 
@@ -213,12 +227,15 @@ SQLite is probably the simplest relational database that one can use in combinat
 
 The first thing you need to do to read data into R from a database is to connect to the database. We do that using `dbConnect()` function from the **DBI** (database interface) package. This does not read in the data, but simply tells R where the database is and opens up a communication channel.
 
-<!-- AG: Why is all of this code commented out? This passage is incomprehensible without it. -->
+<!-- Why is all of this code commented out? This passage is incomprehensible without it. Because this whole section sucks! Get this to work. -->
 
-<!-- ```{r} -->
-<!--  library(DBI) -->
-<!--  con_lang_data <- dbConnect(RSQLite::SQLite(), "data/can_lang.db") -->
+
+<!-- ```{r, eval = FALSE} -->
+<!-- library(DBI) -->
+
+<!-- con_lang_data <- dbConnect(RSQLite::SQLite(), "data/can_lang.db") -->
 <!-- ``` -->
+
 
 Often relational databases have many tables, and their power comes from the useful ways they can be joined. Thus anytime you want to access data from a relational database, you need to know the table names. You can get the names of all the tables in the database using `dbListTables()`.
 
@@ -280,7 +297,8 @@ PostgreSQL (also called Postgres) is a very popular and open-source option for r
 
 Additionally, we must use the **RPostgres** package instead of **RSQLite** in the `dbConnect()` function call. Below we demonstrate how to connect to a version of the `can_mov_db` database, which contains information about Canadian movies (*note - this is a synthetic, or artificial, database*).
 
-<!-- AG: I think this database is broken. When I tried to run it, it gave me a Connection timed out error. -->
+<!-- I think this database is broken. When I tried to run it, it gave me a Connection timed out error. So what should we do? -->
+
 ```
 library(RPostgres)
 can_mov_db_con <- dbConnect(RPostgres::Postgres(), dbname = "can_mov_db",
@@ -554,6 +572,7 @@ To get a certain set of weather data from the Iowa Environmental Mesonet, you ca
 When you are making an HTTP request using the `GET()` or `POST()` functions from the **httr** package, you can include the key-value pairs for any query parameters as a list object in the `query` argument of the function. For example, suppose you want to get wind speed in miles per hour (data = "sped") for Denver, CO, (station = "DEN") for the month of June 2016 (year1 = "2016", month1 = "6", etc.) in Denver’s local time zone (tz = "America/Denver") and in a comma-separated file (format = "comma"). To get this weather dataset, you can run:
 
 <!-- AG: The httr library output is still there, it looks nicer to hide it. It's fine either way though. -->
+
 ```{r}
 library(httr)
 meso_url <- "https://mesonet.agron.iastate.edu/cgi-bin/request/asos.py/"
