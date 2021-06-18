@@ -8,18 +8,19 @@
 
 <!-- TODO: -->
 
-<!-- Read misc/style.Rmd. -->
+<!-- Read misc/style.Rmd. DONE-->
 
 <!-- Delete the PostgreSQL stuff. Learning how to connect to one database is enough. (Of course, in a sentence, you can mention other databases and what not.) -->
 
+<!-- AG: I'm going to be doing the following three parts when my pull request goes through because I'm going to be loading in a database through       SQLite for these examples. It's in the pull request as a file called chinook.db in 03-data/data/chinook.db -->
+
 <!-- Add a subsection within databases that shows SQL code. -->
 
-<!-- Keep parts which show write_csv and write_rds. And then delete those files with file.remove. -->
+<!-- Keep parts which show write_csv and write_rds. And then delete those files with file.remove. DONE-->
 
 <!-- Database section: Only reading from. Not setting up. Not writing to. Show how to connect. Discuss what connection is doing. Discuss (briefly) other databases. Show how to get general information, like list of tables and other stuff. Last section is SQL. What it is. Bunch of examples of using SQL on the database. -->
 
 <!-- Rewrite entire webscraping section. Delete everything you don't like. Look closely at the current version of the tutorial. Rewrite this section so that it will be easy to fold the tutorial questions into it at some point in the future. -->
-
 
 Start by loading the packages which we will need in this chapter.
 
@@ -29,7 +30,12 @@ library(tidyverse)
 library(primer.data)
 library(lubridate)
 library(dbplyr)
+library(janitor)
+library(skimr)
 ```
+
+## Writing and Reading Files
+
 
 ## Writing and reading files
 
@@ -37,66 +43,94 @@ Getting data into and out of R is a major part of any real world data science pr
 
 ### CSV files
 
-"CSV" stands for **c**omma **s**eparated **v**alue. In other words, csv files are files whose values are separated by commas. Each comma from the csv file corresponds to a column, and the column names are, by default, taken from the first line of the file. 
+"CSV" stands for **c**omma **s**eparated **v**alue. In other words, csv files are files whose values are separated by commas. Each comma from the csv file corresponds to a column, and the column names are, by default, taken from the first line of the file.
 
-Use `write_csv()` to save a tibble to a csv file. `write_csv()` has two main arguments: `x` and `path`. The `x` argument is the data set that you want to save. The `path` argument is the file path to which you want to save the file. The end of the `path` argument is the name that you want to use for the file. 
+#### Reading and writing from a CSV file
 
-<!-- Does there need to be an example here? -->
+Here's an example of a CSV file and what it looks like. Use `read_csv()` from the **readr** package --- which is one of the main packages within the **tidyverse** collection of packages --- to load the data into R. The `file` argument is the file path for the CSV file.
 
-Use `read_csv()` from the **readr** package --- which is one of the main packages within the **tidyverse** collection of packages --- to load the data into R.
+```{r}
+# We can access files either by using their URL or their file path. 
+# In this case, we're using the GitHub URL to access the database.
+file_1 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/test_1.csv"
+read_csv(file = file_1)
+```
 
-Consider the following csv file: `test_2.csv`. 
+<!-- the path argument is deprecated, use file instead -->
 
-<!-- This looks really ugly on the actual website because we have parsing failures just out in the open. It looks like a column vs rowwise parsing failure, and it's really confusing if you see this kind of junk. Fixed by AG. -->
+Use `write_csv()` to save a tibble to a csv file. `write_csv()` has two main arguments: `x` and `file`. The `x` argument is the data set that you want to save. The `file` argument is the file path to which you want to save the file. The end of the `file` argument is the name that you want to use for the file. 
 
-Here's what `test_2.csv` looks like as a text file:
+```{r}
+csv_data <- tribble(
+  ~ `a`, ~ `b`, ~ `c`,
+      1,     2,     3,
+      4,     5,     6
+)
+write_csv(x = csv_data, file = "my_csv.csv")
+```
+
+When we read the csv file again, the data shows up. This is useful for saving information both to share and for your own projects.
+```{r}
+read_csv("my_csv.csv")
+```
+
+When you want to remove a file from your system, use `file.remove()`.
+```{r}
+file.remove("my_csv.csv")
+```
+#### Arguments for CSV files
+
+Sometimes, CSV files will not be what you want. Maybe they have the wrong column names, have information at the top of the file, or have comments interspersed within the file.
+
+Consider the following csv file: `test_2.csv`. Here's what it looks like as a text file:
 
 ```{r, echo = FALSE}
 # I made it so that it doesn\'t show this line of code 
 # This is so it doesn't confuse the readers
 # And it lines up with the introduction that I used without looking weird
 # We set `file_1` to be the full path to `test_2.csv`'s location on the web.
-file_1 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/test_2.csv"
+file_2 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/test_2.csv"
   
-readLines(file_1)
+readLines(file_2)
 ```
 
 As you can see, there is text at the top of this file. Often times information about how data was collected, or other relevant information, is included at the top of the data file. However, `read_csv()` can't differentiate between this text and the data that we want to read, causing it to fail.
 
-
 ```{r}
-file_1 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/test_2.csv"
+file_2 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/test_2.csv"
 
-read_csv(file_1)
+read_csv(file_2)
 ```
 
 We can use the `skip` argument to skip the first 2 text lines and allow `read_csv()` to work.
 
 ```{r}
-read_csv(file = file_1,
+read_csv(file = file_2,
          skip = 2)
 ```
 
-Now that we've gotten rid of the warnings, let's look at the other message R sends us, the column specification message. 
-As of now, R "guesses" an appropriate data type for each of the columns. To get rid of this message, we use the `col_types()` argument and specify the data types.
+Now that we've gotten rid of the warnings, let's look at the other message R sends: the column specification message. 
+
+The column specification message is a message that R sends to tell you what data types it is using for the column.
+
+Data types are the types discussed in Chapter 2 Wrangling, such as characters, factors, integers, and dates.
+When we use a tibble, each column has to have a specific type of data. In this example, all of the columns have numbers in them. If there are characters in the column, the columns are going to have a character data type.
+
+To get rid of the column specification message, use the `col_types()` argument and specify the data types. You can do this by just copying the column specification message and putting it as the `col_types()` argument.
 
 ```{r}
-read_csv(file = file_1,
+read_csv(file = file_2,
          skip = 2,
          col_types = cols(a = col_double(),
                           b = col_double(),
                           c = col_double()))
-
 ```
 
-<!-- DK: Need a better discussion of col_types. -->
 
 
+When our tabular data comes in a different format, we can use the `read_delim()` function instead. For example, a different version of `test_2.csv` could exist that has no column names and uses pipes (`|`) as the delimiter instead of commas.
 
-When our tabular data comes in a different format, we can use the `read_delim()` function instead. For example, a different version of `test_2.csv` could exist that has no column names and uses tabs as the delimiter instead of commas.
-
-<!-- This needs an example, it's weird if we just have the text open like this. Fixed - AG -->
-Here's another file named `delim_1`, which uses the `|` to separate the lines instead of a `,` like a normal CSV file.
+Here's another file named `delim_1`, which uses the `|` to separate the lines instead of a comma like a normal CSV file.
 
 ```{r, echo = FALSE}
 delim_1 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/delim_1.txt"
@@ -104,7 +138,7 @@ delim_1 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst
 readLines(delim_1)
 ```
 
-With `read_delim()`, we specify the first argument as the path to the file, as done with `read_csv()`. Then we provide values to the `delim` argument to have the code use `|` as the separator instead of the `,`.
+With `read_delim()`, we specify the first argument as the path to the file, as done with `read_csv()`. Then we provide values to the `delim` argument to have the code use `|` as the separator instead of the comma.
 
 ```{r}
 # Because delim_1 uses pipes to separate values, 
@@ -116,9 +150,9 @@ With `read_delim()`, we specify the first argument as the path to the file, as d
 
 delim_1 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/delim_1.txt"
 
-read_delim(delim_1, delim = "|", col_types = cols(population = col_double(),
-                                                  town = col_character()))
+readLines(delim_1)
 ```
+
 Both CSV files and their text counterparts are easily transferable between computers and programming languages, but due to their simple nature CSV files are only able to move basic data and only as text values. They also have poor support for special characters like commas, which create a column and end up breaking the table in the end.
 
 ### Excel Files
@@ -129,7 +163,7 @@ In order to write excel files you have to install complex packages, and they are
 
 Reading Excel files is easy. To do so, we use the `read_excel()` function from the **readxl** package.
 
-<!-- Add mode = "wb". I got this fix from https://github.com/tidyverse/readxl/issues/374#issuecomment-336597554. You may want to include this, especially since people are just going to copy-paste it into their own PCs to test it out. My PC is a Windows 64-bit if it matters. Additionally, shouldn't the commented portion be out with the rest of the text? I feel like it's pretty important, especially with the "we cannot read". The tempdir() part is also very confusing if you don't have an example as a companion. Agreed! Fixed- AG.-->
+<!-- I tried to merge with the thign and got the weird stuff with the head and what looks like an API key for some reason. I'm hoping this isn't a bad thing. -->
 
 ```{r}
 library(readxl)
@@ -139,6 +173,11 @@ library(readxl)
 # directory. Note that the "proper" way of handling this would be to create a
 # temp directory with tempdir(), download the file into that directory, read it,
 # and then delete the temp directory. That way, you would not have random
+
+# downloaded files hanging around.
+# The mode = "wb" is a necessary addition for Windows users because Windows is
+# weird. It's not necessary on MacOS and may cause an error as well.
+
 # downloaded files hanging around. The mode = "wb" is a necessary addition for
 # Windows users because Windows is weird. It's not necessary on MacOS and may
 # cause an error as well.
@@ -165,8 +204,6 @@ If the .xlsx file has multiple sheets, you have to use the `sheet` argument to s
 
 ### RDS
 
-<!-- This is very undescriptive, and since people are unfamiliar with .rds files they may not understand fully. Maybe a sentence like "These files are much more efficient when loading the data back into R and keeps R-specific information such as variable types and attributes." It might also be worth putting in a section about .Rdata files, which allow you to save multiple R objects. So fix it! Fixed - AG-->
-
 One very important aspect of R is saving objects into rds files, which store a single R object into a file.
 These files allow us to save R objects such as plots and tibbles into R and then reload the object that it contains later without re-running the code that made it.
 This is especially useful for when you're dealing with bulk data and want to save the plot that comes with it for later.
@@ -186,11 +223,6 @@ iris_p
 
 When we save to a rds file, we use the function `write_rds()`. Just like `write_csv()`, this function has two main arguments: `x` and `file`.  The `x` argument is the object that you want to save. The `file` argument is the file path where you want to save the file. The end of the path argument is the name that you want to use for the file.
 
-<!-- AG: I've noticed that we never really write any information into the textbook, 
-however I'm demonstrating reading and writing from an rds file. This may not be good
-practice, so I'm commenting out all of the code that involves it but leaving it in for 
-future revision. Add code back in. -->
-
 ```{r}
 # Technically, it's incorrect to save a ggplot plot as a rds file because it has
 # no real benefit. It still just acts as a plot and restricts the user to only
@@ -198,19 +230,19 @@ future revision. Add code back in. -->
 # We're using a graph here to better show how the rds file is unique from other
 # data formats like CSV files.
 
-# write_rds(x = iris_p, file = "iris_p.rds")
+write_rds(x = iris_p, file = "iris_p.rds")
 ```
 
 `read_rds()` reads the file back into R. Just like `read_csv()` `read_rds()` has one main argument, which is the path to the file that you are wanting to read into R.
 
 ```{r}
-# read_rds(file = "iris_p.rds")
+read_rds(file = "iris_p.rds")
 ```
 
 We can then use that R object in more operations, such as adding a trend line.
 
 ```{r}
-# iris_p <- read_rds(file = "iris_p.rds")
+iris_p <- read_rds(file = "iris_p.rds")
 iris_p + 
   geom_smooth(method = "loess",
               formula = y ~ x,
@@ -220,7 +252,7 @@ iris_p +
 By saving the `iris_p` plot in a rds file, we eliminate the time needed to calculate and generate that plot again because we can use the saved information. We can then use the object by reading the file back into r and using it like any normal plot, adding new layers and doing new operations.
 
 ```{r, include = FALSE}
-# file.remove("iris_p.rds")
+file.remove("iris_p.rds")
 ```
 
 There are also Rdata files which can store multiple objects.
@@ -275,8 +307,6 @@ fromJSON(json_format_ex)
 SQLite is probably the simplest relational database that one can use in combination with R. SQLite databases are self-contained and usually stored and accessed locally on one computer. Data is usually stored in a file with a `.db` extension. Similar to Excel files, these are not plain text files and cannot be read in a plain text editor. 
 
 The first thing you need to do to read data into R from a database is to connect to the database. We do that using `dbConnect()` function from the **DBI** (database interface) package. This does not read in the data, but simply tells R where the database is and opens up a communication channel.
-
-<!-- Why is all of this code commented out? This passage is incomprehensible without it. Because this whole section sucks! Get this to work. Fixed - AG -->
 
 ```{r}
 library(DBI)
@@ -357,10 +387,6 @@ PostgreSQL (also called Postgres) is a very popular and open-source option for r
 
 
 Additionally, we must use the **RPostgres** package instead of **RSQLite** in the `dbConnect()` function call. Below we demonstrate how to connect to a version of the `can_mov_db` database, which contains information about Canadian movies (*note - this is a synthetic, or artificial, database*).
-
-<!-- I think this database is broken. When I tried to run it, it gave me a Connection timed out error. So what should we do? -->
-
-<!-- AG: This is likely because we were previously pulling from a dead server. We may need to choose a different database, but I'm not sure which one to choose. I'm leaning towards an Amazon or Google database, but there are test databases like the Pagila test database. -->
 
 ```
 library(RPostgres)
@@ -468,20 +494,42 @@ Databases are beneficial in a large-scale setting:
 - they provide security to keep data safe
 For example, [there are billions of Google searches conducted daily](https://www.internetlivestats.com/google-search-statistics/). 
 
-
-
 ## Webscraping
-
-<!-- Mention rvest here. -->
 
 In the first part of this chapter, we learned how to read in data from plain text files that are usually "rectangular" in shape using the **tidyverse** `read_*` functions. Sadly, not all data comes in this simple format, but we can happily use many other tools to read in more messy/wild data formats. The formal name for gathering non-rectangular data from the web and transforming it into a more useful format for data analysis is **web scraping**.
 
+We can do web scraping through r by using the **`rvest`** library, which is a library that allows us to look at HTML and CSS selectors, then pick them apart to get the data we want. Let's look at what this means.
 
 ### HTML and CSS selectors
 
-<!-- AG: I'm thinking of just using Wikipedia as the example and show how the TOS differs from Craigslist to show whether something is legal or not. This is fine too, and it actually has some advantages as well. -->
+Before we jump into scraping, let's learn a little bit about what the "source code" of a website looks like. 
 
-Before we jump into scraping, let's learn a little bit about what the "source code" of a website looks like. Say we are interested in knowing the average rental price (per square footage) of the most recently available one-bedroom apartments in Vancouver from https://vancouver.craigslist.org. When we visit the Vancouver Craigslist website and search for one-bedroom apartments, this is what we are shown:
+#### Structure of websites
+Websites are coded in a language called **HTML**, or **H**yper**T**ext **M**arkup **L**anguage. This is the code that puts all of the information on the website, such as the numbers and text. These are the files created when we "knit" our .Rmd files and it's what makes them put information on the screen. When we're webscraping, we can look at the information on the website by looking at the HTML code.
+
+HTML uses many nested "tags" to organize the structure. For example, an html file like this:
+```{.html}
+<html>
+<p>
+Hello World
+</p>
+</html>
+```
+
+looks like this in the result:
+
+<br>
+<html>
+<p  style="background-color:lightgray">
+Hello World
+</p>
+</html>
+<br>
+
+When we're using HTML in R, we use the `minimal_html()` function to allow us to easily use it.
+
+#### Application
+Now let's look at this in a real-world context. Say we are interested in knowing the average rental price (per square footage) of the most recently available one-bedroom apartments in Vancouver from https://vancouver.craigslist.org. When we visit the Vancouver Craigslist website and search for one-bedroom apartments, this is what we are shown:
 
 ![](03-data/images/craigslist_human.png)
 
@@ -545,7 +593,7 @@ and
 <span class="result-price">$2285</span>
 ```
 
-What we can see is there is a special "word" here, "result-price", which appears only on the lines with prices and not on the other lines (that have information we are not interested in). This special word and the context in which is is used (learned from the other words inside the HTML tag) can be combined to create something called a **CSS selector**. The CSS selector can then be used by R's **rvest** package to select the information we want (here price) from the website source code.
+What we can see is there is a special "word" here, "result-price", which appears only on the lines with prices and not on the other lines (that have information we are not interested in). This special word and the context in which is is used (learned from the other words inside the HTML tag) can be combined to create something called a **CSS selector**. The CSS selector can then be used by R's rvest package to select the information we want (here price) from the website source code.
 
 Many websites are quite large and complex, which means the website source code is large as well. And as you saw above, it is not easy to read and pick out the special words we want with our human eyeballs. So to make this easier, we will use the *SelectorGadget* tool. It is an open source tool that simplifies generating and finding CSS selectors. We recommend you use the Chrome web browser to use this tool, and install the [selector gadget tool from the Chrome Web Store](https://chrome.google.com/webstore/detail/selectorgadget/mhjhnkcfbdhnjickkkdbjoemdmbfginb). Here is a short video on how to install and use the SelectorGadget tool to get a CSS selector for use in web scraping:
 
@@ -600,8 +648,6 @@ population_text <- html_text(population_nodes)
 
 head(population_text)
 ```
-
-<!-- AG: It would be helpful if we walked through how we can clean up this data, since it's useful in the future if you're running through Wikipedia and you get this weird stuff. -->
 
 Are we done? Not quite... If you look at the data closely you see that the data is not in an optimal format for data analysis. Both the city names and population are encoded as characters in a single vector instead of being in a data frame with one character column for city and one numeric column for population (think of how you would organize the data in a spreadsheet). Additionally, the populations contain commas (not useful for programmatically dealing with numbers), and some even contain a line break character at the end (`\n`).
 
