@@ -1,16 +1,16 @@
 # Two Parameters {#two-parameters}
 
-<!-- Remove ideal from ideal Preceptor Table. -->
+<!-- Remove ideal from ideal Preceptor Table. MF: I think we were thinking of actual Preceptor Table. I can't find a chapter where we  use "Preceptor Table" instead of "ideal Preceptor Table". Do you still want to change this? -->
 
-<!-- Clean up the plots. (Labels and such.) -->
+<!-- Clean up the plots. (Labels and such.) MF: Done. -->
 
-<!-- Two plots which start Courage section should be redone so as to just refer to mu and sigma. Yes, there is an interpretation we can give to the values of those parameters. And that is sort of cool. But, most times parameters have no useful interpretation. So, don't spend time on them! Spend time on what matters: the results of (interesting!) calls to posterior_epred and posterior_predict. -->
+<!-- Two plots which start Courage section should be redone so as to just refer to mu and sigma. Yes, there is an interpretation we can give to the values of those parameters. And that is sort of cool. But, most times parameters have no useful interpretation. So, don't spend time on them! Spend time on what matters: the results of (interesting!) calls to posterior_epred and posterior_predict. MF: Done.-->
+
+<!-- Put Population Table at the end of Wisdom. It is always how Wisdom ends. Then Justice starts with the Population Table and asks abiout validity, representativeness and assumes a functional relationship. MF: Done. -->
+
+<!-- Get axis labels and titles to use \sigma and \mu MF: Done.-->
 
 <!-- Courage section should end with a summary of the model which we have accepted as true. This is our data generating mechanism. -->
-
-<!-- Put Population Table at the end of Wisdom. It is always how Wisdom ends. Then Justice starts with the Population Table and asks abiout validity, representativeness and assumes a functional relationship. -->
-
-<!-- Get axis labels and titles to use \sigma and \mu -->
 
 <!-- Show posterior_interval() -->
 
@@ -23,7 +23,6 @@ In Chapter \@ref(one-parameter), we learned how to do inference. We created a jo
 $$\text{Prob}(\text{models} | \text{data} = \text{data we observed})$$
 
 Even then, however, the relative likelihood of different models is not that important. Models are invisible, mental entities with no more physical presence than unicorns or leprechauns. In the world itself, we make and test predictions. *People with better models make better predictions. That is what matters.*
-
 
 In addition to a change in tools, there are two key differences in this chapter. First, Chapter \@ref(one-parameter) used models with just one parameter: the number of red beads, which we can also transform into a parameter, $p$, the number of red beads divided by 1,000. The  model in Chapter \@ref(one-parameter) was binomial, and there is only one unknown parameter $p$ in such models. In this chapter, we have two unknown parameters: the mean $\mu$ height in the US and the standard deviation, $\sigma$, of the normally distributed error term.
 
@@ -57,8 +56,6 @@ The real world is complex. Any substantive decision problem includes a great dea
 
 * What is our posterior probability distribution for the height of the 3rd tallest man out of the next 100 we meet?
 
-<!-- DK: This is awkward. Why not just ppd everywhere? -->
-
 The first and fourth questions require a full scale posterior probability distribution as an answer. The middle two questions have a single number as their answer, but we first create a posterior probability distribution in order to derive that number.
 
 ### Ideal Preceptor Table
@@ -72,6 +69,7 @@ Predictive models care nothing about causation. Causal models are often also con
 So, what would our ideal table look like? Assuming we are predicting height for every male on planet Earth at this moment in time, we would have height data for every male person above 18 years of age. This means that we would have almost 4 billion rows, one for each male person, which includes a column for height.
 
 Here is a sample from our ideal Preceptor Table: 
+
 
 ```{r, include=FALSE}
 library(tidyverse)
@@ -164,8 +162,9 @@ Plot your data. `geom_density()` is a smooth version of `geom_histogram()`. With
 ch7 %>%
   ggplot(aes(x = height, color = gender)) + 
   geom_density() + 
-  labs(x = "Height (cm)",
-       title = "Height by Gender in NHANES Dataset") +
+  labs(x = expression(mu),
+       title = "Height (cm) in NHANES Dataset",
+       color = "Sex") +
   theme_classic()
 ```
 
@@ -209,23 +208,6 @@ Is not-perfect data *always* better? No! If your problem is estimating the media
 
 For now, we will accept that our data works. 
 
-## Justice
-
-```{r, echo = FALSE}
-knitr::include_graphics("other/images/Justice.jpg")
-```
-
-<!-- Should include all of the new elements (population table, representativeness, validity), but in the simplest possible way.  --> 
-
-Having looked at our data and decided that it is "close enough" to our questions that creating a model will help us come up with better answers, we move on to Justice. 
-
-Justice emphasizes a few key concepts:
-
-* The Population Table, a structure which includes a row for every unit in the population. We generally break the rows in the Population Table into three categories: the data for units we want to have, the data for units which we actually have, and the data for units we do not care about.
-* Is our data representative of the population?
-* Is the meaning of the columns consistent, i.e., can we assume validity?
-We then make an assumption about the data generating mechanism.
-
 ### The Population Table
 
 The Population Table shows the data that we actually have in our desired population. It shows rows from three sources: the ideal Preceptor Table, the data, and the population outside of the data (rows which exist but for which we have no data).
@@ -268,8 +250,58 @@ tibble(source = c("ideal Preceptor Table", "ideal Preceptor Table", "...",
 
 
 
+## Justice
+
+```{r, echo = FALSE}
+knitr::include_graphics("other/images/Justice.jpg")
+```
+
+Having looked at our data and decided that it is "close enough" to our questions that creating a model will help us come up with better answers, we move on to Justice. 
+
+Justice emphasizes a few key concepts:
+
+* The Population Table, a structure which includes a row for every unit in the population. We generally break the rows in the Population Table into three categories: the data for units we want to have, the data for units which we actually have, and the data for units we do not care about.
+* Is our data representative of the population?
+* Is the meaning of the columns consistent, i.e., can we assume validity?
+We then make an assumption about the data generating mechanism.
+
+We inspect both representativeness and validity through our Population Table. Representativeness focuses on the rows of the table, while validity focuses on the columns. Let's explore what that means in more depth. 
+
+
+### Representativeness
+
+As we've stated above, representativeness involves our rows. More specifically, whether the rows that we *do* have data for are the same as the rows for which we *do not* have data. This is a somewhat convoluted way of saying: do all pieces of desired data have an equal chance of being included in our dataset? 
+
+Ideally, data is a random selection from our population. For our `nhanes` data, is this the case? It is time to investigate. 
+
+According to the CDC, individuals are invited to participate in NHANES based on a randomized process. This process is outlined below. 
+
+> All the counties in the United States are divided into 15 groups based on their characteristics. One is selected from each group and together they form the 15 counties in the NHANES survey for the year. 
+
+> Within each of the 15 NHANES counties, smaller groups (such as neighborhoods) are formed, and between 20 and 24 of these small groups are selected. All the houses or apartments within those selected small groups are identified, and a sample of about 30 households are chosen within each group. 
+
+> NHANES will contact the selected household and ask a short set of questions (age, race, and gender) about everyone in the household. A computer process randomly selects some, all, or none of the household members.
+
+It is clear that this process goes through several layers of randomization. That being said, many counties are excluded by the end of the process. It is also possible for certain groups or communities to be less representative of the greater population, though we cannot know that for certain. 
+
+Regardless, we can assume that this process ensures that all people in the United States have a somewhat equal chance of being surveyed. Thus, our data is representative of our population.
+
+### Validity
+
+Validity involves our columns. More specifically, whether our columns mean the same thing. Consider the following example: we are predicting housing price for 2021. Our dataset is from housing prices in 2006. When we create a column for housing price, are the housing prices in 2006 the same as the housing prices for 2021? No! Think of inflation. Because of inflation, there will be a huge disparity between our precictions using the 2006 data and the truth in 2021. 
+
+Therefore, to ensure validity, we would need to adjust the housing price according to that inflation. After adjusting our column, we would consider our estimates to be valid. 
+
+How does this apply to our height example? We might assume that height is a constant, and thus requires no adjustment. However, over the past few hundred years, it has been found that humans have slowly been getting taller on average in the U.S. and in many European nations.  
+
+In this example, the change in height is so minimal overtime that we do not need to adjust. Because our data is only fifteen years old, and because we do not expect a drastic change in average height within such a small timeframe, we can assume validity. 
+
+
  <!-- Math is in Justice, but just the functional form, not the exact variables. Leave it to you to write about this sensibly. Focus on the functional form. We are choosing linear, not logistic. Why? --> 
  
+ 
+### Functional form
+
 However, a little mathematical notation will make our modeling assumptions clear, will bring some precision to our approach. In this case:
 
 $$ y_i =  \mu + \epsilon_i $$
@@ -278,8 +310,6 @@ with $\epsilon_i \sim N(0, \sigma^2)$. $y_i$ is the height of male $i$. $\mu$ is
 This is the simplest model we can construct. Note: 
 
 * The model has two unknown parameters: $\mu$ and $\sigma$. Before we can do anything else we need to estimate the values of these parameters. Can we ever know their exact value? No! Perfection lies only in God's own R code. But, by using a Bayesian approach similar to what we used in Chapters \@ref(probability) and \@ref(one-parameter), we will be able to create a *posterior probability distribution* for each parameter.
-
-
 
 <!-- Add Dr. Box quote. All models are wrong, some are useful. And a photo. -->
 
@@ -299,8 +329,6 @@ $$\text{outcome} = \text{model} + \text{what is not in the model}$$
 In this case, the *outcome* is the height of an individual male. This variable, also called the "response," is what we are trying to understand and/or explain and/or predict. The *model* is our creation, a mixture of data and parameters, an attempt to capture the underlying structure in the world which generates the outcome. 
 
 What is the difference between the *outcome* and the *model*? By definition, it is *what is not in the model*, all the blooming and buzzing complexity of the real world. The model will always be incomplete in that it won't capture everything. Whatever the model misses is thrown into the error term. 
-
-
 
 ## Courage
 
@@ -433,7 +461,7 @@ fit_obj %>%
                    bins = 100) +
     labs(title = "Posterior for Average Male Height",
          subtitle = "American men average around 176 cm in height",
-         x = "Height in Centimeters",
+         x = expression(mu), 
          y = "Probability",
          caption = "Data source: NHANES") +
     scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
@@ -456,7 +484,7 @@ fit_obj %>%
                    bins = 100) +
     labs(title = "Posterior for Standard Deviation of Male Height",
          subtitle = "The standard deviation of height is around 7 to 11 cm",
-         x = "Sigma in Centimeters",
+         x = expression(sigma),
          y = "Probability",
          caption = "Data source: NHANES") +
     scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
@@ -564,7 +592,7 @@ pe %>%
                    bins = 100) +
     labs(title = "Posterior for Average Adult Male Height",
          subtitle = "Note that the plot is very similar to the one created with the parameters",
-         x = "Average Height in Centimeters",
+         x = expression(mu),
          y = "Probability",
          caption = "Data source: NHANES") + 
     scale_x_continuous(labels = scales::number_format(accuracy = 1)) +
@@ -608,7 +636,7 @@ pp %>%
                    bins = 100) +
     labs(title = "Posterior for Height of Random Male",
          subtitle = "Uncertainty for a single individual is much greater than for the expected value",
-         x = "Height in Centimeters",
+         x = expression(mu),
          y = "Probability",
          caption = "Data source: NHANES") + 
     scale_x_continuous(labels = scales::number_format()) +
@@ -740,7 +768,7 @@ pp %>%
     geom_histogram(bins = 100) +
     labs(title = "Posterior for Height of 3rd Tallest Man from Next 100",
          subtitle = "Should we have more or less certainty about behavior in the tails?",
-         x = "Height in Centimeters",
+         x = expression(mu),
          y = "Probability",
          caption = "Data source: NHANES") + 
     scale_x_continuous(labels = scales::number_format()) +
