@@ -8,9 +8,11 @@
 
 <!-- TODO: -->
 
-<!-- Database section: Only reading from. Not setting up. Not writing to. Show how to connect. Discuss what connection is doing. Discuss (briefly) other databases. Show how to get general information, like list of tables and other stuff. Last section is SQL. What it is. Bunch of examples of using SQL on the database. -->
-
 <!-- Rewrite entire webscraping section. Delete everything you don't like. Look closely at the current version of the tutorial. Rewrite this section so that it will be easy to fold the tutorial questions into it at some point in the future. -->
+
+<!-- Start of chapter, mention that all the files we are working on live in this directory, called `file_dir <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/"`. Then, define `file_1 <- paste0(file_dir, "test_1.csv")` or whatever. -->
+
+<!-- The tutorial includes a lot of arguments like na and comment, but that makes the book feel like it's really long once it's actually put into text form with paragraphs and stuff. True! So, what do we include and what do we not? -->
 
 Start by loading the packages which we will need in this chapter.
 
@@ -43,6 +45,7 @@ Here's an example of a CSV file and what it looks like. Use `read_csv()` from th
 ```{r}
 # We can access files either by using their URL or their file path.
 # In this case, we're using the GitHub URL to access the database.
+
 file_1 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/test_1.csv"
 read_csv(file = file_1)
 ```
@@ -55,17 +58,19 @@ Use `write_csv()` to save a tibble to a csv file. `write_csv()` has two main arg
 csv_data <- tribble(
   ~ `a`, ~ `b`, ~ `c`,
       1,     2,     3,
-      4,     5,     6
-)
+      4,     5,     6)
+
 write_csv(x = csv_data, file = "my_csv.csv")
 ```
 
 When we read the csv file again, the data shows up. This is useful for saving information both to share and for your own projects.
+
 ```{r}
 read_csv("my_csv.csv")
 ```
 
 When you want to remove a file from your system, use `file.remove()`.
+
 ```{r}
 file.remove("my_csv.csv")
 ```
@@ -77,10 +82,11 @@ Sometimes, CSV files will not be what you want. Maybe they have the wrong column
 Consider the following csv file: `test_2.csv`. Here's what it looks like as a text file:
 
 ```{r, echo = FALSE}
-# I made it so that it doesn\'t show this line of code 
-# This is so it doesn't confuse the readers
-# And it lines up with the introduction that I used without looking weird
-# We set `file_1` to be the full path to `test_2.csv`'s location on the web.
+# I made it so that it doesn't show this line of code This is so it doesn't
+# confuse the readers And it lines up with the introduction that I used without
+# looking weird We set `file_1` to be the full path to `test_2.csv`'s location
+# on the web.
+
 file_2 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/test_2.csv"
   
 readLines(file_2)
@@ -89,8 +95,9 @@ readLines(file_2)
 As you can see, there is text at the top of this file. Often times information about how data was collected, or other relevant information, is included at the top of the data file. However, `read_csv()` can't differentiate between this text and the data that we want to read, causing it to fail and output gibberish.
 
 ```{r}
-# You can also get a csv file by using the URL of the file.
-# This won't work for all file types though.
+# You can also get a csv file by using the URL of the file. This won't work for
+# all file types though.
+
 file_2 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/test_2.csv"
 
 read_csv(file_2)
@@ -122,8 +129,10 @@ read_csv(file = file_2,
 
 You can also change the column arguments so that you get the data type that you want.
 Take `test_7.csv`.
+
 ```{r}
 file_3 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/test_7.csv"
+
 read_csv(file_3)
 ```
 
@@ -147,18 +156,20 @@ read_csv(file_4)
 ```
 
 We can fix this by changing the `col_names` argument.
+
 ```{r}
 read_csv(file_4, col_names = c("a", "b", "c"))
 ```
 
 You can also create names automatically by setting `col_names` to FALSE
+
 ```{r}
 read_csv(file_4, col_names = FALSE)
 ```
 
 Changing the names of the columns allows for you to call on the columns later when the data is actually a tibble. Setting the column names to something that you can understand makes it much easier to understand your code later on.
 
-<!-- AG: The tutorial includes a lot of arguments like na and comment, but that makes the book feel like it's really long once it's actually put into text form with paragraphs and stuff. -->
+
 
 Another feature is the `na` argument.
 ```{r}
@@ -217,7 +228,7 @@ read_delim(delim_1, delim = "|")
 
 You can often find CSV files on websites like [kaggle](https://kaggle.com) as well as by exporting from an Excel spreadsheet. Keep in mind that data imported off of the internet is often very messy, so try to use some of the functions listed here to clean it up. For a full list of arguments and in-depth documentation about the `read_csv()` function, please visit this [website](https://readr.tidyverse.org/reference/read_delim.html).
 
-### Excel Files
+### Excel files
 
 Excel is a spreadsheet program that use tables to analyze, store, or manipulate data. The tables are composed of cells which include text, numbers, or formulas. Excel files have the filename extension .xlsx. They store additional things that you cannot store in a .csv file such as fonts, text formatting, graphics, etc.
 
@@ -449,7 +460,7 @@ Additionally, some operations will not work to extract columns or single values 
 
 > Warning: Usually, databases are very big! Reading the object into your local machine may give an error or take a lot of time to run so be careful if you plan to do this! 
 
-###Interacting with SQLite databases
+### Interacting with SQLite databases
 
 Now that we've figured out how to get data from a database, let's look at how to wrangle data within that database.
 
@@ -516,17 +527,13 @@ These are the functions that we're already familiar with using, and they work ju
 However, there are cases where you will have to use SQL code to accomplish certain tasks.
 
 #### Using SQL code
-<!-- AG: I'm devoting a paragraph to SQL and what it is. I'm doing this because I don't want people to misunderstand that you can just use dbplyr for everything, as well as that dbplyr is actually doing the SQL code for you. -->
 
-<!-- AG: The caption seemed to knit ok, but I'm not sure if I should use it in the actual book. -->
 
 ```{r, echo = FALSE, fig.cap="DROP TABLE is a particularly infamous SQL command."}
 knitr::include_graphics("https://imgs.xkcd.com/comics/exploits_of_a_mom.png")
 ```
 
 First off, let's try to understand what SQLite and SQL really is.
-
-<!-- AG: Is it OK to write "in this course" or should I put something else? -->
 
 SQL, or **S**tructured **Q**uery **L**anguage, is a coding language that works to build the relational databases that we've been using so far. SQLite is a special type of database that you can download onto your computer that uses SQL as its basic structure and basic language. Essentially, SQLite uses SQL code to do the things that it does.
 
