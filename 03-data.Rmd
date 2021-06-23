@@ -8,12 +8,6 @@
 
 <!-- TODO: -->
 
-<!-- Delete the PostgreSQL stuff. Learning how to connect to one database is enough. (Of course, in a sentence, you can mention other databases and what not.) -->
-
-
-<!-- Add a subsection within databases that shows SQL code. -->
-
-
 <!-- Database section: Only reading from. Not setting up. Not writing to. Show how to connect. Discuss what connection is doing. Discuss (briefly) other databases. Show how to get general information, like list of tables and other stuff. Last section is SQL. What it is. Bunch of examples of using SQL on the database. -->
 
 <!-- Rewrite entire webscraping section. Delete everything you don't like. Look closely at the current version of the tutorial. Rewrite this section so that it will be easy to fold the tutorial questions into it at some point in the future. -->
@@ -28,10 +22,8 @@ library(lubridate)
 library(dbplyr)
 library(janitor)
 library(skimr)
+library(knitr)
 ```
-
-## Writing and Reading Files
-
 
 ## Writing and reading files
 
@@ -41,12 +33,15 @@ Getting data into and out of R is a major part of any real world data science pr
 
 "CSV" stands for **c**omma **s**eparated **v**alue. In other words, csv files are files whose values are separated by commas. Each comma from the csv file corresponds to a column, and the column names are, by default, taken from the first line of the file.
 
+CSV files (and their counterparts) are easily transferable between computers and programming languages and are extremely simple because they're effectively just text files that have a special format. Additionally, they're very easy to parse through small amounts of data because they're easily readable by humans and computers. 
+However, due to their simple nature, CSV files are only able to move basic data and only as text values. They also have poor support for special characters like commas, which can make the dataset harder to organize and understand by adding a new column for a few specific entries. This make CSV files good for sharing data between computers and languages, but not efficient for transporting or saving large amounts of data.
+
 #### Reading and writing from a CSV file
 
 Here's an example of a CSV file and what it looks like. Use `read_csv()` from the **readr** package --- which is one of the main packages within the **tidyverse** collection of packages --- to load the data into R. The `file` argument is the file path for the CSV file.
 
 ```{r}
-# We can access files either by using their URL or their file path. 
+# We can access files either by using their URL or their file path.
 # In this case, we're using the GitHub URL to access the database.
 file_1 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/test_1.csv"
 read_csv(file = file_1)
@@ -74,6 +69,7 @@ When you want to remove a file from your system, use `file.remove()`.
 ```{r}
 file.remove("my_csv.csv")
 ```
+
 #### Arguments for CSV files
 
 Sometimes, CSV files will not be what you want. Maybe they have the wrong column names, have information at the top of the file, or have comments interspersed within the file.
@@ -90,9 +86,11 @@ file_2 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/
 readLines(file_2)
 ```
 
-As you can see, there is text at the top of this file. Often times information about how data was collected, or other relevant information, is included at the top of the data file. However, `read_csv()` can't differentiate between this text and the data that we want to read, causing it to fail.
+As you can see, there is text at the top of this file. Often times information about how data was collected, or other relevant information, is included at the top of the data file. However, `read_csv()` can't differentiate between this text and the data that we want to read, causing it to fail and output gibberish.
 
 ```{r}
+# You can also get a csv file by using the URL of the file.
+# This won't work for all file types though.
 file_2 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/test_2.csv"
 
 read_csv(file_2)
@@ -122,9 +120,77 @@ read_csv(file = file_2,
                           c = col_double()))
 ```
 
+You can also change the column arguments so that you get the data type that you want.
+Take `test_7.csv`.
+```{r}
+file_3 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/test_7.csv"
+read_csv(file_3)
+```
 
+Let's try parsing this so that the `student` column is a factor and the `grade` column is an integer.
+```{r}
+read_csv(file_3,
+         col_types = cols(grade = col_integer(),
+                          student = col_factor()))
+```
+By being clever with the columns, we can make our lives easier down the line when we graph the data.
 
-When our tabular data comes in a different format, we can use the `read_delim()` function instead. For example, a different version of `test_2.csv` could exist that has no column names and uses pipes (`|`) as the delimiter instead of commas.
+We can also manipulate other arguments for CSV files.
+
+Let's try changing the column names in the `test_3.csv` file.
+
+As you can see below, the file doesn't have any column names, resulting in the first row being considered as a column.
+
+```{r}
+file_4 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/test_3.csv"
+read_csv(file_4)
+```
+
+We can fix this by changing the `col_names` argument.
+```{r}
+read_csv(file_4, col_names = c("a", "b", "c"))
+```
+
+You can also create names automatically by setting `col_names` to FALSE
+```{r}
+read_csv(file_4, col_names = FALSE)
+```
+
+Changing the names of the columns allows for you to call on the columns later when the data is actually a tibble. Setting the column names to something that you can understand makes it much easier to understand your code later on.
+
+<!-- AG: The tutorial includes a lot of arguments like na and comment, but that makes the book feel like it's really long once it's actually put into text form with paragraphs and stuff. -->
+
+Another feature is the `na` argument.
+```{r}
+file_5 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/test_5.csv"
+read_csv(file_5)
+```
+
+`test_5.csv` is missing a value, and it uses a `.` as a substitute. This makes the computer think that the period is the actual value of the data point, which is obviously not true (we want numbers instead). By default, `read_csv()` treats white space like ` ` as a missing value, but you can set this argument directly as well.
+
+```{r}
+read_csv(file_5,
+         na = ".")
+```
+
+You can also tell the code to ignore comment lines, which may be common in a csv file that was written by a human and as such has comments in it. `test_6.csv` is a perfect example of this. Here's what it looks like:
+```{r, echo = FALSE}
+file_6 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/test_6.csv"
+readLines(file_6)
+```
+
+By setting the `comment` argument, we're able to skip lines that have a certain starting point.
+In this case, the comment is the `#` sign, so we just need to include that in.
+
+```{r}
+read_csv(file_6, comment = "#")
+```
+
+If you ever want to skip certain lines, just use the `comment` argument in order to designate it as something to be skipped. This is best used with cases where the `read_csv()` command will not compile without it.
+
+So far, we've covered how we can organize CSV data, but at it's core we're working with comma separated values. But what happens when we want to read data from something that doesn't use commas to separate the values?
+
+When our tabular data comes in a different format, we can use the `read_delim()` function instead. For example, a different version of `test_6.csv` could exist that has no column names and uses pipes (`|`) as the delimiter instead of commas.
 
 Here's another file named `delim_1`, which uses the `|` to separate the lines instead of a comma like a normal CSV file.
 
@@ -146,20 +212,20 @@ With `read_delim()`, we specify the first argument as the path to the file, as d
 
 delim_1 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/delim_1.txt"
 
-readLines(delim_1)
+read_delim(delim_1, delim = "|")
 ```
 
-Both CSV files and their text counterparts are easily transferable between computers and programming languages, but due to their simple nature CSV files are only able to move basic data and only as text values. They also have poor support for special characters like commas, which create a column and end up breaking the table in the end.
+You can often find CSV files on websites like [kaggle](https://kaggle.com) as well as by exporting from an Excel spreadsheet. Keep in mind that data imported off of the internet is often very messy, so try to use some of the functions listed here to clean it up. For a full list of arguments and in-depth documentation about the `read_csv()` function, please visit this [website](https://readr.tidyverse.org/reference/read_delim.html).
 
 ### Excel Files
 
 Excel is a spreadsheet program that use tables to analyze, store, or manipulate data. The tables are composed of cells which include text, numbers, or formulas. Excel files have the filename extension .xlsx. They store additional things that you cannot store in a .csv file such as fonts, text formatting, graphics, etc.
 
-In order to write excel files you have to install complex packages, and they are hard to create. Writing excel files is beyond the scope of Primer. 
+In order to write excel files you have to install complex packages, and they are hard to create. Writing excel files is beyond the scope of Primer.
+
+This makes Excel files valuable because they're commonly accepted and usable (Microsoft Excel is a very common program), but they're also hard to use because you can't write new data into them. This makes Excel files more common for data that was originally in Excel, like accounting data or other spreadsheet applications.
 
 Reading Excel files is easy. To do so, we use the `read_excel()` function from the **readxl** package.
-
-<!-- I tried to merge with the thign and got the weird stuff with the head and what looks like an API key for some reason. I'm hoping this isn't a bad thing. -->
 
 ```{r}
 library(readxl)
@@ -169,14 +235,10 @@ library(readxl)
 # directory. Note that the "proper" way of handling this would be to create a
 # temp directory with tempdir(), download the file into that directory, read it,
 # and then delete the temp directory. That way, you would not have random
-
 # downloaded files hanging around.
+
 # The mode = "wb" is a necessary addition for Windows users because Windows is
 # weird. It's not necessary on MacOS and may cause an error as well.
-
-# downloaded files hanging around. The mode = "wb" is a necessary addition for
-# Windows users because Windows is weird. It's not necessary on MacOS and may
-# cause an error as well.
 
 download.file(url = "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/excel_1.xlsx", 
               destfile = "example_excel.xlsx", mode = "wb")
@@ -196,14 +258,15 @@ file.remove("example_excel.xlsx")
 
 
 If the .xlsx file has multiple sheets, you have to use the `sheet` argument to specify the sheet number or name. 
+The `read_excel()` function has arguments similar to the `read_csv()` function such as `col_names`, `col_types`, and `na`.
 
+### RDS files
 
-### RDS
-
-One very important aspect of R is saving objects into rds files, which store a single R object into a file.
+One very important aspect of R is saving objects into  RDS  files, which store a single R object into a file.
 These files allow us to save R objects such as plots and tibbles into R and then reload the object that it contains later without re-running the code that made it.
 This is especially useful for when you're dealing with bulk data and want to save the plot that comes with it for later.
-With a rds file, you save the entire object, allowing you to do more things with it later without having to go through all of the code.
+With a RDS file, you save the entire object, allowing you to do more things with it later without having to go through all of the code.
+However, RDS files are limited to R projects only, and they're often incomprehensible both to human eyes and to other programming languages. This makes RDS files ideal for saving objects temporarily in your own project or for sharing objects to other R users.
 
 Take the following R object, a graph of the `iris` data set.
 
@@ -217,13 +280,13 @@ iris_p <- iris %>%
 iris_p
 ```
 
-When we save to a rds file, we use the function `write_rds()`. Just like `write_csv()`, this function has two main arguments: `x` and `file`.  The `x` argument is the object that you want to save. The `file` argument is the file path where you want to save the file. The end of the path argument is the name that you want to use for the file.
+When we save to a RDS file, we use the function `write_rds()`. Just like `write_csv()`, this function has two main arguments: `x` and `file`.  The `x` argument is the object that you want to save. The `file` argument is the file path where you want to save the file. The end of the path argument is the name that you want to use for the file.
 
 ```{r}
-# Technically, it's incorrect to save a ggplot plot as a rds file because it has
+# Technically, it's incorrect to save a ggplot plot as a RDS file because it has
 # no real benefit. It still just acts as a plot and restricts the user to only
 # using ggplot functions. It's more practical to save the data set itself.
-# We're using a graph here to better show how the rds file is unique from other
+# We're using a graph here to better show how the RDS file is unique from other
 # data formats like CSV files.
 
 write_rds(x = iris_p, file = "iris_p.rds")
@@ -238,24 +301,26 @@ read_rds(file = "iris_p.rds")
 We can then use that R object in more operations, such as adding a trend line.
 
 ```{r}
-iris_p <- read_rds(file = "iris_p.rds")
-iris_p + 
+rds_p <- read_rds(file = "iris_p.rds")
+rds_p + 
   geom_smooth(method = "loess",
               formula = y ~ x,
               se = FALSE)
 ```
 
-By saving the `iris_p` plot in a rds file, we eliminate the time needed to calculate and generate that plot again because we can use the saved information. We can then use the object by reading the file back into r and using it like any normal plot, adding new layers and doing new operations.
+By saving the `iris_p` plot in a RDS file, we eliminate the time needed to calculate and generate that plot again because we can use the saved information. We can then use the object by reading the file back into r and using it like any normal plot, adding new layers and doing new operations.
 
 ```{r, include = FALSE}
 file.remove("iris_p.rds")
 ```
 
-There are also Rdata files which can store multiple objects.
+There are also .Rdata files which can store multiple objects, but RDS files can accomplish a similar task. This makes it much easier to use RDS files for anything that you want to keep in R.
 
 ### JSON
 
 An increasingly common format for sharing data is **J**avaScript **O**bject **N**otation or JSON. Because this format is very general, it is nothing like a spreadsheet. Note that JSON files are often made available via the internet. Several organizations provide a JSON API or a web service that you can connect directly to and from which you can obtain data. 
+
+JSON files are a minimal readable format that structures data, and they're commonly used to transmit data between a server and a web application like a website. For people familiar with the Javascript coding language, you'll likely see the similarities between the JSON file format and the Javascript syntax. This makes JSON files ideal for internet transport, but they don't see much use within a project like RDS files do.
 
 The functions `fromJSON()` and `toJSON()` allow you to convert between R objects and JSON. Both functions come from the **jsonlite** package. 
 
@@ -263,7 +328,7 @@ The functions `fromJSON()` and `toJSON()` allow you to convert between R objects
 library(jsonlite)
 ```
 
-The function `toJSON()` converts a tibble to JSON format. Consider the `example_1`:
+The function `toJSON()` converts a tibble to JSON format. Consider the `example_1` tibble:
 
 ```{r}
 example_1 <- tibble(name= c("Miguel", "Sofia", "Aya", "Cheng"), 
@@ -272,8 +337,6 @@ example_1 <- tibble(name= c("Miguel", "Sofia", "Aya", "Cheng"),
 
 example_1
 ```
-
-
 
 ```{r}
 # The pretty argument adds indentation and whitespace when TRUE.
@@ -284,7 +347,6 @@ toJSON(example_1, pretty = TRUE)
 The function `fromJSON()` converts JSON format to a tibble.
 
 ```{r}
-
 json_format_ex <-
 '[
   {"Name" : "Mario", "Age" : 32, "Occupation" : "Plumber"}, 
@@ -296,11 +358,21 @@ json_format_ex <-
 fromJSON(json_format_ex) 
 ```
 
+Make sure to follow the JSON format exactly when you're writing JSON files, as the format is what makes them special and what allows them to work.
+
 ## Databases
+
+Databases are one of the most common methods of storing data, as they are capable of storing large amounts of data while also allowing for multiple people to access and change them at the same time. Think of these like a giant book with a bunch of tables that hold data. These are useful by themselves, but with the advent of computers we are now able to use relational databases.
+
+A relational database is a database that has the tables interact with one another based on common data, allowing you to create custom tables from an existing set of records. For example, a relational database may hold multiple tables that use the same ID to keep track of different information, like one table having an ID and a movie name while another has the ID and the rating. You can then combine those two in your code, creating a table with the ID, name, and rating. This allows the person who made the database to easily put in new data as well as allow you to pull out some data at a time without loading the entire database.
+
+It's common to use and interact with these databases in the real world due to most businesses using relational databases to keep track of their data and to update it at their leisure. It's not uncommon for databases to hold thousands or even millions of rows due to the need to keep track of data.
+
+<!-- Link to writing databases, saving it here for now https://www.datacamp.com/community/tutorials/sqlite-in-r -->
 
 ### Reading data from a SQLite database
 
-SQLite is probably the simplest relational database that one can use in combination with R. SQLite databases are self-contained and usually stored and accessed locally on one computer. Data is usually stored in a file with a `.db` extension. Similar to Excel files, these are not plain text files and cannot be read in a plain text editor. 
+SQLite is probably the simplest relational database that one can use in combination with R. SQLite databases are self-contained and usually stored and accessed locally on one computer, instead of on the internet or through the cloud. Data is usually stored in a file with a `.db` extension. Similar to Excel files, these are not plain text files and cannot be read in a plain text editor. 
 
 The first thing you need to do to read data into R from a database is to connect to the database. We do that using `dbConnect()` function from the **DBI** (database interface) package. This does not read in the data, but simply tells R where the database is and opens up a communication channel.
 
@@ -316,8 +388,6 @@ con_lang_data <- dbConnect(RSQLite::SQLite(), "example_db.db")
 Often relational databases have many tables, and their power comes from the useful ways they can be joined. Thus anytime you want to access data from a relational database, you need to know the table names. You can get the names of all the tables in the database using `dbListTables()`.
 
 ```{r, con_lang_data}
-library(DBI)
-library(RSQLite)
 tables <- dbListTables(con_lang_data)
 tables
 ```
@@ -358,11 +428,19 @@ tail(aboriginal_lang_db)
 ## Error: tail() is not supported by sql sources
 ```
 
+These functions only work when we use the version that we used collect() on:
+
+```{r}
+nrow(aboriginal_lang_data)
+```
+
+```{r}
+tail(aboriginal_lang_data)
+```
+
 In order to delete and stop using an SQLite server, you need to first disconnect the file from the connection be using `dbDisconnect()` and passing in the connection object as an argument. You can then safely delete the database file from your computer by using `file.remove()`.
 
 ```{r, results = "hide"}
-library(DBI)
-library(RSQLite)
 dbDisconnect(con_lang_data)
 file.remove("example_db.db")
 ```
@@ -370,117 +448,239 @@ file.remove("example_db.db")
 Additionally, some operations will not work to extract columns or single values from the reference given by the `tbl` function. Thus, once you have finished your data wrangling of the `tbl()` database reference object, it is advisable to bring it into your local machine's memory using `collect()` as a data frame. 
 
 > Warning: Usually, databases are very big! Reading the object into your local machine may give an error or take a lot of time to run so be careful if you plan to do this! 
+
+###Interacting with SQLite databases
+
+Now that we've figured out how to get data from a database, let's look at how to wrangle data within that database.
+
+Because databases normally contain large amounts of data, it's advisable to do your wrangling before you use `collect()` to transform the database table into a tibble. This stops you from pulling large amounts of data onto your computer and just ignoring it.
+
+So let's try pulling in a database and see how we can manipulate it.
+
+```{r}
+library(DBI)
+library(RSQLite)
+# Again, use mode = "wb" if you're using a Windows operating system.
+download.file(url = "https://github.com/PPBDS/primer/blob/master/03-data/data/chinook.db?raw=true",
+             dest = "chinook.db", mode = "wb")
+
+con <- dbConnect(RSQLite::SQLite(), "chinook.db")
+```
+
+First off, look at what data this database holds.
+
+```{r}
+dbListTables(con)
+```
+There are 13 tables in this database. Let's access the first couple of tables, just so that we can get a good look at them and see how they're structured..
+
+```{r}
+albums <- tbl(con, "albums")
+albums
+artists <- tbl(con, "artists")
+artists
+```
  
-### Reading data from a PostgreSQL database 
+As you can see, each table has a common column: the `ArtistId` column. However, they all have different information linked to that ID, such as "albums" having the albums that artist produced and "artists" having the name of that artist.
 
-PostgreSQL (also called Postgres) is a very popular and open-source option for relational database software. Unlike SQLite, PostgreSQL uses a client–server database engine, as it was designed to be used and accessed on a network. This means that you have to provide more information to R when connecting to Postgres databases. The additional information that you need to include when you call the `dbConnect()` is listed below:
+Here is the [full relationship diagram](http://schemaspy.org/sample/diagrams/summary/relationships.real.large.png) of the database that we're using.
 
-- `dbname` - the name of the database (a single PostgreSQL instance can host more than one database)
-- `host` - the URL pointing to where the database is located
-- `port` - the communication endpoint between R and the PostgreSQL database (this is typically 5432 for PostgreSQL)
-- `user` - the username for accessing the database
-- `password` - the password for accessing the database
+Let's go over some of the operations that you can do on a SQLite database.
 
+#### Using dbplyr
 
-Additionally, we must use the **RPostgres** package instead of **RSQLite** in the `dbConnect()` function call. Below we demonstrate how to connect to a version of the `can_mov_db` database, which contains information about Canadian movies (*note - this is a synthetic, or artificial, database*).
+We've already seen how you can use the **dbpylr** package to get a table from a database, but let's look at how you can also use it to do operations on databases as well.
 
-```
-library(RPostgres)
-can_mov_db_con <- dbConnect(RPostgres::Postgres(), dbname = "can_mov_db",
-                        host = "r7k3-mds1.stat.ubc.ca", port = 5432,
-                        user = "user0001", password = '################')
-```
+The **dbpylr** package allows you to use many of the same functions from the **tidyverse** like `select()`, `filter()`, `mutate()` without any issues, making it the easiest to do operations with.
 
-### Interacting with a database
+Here's an example of using the **dbpylr** package to get the number of albums each artist has created.
 
-After opening the connection, everything looks and behaves almost identically to when we were using an SQLite database in R. For example, we can again use `dbListTables()` to find out what tables are in the `can_mov_db` database:
-
-```
-dbListTables(can_mov_db_con)
-```
-
-```
- [1] "themes"            "medium"           "titles"     "title_aliases"       "forms"            
- [6] "episodes"          "names"      "names_occupations" "occupation"       "ratings" 
+```{r} 
+# You can keep a column during the summarize() if you just put the name equal to itself.
+# This code is deliberately long in order to show the common functions that we use.
+band_albums <- tbl(con, "albums") %>%
+                 inner_join(tbl(con, "artists"), by = "ArtistId") %>%
+                 select("AlbumId", "ArtistId", "Title", "Name") %>%
+                 group_by(ArtistId) %>%
+                 summarize(Name = Name, num_albums = n()) %>%
+                 mutate(artist_name = Name) %>%
+                 mutate(artist_id = ArtistId) %>%
+                 filter(num_albums > 3) %>%
+                 arrange(desc(num_albums)) %>%
+                 select(artist_id, artist_name, num_albums)
+band_albums
 ```
 
-We see that there are 10 tables in this database. Let's first look at the `"ratings"` table to find the lowest rating that exists in the `can_mov_db` database:
+These are the functions that we're already familiar with using, and they work just as well on database tables as well.
 
-```
-ratings_db <- tbl(can_mov_db_con, "ratings")
-ratings_db
-```
+However, there are cases where you will have to use SQL code to accomplish certain tasks.
 
-```
-# Source:   table<ratings> [?? x 3]
-# Database: postgres [user0001@r7k3-mds1.stat.ubc.ca:5432/can_mov_db]
-   title              average_rating num_votes
-   <chr>                    <dbl>     <int>
- 1 The Grand Seduction       6.6       150
- 2 Rhymes for Young Ghouls   6.3      1685
- 3 Mommy                     7.5      1060
- 4 Incendies                 6.1      1101
- 5 Bon Cop, Bad Cop          7.0       894
- 6 Goon                      5.5      1111
- 7 Monsieur Lazhar           5.6       610
- 8 What if                   5.3      1401
- 9 The Barbarian Invations   5.8        99
-10 Away from Her             6.9      2311
-# … with more rows
+#### Using SQL code
+<!-- AG: I'm devoting a paragraph to SQL and what it is. I'm doing this because I don't want people to misunderstand that you can just use dbplyr for everything, as well as that dbplyr is actually doing the SQL code for you. -->
+
+<!-- AG: The caption seemed to knit ok, but I'm not sure if I should use it in the actual book. -->
+
+```{r, echo = FALSE, fig.cap="DROP TABLE is a particularly infamous SQL command."}
+knitr::include_graphics("https://imgs.xkcd.com/comics/exploits_of_a_mom.png")
 ```
 
-To find the lowest rating that exists in the data base, we first need to extract the `average_rating` column using `select()`:
+First off, let's try to understand what SQLite and SQL really is.
 
-```
-avg_rating_db <- select(ratings_db, average_rating)
-avg_rating_db
-```
+<!-- AG: Is it OK to write "in this course" or should I put something else? -->
 
-```
-# Source:   lazy query [?? x 1]
-# Database: postgres [user0001@r7k3-mds1.stat.ubc.ca:5432/can_mov_db]
-   average_rating
-            <dbl>
- 1            6.6
- 2            6.3
- 3            7.5
- 4            6.1
- 5            7.0
- 6            5.5
- 7            5.6
- 8            5.3
- 9            5.8
-10            6.9
-# … with more rows
+SQL, or **S**tructured **Q**uery **L**anguage, is a coding language that works to build the relational databases that we've been using so far. SQLite is a special type of database that you can download onto your computer that uses SQL as its basic structure and basic language. Essentially, SQLite uses SQL code to do the things that it does.
+
+While you shouldn't need to write SQL code in this course, it's very common to read from an SQL database in order to access data so that you can graph it.
+
+SQL runs through something known as a **query**, a line of code that pulls in information from the database. This is effectively asking the database for a specific set of data. This is what's known as a `SELECT` command, which "selects" data from the database and brings it into your computer for your use.
+
+```{sql, connection = con}
+-- This code is written in SQL syntax, so it won't work if you just put it into R. 
+-- We'll be going over how to write SQL in R later in this section.
+SELECT AlbumId, Title, ArtistId FROM albums
 ```
 
-Next we use `min()` to find the minimum rating in that column:
-
-```
-min(avg_rating_db)
-```
-
-```
-Error in min(avg_rating_db) : invalid 'type' (list) of argument
-```
-
-Instead of the minimum, we get an error! This is another example of when we need to use the `collect()` function to bring the data into R for further computation:
-
-```
-avg_rating_data <- collect(avg_rating_db)
-min(avg_rating_data)
+You can then modify these queries to do operations like joins.
+```{sql, connection = con}
+-- This does the same thing as the inner join from Chapter 2 Wrangling
+-- Here we're joining the albums and the artists table by the ArtistId column
+SELECT ArtistId, Name, Title FROM (
+  SELECT Title, albums.ArtistId AS "ArtistId", "Name"
+  FROM albums
+  INNER JOIN artists
+  ON albums.ArtistId = artists.ArtistId
+)
 ```
 
-```
-[1] 1
+>If you're interested in what SQL statements mean and how to write SQL code, visit this [tutorial](https://www.sqlitetutorial.net/).
+
+In fact, the `dbplyr` commands actually use SQL code to create their effect.
+You can run `show_query()` to see the SQL code, or the *query* that `dbplyr` produces.
+
+```{r}
+show_query(band_albums)
 ```
 
-We see the lowest rating given to a movie is 1, indicating that it must have been a really bad movie...
+However, you can't do everything from SQL through the `dbplyr` package. For example, you can't use the `slice()` command.
 
+```
+slice(band_albums, 1:10)
+```
+```
+## Error: slice() is not supported on database backends
+```
+
+This is possible in an SQL database. There are a couple of ways to run SQL code in R, but the easiest way is by using the `dbGetQuery()` function from the **DBI** library.
+
+<!-- AG: This is my first time doing SQL code and I'm more experienced with Java/Python, so I formatted it like how Java and Python are formatted with the parentheses acting as brackets instead. This may be heresy in the SQL world, so please tell me if I have to fix it. -->
+
+```{r}
+# This code is just copy-pasted from the earlier dbplyr code so you can best understand it.
+# It's also organized for readability, with the parentheses having their own lines.
+# This isn't how SQL code is formatted normally, but it's intended for readability.
+# This is probably more understandable for people who have Java or Python experience
+
+dbGetQuery(con, "
+  SELECT `artist_id`, `artist_name`, `num_albums` FROM (
+    SELECT `ArtistId`, `Name`, `num_albums`, `artist_name`, `ArtistId` AS `artist_id` FROM (
+      SELECT `ArtistId`, `Name`, `num_albums`, `Name` AS `artist_name` FROM (
+        SELECT `ArtistId`, `Name`, COUNT(*) AS `num_albums` FROM (
+          SELECT `AlbumId`, `ArtistId`, `Title`, `Name` FROM (
+            SELECT `AlbumId`, `Title`, `LHS`.`ArtistId` AS `ArtistId`, `Name` FROM `albums` AS `LHS`
+            INNER JOIN `artists` AS `RHS` ON (`LHS`.`ArtistId` = `RHS`.`ArtistId`)
+          )
+        )
+        GROUP BY `ArtistId`
+      )
+    )
+  )
+  WHERE (`num_albums` > 3.0)
+  ORDER BY `num_albums` DESC
+")
+```
+
+This method allows you to only use R code within your project, making it easier.
+
+You can also use SQL code directly in your project by changing the header in an Rmarkdown file. When you code in an Rmarkdown file, you create chunks that look like this:
+```
+## ```{r}
+##
+## ```
+```
+
+You can code in SQL by changing the chunk to look like this:
+
+```
+## ```{sql, connection = con, output.var = "your_variable_name"}
+## 
+## ```
+```
+
+This allows you to write SQL code in genuine SQL syntax and save the output to a variable.
+```
+## ```{sql, connection = con, output.var = "your_variable_name"}
+## SELECT * FROM albums
+## ```
+```
+
+```{sql, connection = con, output.var = "your_variable_name", echo = FALSE}
+-- SQL uses a semicolon to show the end of the statements
+-- However, you don't need to include that for the dbGetQuery() statemetn
+SELECT * FROM albums;
+```
+
+You can then use that variable in your R code.
+```{r}
+head(your_variable_name)
+```
+
+Coding in SQL allows you to do the things that the **dbplyr** package doesn't, such as only using certain rows. If you add `LIMIT 10;` at the end of the query (the first `SELECT` statement), you can limit the query to only the first 10 rows.
+
+```{sql, connection = con, output.var = "band_albums_sql"}
+-- We're writing this code using the sql code chunk method. 
+-- This is because it allows you to see what's highlighted and what's not.
+-- SQL code is also inconvenient because you can't just add a new line,
+-- Instead, you need to treat all of these lines of code as a single statement
+-- Then add in the command where you think that it would fit.
+SELECT `artist_id`, `artist_name`, `num_albums` FROM (
+  SELECT `ArtistId`, `Name`, `num_albums`, `artist_name`, `ArtistId` AS `artist_id` FROM (
+    SELECT `ArtistId`, `Name`, `num_albums`, `Name` AS `artist_name` FROM (
+      SELECT `ArtistId`, `Name`, COUNT(*) AS `num_albums` FROM (
+        SELECT `AlbumId`, `ArtistId`, `Title`, `Name` FROM (
+          SELECT `AlbumId`, `Title`, `LHS`.`ArtistId` AS `ArtistId`, `Name` FROM `albums` AS `LHS`
+          INNER JOIN `artists` AS `RHS` ON (`LHS`.`ArtistId` = `RHS`.`ArtistId`)
+        )
+      )
+      GROUP BY `ArtistId`
+    )
+  )
+)
+WHERE (`num_albums` > 3.0)
+ORDER BY `num_albums` DESC 
+LIMIT 10;
+```
+```{r}
+# You can't see this, but output.var = "band_albums_sql" in the chunk above this.
+# So we're outputting our data into band_albums_sql
+band_albums_sql
+```
+
+SQL is more versatile than `dbplyr`, but it's also a lot more confusing because it's not as straightforward. This creates one golden rule:
+
+> **Use dbplyr functions for data analysis and SQL code for accessing data**
+
+This is because SQL code is weird and hard to understand, but it allows you to easily pull in data. SQL is a coding language designed for you to query or ask databases for data. Meanwhile, `dbplyr` is meant for analyzing that data and modifying it.
+
+```{r, include = FALSE}
+dbDisconnect(con)
+file.remove("chinook.db")
+```
+
+Now, we worked with an SQLite database within this tutorial due to its simplicity. However, there are other databases that can be accessed in different ways. For example, a PostgresSQL server is located on the internet and allows you to pull data from the internet instead of downloading it into your computer. You can learn about some of the types of SQL databases and their differences [here](https://www.digitalocean.com/community/tutorials/sqlite-vs-mysql-vs-postgresql-a-comparison-of-relational-database-management-systems).
 
 **Why should we bother with databases at all?**
 
-Opening a database stored in a `.db` file involved a lot more effort than just opening a `.csv`, `.tsv`, or any of the other plain text or Excel formats. It was a bit of a pain to use a database in that setting since we had to use `dbplyr` to translate `tidyverse`-like commands (`filter`, `select`, `head`, etc.) into SQL commands that the database understands. Not all `tidyverse` commands can currently be translated with SQLite databases. For example, we can compute a mean with an SQLite database but can't easily compute a median. So you might be wondering why should we use databases at all? 
+Opening a database stored in a `.db` file involved a lot more effort than just opening a `.csv`, `.tsv`, or any of the other plain text or Excel formats. It was a bit of a pain to use a database in that setting since we had to use `dbplyr` to translate `tidyverse`-like commands (`filter`, `select`, `head`, etc.) into SQL commands that the database understands. Not all `tidyverse` commands can currently be translated with SQLite databases, like we showed with `slice()`. So you might be wondering, why should we use databases at all? 
 
 Databases are beneficial in a large-scale setting:
 
@@ -489,6 +689,8 @@ Databases are beneficial in a large-scale setting:
 - they provide mechanisms for ensuring data integrity and validating input
 - they provide security to keep data safe
 For example, [there are billions of Google searches conducted daily](https://www.internetlivestats.com/google-search-statistics/). 
+
+This makes databases extremely useful for a business where they'll have employees doing thousands or millions of operations daily. This makes knowing what SQL databases are extremely vital from both a data science and a general usage perspective.
 
 ## Webscraping
 
@@ -521,8 +723,6 @@ Hello World
 </p>
 </html>
 <br>
-
-When we're using HTML in R, we use the `minimal_html()` function to allow us to easily use it.
 
 #### Application
 Now let's look at this in a real-world context. Say we are interested in knowing the average rental price (per square footage) of the most recently available one-bedroom apartments in Vancouver from https://vancouver.craigslist.org. When we visit the Vancouver Craigslist website and search for one-bedroom apartments, this is what we are shown:
@@ -709,8 +909,6 @@ denver %>%
   slice(1:3)
 
 ```
-
-<!-- AG: There's a great tutorial here: https://masalmon.eu/2017/11/16/wheretoliveus/ that shows how to create a graph and how to manipulate Mesonet API data. This may be more suited to a tutorial however. Also see the README.md here: https://github.com/eringrand/astropic on how to use NASA's APOD-->
 
 The `content()` call extracts the content from the response to the HTTP request sent by the `GET()` function. The Iowa Environmental Mesonet API offers the option to return the requested data in a comma-separated file (format = "comma" in the GET request), so here content and `read_csv()` are used to extract and read in that csv file. Usually, data will be returned in a JSON format instead.
 
