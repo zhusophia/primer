@@ -8,11 +8,11 @@
 
 <!-- TODO: -->
 
-<!-- Rewrite entire webscraping section. Delete everything you don't like. Look closely at the current version of the tutorial. Rewrite this section so that it will be easy to fold the tutorial questions into it at some point in the future. -->
+<!-- Rewrite entire webscraping section. Delete everything you don't like. Look closely at the current version of the tutorial. Rewrite this section so that it will be easy to fold the tutorial questions into it at some point in the future. DONE -->
 
-<!-- Start of chapter, mention that all the files we are working on live in this directory, called `file_dir <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/"`. Then, define `file_1 <- paste0(file_dir, "test_1.csv")` or whatever. -->
+<!-- Start of chapter, mention that all the files we are working on live in this directory, called `file_dir <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/"`. Then, define `file_1 <- paste0(file_dir, "test_1.csv")` or whatever. DONE -->
 
-<!-- The tutorial includes a lot of arguments like na and comment, but that makes the book feel like it's really long once it's actually put into text form with paragraphs and stuff. True! So, what do we include and what do we not? -->
+<!-- The tutorial includes a lot of arguments like na and comment, but that makes the book feel like it's really long once it's actually put into text form with paragraphs and stuff. True! So, what do we include and what do we not? I I don't know, I don't really have any feelings either way. It makes sense to have it in the book though since people will likely refer to the book rather than the documentation when they have problems. DONE -->
 
 Start by loading the packages which we will need in this chapter.
 
@@ -24,12 +24,21 @@ library(lubridate)
 library(dbplyr)
 library(janitor)
 library(skimr)
-library(knitr)
 ```
 
 ## Writing and reading files
 
+```{r, echo = FALSE}
+knitr::include_graphics("03-data/images/file_extensions.png")
+```
+
 Getting data into and out of R is a major part of any real world data science project. There are multiple data formats that you use to transport this data, each with their own positives and negatives.
+
+You can find most of the files that we use for this chapter [here](https://github.com/PPBDS/primer.tutorials/tree/master/inst/www). We can also access these files by saving the URL to R and then using it so that we can download and access the files located on the internet.
+
+```{r}
+github_url <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/"
+```
 
 ### CSV files
 
@@ -45,8 +54,12 @@ Here's an example of a CSV file and what it looks like. Use `read_csv()` from th
 ```{r}
 # We can access files either by using their URL or their file path.
 # In this case, we're using the GitHub URL to access the database.
+# This is done by pasting the file name into our URL using the paste0() command
+# This does the same thing as creating the URL below.
+# https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/test_1.csv
 
-file_1 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/test_1.csv"
+file_1 <- paste0(github_url, "test_1.csv")
+
 read_csv(file = file_1)
 ```
 
@@ -87,7 +100,7 @@ Consider the following csv file: `test_2.csv`. Here's what it looks like as a te
 # looking weird We set `file_1` to be the full path to `test_2.csv`'s location
 # on the web.
 
-file_2 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/test_2.csv"
+file_2 <- paste0(github_url, "test_2.csv")
   
 readLines(file_2)
 ```
@@ -98,7 +111,7 @@ As you can see, there is text at the top of this file. Often times information a
 # You can also get a csv file by using the URL of the file. This won't work for
 # all file types though.
 
-file_2 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/test_2.csv"
+file_2 <- paste0(github_url, "test_2.csv")
 
 read_csv(file_2)
 ```
@@ -129,9 +142,8 @@ read_csv(file = file_2,
 
 You can also change the column arguments so that you get the data type that you want.
 Take `test_7.csv`.
-
 ```{r}
-file_3 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/test_7.csv"
+file_3 <- paste0(github_url, "test_7.csv")
 
 read_csv(file_3)
 ```
@@ -148,36 +160,36 @@ We can also manipulate other arguments for CSV files.
 
 Let's try changing the column names in the `test_3.csv` file.
 
-As you can see below, the file doesn't have any column names, resulting in the first row being considered as a column.
+As you can see below, the file doesn't have any column names, resulting in the first row being considered as the names for the rest of the file.
 
 ```{r}
-file_4 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/test_3.csv"
+file_4 <- paste0(github_url, "test_3.csv")
+
 read_csv(file_4)
 ```
 
 We can fix this by changing the `col_names` argument.
-
 ```{r}
 read_csv(file_4, col_names = c("a", "b", "c"))
 ```
 
 You can also create names automatically by setting `col_names` to FALSE
-
 ```{r}
 read_csv(file_4, col_names = FALSE)
 ```
 
 Changing the names of the columns allows for you to call on the columns later when the data is actually a tibble. Setting the column names to something that you can understand makes it much easier to understand your code later on.
 
-
+<!-- The tutorial includes a lot of arguments like na and comment, but that makes the book feel like it's really long once it's actually put into text form with paragraphs and stuff. -->
 
 Another feature is the `na` argument.
 ```{r}
-file_5 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/test_5.csv"
+file_5 <- paste0(github_url, "test_5.csv")
+
 read_csv(file_5)
 ```
 
-`test_5.csv` is missing a value, and it uses a `.` as a substitute. This makes the computer think that the period is the actual value of the data point, which is obviously not true (we want numbers instead). By default, `read_csv()` treats white space like ` ` as a missing value, but you can set this argument directly as well.
+`test_5.csv` is missing a value, and it uses a `.` as a substitute. This makes the computer think that the period is the actual value of the data point, which is obviously not true (we want numbers instead). By default, `read_csv()` treats white space like spaces or tabs as a missing value, but you can set this argument directly as well.
 
 ```{r}
 read_csv(file_5,
@@ -186,7 +198,7 @@ read_csv(file_5,
 
 You can also tell the code to ignore comment lines, which may be common in a csv file that was written by a human and as such has comments in it. `test_6.csv` is a perfect example of this. Here's what it looks like:
 ```{r, echo = FALSE}
-file_6 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/test_6.csv"
+file_6 <- paste0(github_url, "test_6.csv")
 readLines(file_6)
 ```
 
@@ -206,7 +218,7 @@ When our tabular data comes in a different format, we can use the `read_delim()`
 Here's another file named `delim_1`, which uses the `|` to separate the lines instead of a comma like a normal CSV file.
 
 ```{r, echo = FALSE}
-delim_1 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/delim_1.txt"
+delim_1 <- paste0(github_url, "delim_1.txt")
 
 readLines(delim_1)
 ```
@@ -221,7 +233,7 @@ With `read_delim()`, we specify the first argument as the path to the file, as d
 # This varies for every symbol, but you can 
 # find most delim values on the internet.
 
-delim_1 <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/delim_1.txt"
+delim_1 <- paste0(github_url, "delim_1.txt")
 
 read_delim(delim_1, delim = "|")
 ```
@@ -251,7 +263,7 @@ library(readxl)
 # The mode = "wb" is a necessary addition for Windows users because Windows is
 # weird. It's not necessary on MacOS and may cause an error as well.
 
-download.file(url = "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/excel_1.xlsx", 
+download.file(url = paste0(github_url, "excel_1.xlsx"), 
               destfile = "example_excel.xlsx", mode = "wb")
 
 
@@ -294,12 +306,6 @@ iris_p
 When we save to a RDS file, we use the function `write_rds()`. Just like `write_csv()`, this function has two main arguments: `x` and `file`.  The `x` argument is the object that you want to save. The `file` argument is the file path where you want to save the file. The end of the path argument is the name that you want to use for the file.
 
 ```{r}
-# Technically, it's incorrect to save a ggplot plot as a RDS file because it has
-# no real benefit. It still just acts as a plot and restricts the user to only
-# using ggplot functions. It's more practical to save the data set itself.
-# We're using a graph here to better show how the RDS file is unique from other
-# data formats like CSV files.
-
 write_rds(x = iris_p, file = "iris_p.rds")
 ```
 
@@ -373,13 +379,15 @@ Make sure to follow the JSON format exactly when you're writing JSON files, as t
 
 ## Databases
 
+```{r, echo = FALSE, fig.cap="DROP TABLE is a particularly infamous SQL command."}
+knitr::include_graphics("03-data/images/exploits_of_a_mom.png")
+```
+
 Databases are one of the most common methods of storing data, as they are capable of storing large amounts of data while also allowing for multiple people to access and change them at the same time. Think of these like a giant book with a bunch of tables that hold data. These are useful by themselves, but with the advent of computers we are now able to use relational databases.
 
 A relational database is a database that has the tables interact with one another based on common data, allowing you to create custom tables from an existing set of records. For example, a relational database may hold multiple tables that use the same ID to keep track of different information, like one table having an ID and a movie name while another has the ID and the rating. You can then combine those two in your code, creating a table with the ID, name, and rating. This allows the person who made the database to easily put in new data as well as allow you to pull out some data at a time without loading the entire database.
 
 It's common to use and interact with these databases in the real world due to most businesses using relational databases to keep track of their data and to update it at their leisure. It's not uncommon for databases to hold thousands or even millions of rows due to the need to keep track of data.
-
-<!-- Link to writing databases, saving it here for now https://www.datacamp.com/community/tutorials/sqlite-in-r -->
 
 ### Reading data from a SQLite database
 
@@ -390,6 +398,9 @@ The first thing you need to do to read data into R from a database is to connect
 ```{r}
 library(DBI)
 library(RSQLite)
+
+# This example uses a different github URL, so you can't use the paste0() trick
+
 download.file(url = "https://github.com/PPBDS/primer/blob/master/03-data/data/can_lang.db?raw=true",
               destfile = "example_db.db", mode = "wb")
 
@@ -471,7 +482,9 @@ So let's try pulling in a database and see how we can manipulate it.
 ```{r}
 library(DBI)
 library(RSQLite)
+
 # Again, use mode = "wb" if you're using a Windows operating system.
+
 download.file(url = "https://github.com/PPBDS/primer/blob/master/03-data/data/chinook.db?raw=true",
              dest = "chinook.db", mode = "wb")
 
@@ -488,6 +501,7 @@ There are 13 tables in this database. Let's access the first couple of tables, j
 ```{r}
 albums <- tbl(con, "albums")
 albums
+
 artists <- tbl(con, "artists")
 artists
 ```
@@ -509,6 +523,7 @@ Here's an example of using the **dbpylr** package to get the number of albums ea
 ```{r} 
 # You can keep a column during the summarize() if you just put the name equal to itself.
 # This code is deliberately long in order to show the common functions that we use.
+
 band_albums <- tbl(con, "albums") %>%
                  inner_join(tbl(con, "artists"), by = "ArtistId") %>%
                  select("AlbumId", "ArtistId", "Title", "Name") %>%
@@ -528,38 +543,42 @@ However, there are cases where you will have to use SQL code to accomplish certa
 
 #### Using SQL code
 
-
-```{r, echo = FALSE, fig.cap="DROP TABLE is a particularly infamous SQL command."}
-knitr::include_graphics("https://imgs.xkcd.com/comics/exploits_of_a_mom.png")
-```
-
 First off, let's try to understand what SQLite and SQL really is.
 
 SQL, or **S**tructured **Q**uery **L**anguage, is a coding language that works to build the relational databases that we've been using so far. SQLite is a special type of database that you can download onto your computer that uses SQL as its basic structure and basic language. Essentially, SQLite uses SQL code to do the things that it does.
 
-While you shouldn't need to write SQL code in this course, it's very common to read from an SQL database in order to access data so that you can graph it.
+While you shouldn't need to write SQL code in this primer, it's very common to read from an SQL database in order to access data so that you can graph it.
 
 SQL runs through something known as a **query**, a line of code that pulls in information from the database. This is effectively asking the database for a specific set of data. This is what's known as a `SELECT` command, which "selects" data from the database and brings it into your computer for your use.
 
 ```{sql, connection = con}
 -- This code is written in SQL syntax, so it won't work if you just put it into R. 
 -- We'll be going over how to write SQL in R later in this section.
-SELECT AlbumId, Title, ArtistId FROM albums
+
+SELECT AlbumId,
+       Title,
+       ArtistId
+FROM albums;
 ```
 
 You can then modify these queries to do operations like joins.
 ```{sql, connection = con}
 -- This does the same thing as the inner join from Chapter 2 Wrangling
 -- Here we're joining the albums and the artists table by the ArtistId column
-SELECT ArtistId, Name, Title FROM (
-  SELECT Title, albums.ArtistId AS "ArtistId", "Name"
-  FROM albums
-  INNER JOIN artists
-  ON albums.ArtistId = artists.ArtistId
-)
+
+SELECT artistid,
+       NAME,
+       title
+FROM
+  (SELECT title,
+          albums.artistid AS "ArtistId",
+          "name"
+   FROM albums
+   INNER JOIN artists ON albums.artistid = artists.artistid);
 ```
 
->If you're interested in what SQL statements mean and how to write SQL code, visit this [tutorial](https://www.sqlitetutorial.net/).
+>If you're interested in what SQL statements mean and how to write SQL code, visit this [tutorial](https://www.sqlitetutorial.net/). If you're interested in how to create a
+database through SQL, visit [here](https://www.datacamp.com/community/tutorials/sqlite-in-r).
 
 In fact, the `dbplyr` commands actually use SQL code to create their effect.
 You can run `show_query()` to see the SQL code, or the *query* that `dbplyr` produces.
@@ -579,30 +598,45 @@ slice(band_albums, 1:10)
 
 This is possible in an SQL database. There are a couple of ways to run SQL code in R, but the easiest way is by using the `dbGetQuery()` function from the **DBI** library.
 
-<!-- AG: This is my first time doing SQL code and I'm more experienced with Java/Python, so I formatted it like how Java and Python are formatted with the parentheses acting as brackets instead. This may be heresy in the SQL world, so please tell me if I have to fix it. -->
+<!-- AG: This is my first time doing SQL code and I'm more experienced with Java/Python, so I formatted it like how Java and Python are formatted with the parentheses acting as brackets instead. This may be heresy in the SQL world, so please tell me if I have to fix it. I did some research and found an online SQL formatter here: https://sqlformat.org/ I'm just going to use this syntax because there are a lot of conflicting things and this is the one .org website I found.-->
 
 ```{r}
-# This code is just copy-pasted from the earlier dbplyr code so you can best understand it.
-# It's also organized for readability, with the parentheses having their own lines.
-# This isn't how SQL code is formatted normally, but it's intended for readability.
-# This is probably more understandable for people who have Java or Python experience
+# This code is just copy-pasted and reformatted from the earlier dbplyr code so 
+# you can best understand it.
 
 dbGetQuery(con, "
-  SELECT `artist_id`, `artist_name`, `num_albums` FROM (
-    SELECT `ArtistId`, `Name`, `num_albums`, `artist_name`, `ArtistId` AS `artist_id` FROM (
-      SELECT `ArtistId`, `Name`, `num_albums`, `Name` AS `artist_name` FROM (
-        SELECT `ArtistId`, `Name`, COUNT(*) AS `num_albums` FROM (
-          SELECT `AlbumId`, `ArtistId`, `Title`, `Name` FROM (
-            SELECT `AlbumId`, `Title`, `LHS`.`ArtistId` AS `ArtistId`, `Name` FROM `albums` AS `LHS`
-            INNER JOIN `artists` AS `RHS` ON (`LHS`.`ArtistId` = `RHS`.`ArtistId`)
-          )
-        )
-        GROUP BY `ArtistId`
-      )
-    )
-  )
-  WHERE (`num_albums` > 3.0)
-  ORDER BY `num_albums` DESC
+SELECT `artist_id`,
+       `artist_name`,
+       `num_albums`
+FROM
+  (SELECT `artistid`,
+          `name`,
+          `num_albums`,
+          `artist_name`,
+          `artistid` AS `artist_id`
+   FROM
+     (SELECT `artistid`,
+             `name`,
+             `num_albums`,
+             `name` AS `artist_name`
+      FROM
+        (SELECT `artistid`,
+                `name`,
+                Count(*) AS `num_albums`
+         FROM
+           (SELECT `albumid`,
+                   `artistid`,
+                   `title`,
+                   `name`
+            FROM
+              (SELECT `albumid`,
+                      `title`,
+                      `LHS`.`artistid` AS `ArtistId`,
+                      `name`
+               FROM `albums` AS `LHS`
+               INNER JOIN `artists` AS `RHS` ON (`LHS`.`artistid` = `RHS`.`artistid`))) GROUP  BY `artistid`)))
+WHERE (`num_albums` > 3.0)
+  ORDER  BY `num_albums` DESC
 ")
 ```
 
@@ -632,8 +666,10 @@ This allows you to write SQL code in genuine SQL syntax and save the output to a
 
 ```{sql, connection = con, output.var = "your_variable_name", echo = FALSE}
 -- SQL uses a semicolon to show the end of the statements
--- However, you don't need to include that for the dbGetQuery() statemetn
-SELECT * FROM albums;
+-- However, you don't need to include that for the dbGetQuery() statement
+
+SELECT * 
+FROM albums;
 ```
 
 You can then use that variable in your R code.
@@ -649,21 +685,38 @@ Coding in SQL allows you to do the things that the **dbplyr** package doesn't, s
 -- SQL code is also inconvenient because you can't just add a new line,
 -- Instead, you need to treat all of these lines of code as a single statement
 -- Then add in the command where you think that it would fit.
-SELECT `artist_id`, `artist_name`, `num_albums` FROM (
-  SELECT `ArtistId`, `Name`, `num_albums`, `artist_name`, `ArtistId` AS `artist_id` FROM (
-    SELECT `ArtistId`, `Name`, `num_albums`, `Name` AS `artist_name` FROM (
-      SELECT `ArtistId`, `Name`, COUNT(*) AS `num_albums` FROM (
-        SELECT `AlbumId`, `ArtistId`, `Title`, `Name` FROM (
-          SELECT `AlbumId`, `Title`, `LHS`.`ArtistId` AS `ArtistId`, `Name` FROM `albums` AS `LHS`
-          INNER JOIN `artists` AS `RHS` ON (`LHS`.`ArtistId` = `RHS`.`ArtistId`)
-        )
-      )
-      GROUP BY `ArtistId`
-    )
-  )
-)
+SELECT `artist_id`,
+       `artist_name`,
+       `num_albums`
+FROM
+  (SELECT `artistid`,
+          `name`,
+          `num_albums`,
+          `artist_name`,
+          `artistid` AS `artist_id`
+   FROM
+     (SELECT `artistid`,
+             `name`,
+             `num_albums`,
+             `name` AS `artist_name`
+      FROM
+        (SELECT `artistid`,
+                `name`,
+                Count(*) AS `num_albums`
+         FROM
+           (SELECT `albumid`,
+                   `artistid`,
+                   `title`,
+                   `name`
+            FROM
+              (SELECT `albumid`,
+                      `title`,
+                      `LHS`.`artistid` AS `ArtistId`,
+                      `name`
+               FROM `albums` AS `LHS`
+               INNER JOIN `artists` AS `RHS` ON (`LHS`.`artistid` = `RHS`.`artistid`))) GROUP  BY `artistid`)))
 WHERE (`num_albums` > 3.0)
-ORDER BY `num_albums` DESC 
+  ORDER  BY `num_albums` DESC
 LIMIT 10;
 ```
 ```{r}
@@ -676,7 +729,7 @@ SQL is more versatile than `dbplyr`, but it's also a lot more confusing because 
 
 > **Use dbplyr functions for data analysis and SQL code for accessing data**
 
-This is because SQL code is weird and hard to understand, but it allows you to easily pull in data. SQL is a coding language designed for you to query or ask databases for data. Meanwhile, `dbplyr` is meant for analyzing that data and modifying it.
+This is because SQL code is weird and hard to understand, but it allows you to easily pull in data. SQL is a coding language *designed* for you to query or ask databases for data. Meanwhile, `dbplyr` is meant for analyzing that data and modifying it.
 
 ```{r, include = FALSE}
 dbDisconnect(con)
@@ -701,6 +754,10 @@ This makes databases extremely useful for a business where they'll have employee
 
 ## Webscraping
 
+```{r, echo = FALSE}
+knitr::include_graphics("03-data/images/tags.png")
+```
+
 In the first part of this chapter, we learned how to read in data from plain text files that are usually "rectangular" in shape using the **tidyverse** `read_*` functions. Sadly, not all data comes in this simple format, but we can happily use many other tools to read in more messy/wild data formats. The formal name for gathering non-rectangular data from the web and transforming it into a more useful format for data analysis is **web scraping**.
 
 We can do web scraping through r by using the **`rvest`** library, which is a library that allows us to look at HTML and CSS selectors, then pick them apart to get the data we want. Let's look at what this means.
@@ -709,11 +766,20 @@ We can do web scraping through r by using the **`rvest`** library, which is a li
 
 Before we jump into scraping, let's learn a little bit about what the "source code" of a website looks like. 
 
-#### Structure of websites
+#### Website structure
+
+<!-- AG: I noticed that David Kane is never actually listed anywhere in the book, is it ok to have your name in a meme like the one below? -->
+
+```{r, echo = FALSE, fig.cap = "A little bit of HTML editing can bring you a long way."}
+knitr::include_graphics("03-data/images/nobel.png")
+```
+
 Websites are coded in a language called **HTML**, or **H**yper**T**ext **M**arkup **L**anguage. This is the code that puts all of the information on the website, such as the numbers and text. These are the files created when we "knit" our .Rmd files and it's what makes them put information on the screen. When we're webscraping, we can look at the information on the website by looking at the HTML code.
 
 HTML uses many nested "tags" to organize the structure. For example, an html file like this:
 ```{.html}
+<!-- This is using the HTML language. You don't actually put this in a chunk if 
+you want to put this in an Rmarkdown file, you can just type it straight in.-->
 <html>
 <p>
 Hello World
@@ -725,18 +791,368 @@ looks like this in the result:
 
 <br>
 <html>
-<p  style="background-color:lightgray">
+<p style="background-color:lightgray">
 Hello World
 </p>
 </html>
 <br>
 
-#### Application
-Now let's look at this in a real-world context. Say we are interested in knowing the average rental price (per square footage) of the most recently available one-bedroom apartments in Vancouver from https://vancouver.craigslist.org. When we visit the Vancouver Craigslist website and search for one-bedroom apartments, this is what we are shown:
+Each tag defines an **element**, or a part of a website. For example, we used the `<p>` tag to define a paragraph element in HTML. We then close the paragraph by using the `</p>` tag, ending the paragraph. You can find a full list of HTML tags and elements [here](https://developer.mozilla.org/en-US/docs/Web/HTML/Element).
 
-![](03-data/images/craigslist_human.png)
+<!-- AG: I'm pretty sure I can link to the rest of the book like what I did here. Just making sure since I'm not really sure about how to style a link to the rest of the book. -->
 
-From that page, it's pretty easy for our human eyes to find the apartment price and square footage. But how can we do this programmatically, so we don't have to copy and paste all these numbers? Well, we have to deal with the webpage source code, which we show a snippet of below (and link to the [entire source code here](img/website_source.txt)):
+Now, we're doing data science. And let's say you find some really cool website off of the internet that has a lot of really useful data, but there's no download file ([and it's legal to scrape off of it](https://ppbds.github.io/primer/data.html#are-you-allowed-to-scrape-that-website)). That means that you have to pull the information from the HTML code.
+
+We can do this by using the **`rvest`** package like I talked about earlier. This is essentially a package that allows you to scrape information from HTML code, allowing you to scrape the information off of the website overall.
+
+```{r, message = FALSE}
+library(rvest)
+```
+
+Let's try scraping the `Hello World` from the earlier HTML code.
+
+First off, we need to use the `minimal_html()` function so that we can get an R object that we can then work on. Think about it like changing the information from HTML code into something that R can understand.
+
+```{r}
+# You can't use HTML code that's structured properly in R, so we condense it 
+# into one line, like what's shown below.
+
+raw_html_1 <- "<html><p>Hello World</p></html>"
+raw_html_1 %>%
+  minimal_html()
+```
+
+Then we need to filter by the elements that the HTML file contains. In this case, we're looking for the paragraph tag, or `<p>`. That means that we can just use `html_element()` to get the first paragraph element.
+
+```{r}
+# Only use the letter part of the tag, not the <, >, or /
+
+raw_html_1 %>%
+  minimal_html() %>%
+  html_element("p")
+```
+
+This returns an HTML node, or the specific element that we chose. If we had more paragraphs in our HTML code, this would return more HTML nodes. Now, the interesting thing about these nodes is that they contain information that we can access using `html_text2()`. This lets us parse through the code without any problems.
+
+```{r}
+# html_text2() is different from the normal html_text() because it returns an
+# actual string. This is normally what we want.
+
+raw_html_1 %>%
+  minimal_html() %>%
+  html_element("p") %>%
+  html_text2()
+```
+
+But websites, especially ones with useful data, don't just exist to state "Hello World". They're much more complex than that. By layering different elements, you can create a website that contains a lot more information.
+
+For example, doing this in HTML:
+
+<!-- AG: I'm wondering how closely I should stick to the tutorial problems. I know that we're going to be integrating them into each other soon, but the tutorial problems don't have as much information as I would like (such as the paragraph tags) and they're not as reusable (I can do both examples with one piece of code vs the two used in the tutorial). Right now, I'm going to use my own examples because I feel like it makes the section more understandable. Also, the tutorials shouldn't be too close to the primer since we're likely not going to be combining them too soon (I think) and I personally don't think that they should cover the exact same things with the exact same examples, especially for something as in-depth as HTML code. -->
+
+```{.html}
+<html>
+  <table>
+    <tr>
+      <td>
+        This is some important info.
+      </td>
+      <td>
+        This is some other important info.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        This is really important info.
+      </td>
+      <td>
+        This is some useful information.
+      </td>
+    </tr>
+  </table>
+  <p>
+    This is so useless, you shouldn't even be reading it.
+  </p>
+</html>
+```
+
+Creates a table and a paragraph that looks like this:
+
+<br>
+<html>
+  <table>
+    <tr>
+      <td>
+        This is some important info.
+      </td>
+      <td>
+        This is some other important info.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        This is really important info.
+      </td>
+      <td>
+        This is some useful information.
+      </td>
+    </tr>
+  </table>
+  <p>
+    This is so useless, you shouldn't even be reading it.
+  </p>
+</html>
+<br>
+
+Now, let's say we want to get all of the information in the table but we don't want to get the useless description at the end.
+
+We can do this by only looking at the table (the `<table>` tag) and then getting the cells (the `<td>` tag). We'll also save this to a variable for later.
+
+<!-- AG: This just feels wrong, but it doesn't run any other way. So if I want to keep the HTML code syntax without going miles off screen, I'm going to be doing this. The error that it gives me is: `Error: unexpected `<` in "<"`. It's weird, dumb, and stops me from using the proper syntax without having to circumvent it. -->
+
+```{r}
+# We're using a trick here where every line of HTML is pasted together, allowing
+# us to keep the original syntax even though the line is super long.
+
+raw_html_2 <- paste0("<html>",
+                       "<table>",
+                         "<tr>",
+                           "<td>", 
+                             "This is some important info.",
+                           "</td>",
+                           "<td>",
+                             "This is some other important info.",
+                           "</td>",
+                         "</tr>",
+                         "<tr>",
+                           "<td>",
+                             "This is really important info.",
+                           "</td>",
+                           "<td>",
+                             "This is some useful information.",
+                           "</td>",
+                         "</tr>",
+                       "</table>",
+                       "<p>",
+                         "This is so useless, you shouldn't even be reading it.",
+                       "</p>",
+                     "</html>")
+
+# We use html_elements() to get all of the elements in the HTML file.
+
+td_tags <- raw_html_2 %>%
+             minimal_html() %>%
+             html_element("table") %>%
+             html_elements("td")
+td_tags
+```
+
+Notice that this actually outputs a list of the elements and their text. That means that we can use the this output like a list in order to get the information that we want. Just use the `[[]]` syntax.
+
+```{r}
+td_tags[[2]] %>%
+  html_text2()
+```
+
+However, what if we want only a specific column or type of tag? That's what CSS selectors are for.
+
+#### CSS selectors
+
+**CSS**, or **C**ascading **S**tyle **S**heets, is a coding language that defines the style of webpages. You may have noticed earlier that the HTML code we output earlier was drab and boring. But websites aren't drab and boring, they're fun and exciting! They do this by using CSS to add special rules to specific elements.
+
+Now, there are a number of ways to do this. The first one is by using an **ID** to tell the webpage that they want this specific element to be a specific style. We can see an example of this below, where we set the element with the ID `red-id` to be red.
+
+<!-- AG: This is a version that's very different from that of the tutorial because the examples there aren't great for explaining CSS selectors. There's no explanation and you end up just following the tutorial without really understanding anything (at least that's what I felt like, and what my experience as a TF showed). As such, I'm using custom examples and I'm only going to use the tutorial explanation at the end. This may interfere with future work though. -->
+
+```{css}
+/*This uses the `css` language instead of the R language. You can use this
+  code in an Rmarkdown file by substituting the "r" for "css" in the top 
+  brackets*/
+  
+#red-id {
+  color: red
+}
+```
+
+We can then use that ID in the HTML code.
+
+```{.html}
+<html>
+<p> This is not red :( </p>
+<p> This is not red :( </p>
+<p id = 'red-id'> Amazing! </p>
+<p> This is not red :( </p>
+<p> This is not red :( </p>
+<p> This is not red :( </p>
+<p> This is not red :( </p>
+</html>
+```
+
+<html>
+<p> This is not red :( </p>
+<p> This is not red :( </p>
+<p id = 'red-id'> Amazing! </p>
+<p> This is not red :( </p>
+<p> This is not red :( </p>
+<p> This is not red :( </p>
+</html>
+
+Now, there's a really clever trick that we can use here. Let's say that we only want that one piece of text that's colored red, but we don't know exactly where it is. We can actually use that CSS id to get that piece of text, using the same function `html_element()`. Just plug in the ID of the element that you want with a `#` in front to tell R that it's an ID.
+
+```{r}
+raw_html_3 <- paste0("<p> This is not red :( </p>",
+                     "<p> This is not red :( </p>",
+                     "<p id = 'red-id'> Amazing! </p>",
+                     "<p> This is not red :( </p>",
+                     "<p> This is not red :( </p>",
+                     "<p> This is not red :( </p>",
+                     "<p> This is not red :( </p>")
+raw_html_3 %>%
+  minimal_html() %>%
+  html_element("#red-id") %>%
+  html_text2()
+```
+
+Now, we talked about using IDs for getting an element, but what about if we want multiple elements to be formatted the same way? We can just use classes!
+
+CSS classes are a way for multiple elements to have the same style, rather than being limited to a unique ID. Elements can also have multiple classes that combine all of the styles together.
+
+```{css}
+.red-class {
+  color: red
+}
+
+.green-bg {
+  background-color: palegreen
+}
+```
+
+```{.html}
+<html>
+<p class = 'green-bg'> This is green :) </p>
+<p class = 'red-class'> This is red :) </p>
+<p class = 'red-class green-bg'> Amazing! </p>
+<p class = 'red-class'> This is red :) </p>
+<p> This is not red :( </p>
+<p class = 'green-bg'> This is green :) </p>
+<p> This is not red :( </p>
+</html>
+```
+
+<html>
+<p class = 'green-bg'> This is green :) </p>
+<p class = 'red-class'> This is red :) </p>
+<p class = 'red-class green-bg'> Amazing! </p>
+<p class = 'red-class'> This is red :) </p>
+<p> This is not red :( </p>
+<p class = 'green-bg'> This is green :) </p>
+<p> This is not red :( </p>
+</html>
+
+We can do the same thing with classes that we did with IDs, using `html_elements()` to sort through them. You use a `.` instead of a `#` to show that it's a class. In order to sort by multiple classes, just combine the statements together. If you want to get all of the elements from multiple classes, use a comma to separate them.
+
+```{r}
+raw_html_4 <- paste0("<html>",
+                     "<p class = 'green-bg'> This is green :) </p>",
+                     "<p class = 'red-class'> This is red :) </p>",
+                     "<p class = 'red-class green-bg'> Amazing! </p>",
+                     "<p class = 'red-class'> This is red :) </p>",
+                     "<p> This is not red :( </p>",
+                     "<p class = 'green-bg'> This is green :) </p>",
+                     "<p> This is not red :( </p>",
+                     "</html>")
+
+raw_html_4 %>%
+  minimal_html() %>%
+  html_elements(".red-class") %>%
+  html_text2()
+
+raw_html_4 %>%
+  minimal_html() %>%
+  html_elements(".red-class.green-bg") %>%
+  html_text2()
+
+raw_html_4 %>%
+  minimal_html() %>%
+  html_elements(".red-class, .green-bg") %>%
+  html_text2()
+```
+
+So far, we've covered 3 ways to find the parts of a website through it's HTML code: the element (`<p>`), the ID (`#red-id`), and the class (`.red-class`). However, we can also mix-and-match these tags. Take the following HTML element:
+
+```{.html}
+<a href="https://ppbds.github.io/primer/index.html" id="abcd1234" class="hello hi">
+link to primer
+</a>
+```
+
+We can try accessing it through the normal methods, like so:
+
+```{r}
+raw_html_5 <- '<a href = "https://ppbds.github.io/primer/index.htm" id="abcd1234" class="hello hi">link to primer</a>'
+
+raw_html_5 %>%
+  minimal_html() %>%
+  html_element("a") %>%
+  html_text2()
+
+raw_html_5 %>%
+  minimal_html() %>%
+  html_element("#abcd1234") %>%
+  html_text2()
+
+raw_html_5 %>%
+  minimal_html() %>%
+  html_element(".hello.hi") %>%
+  html_text2()
+```
+
+Or we can mix and match them to make an even more narrow search by chaining them together.
+
+```{r}
+raw_html_5 %>%
+  minimal_html() %>%
+  html_element("a#abcd1234") %>%
+  html_text2()
+
+raw_html_5 %>%
+  minimal_html() %>%
+  html_element("a.hello") %>%
+  html_text2()
+
+raw_html_5 %>%
+  minimal_html() %>%
+  html_element("a.hello#abcd1234") %>%
+  html_text2()
+
+raw_html_5 %>%
+  minimal_html() %>%
+  html_element(".hello#abcd1234") %>%
+  html_text2()
+```
+
+We can also get the link that the node refers to rather than the text. In this case, the link is stored in the `href` attribute, so we use `html_attr()` to access it.
+
+```{r}
+raw_html_5 %>%
+  minimal_html() %>%
+  html_element("a.hello.hi#abcd1234") %>%
+  html_attr("href")
+```
+
+This accesses the `href` attribute of the element without accessing the link, allowing you to find the links to outside websites.
+
+These chains are known as **CSS Selectors** and they're an important part of data science because they allow us to find data and information on a website without having to download every file or copying everything down. Instead, we can just use the website's inbuilt code to get the information.
+
+### Application
+
+Now let's look at this in a real-world context. Say we are interested in knowing the average rental price (per square footage) of the most recently available one-bedroom apartments in Vancouver according to [this](https://vancouver.craigslist.org). When we visit the Vancouver Craigslist website and search for one-bedroom apartments, this is what we are shown:
+
+```{r, echo = FALSE}
+knitr::include_graphics("03-data/images/craigslist_human.png")
+```
+
+From that page, it's pretty easy for us to find the apartment price and square footage (Craigslist would be utterly incomprehensible otherwise). But the computer can't deal with that because human eyes and computer eyes are very different. It can't understand anything on the screen. So instead of looking at the screen, we can just parse through the HTML and find the correct information. Here's part of the HTML code for [Vancouver's Craigslist](https://vancouver.craigslist.org/search/apa?min_bedrooms=1&max_bedrooms=1&availabilityMode=0&sale_data=all+dates):
 
 ```
         <span class="result-meta">
@@ -784,75 +1200,110 @@ From that page, it's pretty easy for our human eyes to find the apartment price 
 
 ```
 
-This is not easy for our human eyeballs to read! However, it is easy for us to use programmatic tools to extract the data we need by specifying which HTML tags (things inside `<` and `>` in the code above). For example, if we look in the code above and search for lines with a price, we can also look at the tags that are near that price and see if there's a common "word" we can use that is near the price but doesn't exist on other lines that have the information we are not interested in:
+This genuinely sucks to read. There's links, random numbers, and elements that have 4 classes on them at the same time, all while being stupidly long to the point where your eyes fall out. While we can pick out the CSS selectors that we need, ("result-price" and "housing"), this is a hassle and a pain and there's a better solution.
 
-```
-<span class="result-price">$800</span>
-```
-
-and 
-
-```
-<span class="result-price">$2285</span>
-```
-
-What we can see is there is a special "word" here, "result-price", which appears only on the lines with prices and not on the other lines (that have information we are not interested in). This special word and the context in which is is used (learned from the other words inside the HTML tag) can be combined to create something called a **CSS selector**. The CSS selector can then be used by R's rvest package to select the information we want (here price) from the website source code.
-
-Many websites are quite large and complex, which means the website source code is large as well. And as you saw above, it is not easy to read and pick out the special words we want with our human eyeballs. So to make this easier, we will use the *SelectorGadget* tool. It is an open source tool that simplifies generating and finding CSS selectors. We recommend you use the Chrome web browser to use this tool, and install the [selector gadget tool from the Chrome Web Store](https://chrome.google.com/webstore/detail/selectorgadget/mhjhnkcfbdhnjickkkdbjoemdmbfginb). Here is a short video on how to install and use the SelectorGadget tool to get a CSS selector for use in web scraping:
+We will be using the *SelectorGadget* tool in order to find CSS selectors. It's an open source tool that simplifies generating and finding CSS selectors. We recommend that you use the Chrome web browser to use this tool, and install the [selector gadget tool from the Chrome Web Store](https://chrome.google.com/webstore/detail/selectorgadget/mhjhnkcfbdhnjickkkdbjoemdmbfginb). Here is a short video on how to install and use the SelectorGadget tool to get a CSS selector for use in web scraping:
 
 <iframe width="840" height="473" src="https://www.youtube.com/embed/YdIWI6K64zo" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-From installing and using the selectorgadget as shown in the video above, we get the two CSS selectors `.housing` and `.result-price` that we can use to scrape information about the square footage and the rental price, respectively. The selector gadget returns them to us as a comma separated list (here `.housing , .result-price`), which is exactly the format we need to provide to R if we are using more than one CSS selector.
+From installing and using the selectorgadget as shown in the video above, we get the two CSS selectors `.housing` and `.result-price` that we can use to scrape information about the square footage and the rental price, respectively. The selector gadget returns them to us as a comma separated list (here `.housing , .result-price`), which is exactly the format we need to provide to R.
 
-### Are you allowed to scrape that website?
+However, when we're scraping from actual websites we need to take more than just the size of the code into consideration. We also need to take the legal aspects into account,
 
-**BEFORE** scraping data from the web, you should always check whether or not you are **ALLOWED** to scrape it! There are two documents that are important for this: the robots.txt file and reading the website's Terms of Service document. The website's Terms of Service document is probably the more important of the two, and so you should look there first. What happens when we look at Craigslist's Terms of Service document? Well we read this:
+#### Are you allowed to scrape that website?
+
+**BEFORE** scraping data from the web, you should always check whether or not you are **ALLOWED** to scrape it! There are two documents that are important for this: the robots.txt file (found by adding `/robots.txt` to the end of a URL like [so](https://www.craigslist.org/robots.txt)) and reading the website's Terms of Service document. The website's Terms of Service document is far and away the more important of the two because it's actually legally binding, so you should look there first. What happens when we look at Craigslist's Terms of Service document? Well we read this:
 
 *"You agree not to copy/collect CL content via robots, spiders, scripts, scrapers, crawlers, or any automated or manual equivalent (e.g., by hand)."*
 
 source: https://www.craigslist.org/about/terms.of.use
 
-
 > Want to learn more about the legalities of web scraping and crawling? Read this interesting blog post titled ["Web Scraping and Crawling Are Perfectly Legal, Right?" by Benoit Bernard](https://benbernardblog.com/web-scraping-and-crawling-are-perfectly-legal-right/) (this is optional, not required reading).
 
-So what to do now? Well, we shouldn't scrape Craigslist! Let's instead scrape some data on the population of Canadian cities from Wikipedia (who's [Terms of Service document](https://foundation.wikimedia.org/wiki/Terms_of_Use/en) does not explicitlty say do not scrape). In this video below we demonstrate using the selectorgadget tool to get CSS Selectors from [Wikipedia's Canada](https://en.wikipedia.org/wiki/Canada) page to scrape a table that contains city names and their populations from the 2016 Canadian Census: 
+<!-- AG: I'm kind of conflicted here because there's a perfectly good video that shows exactly how we can use SelectorGadget on Wikipedia pages, but it doesn't line up with the tutorials. For now, I'm going to comment out the video for future reference and just follow along with the tutorial. -->
 
-<iframe width="840" height="473" src="https://www.youtube.com/embed/O9HKbdhqYzk" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+So what to do now? Well, we can't scrape Craigslist, so we should find something else that allows you to scrape. Let's use a database from [Open Secrets about foreign-connected PACs within our country](https://www.opensecrets.org/political-action-committees-pacs/foreign-connected-pacs/2020).
 
+<!-- <iframe width="840" height="473" src="https://www.youtube.com/embed/O9HKbdhqYzk" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> -->
 
-### Using `rvest`
+#### Scraping from actual websites
 
-Now that we have our CSS selectors we can use the **rvest** R package to scrape our desired data from the website. First we start by loading the **rvest** package:
+<!-- AG: This counts as noncommercial use right? OpenSecrets says it's open to noncommercial use, but we have to request permission for commercial use. -->
 
-```{r, message = FALSE}
-library(rvest)
-```
-
-Next, we tell R what page we want to scrape by providing the webpage's URL in quotations to the function `read_html`:
+Now, earlier we only scraped from pre-written HTML code, but you can do this from websites as well. We can do this just by plugging in the URL to the website and using `read_html()` instead of `minimal_html()`.
 
 ```{r}
-page <- read_html("https://en.wikipedia.org/wiki/Canada")
+web_url <- "https://www.opensecrets.org/political-action-committees-pacs/foreign-connected-pacs/2020"
+
+web_url %>%
+  read_html()
 ```
 
-Then we send the page object to the `html_nodes()` function. We also provide that function with the CSS selectors we obtained from the selectorgadget tool. These should be surrounded by quotations. The `html_nodes` function select nodes from the HTML document using CSS selectors. Nodes are the HTML tag pairs as well as the content between the tags. For our CSS selector `td:nth-child(5)` and example node that would be selected would be: `<td style="text-align:left;background:#f0f0f0;"><a href="/wiki/London,_Ontario" title="London, Ontario">London</a></td>`
-
-We will use `head()` here to limit the print output of these vectors to 6 lines.
+In this case, we can use Selector Gadget to find the correct CSS selector "table.DataTable-Partial". We then just proceed as normal, but we need to use `html_table()` because we're trying to bring in a table and use it as a tibble.
 
 ```{r}
-population_nodes <- html_nodes(page, "td:nth-child(5) , td:nth-child(7) , .infobox:nth-child(122) td:nth-child(1) , .infobox td:nth-child(3)")
-
-head(population_nodes)
+web_url %>%
+  read_html() %>%
+  html_element("table.DataTable-Partial") %>%
+  html_table()
 ```
 
-Next we extract the meaningful data from the HTML nodes using the `html_text()` function. For our example, this functions only required argument is the an html_nodes object, which we named `rent_nodes`. In the case of this example node: `<td style="text-align:left;background:#f0f0f0;"><a href="/wiki/London,_Ontario" title="London, Ontario">London</a></td>`, the `html_text` function would return `London`.
+This allows us to scrape tibbles from websites. We can then use those tibbles to create new graphs.
+
+Let's try this by using a Wikipedia page about [gun violence in the United States](https://en.wikipedia.org/wiki/Gun_violence_in_the_United_States_by_state).
+
+First, we need to save the URL and read the HTML code from it into R.
 
 ```{r}
-population_text <- html_text(population_nodes)
+wiki_url <- "https://en.wikipedia.org/w/index.php?title=%22,%22Gun_violence_in_the_United_States_by_state%22,%22&direction=prev&oldid=810166167"
 
-head(population_text)
+wiki_url %>%
+  read_html()
 ```
 
-Are we done? Not quite... If you look at the data closely you see that the data is not in an optimal format for data analysis. Both the city names and population are encoded as characters in a single vector instead of being in a data frame with one character column for city and one numeric column for population (think of how you would organize the data in a spreadsheet). Additionally, the populations contain commas (not useful for programmatically dealing with numbers), and some even contain a line break character at the end (`\n`).
+We can then use SelectorGadget to find the correct CSS selector. If you can't easily click on the table, you can also find a selector by reading the HTML code itself. You can do this by highlighting the table, right clicking, and pressing "Inspect". While you'll have to dig through the HTML in order to find the correct selector, this is a perfectly viable way to find selectors.
+
+We can then save the table provided into a variable known as `raw_data_wiki`.
+
+```{r}
+raw_data_wiki <- wiki_url %>%
+                   read_html() %>%
+                   html_element("table.wikitable.sortable") %>%
+                   html_table()
+raw_data_wiki
+```
+
+Past this point, you can work with the data just like you would normal data. Here's an example graph of how states that have a denser population experience more consistent gun deaths than states with a less dense population.
+
+<!-- AG: I'm just providing the straight-up graph in this case so that the rest of the tutorial can just be copy-pasted into here. There's a lot of graph building exercises in the tutorial that honestly doesn't really fit in this chapter of the book, which is all about data. -->
+
+```{r}
+clean_data <- raw_data_wiki %>%
+                rename("population" = "Population (total inhabitants) (2015) [1]",
+                       "death_rate" = "Murder and Nonnegligent\nManslaughter Rate(per 100,000 inhabitants) (2015)",
+                       "total_deaths" = "Murders and Nonnegligent\nManslaughter(total deaths) (2015) [2]") %>%
+                        select(population, death_rate) %>%
+                        mutate(population = parse_number(population)) %>%
+                        mutate(pop_tile = ntile(population, 20)) %>%
+                        group_by(pop_tile) %>%
+                        summarize(num_states = n(), sum_rate = sum(death_rate)) %>%
+                        mutate(avg_rate = sum_rate/num_states) %>%
+                        mutate(percent_rate = avg_rate / sum(avg_rate))
+
+ggplot(clean_data, aes(x = pop_tile, y = percent_rate)) + 
+  geom_col() +
+  geom_smooth(method = "loess", formula = "y ~ x", se = FALSE) +
+  scale_x_continuous(breaks = 1:20) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  theme_classic() +
+  labs(title = "Distribution of US Death Rate by Guns in Quantile of Population in 2015",
+       subtitle = "Death rate of less populated states fluctuate more than states with a denser population",
+       x = "Quantile by Population (least to most)",
+       y = "Percent of Average Death Rate",
+       caption = "Wikipedia: Gun Violence in the United States (2017)")
+```
+
+Webscraping is a powerful tool to gain data directly from the internet, but make sure that you're following the proper protocols so that you don't break the law and actually get the information that you need.
 
 ## Working with APIs
 
