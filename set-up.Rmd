@@ -1,12 +1,8 @@
----
-title: "Set Up for Working on The Primer"
-author: "David Kane"
-output: html_document
----
+# Set Up for Working on The Primer {-}
 
 The current version of this document lives [here](https://github.com/PPBDS/primer/blob/master/misc/set-up.Rmd).
 
-This document provides a guide in setting up R/RStudio to work on *[The Primer](https://ppbds.github.io/primer/)*, both the book itself, [PPDBS/primer](https://github.com/PPBDS/primer), and the associated tutorials and data package: [PPDBS/primer.tutorials](https://github.com/PPBDS/primer.tutorials) and [PPDBS/primer.data](https://github.com/PPBDS/primer.data). There are three steps:
+This document provides a guide in setting up R/RStudio to work on *[The Primer](https://ppbds.github.io/primer/)*, both the book itself, [PPDBS/primer](https://github.com/PPBDS/primer), and the associated tutorial and data packages: [PPDBS/primer.tutorials](https://github.com/PPBDS/primer.tutorials) and [PPDBS/primer.data](https://github.com/PPBDS/primer.data). There are three steps:
 
 * The first part ensures that you have the knowledge and computer settings to be successful. With luck, you will only need to do this once. 
 
@@ -48,11 +44,19 @@ I left out the end of the output.
 
 If the first part --- Git config --- seems messed up, execute:
 
-> use_git_config(user.name = "David Kane", user.email = "dave.kane@gmail.com")
+
+```{r, eval = FALSE}
+use_git_config(user.name = "David Kane", user.email = "dave.kane@gmail.com")
+```
+
+
 
 If the second part seems messed up, try:
 
-> usethis::create_github_token()
+
+```{r, eval = FALSE}
+usethis::create_github_token()
+```
 
 and read about [Github credentials](https://usethis.r-lib.org/articles/articles/git-credentials.html). After you do, restart R and then run `git_sitrep()` again to make sure that things look like mine, more or less.
 
@@ -134,7 +138,7 @@ pr_merge_main()
 Issue this command all the time. This is how you make sure that your repo and your computer is updated with the latest changes that have been made in the book. The word "upstream" is associated with the repos at PPBDS. The word "origin" is associated with the fork at your Github account. But, in general, you don't need to worry about this. Just pull every time you sit down. (Just clicking the pull button is not enough. That only pulls from your repo, to which no changes have been made. It does not pull from **PPBDS/primer**, et al.) You issue this command multiple times a day.
 
 
-2) Make changes in the file you are editing. Knit to make sure they work. Commit with a message. Push to the repo on your Github account. And so on. 
+2) Make changes in the file you are editing. Knit to make sure the changes work. Commit with a message. Push to the repo on your Github account. And so on. 
 
 At some point, you will be ready to push to the PPBDS organization. However, you can't do this directly. Instead, you must submit a pull request (PR). Because you are part of a larger project, these commands are slightly different than what you have done before, which has usually just been clicking on the pull (blue) and push (green) arrows in the Git pane in RStudio.
 
@@ -144,13 +148,13 @@ At some point, you will be ready to push to the PPBDS organization. However, you
 pr_push()
 ```
 
-Again, these commands bundle up a bunch of git commands (which you could do by hand) into one handy step. This command does everything needed to create a "pull request" --- a request from you to me that I accept the changes you are proposing into the repo at **PPBDS/primer** --- and then opens up the web page to show you. **But your are not done!** You must PRESS the green button on that web page, sometimes twice. Until then, the PR has not actually been created. `pr_push()` just does everything before that. The "pr" in `pr_push()` stands for pull request.
+This command bundles up a bunch of git commands (which you could do by hand) into one handy step. This command does everything needed to create a "pull request" --- a request from you to me that I accept the changes you are proposing into the repo at **PPBDS/primer** --- and then opens up the web page to show you. **But your are not done!** You must PRESS the green button on that web page, sometimes twice. Until then, the PR has not actually been created. `pr_push()` just does everything before that. The "pr" in `pr_push()` stands for pull request.
 
-7) I will leave aside for now issues associated with the back-and-forth discussions we might have around your pull request. I will probably just accept it. Your changes will go into the repos at PPBDS and then be distributed to everyone else when they run `pr_merge_main()`.
+4) I will leave aside for now issues associated with the back-and-forth discussions we might have around your pull request. I will probably just accept it. Your changes will go into the repos at PPBDS and then be distributed to everyone else when they run `pr_merge_main()`.
 
-8) You can now continue on. There is no need to wait for me to deal with your pull request. There is no need to fork/clone/download again. You don't need to create a new branch, although many people do, with a branch name which describes what they are working on now. You just keep editing your files, knitting, and committing. When you feel you have completed another chunk of work, just run `pr_push()` again.
+5) You can now continue on. There is no need to wait for me to deal with your pull request. There is no need to fork/clone/download again. You don't need to create a new branch, although many people do, with a branch name which describes what they are working on now. You just keep editing your files, knitting, and committing. When you feel you have completed another chunk of work, just run `pr_push()` again.
 
-9) Read the **usethis** [setup help page](https://usethis.r-lib.org/articles/articles/usethis-setup) at least once, perhaps after a week or two of working within this framework. It has lots of good stuff!
+6) Read the **usethis** [setup help page](https://usethis.r-lib.org/articles/articles/usethis-setup) at least once, perhaps after a week or two of working within this framework. It has lots of good stuff!
 
 
 ## Common Problems
@@ -163,17 +167,20 @@ Again, these commands bundle up a bunch of git commands (which you could do by h
 
 2) After running `pr_merge_main()`, *you will often see a bunch of files in your Git tab in the top right corner of Rstudio* marked with an M (for Modified), including files which you know you did not edit. These are the files that have been updated on the "truth" --- on **PPBDS/primer** --- since your last `pr_merge_main()`. Since you pulled them directly from the **PPBDS/primer** repo, your forked repo sees all the changes other people have made and thinks that *you made them*. This is easily fixed, however — just commit all the changes to your forked repo. (Strangely, this seems to not always happen. If you don't see this effect, don't worry.)
 
-3) Always run `pr_merge_main()` before committing a file. Otherwise, you may create lots of merge conflicts. If this happens, save a copy of the file(s) you personally were editing off to the side. Then, [nuke it from orbit](https://knowyourmeme.com/memes/nuke-it-from-orbit), following the instructions above. Repeat the set up process. Then move in your file(s) by hand, and commit/push them as normal.
+3) Always run `pr_merge_main()` before committing a file. Otherwise, you may create lots of merge conflicts. If this happens, save a copy of the file(s) you personally were editing off to the side. Then, [nuke it from orbit](https://knowyourmeme.com/memes/nuke-it-from-orbit), following the instructions above. Repeat the Project Set Up process. Then move in your file(s) by hand into the new repo, and commit/push them as normal.
 
 4) When you submit a pull request to merge your work with the PPBDS repo, it won't always be smiles and sunshine — every once in a while, you'll run into *merge conflicts*. When these arise, it is because two parties work on a file separately and submit conflicting changes. This makes it hard for GitHub to "merge" your version with the other version. When this happens, find multiple adjacent ">", "<", and "=" signs in your document — these will show you where the conflicts occur. For more background on merge conflicts, read [this](https://coderefinery.github.io/git-intro/08-conflicts/). 
 
 If you see the above-mentioned conflicts in your document, **do not submit a pull request**. This will mess things up. Instead, first, go through your document, and make sure all the weird conflict indicators (<, >, and =) are removed. Second, decide what goes in that space. It might be the stuff you wrote. It might be the other stuff. It might be some combination of the two which you decide on. Whatever happens, you are making an affirmative choice about what should appear in the file at that location. Once all the merge conflicts are fixed, run `pr_push()` again.
 
-5) `pr_push()` can be tricky. First, note that, if I have not accepted a (p)ull (r)equest which you have submitted, then your PR is still open. You can see it here: https://github.com/PPBDS/primer/pulls. In fact, you can see all the closed/completed pull requests as well. If, while one PR is still open, you submit another `pr_push()`, then this will just be added to your current PR. And that is OK! We don't need it to be separate. 
+5) `pr_push()` can be tricky. First, note that, if I have not accepted a (p)ull (r)equest which you have submitted, then your PR is still open. You can see it [on Github](https://github.com/PPBDS/primer/pulls). In fact, you can see all the closed/completed pull requests as well. If, while one PR is still open, you submit another `pr_push()`, then this will just be added to your current PR. And that is OK! We don't need it to be separate. 
 
 But even if there is not an open PR, `pr_push()` can be tricky. The key thing to remember is that *you must press a green button on Github* for a new PR to be created. Normally, this is easy. Running `pr_push()` automatically (or perhaps after you run `pr_view()`) puts you in a browser and brings you to the correct Github page. Press the button and -- presto! -- you have created a PR. But, sometimes, the web page is different. It actually sends you back to an old pull request. When this happens, you need to click on the "Pull Request" tab above. This will take you to a new page, with a green button labeled "Compare & Pull Request". Press that button.
 
-6) If you end up needing to install a new package --- which should be rare --- just install it and then type `renv::snapshot()`. This will update the `renv.lock` file to include the new package. You just commit/push the new version of `renv.lock`, and that shares the information with everyone else on the project. Never commit/push a modified `renv.lock` unless you know why it has changed.
+6) If you end up needing to install a new package --- which should be rare --- just install it and then type `renv::status()` to confirm than **renv** is aware of the change. Then, type `renv::snapshot()`. This will update the `renv.lock` file to include the new package. You just commit/push the new version of `renv.lock`, and that shares the information with everyone else on the project. Never commit/push a modified `renv.lock` unless you know why it has changed.
+
+7) Be careful of committing garbage files like ".DS_Store", which is a file created sometimes. Only commit changes which you understand. In the vast majority of cases your PRs will only involve one or two files.
+
 
 
 
