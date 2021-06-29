@@ -1,25 +1,31 @@
 ---
-title: "Set Up for working in The Primer"
+title: "Set Up for Working on The Primer"
 author: "David Kane"
 output: html_document
 ---
 
 The current version of this document lives [here](https://github.com/PPBDS/primer/blob/master/misc/set-up.Rmd).
 
-This document provides a guide in setting up R/RStudio to work on *The Primer*, both the book itself, PPDBS/primer, and the associated tutorials and packages: PPDBS/primer.tutorials and PPDBS/primer.data. The first part ensures that you have the knowledge and computer settings to be successful. With luck, you will only need to do this once. The second part involves making a connection between the true repos at the [PPBDS Github organization](https://github.com/PPBDS/) and your Github account and your computer. You may end up doing this dozen of times since, whenever something gets messed up, the easiest solution is often to just [nuke it from orbit](https://knowyourmeme.com/memes/nuke-it-from-orbit) and start again.
+This document provides a guide in setting up R/RStudio to work on *[The Primer](https://ppbds.github.io/primer/)*, both the book itself, [PPDBS/primer](https://github.com/PPBDS/primer), and the associated tutorials and data package: [PPDBS/primer.tutorials](https://github.com/PPBDS/primer.tutorials) and [PPDBS/primer.data](https://github.com/PPBDS/primer.data). There are three steps:
+
+* The first part ensures that you have the knowledge and computer settings to be successful. With luck, you will only need to do this once. 
+
+* The second part involves making a connection between the true repos at the [PPBDS Github organization](https://github.com/PPBDS/) and your Github account and your computer. You may end up doing this dozens of times since, whenever something gets messed up, the easiest solution is often to just [nuke it from orbit](https://knowyourmeme.com/memes/nuke-it-from-orbit) and start again. But, most weeks, you won't do this at all.
+
+* The third part involves the daily workflow of merges and pull requests. You will do these steps many times each day.
 
 
-## Basic Set up and Knowledge
+## Basic Set Up
 
-1) [Install](https://happygitwithr.com/install-r-rstudio.html) the latest released versions of R and RStudio. 
+1) [Install](https://happygitwithr.com/install-r-rstudio.html) the latest released versions of R and RStudio. Install the **usethis** package.
 
 
-If you have not taken Gov 50/1005, read the Getting Started and Tools sections of [The Primer](https://ppbds.github.io/primer/) and make sure your Git/Github is working. Read  (and watch the videos from) [*Getting Used to R, RStudio, and R Markdown*](https://ismayc.github.io/rbasics-book/) by Chester Ismay and Patrick C. Kennedy. Check out [RStudio Essentials Videos](https://rstudio.com/collections/rstudio-essentials/). Most relevant for us are ["Writing code in RStudio"](https://resources.rstudio.com/wistia-rstudio-essentials-2/rstudioessentialsprogrammingpart1-2), ["Projects in RStudio"](https://rstudio.com/resources/webinars/managing-part-1-projects-in-rstudio/) and ["Github and RStudio"]https://rstudio.com/resources/webinars/managing-part-2-github-and-rstudio/). Without having taken the course, you will probably need to watch these videos all the way through. The best reference for R/RStudio/Git/Github issues is always [*Happy Git and GitHub for the useR*](https://happygitwithr.com/).
+Read the Getting Started and Tools sections of [The Primer](https://ppbds.github.io/primer/) and make sure your Git/Github is working. Read  (and watch the videos from) [*Getting Used to R, RStudio, and R Markdown*](https://ismayc.github.io/rbasics-book/) by Chester Ismay and Patrick C. Kennedy. Check out [RStudio Essentials Videos](https://rstudio.com/collections/rstudio-essentials/). Most relevant for us are ["Writing code in RStudio"](https://resources.rstudio.com/wistia-rstudio-essentials-2/rstudioessentialsprogrammingpart1-2), ["Projects in RStudio"](https://rstudio.com/resources/webinars/managing-part-1-projects-in-rstudio/) and ["Github and RStudio"]https://rstudio.com/resources/webinars/managing-part-2-github-and-rstudio/). The best reference for R/RStudio/Git/Github issues is always [*Happy Git and GitHub for the useR*](https://happygitwithr.com/).
 
-Install the **usethis** package, making sure --- `packageVersion("usethis")` --- that you have version >= 2.0.0.
 
-2) Make sure that your Git/Github connections are good. If you have gone through the key chapters in [Happy Git with R](https://happygitwithr.com/) --- as you should have --- then these may already be OK. If not (or, even if you have), then you need to run `git_sitrep().`
+2) Make sure that your Git/Github connections are good. If you have gone through the key chapters in [Happy Git with R](https://happygitwithr.com/) --- as you should have --- then these may already be OK. If not (or, even if you have), then you need to run `usethis::git_sitrep().`
 
+````
 > library(usethis)   
 > git_sitrep()    
 Git config (global)   
@@ -36,6 +42,7 @@ GitHub
 ● Token scopes: 'delete_repo, gist, notifications, repo, user, workflow'   
 ● Email(s): 'dave.kane@gmail.com (primary)', 'dkane@fas.harvard.edu'   
 ...   
+````
 
 I left out the end of the output.
 
@@ -47,22 +54,20 @@ If the second part seems messed up, try:
 
 > usethis::create_github_token()
 
-and read about credentials [here](https://usethis.r-lib.org/articles/articles/git-credentials.html). After you do, restart R and then run git_sitrep() again to make sure that things look like mine, more or less.
+and read about [Github credentials](https://usethis.r-lib.org/articles/articles/git-credentials.html). After you do, restart R and then run `git_sitrep()` again to make sure that things look like mine, more or less.
 
-3) Install the **renv** package:
+3) Install the **renv** package. You can read about the **renv** package [here](https://rstudio.github.io/renv/articles/renv.html).
 
-install.packages("renv")
-
-You can read about the **renv** package [here](https://rstudio.github.io/renv/articles/renv.html).
-
-It is not critical to understand all the details of how **renv** works. The big picture is that it creates a set of libraries which will be used just for this project and whose versions are kept in sync between you and me. (In olden times, `renv::consent()` was a necessary first step. But no longer?)
+It is not critical to understand all the details of how **renv** works. The big picture is that it creates a set of libraries which will be used just for this project and whose versions are kept in sync between you and me. 
 
 4) At this point, you should have all the tools you need to contribute. If you have never done a pull request, however, you will need to learn more. Start by reading the [help page](https://usethis.r-lib.org/articles/articles/pr-functions.html). Read the whole thing! Don't just skim it. These are important concepts for professional-level workflow. The **usethis** package is mostly providing wrappers around the underlying git commands. If you want to understand what is happening at a lower level, read [this](https://git-scm.com/book/en/v2/GitHub-Contributing-to-a-Project), but doing so is optional.
 
 
 Again, with luck, you will only have to do these steps once.
 
-## Make Connection and Submit Work
+5) Prove to yourself (and to me) that your set up is working by submittimg a pull request to me which simply adds your name to the top of one of the TODO.txt files. (See below for how to do this.)
+
+## Project Set Up
 
 You will need to do the below steps at least one time. It is more likely, however, that you will do them dozens of times. If things are working, great! If they start not working, you can try to diagnose the problem. But, if you can't, then you are in a [nuke it from orbit](https://knowyourmeme.com/memes/nuke-it-from-orbit) scenario, which means that you start by deleting the current version of the package from two places: your computer (just put the R Studio project directory in the Trash) and your Github account (just delete the repo by going to Settings and going to the bottom of that page).
 
@@ -82,7 +87,7 @@ That is the repo for working on the book. If you are working on **PPBDS/primer.d
                     
 For your education, it is worth reading the help page for `create_from_github()`. The `fork`  and `protocal` arguments may not really be necessary and, obviously, you should place the project in the location on your computer in which your other projects live. The command first forks a copy of **PPBDS/primer** to your Github account and then clone/downloads that fork to your computer. 
 
-This may seem like overkill, but, as [*Pro Git*](https://git-scm.com/book/en/v2) explains, it is how (essentially) all large projects are organized. With luck, you only have to issue this command once. After that, you are always connected, both to your fork and to the true (PPBDS) repos. Also, note that, if something ever gets totally messed up on your computer, you can just delete the project folder on your computer and the repo on your Github account and then start again. (If you have made changes that you don't want to lose, just save those files to one side and then move them back after you have recreated the project.)
+This may seem like overkill, but, as [*Pro Git*](https://git-scm.com/book/en/v2) explains, it is how (essentially) all large projects are organized. With luck, you only have to issue this command once. After that, you are always connected, both to your fork and to the true repos, which live at github/com/PPBDS. Also, note that, if something ever gets totally messed up on your computer, you can just delete the project folder on your computer and the repo on your Github account and then start again. (If you have made changes that you don't want to lose, just save the files with those changes to one side and then move them back after you have recreated the project.)
 
 Note that this command should automatically put you in a new RStudio session with the primer (or primer.tutorials or primer.data) RStudio project which resides on your computer
 
@@ -118,11 +123,9 @@ Make sure the branch name is sensible. Again, this is a command that you only ne
 
 In more professional settings, you will often work on several different branches at once. So, if you are comfortable, you should feel free to create more than one branch, use it, delete it and so on. Never work on the default branch, however. And, if you use multiple branches, be careful where you are and what you are doing.
 
-4) Now you can work like you usually do. Make changes in your file. Knit to make sure they work. Commit with a message. Push to the repo on your Github account. And so on. 
+## Daily Work
 
-At some point, you will be ready to push to the PPBDS organization. However, you can't do this directly. Instead, you must submit a pull request (PR). Because you are part of a larger project, these commands are slightly different than what you have done before, which has usually just been clicking on the pull (blue) and push (green) arrows in the Git pane in RStudio.
-
-5) Pull regularly:
+1) Pull regularly:
 
 ```{r, eval = FALSE}
 pr_merge_main()
@@ -130,7 +133,12 @@ pr_merge_main()
 
 Issue this command all the time. This is how you make sure that your repo and your computer is updated with the latest changes that have been made in the book. The word "upstream" is associated with the repos at PPBDS. The word "origin" is associated with the fork at your Github account. But, in general, you don't need to worry about this. Just pull every time you sit down. (Just clicking the pull button is not enough. That only pulls from your repo, to which no changes have been made. It does not pull from **PPBDS/primer**, et al.) You issue this command multiple times a day.
 
-6) Issue pull requests every few days, depending on how much work you have done and/or whether other people are waiting for something you have done.
+
+2) Make changes in the file you are editing. Knit to make sure they work. Commit with a message. Push to the repo on your Github account. And so on. 
+
+At some point, you will be ready to push to the PPBDS organization. However, you can't do this directly. Instead, you must submit a pull request (PR). Because you are part of a larger project, these commands are slightly different than what you have done before, which has usually just been clicking on the pull (blue) and push (green) arrows in the Git pane in RStudio.
+
+3) Issue pull requests every few days, depending on how much work you have done and/or whether other people are waiting for something you have done.
 
 ```{r, eval = FALSE}
 pr_push()
