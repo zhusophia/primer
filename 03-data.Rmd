@@ -6,10 +6,6 @@
 
 <!-- TODO: -->
 
-<!-- Add skimr() and skim() to chapter 2. Simple one time use on a tibble. Explain what it does. At end of chapter before Summary. DONE -->
-
-<!-- Use janitor::clean_names() in chapter 3. Simple example with a file with variable names like `my var` and `1-var`.  Read this in without fixing. Show how to use backticks to refer to those variables. Point out that this is annoying. Fix with clean_names(). DONE -->
-
 <!-- Change all the files used so that they always have one blank line at the bottom to make that warning go away. Get rid of "warn" argument. DONE -->
 
 <!-- * Deal with this message we get when knitting the chapter: -->
@@ -45,9 +41,9 @@ You can find most of the files that we use for this chapter [here](https://githu
 github_url <- "https://raw.githubusercontent.com/PPBDS/primer.tutorials/master/inst/www/"
 ```
 
-### CSV files
+### Text files
 
-"CSV" stands for **c**omma **s**eparated **v**alue. In other words, csv files are files whose values are separated by commas. Each comma from the csv file corresponds to a column, and the column names are, by default, taken from the first line of the file.
+The most common type of data text file is "CSV," which stands for **c**omma **s**eparated **v**alue. In other words, csv files are files whose values are separated by commas. Each comma from the csv file corresponds to a column, and the column names are, by default, taken from the first line of the file.
 
 CSV files (and their counterparts) are easily transferable between computers and programming languages and are extremely simple because they're effectively just text files that have a special format. Additionally, they're very easy to parse through small amounts of data because they're easily readable by humans and computers. 
 However, due to their simple nature, CSV files are only able to move basic data and only as text values. They also have poor support for special characters like commas, which can make the dataset harder to organize and understand by adding a new column for a few specific entries. This make CSV files good for sharing data between computers and languages, but not efficient for transporting or saving large amounts of data.
@@ -95,13 +91,9 @@ When you want to remove a file from your system, use `file.remove()`.
 file.remove("my_csv.csv")
 ```
 
-#### Arguments for CSV files
-
 Sometimes, CSV files will not be what you want. Maybe they have the wrong column names, have information at the top of the file, or have comments interspersed within the file.
 
-<!-- AG: I may be going too overboard with the headers, is it ok to use `#####` or is four the limit? -->
-
-##### `skip`
+#### `skip`
 
 Consider the following csv file: `test_2.csv`. Here's what it looks like as a text file:
 
@@ -136,7 +128,7 @@ read_csv(file = file_2,
 
 Now that we've gotten rid of the warnings, let's look at the other message R sends: the column specification message. 
 
-##### `col_types`
+#### `col_types`
 
 The column specification message is a message that R sends to tell you what data types it is using for the column.
 
@@ -174,7 +166,7 @@ By being clever with the columns, we can make our lives easier down the line whe
 
 We can also manipulate other arguments for CSV files.
 
-##### `col_names` and `clean_names()`
+#### `col_names` and `clean_names()`
 
 Let's try changing the column names in the `test_3.csv` file.
 
@@ -200,12 +192,12 @@ Changing the names of the columns allows for you to call on the columns later wh
 
 But what if we have good column names, they just aren't formatted correctly? Let's look at `test_4.csv` for an example.
 
-<!-- AG: This currently relies on the renamed version for the test_4.csv file in primer.tutorials, so it won't work or knit correctly until that goes through -->
 
 ```{r}
-file_4 <- paste0(github_url, "test_3.csv")
+file_4 <- paste0(github_url, "test_4.csv")
 
 file_4_tibble <- read_csv(file_4)
+
 file_4_tibble
 ```
 
@@ -218,16 +210,15 @@ file_4_tibble$`one powers`
 But that can still cause problems down the line and it's just annoying to use the backticks every time you want a column name. This is when we can use the `clean_names()` function from the **janitor** package. It essentially formats the column names so that they follow the [underscore separated naming convention](https://en.wikipedia.org/wiki/Snake_case#:~:text=Snake%20case%20(stylized%20as%20snake_case,subroutine%20names%2C%20and%20for%20filenames.) and are all unique.
 
 ```{r}
-file_4_tibble <- file_4_tibble %>% 
-                   clean_names()
-file_4_tibble
+file_4_tibble %>% 
+  clean_names()
 ```
 
 This cleans the column names, saving you time when your file has a large amount of columns or you need to type a lot of column names. These issues are more common when you're pulling data off of the internet as that's normally dirty data and can have a lot of columns formatted in weird ways.
 
 <!-- The tutorial includes a lot of arguments like na and comment, but that makes the book feel like it's really long once it's actually put into text form with paragraphs and stuff. -->
 
-##### `na`
+#### `na`
 
 Another feature of `read_csv()` is the `na` argument.
 
@@ -244,7 +235,7 @@ read_csv(file_5,
          na = ".")
 ```
 
-##### `comment`
+#### `comment`
 
 You can also tell the code to ignore comment lines, which may be common in a csv file that was written by a human and as such has comments in it. `test_6.csv` is a perfect example of this. Here's what it looks like:
 
@@ -262,7 +253,7 @@ read_csv(file_6, comment = "#")
 
 If you ever want to skip certain lines, just use the `comment` argument in order to designate it as something to be skipped. This is best used with cases where the `read_csv()` command will not compile without it.
 
-##### `read_delim()`
+#### `read_delim()`
 
 So far, we've covered how we can organize CSV data, but at it's core we're working with comma separated values. But what happens when we want to read data from something that doesn't use commas to separate the values?
 
@@ -815,7 +806,7 @@ knitr::include_graphics("03-data/images/tags.png")
 
 In the first part of this chapter, we learned how to read in data from plain text files that are usually "rectangular" in shape using the **tidyverse** `read_*` functions. Sadly, not all data comes in this simple format, but we can happily use many other tools to read in more messy/wild data formats. The formal name for gathering non-rectangular data from the web and transforming it into a more useful format for data analysis is **web scraping**.
 
-We can do web scraping through r by using the **`rvest`** library, which is a library that allows us to look at HTML and CSS selectors, then pick them apart to get the data we want. Let's look at what this means.
+We can do web scraping through r by using the **rvest** library, which is a library that allows us to look at HTML and CSS selectors, then pick them apart to get the data we want. Let's look at what this means.
 
 ### HTML and CSS selectors
 
@@ -879,7 +870,7 @@ Each tag defines an **element**, or a part of a website. For example, we used th
 
 Now, we're doing data science. And let's say you find some really cool website off of the internet that has a lot of really useful data, but there's no download file (and [it's legal to scrape from that website](#legal-to-scrape)). That means that you have to pull the information from the HTML code.
 
-We can do this by using the **`rvest`** package like I talked about earlier. This is essentially a package that allows you to scrape information from HTML code, allowing you to scrape the information off of the complete website.
+We can do this by using the **rvest** package like I talked about earlier. This is essentially a package that allows you to scrape information from HTML code, allowing you to scrape the information off of the complete website.
 
 ```{r, message = FALSE}
 library(rvest)
@@ -1035,7 +1026,6 @@ However, what if we want only the important information in that table? That's wh
 
 Now, there are a number of ways to do this. The first one is by using a **class** to tell the webpage that you want all of these elements to have the same style. CSS classes are a way for multiple elements to have the same style, rather than being limited to a unique ID. We can see an example of this below, where we set the elements with the class `good-info` to be green and the class `amazing-info` to have a pale red background.
 
-<!-- AG: This is extremely cut down from the previous version, I'm only going to include the stuff about CSS changing the color and being clever. -->
 
 ```{css}
 /*This uses the `css` language instead of the R language. You can use this
@@ -1331,8 +1321,6 @@ However, when we're scraping from actual websites we need to take more than just
 source: https://www.craigslist.org/about/terms.of.use
 
 > Want to learn more about the legalities of web scraping and crawling? Read this interesting blog post titled ["Web Scraping and Crawling Are Perfectly Legal, Right?" by Benoit Bernard](https://benbernardblog.com/web-scraping-and-crawling-are-perfectly-legal-right/) (this is optional, not required reading).
-
-<!-- AG: I'm kind of conflicted here because there's a perfectly good video that shows exactly how we can use SelectorGadget on Wikipedia pages, but it doesn't line up with the tutorials. For now, I'm going to comment out the video for future reference and just follow along with the tutorial. So maybe make them line up? I included my comments in my most recent pull request. -->
 
 So what to do now? Well, we can't scrape Craigslist, so we should find something else that allows you to scrape. Let's use a database from [Open Secrets about foreign-connected PACs within our country](https://www.opensecrets.org/political-action-committees-pacs/foreign-connected-pacs/2020).
 
