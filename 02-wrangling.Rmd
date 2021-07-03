@@ -388,7 +388,7 @@ gapminder$continent %>%
   levels()
 ```
 
-These two barcharts of frequency by continent differ only in the order of the continents. Which do you prefer? We show the code for just the second one.
+These two bar charts of frequency by continent differ only in the order of the continents. Which do you prefer? We show the code for just the second one.
 
 ```{r, echo = FALSE}
 gapminder %>% 
@@ -506,7 +506,8 @@ i_gap$country %>%
 
 ## Date-Times 
 
-We will manipulate date-times using the **lubridate** package, which makes it easier to work with dates and times in R. **lubridate** is not part of the core tidyverse because you only need it when you're working with dates/times.
+We will manipulate date-times using the **lubridate** package because lubridate makes it easier to work with dates and times in R. **lubridate** is not part of the core tidyverse because you only need it when you're working with dates/times.
+
 
 ```{r echo = FALSE}
 knitr::include_graphics("https://imgs.xkcd.com/comics/iso_8601.png")
@@ -518,11 +519,11 @@ There are three types of date/time data that refer to an instant in time:
 
 * A `time` within a day. Tibbles print this as `<time>`.
 
-* A `date-time` is a date plus a time: it uniquely identifies an
+* A `date-time` is a date plus a time. It uniquely identifies an
   instant in time (typically to the nearest second). Tibbles print this
   as `<dttm>`.
 
-You should always use the simplest possible datatype that works for your needs. That means if you can use a date instead of a date-time, you should. Date-times are substantially more complicated because of the need to handle time zones, which we'll come back to at the end of the chapter.
+You should always use the simplest possible data type that works for your needs. That means if you can use a date instead of a date-time, you should. Date-times are substantially more complicated because of the need to handle time zones, which we'll come back to at the end of the chapter.
 
 To get the current date or date-time you can use `today()` or `now()`:
 
@@ -541,7 +542,7 @@ They work as follows:
 
 ### From strings
 
-Date/time data often comes as strings. The **lubridate** functions automatically work out the format once you specify the order of the component. To use them, identify the order in which year, month, and day appear in your dates, then arrange "y", "m", and "d" in the same order. That gives you the name of the **lubridate** function that will parse your date. For example:
+Date/time data often comes as strings. The **lubridate** functions automatically work out the format once you specify the order of the component. First, figure out that you want the order in which year, month, and day appear in your dates, then arrange "y", "m", and "d" accordingly. That gives you the name of the **lubridate** function that will parse your date. For example:
 
 ```{r}
 ymd("2017-01-31")
@@ -597,6 +598,8 @@ as_date(now())
 
 Sometimes you'll get date/times as numeric offsets from the "Unix Epoch", 1970-01-01. If the offset is in seconds, use `as_datetime()`; if it's in days, use `as_date()`.
 
+<!-- Atilla: This section seems ambiguous. I feel like what the code below does and what the offset from "Unix Epoch" should be more clearly explained.-->
+
 ```{r}
 as_datetime(60 * 60 * 10)
 as_date(365 * 10 + 2)
@@ -617,7 +620,7 @@ yday(datetime)
 wday(datetime)
 ```
 
-For `month()` and `wday()` you can set `label = TRUE` to return the abbreviated name of the month or day of the week. Set `abbr = FALSE` to return the full name.
+For `month()` and `wday()` you can set `label = TRUE` to return the abbreviated name of the month or day of the week. Set both `label = TRUE` and `abbr = FALSE` to return the full name.
 
 ```{r}
 month(datetime, label = TRUE)
@@ -645,7 +648,7 @@ ymd("2015-02-01") %>%
 
 ### Time zones 
 
-Time zones are an enormously complicated topic because of their interaction with geopolitical entities. Fortunately we don't need to dig into all the details as they're not all that important for data analysis. You can see the complete list of possible timezones with the function `OlsonNames()`. Unless otherwise specified, **lubridate** always uses UTC (Coordinated Universal Time).
+Time zones are an enormously complicated topic because of their interaction with geopolitical entities. Fortunately, we don't need to dig into all the details as they're not all imperative for data analysis. You can see the complete list of possible timezones with the function `OlsonNames()`. Unless otherwise specified, **lubridate** always uses UTC (Coordinated Universal Time).
 
 In R, the time zone is an attribute of the date-time that only controls printing. For example, these three objects represent the same instant in time:
 
@@ -702,7 +705,7 @@ publishers <- tibble::tribble(
   )
 ```
 
-Note how easy it is to use `tribble()`, from the **tibble** package (part of the Tidyverse) to create a tibble on the fly using text which organized for easy entry and reading. Recall that a double colon --- `::` --- is how we indicate that a function comes from a specific package.
+Note how easy it is to use `tribble()` from the **tibble** package to create a tibble on the fly using text which organized for easy entry and reading. Recall that a double colon --- `::` --- is how we indicate that a function comes from a specific package.
 
 #### `inner_join()`
 
