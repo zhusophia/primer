@@ -711,7 +711,7 @@ Note how easy it is to use `tribble()` from the **tibble** package to create a t
 
 <!-- Instead show a diagram of left_join() and briefly cover the rest of the joins, as left_join() is by far the most commonly-used join method. -->
 
-`inner_join(x, y)`: Return all rows from `x` where there are matching values in `y`, and all columns from `x` and `y`. If there are multiple matches between `x` and `y`, all combination of the matches are returned. 
+`inner_join(x, y)`: Returns all rows from `x` where there are matching values in `y`, and all columns from `x` and `y`. If there are multiple matches between `x` and `y`, all combination of the matches are returned. 
 
 ```{r, echo= FALSE, fig.cap = "Inner join."}
 knitr::include_graphics("02-wrangling/images/join-inner.png")
@@ -742,7 +742,7 @@ In a way, this does illustrate multiple matches, if you think about it from the 
 
 #### `full_join()`
 
-`full_join(x, y)`: Return all rows and all columns from both `x` and `y`. Where there are not matching values, returns `NA` for the one missing. 
+`full_join(x, y)`: Returns all rows and all columns from both `x` and `y`. Where there are not matching values, returns `NA` for the one missing. 
 
 ```{r}
 full_join(superheroes, publishers, by = "publisher")
@@ -751,17 +751,17 @@ full_join(superheroes, publishers, by = "publisher")
 We get all rows of `x = superheroes` plus a new row from `y = publishers`, containing the publisher Image. We get all variables from `x = superheroes` AND all variables from `y = publishers`. Any row that derives solely from one table or the other carries `NA`s in the variables found only in the other table.
 
 
-Because `full_join()` returns all rows and all columns from both `x` and `y` the result of `full_join(x = superheroes, y = publishers)` should match that of `full_join(x = publishers, y = superheroes)`.
+Because `full_join()` returns all rows and all columns from both `x` and `y`, the result of `full_join(x = superheroes, y = publishers)` should match that of `full_join(x = publishers, y = superheroes)`.
 
 #### `left_join()`
 
-`left_join(x, y)`: Return all rows from `x`, and all columns from `x` and `y`. If there are multiple matches between `x` and `y`, all combination of the matches are returned. 
+`left_join(x, y)`: Returns all rows from `x`, and all columns from `x` and `y`. If there are multiple matches between `x` and `y`, all combination of the matches are returned. 
 
 ```{r}
 left_join(superheroes, publishers, by = "publisher")
 ```
 
-We basically get `x = superheroes` back, but with the addition of variable `yr_founded`, which is unique to `y = publishers`. Hellboy, whose publisher does not appear in `y = publishers`, has an `NA` for `yr_founded`.
+We basically get `x = superheroes` back, but with an additional variable `yr_founded`, which is unique to `y = publishers`. Hellboy, whose publisher does not appear in `y = publishers`, has an `NA` for `yr_founded`.
 
 Now compare this result to that of running `left_join(x = publishers, y = superheroes)`. Unlike `inner_join()` and `full_join()` the order of the arguments has a significant effect on the resulting tibble. 
 
@@ -769,13 +769,13 @@ Now compare this result to that of running `left_join(x = publishers, y = superh
 left_join(publishers, superheroes, by = "publisher")
 ```
 
-We get a similar result as with `inner_join()` but the publisher Image survives in the join, even though no superheroes from Image appear in `y = superheroes`. As a result, Image has `NA`s for `name` and `gender`.
+We get a similar result as with `inner_join()`, but the publisher Image survives in the join, even though no superheroes from Image appear in `y = superheroes`. As a result, Image has `NA`s for `name` and `gender`.
 
-There is a similar function, `right_join(x, y)` that return all rows from `y`, and all columns from `x` and `y`. 
+There is a similar function, `right_join(x, y)` that returns all rows from `y`, and all columns from `x` and `y`. 
 
 #### `semi_join()`
 
-`semi_join(x, y)`: Return all rows from `x` where there are matching values in `y`, keeping just columns from `x`. A semi join differs from an inner join because an inner join will return one row of `x` for each matching row of `y`, where a semi join will never duplicate rows of `x`. This is a filtering join.
+`semi_join(x, y)`: Returns all rows from `x` where there are matching values in `y`, keeping just columns from `x`. A semi join differs from an inner join because an inner join will return one row of `x` for each matching row of `y`, whereas a semi join will never duplicate rows of `x`. This is a filtering join.
 
 ```{r}
 semi_join(superheroes, publishers, by = "publisher")
@@ -787,7 +787,7 @@ Compare the result of switching the values of the arguments.
 semi_join(x = publishers, y = superheroes, by = "publisher")
 ```
 
-Now the effects of switching the `x` and `y` roles is more clear. The result resembles `x = publishers`, but the publisher Image is lost, because there are no observations where `publisher == "Image"` in `y = superheroes`.
+Now the effects of switching the `x` and `y` roles is more clear. The result resembles `x = publishers`, but the publisher Image is lost, since there are no observations where `publisher == "Image"` in `y = superheroes`.
 
 #### `anti_join()`
 
@@ -797,7 +797,9 @@ Now the effects of switching the `x` and `y` roles is more clear. The result res
 anti_join(superheroes, publishers, by = "publisher")
 ```
 
-We keep only Hellboy now (and do not get `yr_founded`).
+We keep only Hellboy now.
+
+<!-- Atilla: I've removed the "and do not get `yr_founded` " phrase from the sentence "We keep only Hellboy now (and do not get `yr_founded`). " It is already stated in the past sentences. It was given in the  previous sentence that " keeping just columns from x." -->
 
 Now switch the arguments and compare the result.
 
@@ -872,7 +874,7 @@ drinks %>%
   head(5)
 ```
 
-After reading the help file by running `?drinks`, you'll see that `drinks` is a data frame containing results from a survey of the average number of servings of beer, spirits, and wine consumed in 193 countries. This data was originally reported on FiveThirtyEight.com in Mona Chalabi's article: ["Dear Mona Followup: Where Do People Drink The Most Beer, Wine And Spirits?"](https://fivethirtyeight.com/features/dear-mona-followup-where-do-people-drink-the-most-beer-wine-and-spirits/).
+After reading the help file by running `?drinks`, you'll see that `drinks` is a data frame that contains the results from a survey of the average number of servings of beer, spirits, and wine consumed in 193 countries. This data was originally reported on FiveThirtyEight.com in Mona Chalabi's article: ["Dear Mona Followup: Where Do People Drink The Most Beer, Wine And Spirits?"](https://fivethirtyeight.com/features/dear-mona-followup-where-do-people-drink-the-most-beer-wine-and-spirits/).
 
 Let's apply some of the data wrangling verbs on the `drinks` data frame:
 
@@ -908,7 +910,9 @@ knitr::include_graphics("02-wrangling/images/tidy-1.png")
 
 ### Converting to "tidy" data
 
-In this book so far, you've only seen data frames that were already in "tidy" format. Furthermore, for the rest of this book, you'll mostly only see data frames that are already in "tidy" format as well. This is not always the case however with all datasets in the world. If your original data frame is in wide (non-"tidy") format and you would like to use the **ggplot2** or **dplyr** packages, you will first have to convert it to "tidy" format. To do so, we recommend using the `pivot_longer()` function in the **tidyr** package [@R-tidyr]. 
+In this book so far, you've only seen data frames that were already in "tidy" format. Furthermore, for the rest of this book, you'll mostly only see data frames that are already tidy as well. This is not always the case, however, with all datasets in the world. If your original data frame is in wide (non-"tidy") format and you would like to use the **ggplot2** or **dplyr** packages, you will first have to convert it to "tidy" format. To do so, we recommend using the `pivot_longer()` function in the **tidyr** package [@R-tidyr]. 
+
+<!-- Atilla: I feel like phrase "tidy" format is repetitively used and is awk. Therefore, I replaced some of the "'tidy' format" phrases with tidy.  -->
 
 Going back to our `drinks_smaller` data frame from earlier:
 
@@ -916,7 +920,7 @@ Going back to our `drinks_smaller` data frame from earlier:
 drinks_smaller
 ```
 
-We convert it to "tidy" format by using the `pivot_longer()` function from the **tidyr** package as follows:
+We tidy it by using the `pivot_longer()` function from the **tidyr** package as follows:
 
 ```{r}
 drinks_smaller_tidy <- drinks_smaller %>% 
@@ -930,11 +934,11 @@ Let's dissect the arguments to `pivot_longer()`.
 
 1. the first argument`names_to` corresponds to the name of the variable in the new "tidy"/long data frame that will contain the *column names* of the original data. Observe how we set `names_to = "type"`. In the resulting `drinks_smaller_tidy`, the column `type` contains the three types of alcohol `beer`, `spirit`, and `wine`. Since `type` is a variable name that doesn't appear in `drinks_smaller`, we use quotation marks around it. You'll receive an error if you just use `names_to = type` here.
 
-1. The second argument `values_to` corresponds to the name of the variable in the new "tidy" data frame that will contain the *values* of the original data. Observe how we set `values_to = "servings"` since each of the numeric values in each of the `beer`, `wine`, and `spirit` columns of the `drinks_smaller` data corresponds to a value of `servings`. In the resulting `drinks_smaller_tidy`, the column `servings` contains the 4 $\times$ 3 = 12 numerical values. Note again that `servings` doesn't appear as a variable in `drinks_smaller` so it again needs quotation marks around it for the `values_to` argument.
+1. The second argument `values_to` corresponds to the name of the variable in the new "tidy" data frame that will contain the *values* of the original data. Observe how we set `values_to = "servings"` since each numeric value in the `beer`, `wine`, and `spirit` columns of the `drinks_smaller` corresponds to a value of `servings`. In the resulting `drinks_smaller_tidy`, the column `servings` contains the 4 $\times$ 3 = 12 numerical values. Note again that `servings` doesn't appear as a variable in `drinks_smaller` so it again needs quotation marks around it for the `values_to` argument.
 
 1. The third argument `cols` is the columns in the `drinks_smaller` data frame you either want to or don't want to "tidy." Observe how we set this to `-country` indicating that we don't want to "tidy" the `country` variable in `drinks_smaller` and rather only `beer`, `spirit`, and `wine`. Since `country` is a column that appears in `drinks_smaller` we don't put quotation marks around it.
 
-The third argument here of `cols` is a little nuanced, so let's consider code that's written slightly differently but that produces the same output: 
+The third argument here of `cols` is a little nuanced, so let's consider code that was written slightly differently but that produces the same output: 
 
 ```{r, eval=FALSE}
 drinks_smaller %>% 
@@ -943,7 +947,7 @@ drinks_smaller %>%
                cols = c(beer, spirit, wine))
 ```
 
-Note that the third argument now specifies which columns we want to "tidy" with `c(beer, spirit, wine)`, instead of the columns we don't want to "tidy" using `-country`. We use the `c()` function to create a vector of the columns in `drinks_smaller` that we'd like to "tidy." Note that since these three columns appear one after another in the `drinks_smaller` data frame, we could also do the following for the `cols` argument:
+Note that the third argument now specifies which columns we want to "tidy" with `c(beer, spirit, wine)`, instead of the columns we don't want to "tidy" using `-country`. We use the `c()` function to create a vector of the columns in `drinks_smaller` that we'd like to "tidy." Note that since these three columns appear one after another in the `drinks_smaller` data frame, we can also do the following for the `cols` argument:
 
 ```{r, eval = FALSE}
 drinks_smaller %>% 
@@ -953,9 +957,9 @@ drinks_smaller %>%
 ```
 
 
-Converting "wide" format data to "tidy" format often confuses new R users. The only way to learn to get comfortable with the `pivot_longer()` function is with practice, practice, and more practice using different datasets. For example, run `?pivot_longer` and look at the examples in the bottom of the help file.
+Converting "wide" format data to "tidy" format often confuses new R users. The only way to get comfortable with the `pivot_longer()` function is with practice, practice, and more practice using different datasets. For example, run `?pivot_longer` and look at the examples in the bottom of the help file.
 
-If however you want to convert a "tidy" data frame to "wide" format, you will need to use the `pivot_wider()` function instead. Run `?pivot_wider` and look at the examples in the bottom of the help file for examples.
+If, however, you want to convert a "tidy" data frame to "wide" format, you will need to use the `pivot_wider()` function instead. Run `?pivot_wider` and look at the examples in the bottom of the help file for examples.
 
 You can also view examples of both `pivot_longer()` and `pivot_wider()` on the [tidyverse.org](https://tidyr.tidyverse.org/dev/articles/pivot.html#pew) webpage. There's a nice example to check out the different functions available for data tidying and a case study using data from the World Health Organization on that webpage. Furthermore, each week the R4DS Online Learning Community posts a dataset in the weekly [`#`TidyTuesday event](https://github.com/rfordatascience/tidytuesday) that might serve as a nice place for you to find other data to explore and transform. 
 
@@ -965,7 +969,7 @@ You can also view examples of both `pivot_longer()` and `pivot_wider()` on the [
 
 <!-- DK: This could be re-organized. More discussion of discrete versus continuous. -->
 
-*A distribution is a function which shows the possible values of a variable and how often they occur.*
+*A distribution is a function that shows the possible values of a variable and how often they occur.*
 
 Think of the distribution of a variable as an urn from which we can pull out, at random, values for that variable. Drawing a thousand or so values from that urn, and then looking at a histogram, can show where the values are centered and how the values vary. Because people are sloppy, they will use the word distribution to refer to both the (imaginary!) urn from which we are drawing values and to the list of values we have drawn. It is better, however, to keep three distinct ideas separate:
 
