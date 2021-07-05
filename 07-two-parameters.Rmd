@@ -2,15 +2,16 @@
 
 <!-- Read Gelman on problems with testing. GP: Not yet. -->
 
-<!-- I think the introduction of 7.1 (everything before 7.1.1) belongs outside of the "Wisdom" section entirely. Chapter 5 establishes that the cardinal virtues are parts of a process to answer your questions. Creating the questions themselves is not part of "Wisdom" (as per chapter 5) and therefore doesn't belong in that section, but rather right before it. GP: Done -->
+<!-- Read chapter 8 and 11.  -->
 
-<!-- Delete females from EDA plot and make a better plot.  Maybe it has both a histogram and a density overlayed. Or maybe not! I don't know. GP: Done -->
+<!-- Add comments to important code chunks, like the EDA graphic. -->
+
+<!-- Place Population Table at the start of Justice. -->
+
+<!-- Add discussion of why Wisdom has nothing to do with representativeness. Use basketball player example. The  best way to be sure that your data is representative of the population is for the process which selected that data to be random. Almost never true! Even if NHANES is a perfect survey --- things are still hard. And no survey is perfect. People in jail? People in hospitals?  -->
 
 <!-- old stuff: -->
 
-<!-- Reserve discussion of validity for cases in which the measure/meaning/treatment has truly changed. Examples? Meaning if height has not truly changed. Or has it? Are we measuring people with shoes on or shoes off? Height is not just height. It is all the details associated with how you took that measurement. Where did the data come from?  Are you telling people to stand up straight? What tool are you using to measure? MF: Done. -->
-
-<!-- Remove ideal from ideal Preceptor Table. After chapter 4, there is only one notion of a "Preceptor Table." It is a table with the rows and columns such that, if there is no missing data, you can answer all the questions with easy algebra. MF: Done. -->
 
 <!-- Concerns about representativeness and validity may cause us to make adjustments in our final posteriors in an ad hoc --- but still useful! --- manner, or they may cause us to make changes in our actual models.  -->
 
@@ -151,7 +152,7 @@ nhanes %>%
   skim()
 ```
 
-Interesting! There are 353 missing values of height in our subset of data. Just using `glimpse()` does not show us that.  Let's filter out the NA's using `drop_na()`. This will delete the rows in which the value of any variable is missing. Because we want to examine height in men (not boys, nor females), let's limit our data to only include adult males. 
+Interesting! There are `r sum(is.na(nhanes$height))` missing values of height in our subset of data. Just using `glimpse()` does not show us that.  Let's filter out the NA's using `drop_na()`. This will delete the rows in which the value of any variable is missing. Because we want to examine height in men (not boys, nor females), let's limit our data to only include adult males. 
 
 ```{r}
 ch7 <- nhanes %>% 
@@ -170,11 +171,20 @@ ch7 %>%
   geom_density(color = "black",
                fill = "red",
                alpha = .2) +
+  
+  # You can have multiple geom layers in a plot by simply adding them one after
+  # the other.
+  
   geom_histogram(mapping = aes(y = ..density..),
                  bins = 15,
                  color = "black",
                  fill = "blue",
                  alpha = .2) +
+  
+  # In order to gave Greek letters and other mathematical expressions appear in
+  # plot labels, you need to use the expression() function, with appropriate
+  # arguments, which will often be the name of the Greek letter you want.
+  
   labs(x = expression(mu),
        y = "Density",
        title = "Height (cm) in NHANES Dataset",
