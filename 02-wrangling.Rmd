@@ -971,13 +971,13 @@ You can also view examples of both `pivot_longer()` and `pivot_wider()` on the [
 
 *A distribution is a function that shows the possible values of a variable and how often they occur.*
 
-Think of the distribution of a variable as an urn from which we can pull out, at random, values for that variable. Drawing a thousand or so values from that urn, and then looking at a histogram, can show where the values are centered and how the values vary. Because people are sloppy, they will use the word distribution to refer to both the (imaginary!) urn from which we are drawing values and to the list of values we have drawn. It is better, however, to keep three distinct ideas separate:
+Think of the distribution of a variable as an urn from which we can pull out, at random, values for that variable. Drawing a thousand or so values from that urn, and then looking at a histogram, can show where the values are centered and how they vary. Because people are sloppy, they will use the word distribution to refer to both the (imaginary!) urn from which we are drawing values and to the list of values we have drawn. It is better, however, to keep three distinct ideas separate:
 
-* The *unknown true distribution* which, in reality, generates the data which we see. Outside of stylized examples in which we *assume* that a distribution follows a simple mathematical formula, we will never have access to the unknown true distribution. We can only estimate it, however imperfectly. This unknown true distribution is often referred to as the *data generating mechanism*, or DGM. It is a function or black box or urn which produces data. We can see the data. We can't see the urn. Later in the *Primer*, once we have learned about posterior distributions, we will often refer to this as *Preceptor's Posterior*.
+* The *unknown true distribution* which, in reality, generates the data which we see. Outside of stylized examples in which we *assume* that a distribution follows a simple mathematical formula, we will never have access to the unknown true distribution. We can only estimate it. This unknown true distribution is often referred to as the *data generating mechanism*, or DGM. It is a function or black box or urn which produces data. We can see the data. We can't see the urn. Later in the *Primer*, once we have learned about posterior distributions, we will often refer to this as *Preceptor's Posterior*.
 
 * The *estimated distribution* which, we think, generates the data which we see. Again, we can never know the unknown true distribution. But, by making some assumptions and using the data we have, we can *estimate* a distribution. Our estimate may be very close to the true distribution. Or it may be far away. The main task of data science to to create and use these estimated distributions. Almost always, these distributions are instantiated in computer code.
 
-* A *vector of numbers drawn* from the estimated distribution. Both true and estimated distributions can be complex beasties, difficult to describe accurately and in detail. But a vector of numbers drawn from a distribution is easy to understand and use. So, in general, we work with vectors of numbers. When someone --- either a colleague or a piece of R code --- has created a distribution which we want to use to answer a question, we don't really want the distribution itself. We just want a vectors of "draws" from that distribution. Vectors are easy to work with! Complex computer code is not.
+* A *vector of numbers drawn* from the estimated distribution. Both true and estimated distributions can be complex beasties, difficult to describe accurately and in detail. But a vector of numbers drawn from a distribution is easy to understand and use. So, in general, we work with vectors of numbers. When someone --- either a colleague or a piece of R code --- creates a distribution which we want to use to answer a question, we don't really want the distribution itself. Rather, we want a vectors of "draws" from that distribution. Vectors are easy to work with! Complex computer code is not.
 
 Again, people (including us!) will often be sloppy and use the same word, "distribution," without making it clear whether they are talking about the *true distribution*, the *estimated distribution*, or a vector of *draws* from the estimated distribution. Try not to be sloppy.
 
@@ -996,7 +996,7 @@ table(rolls)
 ```
 
 
-In this case, with only 10 values, it is actually less efficient to store the data like this. But what happens when we have 10,000 rolls.
+In this case, with only 10 values, it is actually less efficient to store the data like this. But what happens when we have 10,000 rolls?
 
 ```{r}
 more_rolls <- rep(rolls, 1000)
@@ -1025,9 +1025,11 @@ more_rolls_p <- tibble(value = more_rolls) %>%
 rolls_p + more_rolls_p
 ```
 
-The two vectors --- `rolls` and `more_rolls` --- have the exact same shape because, even though their lengths differ, they are the same thing. *The total count for each value does not matter. What matters is the relative proportions.*
+The two vectors --- `rolls` and `more_rolls` --- have the exact same shape because even though of different lengths, these values were drawn from the same distribution. *The total count for each value does not matter. What matters is the relative proportions.*
 
-Since shape is what matters, we will often "normalize" distributions so that the sum of the counts equals one, meaning that the y-axis is a percentage of the total. Example:
+<!-- Atilla:Phrase "they are the same thing" seems ambiguous. I thought following phrase would be more proper: " since even though of different lengths, these values were drawn from the same distribution. "  Could the preceptor check this revision? -->
+
+Since shape is what matters, we often "normalize" distributions so that the sum of the counts equals one, where y-axis shows the percentages of total. Example:
 
 ```{r, echo = FALSE}
 rolls_p <- tibble(value = rolls) %>% 
@@ -1114,7 +1116,7 @@ Consider a "uniform" distribution. This is the case in which every outcome in th
 runif(n = 10, min = 4, max = 6)
 ```
 
-Mathematically, we would write:
+Mathematically, we would notate:
 
 $$y_i \sim U(4, 6)$$, 
 
@@ -1531,7 +1533,7 @@ tbl %>%
   drop_na(a)
 ```
 
-Be careful, however, if you use `drop_na()` without a specific variable provided. In that case, you will remove all rows with a missing value for any variable in the tibble.
+However, be careful! If you use `drop_na()` without a specific variable provided, you will remove all rows with a missing value for any variable in the tibble.
 
 ```{r}
 tbl %>% 
@@ -1566,7 +1568,7 @@ tbl %>%
 
 ### Using `skim()`
 
-The **`skimr`** package offers a very useful function know as the `skim()` function, and it allows you to get valuable information from the data set in one glance. This is similar to the `glimpse()` function but it's a little more detailed and offers some preliminary analysis of the topic.
+The **`skimr`** package offers a very useful function known as the `skim()` function, allowing you to get valuable information from the data set in one glance. This is similar to the `glimpse()` function, but it's a little more detailed and offers some preliminary analysis of the topic.
 
 Let's try skimming the `nhanes` dataset.
 
@@ -1592,7 +1594,7 @@ No! That is ridiculous. We don't have them all memorized. Why should you? The po
 
 <!-- DK: I am eliding over distributions of numbers (easy) and of values, like race. Should go back and have binom return "Head". Or maybe this is subtle enough that I can ignore it. Also, should make clear that sample() is, conceptually, taking draws from trains$age. Or, rather, trains$age is some draw from an imaginary distribution or population. -->
 
-The key data science concept from this chapter is, again, the idea of a "distribution." The word distribution is used in two very different ways. First, a distribution is an invisible object that you can never use of touch. <!-- Alex- not sure what "use of touch" means -->It is the imaginary urn from which you can take draws. Only in very special cases will you ever be able to "know" what the distribution is, mainly the case where there is a physical process, like a roulette wheel, which you can inspect or in the case of an assumed mathematical formula. But, in almost all real world data science problems, the "distribution" is a mental creation whose reality you can never confirm.
+The key data science concept from this chapter is, again, the idea of a "distribution." The word distribution is used in two very different ways. First, a distribution is an invisible object that you can never use of touch. <!-- Alex- not sure what "use of touch" means -->It is the imaginary urn from which you can take draws. Only in very special cases will you ever be able to "know" what the distribution is, mainly in cases where there is a physical process, like a roulette wheel, which you can inspect or in the case of an assumed mathematical formula. Nevertheless, in almost all real world data science problems, the "distribution" is a mental creation whose reality you can never confirm.
 
 The second way that the word distribution is used is to refer to a vector of values, a variable in an R tibble. The 115 ages in `trains` are a distribution as are 1,000 draws from `rnorm()`. 
 
