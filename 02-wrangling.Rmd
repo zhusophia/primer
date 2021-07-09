@@ -52,6 +52,7 @@ library(fivethirtyeight)
 Tibbles are a kind of data frame, useful for storing data in which we have the same number of observations for each variable. We can use the `tibble()` function to create tibbles. Tibbles are composed of columns, each of which is a variable, and rows, each of which is a "unit" or an "observation." Furthermore, each column (i.e., each variable) can be of a different type: character, integer, factor, double, date and so on.
 
 <!-- Atilla: Tibble description was too long and ambiguous. I've broke it into multiple sentences with a little different wording. -->
+<!-- AM: Probably mention how we've already used tibbles, such as the trains dataset from Chapter 1. -->
 
 ### `tibble()`
 
@@ -61,7 +62,7 @@ tibble(a = 2.1, b = "Hello", c = TRUE, d = 9L)
 
 <!-- AM: Also unnecessarily wordy. -->
 
-In our code, we specify the variable names (or the names of columns) as , `a`, `b`, and `c`. Under each variable, we give a different value. Under each variable name, the data type is specified for the data within that column. A tibble can consist of one or more atomic vectors, the most important types of which are double, character, logical, and integer. The tibble above includes a variable of each type. The "L" in "9L" tells R that we want `d` to be an integer rather than the default, which would be a double. When you print out a tibble, the variable type is shown below the variable name.
+In our code, we specify the column names as , `a`, `b`, and `c`. Under each variable, we give a different value. Under each variable name, the data type is specified for the data within that column. A tibble can consist of one or more atomic vectors, the most important types of which are double, character, logical, and integer. The tibble above includes a variable of each type. The "L" in "9L" tells R that we want `d` to be an integer rather than the default, which would be a double. When you print out a tibble, the variable type is shown below the variable name, as indicated by `<dbl>`, `<chr>`, and so on.
 
 <!--Atilla: "The "L" in "9L" tells R that we want `d" part is not necessarily an extra information. I think parentheses is unnecessary in this case. I've edited that.-->
 
@@ -83,6 +84,8 @@ If we did not include the backticks, R would give us an error.
 tibble(54abc = 1, my var = 2, c = 3)
 ```
 
+In the real world, you may come across datasets with dirty column names such as `54abc` or `my var`.
+
 It is sometimes easier to use the function `tribble()` to create tibbles.
 
 ```{r}
@@ -93,9 +96,13 @@ tribble(
 )
 ```
 
+<!-- AM: The last part of this sentence is confusing. -->
+
 The tildes --- as in `~ var1` --- specify which row has the column names. The formatting makes it easier, relative to specifying raw vectors, to see which values are from the same observation.
 
 ## Lists
+
+<!-- AM: Shouldn't the figure come AFTER the first demonstration of `list()` on lines 113-116? -->
 
 ```{r, echo = FALSE, fig.cap = "Subsetting a list, visually."}
 knitr::include_graphics("02-wrangling/images/lists-subsetting.png")
@@ -116,7 +123,7 @@ x_named <- list(a = 1, b = 2, c = 3)
 str(x_named)
 ```
 
-Unlike atomic vectors, `list()` can contain a mix of objects.
+Unlike atomic vectors, `list()` can contain objects of several types.
 
 ```{r}
 y <- list("a", 1L, 1.5, TRUE)
@@ -140,7 +147,7 @@ x2 <- list(list(1, 2), list(3, 4))
 x3 <- list(1, list(2, list(3)))
 ```
 
-I'll draw them as follows:
+They are structured as follows:
 
 ```{r, echo = FALSE}
 knitr::include_graphics("02-wrangling/images/lists-structure.png")
@@ -198,8 +205,11 @@ knitr::include_graphics("02-wrangling/images/nasty.gif")
 
 So far, our tibbles have been clean and wholesome, like `gapminder` and `trains`. **Real data is nasty.** You will bring data into R from the outside world and discover there are problems. We will now discuss common remedial tasks for cleaning and transforming character data, also known as strings. A *string* is one or more characters that are enclosed inside a pair of matching 'single' or "double quotes".
 
+<!-- AM: This could be worded better. -->
 
 We will use the `fruit` data, a vector with the names of different fruits, from the **stringr** package, which is automatically loaded when we issue `library(tidyverse)`. Although we can manipulate character vectors directly, it is much more common, in real world situations, to work with vectors which are in a tibble.
+
+<!-- AM: Should this codeblock be put beneath the "Character vectors" section? -->
 
 ```{r}
 tbl_fruit <- tibble(fruit = fruit)
@@ -213,7 +223,9 @@ tbl_fruit %>%
   slice_sample(n = 8)
 ```
 
-Note that `slice_sample()` selects a random set of rows from the tibble. If you use the argument `n`, as here, you get back that many rows. Use the argue `prop` to return a specific percentage of all the rows in the tibble.
+<!-- AM: Demonstrate a use of the `prop` argument? Or just delete it entirely? -->
+
+Note that `slice_sample()` selects a random set of rows from the tibble. The argument `n`, as shown above, will display that many rows. Use the argument `prop` to return a specific percentage of all the rows in the tibble.
 
 `str_detect()` determines if a character vector matches a pattern.  It returns a logical vector that is the same length as the input. Recall logicals are either `TRUE` or `FALSE`.
 
@@ -222,9 +234,9 @@ Which fruit names actually include the letter "c?"
 ```{r}
 tbl_fruit %>% 
   mutate(fruit_in_name = str_detect(fruit, pattern = "c")) 
-
 ```
 
+<!-- AM: How is it different? Demonstrate a usage of `length()`? -->
 
 `str_length()` counts characters in your strings. Note this is different from the `length()` of the character vector itself.
 
@@ -233,7 +245,7 @@ tbl_fruit %>%
   mutate(name_length = str_length(fruit)) 
 ```
 
-`str_sub()` extracts parts of a string. The function takes start and end arguments which are vectorised.
+`str_sub()` returns a portion of a string. This demonstration will return the first three letters of each `fruit` with the arguments `fruit`, `1`, and `3`.
 
 ```{r}
 tbl_fruit %>% 
