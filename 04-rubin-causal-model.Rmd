@@ -79,18 +79,16 @@ knitr::include_app("https://www.youtube.com/embed/cR7p-IB6INM")
 
 George Bailey, in the movie "It's a Wonderful Life," believes that his life has served no purpose. The movie follows George as he explores a world in which he was never born. It is clear that he had a profound impact on the lives of many people in his community. His actions mattered, more than he ever realized.
 
-By showing what the world would have been like without George, we get an idea of the *causal effect* of his life on his town and the people who live there. This chapter covers causal effects using the framework of *potential outcomes* and the *Rubin Causal Model* (RCM). 
+By showing what the world would have been like without George, we get an idea of the *causal effect* of his life on his town and the people who live there. This chapter explains causation using the framework of *potential outcomes* and the *Rubin Causal Model* (RCM). 
 
 
 
 
 ## Preceptor Tables
 
-A **Preceptor Table** is a table with rows and columns for all the data that we have and all the data we would (reasonably) like to have, such that, if none of the data is missing, the thing we want to know is trivial to calculate. Preceptor Tables vary in the number of their rows and columns, as well as in the amount of missing data. We use question marks to indicate missing data in a Preceptor Table.
+A **Preceptor Table** is a table with rows and columns such that, if none of the data is missing, the thing we want to know is trivial to calculate. Preceptor Tables vary in the number of their rows and columns. We use question marks to indicate missing data in a Preceptor Table.
 
-<!-- DK: Instead, should we look for the height of the missing brother? -->
-
-Assume that there are five adult brothers and you are given four of their heights. What is the average height of all five brothers? Because we are not given it, we can use statistics to estimate this unknown value. Consider a Preceptor Table for this problem:
+Assume that there are five adult brothers and you are given four of their heights. What is the average height of all five brothers? Consider a Preceptor Table for this problem:
 
 ```{r echo = FALSE}
 tibble(ID = c("Robert", "Andy", "Beau", "Ishan", "Nicolas"),
@@ -184,17 +182,17 @@ knitr::include_graphics("04-rubin-causal-model/images/enos_seal.png")
 
 <!-- SZ: Image is very out of the blue, at first seemed to have little correlation, espicially with seal -->
 
-The Rubin Causal Model (RCM) is based on the idea of **potential outcomes.** For example, @enos2014 measured attitudes toward immigration among Boston commuters. Individuals were exposed to one of two possible conditions, and then their attitudes towards immigrants were recorded. One condition was being on a train platform near individuals speaking Spanish. The other was being on a train platform without Spanish-speakers. To calculate the causal effect of having Spanish-speakers nearby, we need to compare the outcome for an individual in one possible state of the world (with Spanish-speakers) to another (without Spanish-speakers). It is impossible to observe both potential outcomes at once. One of the potential outcomes is always missing. This dilemma is the *Fundamental Problem of Causal Inference*.
+The Rubin Causal Model (RCM) is based on the idea of **potential outcomes.** For example, @enos2014 measured attitudes toward immigration among Boston commuters. Individuals were exposed to one of two possible conditions, and then their attitudes towards immigrants were recorded. One condition was being on a train platform near individuals speaking Spanish. The other was being on a train platform without Spanish-speakers. To calculate the causal effect of having Spanish-speakers nearby, we need to compare the outcome for an individual in one possible state of the world (with Spanish-speakers) to the outcome for that same individual in another state of the world,  one without Spanish-speakers. It is impossible to observe both potential outcomes at once. One of the potential outcomes is always missing. This dilemma is the *Fundamental Problem of Causal Inference*.
 
 In most circumstances, we are interested in comparing two experimental manipulations, one generally termed "treatment" and the other "control." The difference between the potential outcome under treatment and the potential outcome under control is a "causal effect" or a "treatment effect."  The scenario that didn't actually happen, and thus that we didn't observe, is a "counterfactual." According to the RCM, the **causal effect** of being on the platform with Spanish-speakers is the *difference* between what your attitude would have been under "treatment" (with Spanish-speakers) and under "control" (no Spanish-speakers).
 
 The commuter survey consisted of three questions, each measuring agreement on a 1 to 5 integer scale, with 1 being liberal and 5 being conservative. For each person, the three answers were summed, generating an overall measure of attitude toward immigration which ranged from 3 to 15. If your attitude towards immigrants would have been a 13 with Spanish-speakers and a 9 without Spanish-speakers, then the causal effect of being on a platform with Spanish-speakers is a 4-point increase in your score.
 
-We will use the symbol $Y$ to represent potential outcomes, the variable we are interested in understanding and modeling. $Y$ is called the *response* or *outcome* variable. It is the variable we want to "explain." In our case this would be the attitude score. If we are trying to understand a causal effect, we need two symbols: so that control and treated values can be represented separately. We will use the symbols $Y_t$ and $Y_c$. 
+We will use the symbol $Y$ to represent potential outcomes, the variable we are interested in understanding and modeling. $Y$ is called the *response* or *outcome* variable. It is the variable we want to "explain." In our case this would be the attitude score. If we are trying to understand a causal effect, we need two symbols so that control and treated values can be represented separately: $Y_t$ and $Y_c$. 
 
 ### Potential outcomes
 
-Suppose that Yao is one of the commuters surveyed in this experiment. If we were omniscient, we would know the outcomes for Yao under both treatment (with Spanish-speakers) and control (no Spanish-speakers). We can show this using an ideal Preceptor Table. This Preceptor Table is considered *ideal* because we are not missing any data, and so calculating the number we are interested in is trivial.
+Suppose that Yao is one of the commuters surveyed in this experiment. If we were omniscient, we would know the outcomes for Yao under both treatment (with Spanish-speakers) and control (no Spanish-speakers). We can show this using a Preceptor Table. Calculating the number we are interested in is trivial because none of the data is missing.
 
 ```{r, echo = FALSE, fig.align = 'left'}
 # First, we create a tibble with the values we want for the table
@@ -221,6 +219,7 @@ tibble(ID = "Yao",
 &nbsp;
 
 From this table we only know the causal effect on Yao. Everyone else in the study might have a lower attitude score (more liberal) if treated. Regardless of what the causal effect is for other subjects, the causal effect for Yao of being on the train platform with Spanish-speakers is a shift towards a more conservative attitude.
+
 <!-- SZ: Is there a need to mention other people when we're focusing on Yao? -->
 
 
@@ -252,7 +251,7 @@ gt() %>%
 &nbsp;
 
 
-Recall that the "causal effect" is the difference between Yao's potential outcomes under treatment and under control. 
+Recall that the "causal effect" is the difference between Yao's potential outcome under treatment and his potential outcome under control. 
 
 ```{r, echo = FALSE}
 # First, we create a tibble with the values we want for the table
@@ -300,7 +299,7 @@ In other words, there needs to be a distinction between $Y_t$ for Yao, and $Y_t$
 
 Instead of $Y_t$, we will use $Y_t(u)$ to represent "Attitude if Treated." If you want to talk about only Emma, you could say "Emma's Attitude if Treated" or "$Y_t(u = Emma)$" or "the $Y_t(u)$ for Emma", but not just $Y_t$. That notation is too ambiguous when there is more than one subject.
 
-Let's look at an ideal Preceptor Table with more subjects using our new notation: 
+Let's look at a Preceptor Table with more subjects using our new notation: 
 
 ```{r, echo = FALSE}
 # First, we create a tibble with the values we want for the table
@@ -331,7 +330,7 @@ tibble(subject = c("Yao", "Emma", "Cassidy", "Tahmid", "Diego"),
 
 &nbsp;
 
-From this ideal Preceptor Table, there are many possible estimands we might be interested in. Consider some examples, along with their true values:
+From this Preceptor Table, there are many possible estimands we might be interested in. Consider some examples, along with their true values:
 
 ::: {.fullwidth} 
 
@@ -699,7 +698,7 @@ Consider point #3. For example, let's say the treatment effect does vary depende
 
 <!-- DK: Stick in the formula for estimating ATE. -->
 
-Estimating the average treatment effect, by calculating $\widehat{ATE}$, is easy.  But is our $\widehat{ATE}$ a good estimate of the actual ATE?  After all, if we knew all the missing values in the Preceptor Table, we could calculate the ATE perfectly.  But those missing values may be wildly different from the observed values.  Consider this unobservable ideal Preceptor Table:
+Estimating the average treatment effect, by calculating $\widehat{ATE}$, is easy.  But is our $\widehat{ATE}$ a good estimate of the actual ATE?  After all, if we knew all the missing values in the Preceptor Table, we could calculate the ATE perfectly.  But those missing values may be wildly different from the observed values.  Consider this Preceptor Table:
 
 ```{r, echo = FALSE}
 # First, we create a tibble with the values we want for the table
@@ -835,7 +834,7 @@ knitr::include_graphics("04-rubin-causal-model/images/governors.png")
 
 Let's consider a new example experiment to highlight another type of data problem we might encounter. Say we want to know the causal effect of being elected governor on longevity. In most states the minimum age requirement to be elected governor is 30. People under the age of 30 have no chance of being elected governor. That means for people less than 30 there is only one possible potential outcome. In our actual Preceptor Table, this means we have some rows with 2 columns (people old enough to be elected), and some rows with only 1 column (people too young to be elected).
 
-An actual Preceptor Table for this problem might look something like this: 
+A Preceptor Table for this problem might look something like this: 
 
 &nbsp;
 
@@ -861,11 +860,11 @@ tibble(subject = c("Yao", "Dean Khurana", "Cassidy", "Preceptor", "Tahmid"),
 
 &nbsp;
 
-For Yao, Cassidy and Tahmid there is no question mark in the treatment column because they have no chance of being elected governor. Often in the real world an actual Preceptor Table might look like this. Some rows have two (or more) potential outcomes, and some have fewer. So where do we go from here?
+For Yao, Cassidy and Tahmid there is no question mark in the treatment column because they have no chance of being elected governor. Often in the real world a Preceptor Table might look like this. Some rows have two (or more) potential outcomes, and some have fewer. So where do we go from here?
 
 We should consider what we are actually interested in knowing. In this case, we don't really care what the causal effect is on people who can't possibly be elected governor. In other words, we don't care what the causal effect is on the whole population, but rather only a subset of the population. Just like in the case of the infinite Preceptor Table we need to throw out rows by being more specific about our problem. Instead of saying we want to know the causal effect of being elected governor, we might specify that we want to know the causal effect for the American population over 30. 
 
-Once we have a defined problem and a reasonable actual Preceptor Table, we can begin to deal with all those question marks. 
+Once we have a defined problem and a Preceptor Table, we can begin to deal with all those question marks. 
 
 
 ### Causal and predictive models
