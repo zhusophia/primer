@@ -205,7 +205,7 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
 <span class="va">rv_p</span> <span class="op">+</span> <span class="va">log_rv_p</span> <span class="op">+</span>
   <span class="fu">plot_annotation</span><span class="op">(</span>title <span class="op">=</span> <span class="st">'Registered Votes In Kenya Communities'</span>,
                   subtitle <span class="op">=</span> <span class="st">"Taking logs helps us deal with outliers"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-644-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-648-1.png" width="100%"></div>
 <p>Most experienced data scientists would use the log of <code>rv13</code> rather than the raw value. Comments:</p>
 <ul>
 <li><p>We do not know the “true” model. Who is to say that a model using the raw value is right or wrong?</p></li>
@@ -242,7 +242,7 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
          x <span class="op">=</span> <span class="st">"Age"</span>,
          y <span class="op">=</span> <span class="st">"Height (cm)"</span>,
          caption <span class="op">=</span> <span class="st">"Data source: NHANES"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-646-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-650-1.png" width="100%"></div>
 <p>That is not a very good model, obviously.</p>
 <p>Adding a quadratic term makes it better. (Note the need for <code><a href="https://rdrr.io/r/base/AsIs.html">I()</a></code> in creating the squared term within the <code>formula</code> argument.)</p>
 <div class="sourceCode" id="cb810"><pre class="downlit sourceCode r">
@@ -261,7 +261,7 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
          x <span class="op">=</span> <span class="st">"Age"</span>,
          y <span class="op">=</span> <span class="st">"Height (cm)"</span>,
          caption <span class="op">=</span> <span class="st">"Data source: NHANES"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-647-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-651-1.png" width="100%"></div>
 <p>Still, we have not made use of our background knowledge in creating these variables. We know that people don’t get any taller after age 18 or so. Let’s create variables which capture that break.</p>
 <div class="sourceCode" id="cb811"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">nhanes_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html">stan_glm</a></span><span class="op">(</span><span class="va">height</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html">I</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">age</span> <span class="op">&gt;</span> <span class="fl">18</span>, <span class="fl">18</span>, <span class="va">age</span><span class="op">)</span><span class="op">)</span>,
@@ -279,7 +279,7 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
          x <span class="op">=</span> <span class="st">"Age"</span>,
          y <span class="op">=</span> <span class="st">"Height (cm)"</span>,
          caption <span class="op">=</span> <span class="st">"Data source: NHANES"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-648-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-652-1.png" width="100%"></div>
 <p>The point is that we should not take the variables we receive as <em>given</em>. We are the captains of our souls. We transform variables as needed.</p>
 <!-- ### If parameters are unicorns, why bother with transformations? -->
 <!-- * standardizing variables. Key advantage is to make the coefficients easier to interpret. Even though the "right" thing to do in looking at models is to use posterior_* to look at model predictions, this takes some time. It is very handy, first pass, to look at all the coefficients and get a sense of which ones are "interesting." Then, focus on those when making newobs tibbles. -->
@@ -528,7 +528,7 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
          subtitle <span class="op">=</span> <span class="st">"Liberals are less conservative"</span>,
          x <span class="op">=</span> <span class="st">"Predicted Attitude"</span>,
          y <span class="op">=</span> <span class="st">"True Attitude"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-655-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-659-1.png" width="100%"></div>
 <!-- DK: Could put this discussion in fig.cap. Could add some details to the plots to indicate the points that I am talking about. Should create an animation, which brings in new point, forecasts it, and then measures how wrong the model was. -->
 <p>Because there are only two possible values for <code>liberal</code> — TRUE and FALSE — there are only two predictions which this model will make: about 10 for <code>liberal == FALSE</code> and about 8 for <code>liberal == TRUE</code>. (The points in the above plot are jittered.) For some individuals, these are perfect predictions. For others, they are poor predictions. the red circles on our plot illustrate the areas where our predictions are equal to true values. As we can see, the model isn’t great at predicting attitude end. (Note the two individuals who are <code>liberal == TRUE</code>, and who the model thinks will have <code>att_end == 8</code>, but who have <code>att_end == 15</code>. The model got them both very, very wrong.)</p>
 <p>Consider our second model, using <code>att_start</code> to forecast <code>att_end</code>.</p>
@@ -546,7 +546,7 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
          subtitle <span class="op">=</span> <span class="st">"Survey responses are somewhat consistent"</span>,
          x <span class="op">=</span> <span class="st">"Predicted Attitude"</span>,
          y <span class="op">=</span> <span class="st">"True Attitude"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-656-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-660-1.png" width="100%"></div>
 <p>Because <code>att_end</code> takes on 13 unique values, the model makes 13 unique predictions. Some of those predictions are perfect! But others are very wrong. The red line shows the points where our predictions match the truth. Note the individual with a predicted <code>att_end</code> of around 9 but with an actual value of <code>15</code>. That is a big miss!</p>
 <p>Rather than looking at individual cases, we need to look at the errors for all the predictions. Fortunately, a prediction error is the same thing as a residual, which is easy enough to calculate.</p>
 <div class="sourceCode" id="cb824"><pre class="downlit sourceCode r">
@@ -592,13 +592,13 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
 <span class="header-section-number">9.3.2</span> Beware overfitting<a class="anchor" aria-label="anchor" href="#beware-overfitting"><i class="fas fa-link"></i></a>
 </h3>
 <p>One of the biggest dangers in data science is <em>overfitting</em>, using a model with too many parameters which fits the data we have too well and, therefore, works poorly on data we have yet to see. Consider a simple example with 10 data points.</p>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-659-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-663-1.png" width="100%"></div>
 <p>What happens when we fit a model with one predictor?</p>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-660-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-664-1.png" width="100%"></div>
 <p>That is a reasonable model. It does not fit the data particularly well, but we certainly believe that higher values of <code>x</code> are associated with higher values of <code>y</code>. A linear fit is not unreasonable.</p>
 <!-- DK: Add a discussion about the difference between plotting y versus x, as we do here, and y versus y_hat, which is what we did in the previous section. In fact, show y versus y_hat with this model, right now! -->
 <p>But we can also use some of the lessons from above and try a quadratic fit by adding <span class="math inline">\(x^2\)</span> as a predictor.</p>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-661-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-665-1.png" width="100%"></div>
 <p>Is this a better model? Maybe?</p>
 <p>But why stop at adding <span class="math inline">\(x^2\)</span> to the regression? Why not add <span class="math inline">\(x^3\)</span>, <span class="math inline">\(x^4\)</span> and all the way to <span class="math inline">\(x^9\)</span>? When we do so, the fit is much better.</p>
 <div class="sourceCode" id="cb828"><pre class="downlit sourceCode r">
@@ -617,7 +617,7 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
     <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"`y` as a 9-Degree Polynomial Function of `x`"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_x_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">10</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_y_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">10</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> </code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-662-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-666-1.png" width="100%"></div>
 <p><em>If the only criteria we cared about was how well the model predicts using the data on which the parameters were estimated, then a model with more parameters will always be better.</em> But that is not what truly matters. What matters is how well the model works on data which was not used to create the model.</p>
 <!-- DK: Discuss how this is the perfect model. Plot y versus y_hat. It is a perfect line!  -->
 </div>
@@ -783,7 +783,7 @@ Do we discuss anything in the "Other transformations section" (pg. 195)? This in
 <span class="header-section-number">9.6.1</span> Wisdom<a class="anchor" aria-label="anchor" href="#wisdom-7"><i class="fas fa-link"></i></a>
 </h3>
 <div class="figure">
-<span id="fig:unnamed-chunk-668"></span>
+<span id="fig:unnamed-chunk-672"></span>
 <img src="other/images/Wisdom.jpg" alt="Wisdom" width="100%"><p class="caption">
 FIGURE 9.1: Wisdom
 </p>
@@ -796,7 +796,7 @@ FIGURE 9.1: Wisdom
        x <span class="op">=</span> <span class="st">"Attitude at Start of Study"</span>,
        y <span class="op">=</span> <span class="st">"Attitude at End of Study"</span>,
        color <span class="op">=</span> <span class="st">"Liberal?"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-669-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-673-1.png" width="100%"></div>
 <p>Is that data believable? Maybe? One could imagine that <code>att_end</code> would be predicted fairly well by <code>att_start</code>. This makes sense for most of our data points, which show not much difference between the attitudes. But what about the great disparities in attitude shown for the individual with a starting attitude of 9 and an ending attitude around 15? In a real data science project, this would require further investigation. For now, we ignore the issue and blithely press on.</p>
 <p>Another component of Wisdom is the population. The concept of the “population” is subtle and important. <em>The population is not the set of commuters for which we have data.</em> That is the dataset. The population is the larger — potentially much larger — set of individuals about whom we want to make inferences. <em>The parameters in our models refer to the population, not to the dataset.</em></p>
 <p>There are many different populations, each with its own <span class="math inline">\(\mu\)</span>, in which we might be interested. For instance:</p>
@@ -813,7 +813,7 @@ FIGURE 9.1: Wisdom
 <span class="header-section-number">9.6.2</span> Justice<a class="anchor" aria-label="anchor" href="#justice-6"><i class="fas fa-link"></i></a>
 </h3>
 <div class="figure">
-<span id="fig:unnamed-chunk-670"></span>
+<span id="fig:unnamed-chunk-674"></span>
 <img src="other/images/Justice.jpg" alt="Justice" width="100%"><p class="caption">
 FIGURE 9.2: Justice
 </p>
@@ -839,7 +839,7 @@ Which equates to, in <code>y = b + mx</code> form:</p>
 <span class="header-section-number">9.6.3</span> Courage<a class="anchor" aria-label="anchor" href="#courage-6"><i class="fas fa-link"></i></a>
 </h3>
 <div class="figure">
-<span id="fig:unnamed-chunk-671"></span>
+<span id="fig:unnamed-chunk-675"></span>
 <img src="other/images/Courage.jpg" alt="Courage" width="100%"><p class="caption">
 FIGURE 9.3: Courage
 </p>
@@ -949,7 +949,7 @@ FIGURE 9.3: Courage
        x <span class="op">=</span> <span class="st">"Attitude at Start"</span>, 
        y <span class="op">=</span> <span class="st">"Attitude at End"</span>, 
        color <span class="op">=</span> <span class="st">"Liberal"</span><span class="op">)</span> </code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-675-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-679-1.png" width="100%"></div>
 <p>This is our parallel slopes model. What we have done, essentially, is created a unique line for <code>liberalTRUE</code> and <code>liberalFALSE</code> to observe the differences in the groups as related to attitude start and attitude end.</p>
 <p>As we can see, commuters who are <em>not</em> liberal tend to start with slightly higher values for <code>att_start</code>. Commuters who <em>are</em> liberal tend to have lower starting values for <code>att_start</code>.</p>
 <p>Now, what if we want to look at another model? To judge whether we can have a superior model? Let’s create another object, using <code>stan_glm</code>, that looks at <code>att_end</code> as a function of <code>treatment</code> and <code>att_start</code>.</p>
