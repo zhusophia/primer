@@ -4,14 +4,22 @@
 
 <!-- Each new model starts with Justice, nodding toward the one true population table. Then discussion of representativeness and validity. -->
 
-<!-- DK: Where is the best place to modify income and discuss it? -->
-
 <!-- DK: Review concept of dummy variables in the context of the intercept model with categorical predictor. Or not? -->
+
+<!-- DK: Need a table which shows all 4 (?) languages for describing a model together: English, math, code, output. Do not do this now. -->
+
+<!-- DK: Should we use different parameter names like beta_r? Probably not. We should always use b_0, b_1 and so on. -->
+
+<!-- DK: Clean up these residuals plots to be similar across chapters! Also, we should ensure that the width of 10 units is the same in each plot. Or does that already happen? Want the intuition that, the more predictive the model, the smaller the remaining variation in the residuals. The below is from chapter 7. -->
+
+<!-- DK: Posterior predictive checks! -->
+
 
 
 Models have parameters. In Chapter \@ref(one-parameter) we created models with a single parameter $p$, the proportion of red beads in an urn. In Chapter \@ref(two-parameters), we used models with two parameters: $\mu$ (the average height in the population, generically known as a model "intercept") and $\sigma$ (the variation in height in the population). Here --- can you guess where this is going? --- we will build models with three parameters: $\sigma$ (which serves the same role throughout the book) and two coefficients. In models which relate a continuous predictor to the outcome, those two parameters will be labeled $\beta_0$ and $\beta_1$. In models which estimate two averages, the parameters will be $\beta_1$ and $\beta_2$. All this notation is confusing, not least because different academic fields use inconsistent schemes. Follow the Cardinal Virtues and tackle your problem step by step.
 
-<!-- DK: More detail? -->
+<!-- More detail? -->
+
 ## Wisdom
 
 Wisdom begins with considering the questions we desire to answer and the data set we are given.
@@ -46,7 +54,7 @@ The fourth question would require income and age for every individual in the pop
 
 <!-- Make sample Preceptor Table. Need a column for all 6 (?) of the variables that are used in the four models. But need two columns for att_end, because it is the dependent variable in the only causal model, which means that there are two potential outcomes.  -->
 
-<!-- MM: Slow down above explanation and discuss why ending attitude is needed for treatment and control groups -->
+<!-- Slow down above explanation and discuss why ending attitude is needed for treatment and control groups -->
 
 ```{r, echo = FALSE, message = FALSE}
 library(gt)
@@ -141,7 +149,7 @@ By taking our first glance at the data in the above manners, we gain greater und
 
 ### Population
 
-<!-- MM: Combo of old things from different sections and new explanations, need to combine and clarify -->
+<!-- Combo of old things from different sections and new explanations, need to combine and clarify -->
 
 The data that we have are very limited. There are only 115 observations, all from 2012 and involving train commuters to Boston. What me must ask ourselves is if the data we have and the data in our Preceptor Table are drawn from the same population. We therefore must consider how useful this data will be today, or for other populations around Boston, or for other cities in the US. Only your judgment, along with advice from your colleagues, can guide you.
 
@@ -258,10 +266,7 @@ Let's first consider the representativeness of the data. In order to determine i
 
 Additionally, we must determine if the data is valid. In other words, we must figure out if the meaning of the columns is the same over the entire population table. For `party`, this would mean considering if the meaning of aligning as a "Democrat" or "Republican" has changed over the years. 
 
-<!-- MM: Explain more in above two paragraphs -->
-
-<!-- Ch.5 states key aspects are representativeness, validity, and data generating mechanism. Correct! This is all garbage! -->
-
+<!-- Explain more in above two paragraphs -->
 
 Any model with age as its dependent variable will be predictive, not causal, for the simple reason that nothing, other than time, can change your age. You are X years old. It would not matter if you changed your party registration from Democrat to Republican or vice versa. Your age is your age.
 
@@ -269,9 +274,9 @@ There is only one potential outcome, i.e., one outcome. There is not a potential
 
 When dealing with a non-causal model, the focus is on predicting things. The underlying mechanism which connects age with party is less important than the brute statistical fact that there is a connection.  *Predictive models care little about causality.*
 
-<!-- DK: Preceptor Tables should be laid out like the formula: outcome on left, predictors on right. -->
+<!-- Preceptor Tables should be laid out like the formula: outcome on left, predictors on right. -->
 
-<!-- DK: Need a table which shows all 4 (?) languages for describing a model together: English, math, code, output. -->
+
 
 A good way at looking at this is with a Preceptor Table, as seen below. Unlike the previous table in Chapter \@ref(two-parameters), we now have two columns in addition to ID.  Since our data does not include all Republicans and Democrats in the world, not every row is filled in. 
 
@@ -305,8 +310,6 @@ In words, any event depends on our explicitly described model as well as on infl
 
 The mathematics:
 
-<!-- DK: Should standardize the notation across the book. -->
-
 $$ y_i = \beta_1 republican_i + \beta_2 democrat_i + \epsilon_i$$
 
 where \n
@@ -322,7 +325,7 @@ Don't panic dear poets and philosophers, the whole thing is easier than it looks
 
 * On the right-hand side we first have the part contained in the model: two similar terms added together. Each term consists of a parameter and a data point. The betas are our two parameters: $\beta_1$ is the average age of Republicans in the population and $\beta_2$ is the average age of Democrats in the population.  $republican_i$ and $democrat_i$ are our explanatory variables and take the values 1 or 0. If person $i$ is a Republican we have $republican_i = 1$ and $democrat_i = 0$. If person $i$ is a Democrat we have $republican_i = 0$ and $democrat_i = 1$. In other words, their values are mutually exclusive -- if you are a Democrat, you cannot also be a Republican.
 
-<!-- DK: "Connected to" is awkward here. -->
+<!-- "Connected to" is awkward here. -->
 
 * The last part, $\epsilon_i$ (“epsilon”), represents the unexplained part of the outcome and is called the error term. It is simply the difference between the outcome and our model predictions. This includes all factors that have an influence on someone's age but are not connected to party affiliation. We assume that this error follows a normal distribution with an expected value of 0 (meaning it is 0 on average).
 
@@ -370,9 +373,8 @@ fit_1
 
 `partyDemocrat` corresponds to $\beta_1$, the average age of Democrats in the population. `partyRepublican` corresponds to $\beta_2$, the average age of Republicans in the population. Since we don't really care about the posterior distribution for $\sigma$, we won't discuss it here. Graphically:
 
-<!-- DK: Lots to clean up about this plot! -->
+<!-- Lots to clean up about this plot! -->
 
-<!-- DK: Should we use different parameter names like beta_r? -->
 
 ```{r}
 fit_1 %>% 
@@ -405,8 +407,6 @@ The unknown parameters $\beta_1$ (partyDemocrat) and $\beta_2$ (partyRepublican)
 
 * The phrase "in the population" is doing a great deal of work because we have not said what, precisely, we mean by the "population." Is it the set of people on those commuter platforms on those days in 2012 when the experiment was done? Is it the set of people on all platforms, including ones never visited? Is it the set of all Boston commuter? All Massachusetts residents? All US residents? Does it include people today, or can we only draw inferences for 2012? We will explore these questions in every model we create.
 
-<!-- MM: touched on in the wisdom section in ch. 5, as well as justice in terms of representativeness does it belong there? -->
-
 * The parameters $\beta_1$ and $\beta_2$ can be interpreted in two ways. First, like all parameters, they are a part of the model. We need to estimate them. But, in many cases, we don't really care what the value of the parameter is. The exact value of $\sigma$, for example, does not really matter. Second, some parameters have a substantive interpretaion, as with $\beta_1$ and $\beta_2$ being the average ages in the population. But this will often not be the case! Fortunately, with such models, we can use functions like `posterior_epred()` and `posterior_predict()` to answer our questions.
 
 
@@ -430,7 +430,7 @@ trains %>%
 
 ```
 
-<!-- DK: More extreme awkwardness. -->
+<!-- More extreme awkwardness. -->
 
 &nbsp;
 
@@ -438,7 +438,7 @@ The fitted values are the same for all Republicans and for all Democrats, as the
 
 The following three histograms show the actual outcomes, fitted values, and residuals of all people in `trains`:
 
-<!-- DK: Clean up these plots to be similar across chapters! Also, we should ensure that the width of 10 units is the same in each plot. Or does that already happen? Want the intuition that, the more predictive the model, the smaller the remaining variation in the residuals. The below is from chapter 7. -->
+
 
 ```{r}
 outcome <- ch8 %>% 
@@ -474,7 +474,7 @@ The three plots are structured like our equation and table above. A value in the
 
 * Since the residuals plot represents the difference between the other two plots, its distribution looks like the first plot. 
 
-<!-- DK: All unclear and would benefit from clean up. -->
+<!-- All unclear and would benefit from clean up. -->
 
 
 ### Temperance
@@ -496,7 +496,7 @@ Start with a simple question, what are the chances that a random Democrat is ove
 new_obs <- tibble(party = "Democrat")
 ```
 
-<!-- DK: Does this D_age work? If so, similar discussion should be used more broadly. Also discuss R_age. Even Person_age for a random person, an analysis which accounts for the mix of Rs and Ds in the sample/population. -->
+<!-- Does this D_age work? If so, similar discussion should be used more broadly. Also discuss R_age. Even Person_age for a random person, an analysis which accounts for the mix of Rs and Ds in the sample/population. -->
 
 Use `posterior_predict()` to create draws from the posterior for this scenario. Note that we have a new posterior distribution under consideration here. The unknown parameter, call it $D_{age}$, is the age of a Democrat. This could be the age of a randomly selected Democrat from the population or of the next Democrat we meet or of the next Democrat we interview on the train platform. The definition of "population" determines the appropriate interpretation. Yet, regardless, $D_{age}$ is an unknown parameter. But it is not one --- like $\beta_1$,  $\beta_2$, or $\sigma$ --- for which we have already created a posterior probability distribution. That is why we need `posterior_predict()`.
 
@@ -552,7 +552,7 @@ posterior_predict(fit_1, newdata = newobs) %>%
     mutate_all(as.numeric)
 ```
 
-<!-- DK: These pp objects are fundamentally flawed because some of the predicted values are absurdly low, even negative! This is not the fault of the model or the code. It is simply that, if sigma is large enough, then the model thinks a negative age is plausible. We should at least mention this, ideally as part of a posterior predictive check, perhaps in a problem set. -->
+<!-- These pp objects are fundamentally flawed because some of the predicted values are absurdly low, even negative! This is not the fault of the model or the code. It is simply that, if sigma is large enough, then the model thinks a negative age is plausible. We should at least mention this, ideally as part of a posterior predictive check. -->
 
 We have 6 columns: one for each person. `posterior_predict()` does not name the columns, but they are arranged in the same order in which we specified the persons in `newobs`: D, D, D, R, R, R. To determine the expected age difference, we add code which works with these posterior draws:
 
@@ -653,9 +653,7 @@ The two elements of Justice in a data science project remain the same: the Prece
 
 A Preceptor Table for this model would look very similar to the one in the first half of this chapter, except that we have now possible outcomes for each individual: `att_end` if they are exposed to treatment and `att_end` if they are exposed to control. 
 
-<!-- DK: We need to add Preceptor Tables here and elsewhere. The below one is wrong because it does not show two potential outcomes.  Should use proper potential outcome notation, as introduced in chapter 4. -->
-
-<!-- MM: Agree: Preceptor Tables need to be added here as well as in wisdom -->
+<!-- We need to add Preceptor Tables here and in Wisdom. The below one is wrong because it does not show two potential outcomes.  Should use proper potential outcome notation, as introduced in chapter 4. -->
 
 
 The math for this model is exactly the same as the math for the predictive model in the first part of this chapter, although we change the notation a bit for clarity.
@@ -671,7 +669,6 @@ $$\epsilon_i \sim N(0, \sigma^2)$$
 
 Nothing has changed, except for the meaning of the data items and the interpretations of the parameters. 
 
-<!-- MM: Possibly directly compare to add clarity to how meaning/interpretations change -->
 
 * On the left-hand side we have the outcome, $y_i$, which is the variable to be explained. In our case, this is a person's attitude toward immigration after the experiment is complete.  $y_i$ takes on integer values between 3 and 15 inclusive.
 
@@ -801,7 +798,7 @@ fit_2 %>%
 
 Could the true value of the average treatment effect be as much as 2 or as little as 1? Of course! The most likely value is around 1.5, but the variation in the data and the smallness of our sample cause the estimate to be imprecise. However, it is quite unlikely that the true average treatment effect is below zero.
 
-<!-- MM: establish that approximate 1.5 difference can be seen by the attitude posterior from courage -->
+<!-- Establish that approximate 1.5 difference can be seen by the attitude posterior from courage -->
 
 We can use `posterior_epred()` to answer this question. Create a tibble and use it as we have done before:
 
@@ -888,7 +885,7 @@ So far, we have only created models in which the predictor variable is discrete,
 
 ### Justice
 
-<!-- MM: Add representativeness and validity -->
+<!-- Add representativeness and validity -->
 
 ```{r echo = FALSE, fig.cap = "Justice"}
 knitr::include_graphics("other/images/Justice.jpg")
@@ -980,9 +977,7 @@ outcome + fitted + res +
 
 There are scores of different fitted values. Indeed, there are a greater number of different fitted values than there are different outcome values! This is often true for models which have continuous predictor variables, we have here with `age`.
 
-<!-- DK: Next step: A scatter plot with the fitted line drawn through it and a residual highlighted. -->
-
-<!-- DK: Some more discussion! And some plots. Explain what the residuals are. And predicted values! Talk about sigma. More could be done. -->
+<!-- DK: Next step: A scatter plot with the fitted line drawn through it and a residual highlighted. Some more discussion! And some plots. Explain what the residuals are. And predicted values! Talk about sigma. More could be done. -->
 
 <!-- MM: Agree, some discussion could possibly be one earlier with residuals and predicted values and reinforced throughout -->
 
@@ -1025,7 +1020,7 @@ pe %>%
     theme_classic()
 ```
 
-<!-- DK: More discussion! -->
+<!-- More discussion! -->
 
 
 ## liberal ~ income
@@ -1042,7 +1037,7 @@ So far in this chapter, we have only considered *continuous* outcome variables. 
 
 ### Justice
 
-<!-- MM: Add representativeness and validity -->
+<!-- Add representativeness and validity -->
 
 Recall the discussion in Section \@ref(zero-one-outcomes) about the logistic regression model which we use whenever the outcome or dependent variable is binary/logical. The math is there, if you care about math. We don't, at least not too much. Reminder:
 
@@ -1113,7 +1108,7 @@ pe %>%
     theme_classic()
 ```
 
-<!-- MM: Mini discussion of graph? -->
+<!-- Mini discussion of graph? -->
 
 *Assume we have a group of eight people, two of whom make $100,000, two $200,000, two $300,000 and two $400,000. How many will be liberal?*
 
