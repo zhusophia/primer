@@ -20,35 +20,41 @@ Wisdom begins with considering the questions we desire to answer and the data se
 
 ### The Questions
 
-*What is the expected age of a Democrat at the train station?*
+*What is the expected age of a Democrat at a train station in the U.S. today?*
 
-*In a group of three Democrats and three Republicans, what will the age difference be between the oldest Democrat and the youngest Republican?* 
+*In a group of train commuters in the U.S. today with three Democrats and three Republicans, what will the age difference be between the oldest Democrat and the youngest Republican?* 
 
-*What is the average treatment effect, of exposing people to Spanish-speakers, on their attitudes toward immigration?* 
+*What is the average treatment effect, of exposing U.S. train commuters today to Spanish-speakers, on their attitudes toward immigration?* 
 
-*What is the largest causal effect which still has a 1 in 10 chance of occurring?*
+*What is the largest causal effect of exposing U.S. train commuters today which still has a 1 in 10 chance of occurring?*
 
 <!-- Clairfy -->
 
-*What would you expect the income to be for a random 40 year old?*
+*What would you expect the income to be for a random 40 year old train commuterf in the U.S. today?*
 
-*Among all people who have an income $100,000, what proportion are liberal?*
+*Among all train commuters in the U.S. today who have an income $100,000, what proportion are liberal?*
 
-*Assume we have a group of eight people, two of whom make $100,000, two $200,000, two $300,000 and two $400,000. How many will be liberal?*
+*Assume we have a group of eight train commuters in the U.S. today, two of whom make $100,000, two $200,000, two $300,000 and two $400,000. How many will be liberal?*
 
-After determining the questions we would like to answer, we must then consider ideally what data we would have to do so and make our preceptor table. Recall: a Preceptor Table is the smallest possible table such that, if there is no missing data, all questions are easy to answer. In other words, for each individual in the population, what information do we need to answer each question. Look at the first question. Upon first glance, it appears that to answer this, we would like to have the age and party affiliation of those in population, and the same holds true for the second question. Therefore, we would need to have the columns of age and party affiliation in our preceptor table. 
+After determining the questions we would like to answer, we must then consider ideally what data we would have to do so and make our Preceptor Table. Recall: a Preceptor Table is the smallest possible table such that, if there is no missing data, all questions are easy to answer. In other words, for each individual in the population, what columns would we need to answer each question? We must also determine for each question whether the model will be predictive or causal. Recall from chapter 4, that a predictive model is a model that only has a single outcome column whereas a causal model would have at least two, such as a treatment column and control column. 
 
-The third and fourth question, however, would require individuals being exposed to Spanish-speakers and the their attitudes on immigration before and after the fact, so in our preceptor table, we would need the columns of attitude on immigration before and after being exposed to Spanish-speakers. 
+Look at the first question. Upon first glance, it appears that to answer this, we would like to have the age and party affiliation of those in population, with age being our outcome variable since it was we are looking to predict. The same holds true for the second question, since knowing the party and the ages of everyone in the population would allow us to create a distribution that compares a group of three Democrats to that of three Republicans. Therefore, we would need to have the columns of age and party affiliation in our Preceptor Table. 
 
-Lastly, the fourth question would require income and age for every individual in the population, and the fifth and sixth would require knowing whether an individual is liberal or not as well as their income, so we would also need columns with information on income and if someone is liberal or not. Therefore, our preceptor table would appear as the following:
+The third and fourth question, however, would require individuals being exposed to Spanish-speakers and the their attitudes on immigration before and after the fact, so in our Preceptor Table, we would need two columns of attitude on immigration: one for the treatment of being exposed and another for the control group.
+
+The fourth question would require income and age for every individual in the population. Lastly, the fifth and sixth would require knowing whether an individual is liberal or not as well as their income, so we would also need columns with information on income and if someone is liberal or not. Therefore, our Preceptor Table would appear as the following:
 
 <!-- Make sample Preceptor Table. Need a column for all 6 (?) of the variables that are used in the four models. But need two columns for att_end, because it is the dependent variable in the only causal model, which means that there are two potential outcomes.  -->
 
 <!-- MM: Slow down above explanation and discuss why ending attitude is needed for treatment and control groups -->
 
-```{r}
+```{r, echo = FALSE, message = FALSE}
 library(gt)
 library(tidyverse)
+```
+
+
+```{r, echo = FALSE}
 tibble(ID = c("Commuter 1", "Commuter 2", "...", "Commuter 1000", "Commuter 1001", "..."),
        age = c("23", "18", "...", "49", "38", "..."),
        party = c("Democrat", "Republican", "...", "Republican", "Democrat", "..."),
@@ -78,7 +84,7 @@ tibble(ID = c("Commuter 1", "Commuter 2", "...", "Commuter 1000", "Commuter 1001
 ```
 
 
-<!-- Recall: a Preceptor Table is the smallest possible table such that, if there is no missing data, all questions are easy to answer. -->
+<!-- Recall: a Preceptor Table is the smallest possible table such that, if there is no missing data, all questions are easy to answer. Done. -->
 
 Now that we have determined the data we would ideally have to answer the above questions, we have to take a look at the data set we have. To demonstrate modeling with three parameters, we will use the `trains` data set from the **primer.data** package. 
 
@@ -99,7 +105,7 @@ glimpse(trains)
 
 The data include information about each respondent's gender, political affiliations, age, income and so on. `treatment` indicates whether a subject was in the control or treatment group. The key outcomes are their attitudes toward immigration both before (`att_start`) and after (`att_end`) the experiment. We also have a measure of their ideology before and after the experiment, but there is little change. Type `?trains` to read the help page for more information about each variable. 
 
-Let's restrict attention to a subset of the variables by recalling the Preceptor table we made. By that, we can determine that the variables `age`, `party`, `liberal` and `income` are relevant to the questions we seek to answer. This is because `age` is the age of the respondent, `party` is their political party affiliation, `liberal` is whether they are liberal or not, and `income` is the income of the respondent. Additionally, since `treatment` tells us whether the respondent was given the treatment of being exposed to Spanish-speakers in the train station and `att_end` tell us about the respondent's attitude on immigration after the treatment, these are also variables of interest to us since they will be useful in answering some questions. 
+Let's restrict attention to a subset of the variables by recalling the Preceptor Table we made. By that, we can determine that the variables `age`, `party`, `liberal` and `income` are relevant to the questions we seek to answer. This is because `age` is the age of the respondent, `party` is their political party affiliation, `liberal` is whether they are liberal or not, and `income` is the income of the respondent. Additionally, since `treatment` tells us whether the respondent was given the treatment of being exposed to Spanish-speakers in the train station and `att_end` tell us about the respondent's attitude on immigration after the treatment, these are also variables of interest to us since they will be useful in answering some questions. 
 
 ```{r}
 ch8 <- trains %>% 
@@ -135,11 +141,25 @@ By taking our first glance at the data in the above manners, we gain greater und
 
 ### Population
 
-The data that we have are very limited. There are only 115 observations, all from 2012 and involving train commuters to Boston. What me must ask ourselves is if this data can be applied to the population that we are answering our questions for. How useful will this data be today, or for other populations around Boston, or for other cities in the US? Only your judgment, along with advice from your colleagues, can guide you.
+<!-- MM: Combo of old things from different sections and new explanations, need to combine and clarify -->
+
+The data that we have are very limited. There are only 115 observations, all from 2012 and involving train commuters to Boston. What me must ask ourselves is if the data we have and the data in our Preceptor Table are drawn from the same population. We therefore must consider how useful this data will be today, or for other populations around Boston, or for other cities in the US. Only your judgment, along with advice from your colleagues, can guide you.
+
+For our current questions, the population we are answering questions for is the general population of train commuters today. However, the data we have involves train commuters in the Boston area in 2012. So, what we must ask ourselves is if this data from Boston in 2012 can be drawn from the same population as all train commuters in the U.S. today. If we believe that the data is representative enough of today's population of train commuters and this can be considered to be true, then we can continue with the process of answering our questions. We will assume that the data is drawn from the larger population of train commuters and that there isn't very much change overtime within this population so we can apply our data to the population of train commuters today.
 
 The key concept is the idea of a "population." From which larger population is the data we have being (conceptually) drawn? If we were only interested in the age of individuals in our data set, we would have no need for inference. *We know everyone's ages already.* We only need tools like `stan_glm()` if we seek to understand individuals not in our data. Only if our data is "representative," at least to some extent, of that larger population can we use our data to answer our questions.
 
-For our current questions, the population we are answering questions for is the general population of train commuters today. However, the data we have involves train commuters around Boston in 2012. So, what we must ask ourselves is if this data from 2012 can be used to draw conclusions to our questions for a population for today. Additionally, we must also questions whether this data which is specific to the Boston Area can be applied to all train commuters. If we believe that the data is representative enough of today's population of train commuters, then we can continue with the process of answering our questions. We will assume that the data is drawn from the larger population of train commuters and that there isn't very much change overtime within this population so we can apply our data to the population of train commuters today.
+We are still using the data from @enos2014. Yet the world is a very different place today! Is data from 2012, four years before Donald Trump's election as president, still relevant? Can we generalize data from Boston commuters to other people in Massachusetts, to other people in the US? There are no obvious answers to these questions. *The data we have is never a perfect match to the problem we face because data is always old.* The world is constantly changing. To use old data, we need to make assumptions about the stability of our model of the world and of the parameters we are estimating. Whether those assumptions are reasonable is a difficult question, one that requires knowledge about the world as it was and the world as it now is. *Math won't save us.*
+
+The issue is always: Do the data we have and the data we want to have come from the same population? If there is no connection between the two, progress is impossible. But, in this case, if we are willing to consider the population to be US residents over the last decade (including today), and if we are willing to assume that our data set of 115 individuals is representative of that population, then we can use our data to create a model to answer our question.
+
+Ethical issues are tricky, or at least trickier than they were in the context of models in which the dependent variable was height or age. (And the ethical issues in conducting the experiment in the first place are non-trivial.) Assume we make a good model. What is to prevent someone from using that information to, say, influence voting and donations? Imagine a Republican Senate candidate who hires Spanish-speakers to ride commuter trains in order to shift voters' attitudes toward immigration in a conservative direction. She believes (correctly?) that doing so will increase her odds of winning the election. Is that the sort of knowledge we seek to create? We can make such models. Indeed, the purpose of this chapter is to show you how to do so! But should you make those models?
+
+The second part of Wisdom is examining whether the data we have is representative of the overall population about which we seek to draw inferences. Our data is from 2012 and includes only Boston-area commuters. Our questions are, apparently, about today. Are they for the world, the US, the Boston-area, or just commuters at these select train stations? We don't know! The questions are not very precise. 
+
+One of the key jobs of a data scientist is to guide people --- our colleagues, bosses and clients --- toward asking precise questions. We must help them to translate English into inference. That translation requires precision. In this case, let's assume that the questions reference Boston-area commuters in 2021.
+
+So, is the data we have from 2012 representative of the data from 2021 about which we seek to draw inferences? Maybe? There is rarely a correct answer to this question. Some things have changed in Boston and some things have not. Our job is to think about these changes and adjust our confidence in our final answers accordingly. Or, in the worst case scenario, if there is no way to understand our actual data and our desired data as coming from the same population, we must stop the project right there.
 
 ### Population Table
 
@@ -151,9 +171,9 @@ Our **Preceptor Table** rows contain the information that we would *want* to kno
 
 Our **actual data** rows contain the information that we *do* know. These rows contain entries for both our covariates *and* the outcomes. In this case, the actual data comes from a study conducted on train commuters around Boston, MA in 2012, so our city entries for these rows will read "Boston, MA" and our year entries of these rows will read "2012".
 
-Our **population** rows contain no data. These are subjects which fall under our desired population, but for which we have no data. As such, all rows are missing.
+Our **population** rows contain no data. These are subjects which fall under our desired population, but for which we have no data. As such, all rows are missing. However, this may include, for example, data from a range of years before and after 2012, since we considered little change overtime, so we would also consider this data to be representative and drawn from the larger population of train commuters in years near 2012.
 
-The population table includes commuters from our Preceptor table with the information that we would ideally have to answer the questions and those from the data we have that is specific to Boston, MA. Additionally, the population table also includes the groups of people within our population that we don't have 
+The population table includes commuters from our Preceptor Table with the information that we would ideally have to answer the questions and those from the data we have that is specific to Boston, MA. Additionally, the population table also includes the groups of people within our population that we don't have 
 
 ```{r}
 tibble(source = c("Preceptor Table", "Preceptor Table", "Preceptor Table",  "...", "Data", "Data", "Data", "...", "Population", "Population", "Population"),
@@ -207,7 +227,7 @@ tibble(source = c("Preceptor Table", "Preceptor Table", "Preceptor Table",  "...
 
 ## age ~ party
 
-No need to repeat the questions. You can make reference to them, and then just conclude that we are using party to model age.
+<!-- No need to repeat the questions. You can make reference to them, and then just conclude that we are using party to model age. -->
 
 We want to build a model and then use that model to make claims about the world. 
 
@@ -217,89 +237,9 @@ We want to build a model and then use that model to make claims about the world.
 
 We can answer these and similar questions by creating a model that uses party affiliation to predict age
 
-### Wisdom
-
-```{r echo = FALSE, fig.cap = "Wisdom"}
-knitr::include_graphics("other/images/Wisdom.jpg")
-```
-
-Wisdom begins with a look at your data.
-
-<!-- Discuss to Preceptor Tables and ideal data to answer our questions -->
-
-#### EDA for `trains`
-
-*Always explore your data.* To demonstrate modeling with three parameters, we will use the `trains` data set from the **primer.data** package. Recall the discussion from Chapter \@ref(rubin-causal-model). @enos2014 randomly placed Spanish-speaking confederates on nine train platforms around Boston, Massachusetts. Exposure to Spanish-speakers -- the `treatment` -- influenced attitudes toward immigration. These reactions were measured through changes in answers to three survey questions. Load the necessary libraries and look at the data.
-
-```{r, message=FALSE}
-library(primer.data)
-library(rstanarm)
-library(skimr)
-library(tidyverse)
-```
-
-```{r}
-glimpse(trains)
-```
-
-The data include information about each respondent's gender, political affiliations, age, income and so on. `treatment` indicates whether a subject was in the control or treatment group. The key outcomes are their attitudes toward immigration both before (`att_start`) and after (`att_end`) the experiment. We also have a measure of their ideology before and after the experiment, but there is little change. Type `?trains` to read the help page for more information about each variable. Let's restrict attention to a subset of the variables.
-
-<!-- Tie above paragraph to selecting data that is relevant to the research question. Think about increasing levels of sophistication in dealing with the "population" question, and discussing examples of what can go wrong. -->
-
-```{r}
-ch8 <- trains %>% 
-  select(age, att_end, party, income, treatment, liberal)
-```
-
-It is always smart to look at a some random samples of the data:
-
-```{r}
-ch8 %>% 
-  slice_sample(n = 5)
-```
-
-`att_end` is a measure of person's attitude toward immigration. A higher number means more conservative, i.e., a more exclusionary stance toward immigration into the United States. 
-
-```{r}
-ch8 %>% 
-  glimpse()
-```
-
-Pay attention to the variable types. Do they make sense? Perhaps. But there are certainly grounds for suspicion. Why is  `att_end` a double rather than an integer? All the values in the data appear to be integers, so there is no benefit to having these variables be doubles. Why is `party` a character variable and `treatment` a factor variable? It could be that these are intentional choices made by the creator of the tibble, i.e., us. Or, these could be mistakes. Most likely, these choices are a mixture of sensible and arbitrary. Regardless, it is your responsibility to notice them. You can't make a good model without looking closely at the data which you are using.
-
-```{r}
-ch8 %>% 
-  skim()
-```
-
-`skim()` shows us what the different values of `treatment` are because it is a factor. Unfortunately, it does not do the same for character variables like `party`. The ranges for `age` and `att_end` seem reasonable. Recall that participants were asked three questions about immigration issues, each of which allowed for an answer indicated strength of agreement on a scale form 1 to 5, with higher values indicating more agreement with conservative viewpoints. `att_end` is the sum of the responses to the three questions, so the most liberal possible value is 3 and the most conservative is 15.
-
-Always plot your data.
-
-```{r}
-ch8 %>%
-  ggplot(aes(x = party, y = age)) + 
-  geom_jitter(width = 0.1, height = 0) + 
-  labs(title = "Age by Party Affiliation in Trains Dataset",
-       subtitle = "Where are the old Republicans?",
-       x = "Party",
-       y = "Age")
-```
-
-There are more Democrats in this dataset than Republicans. Democrats also span a wider range of ages than Republicans. 
-
-
-
-<!-- DK: Could do more here. -->
-
-The data that we have are very limited. There are only 115 observations, all from 2012 and involving train commuters to Boston. How useful will this data be today, or for other populations around Boston, or for other cities in the US? Only your judgment, along with advice from your colleagues, can guide you.
-
-The key concept is the idea of a "population." From which larger population is the data we have being (conceptually) drawn? If we were only interested in the age of individuals in our data set, we would have no need for inference. *We know everyone's ages already.* We only need tools like `stan_glm()` if we seek to understand individuals not in our data. Only if our data is "representative," at least to some extent, of that larger population can we use our data to answer our questions.
-
-
 <!-- Relate back to research questions and the population for them -->
 
-<!-- Discuss whether the data comes from the same population as preceptor table -->
+<!-- Discuss whether the data comes from the same population as Preceptor Table -->
 
 <!-- This sections ends with the Population  Table. -->
 
@@ -312,7 +252,13 @@ The key concept is the idea of a "population." From which larger population is t
 knitr::include_graphics("other/images/Justice.jpg")
 ```
 
-Justice, in data science, consists of three topics: predictive versus causal modeling, the Preceptor Table, and a mathematical formulation of the model. 
+Justice, in data science, consists of three topics: representativeness, validity, and the data-generating mechanism, or model. 
+
+Let's first consider the representativeness of the data. In order to determine if the data is representative, we must determine if we could treat the rows of the data as if they are random samples of the population table. In other words, we must determine if the data from 2012 in Boston is exchangeable with data from 2021 in the U.S.. 
+
+Additionally, we must determine if the data is valid. In other words, we must figure out if the meaning of the columns is the same over the entire population table. For `party`, this would mean considering if the meaning of aligning as a "Democrat" or "Republican" has changed over the years. 
+
+<!-- MM: Explain more in above two paragraphs -->
 
 <!-- Ch.5 states key aspects are representativeness, validity, and data generating mechanism. Correct! This is all garbage! -->
 
@@ -693,34 +639,7 @@ Above, we created a predictive model: with someone's party affiliation, we can m
 Models help us answer questions better than we could without those models, but only if we follow the Cardinal Virtues.
 
 
-### Wisdom
 
-```{r echo = FALSE, fig.cap = "Wisdom"}
-knitr::include_graphics("other/images/Wisdom.jpg")
-```
-
-
-*Look at your data!* Before making a model which seeks to explain `att_end`, we should plot `att_end` and the variable we think is connected to it.
-
-```{r}
-ch8 %>%
-  ggplot(aes(x = treatment, y = att_end)) + 
-  geom_jitter() + 
-  labs(title = "Attitude End and Treatment in Enos (2014)",
-       subtitle = "Did the treatment make people more conservative?",
-       x = "Treatment",
-       y = "Attitude After Experiment")
-```
-
-Treated individuals seem to have a higher values for `att_end` than control individuals, although there is a great deal of variation in both. 
-
-<!-- DK: Could do more here. -->
-
-We are still using the data from @enos2014. Yet the world is a very different place today! Is data from 2012, four years before Donald Trump's election as president, still relevant? Can we generalize data from Boston commuters to other people in Massachusetts, to other people in the US? There are no obvious answers to these questions. *The data we have is never a perfect match to the problem we face because data is always old.* The world is constantly changing. To use old data, we need to make assumptions about the stability of our model of the world and of the parameters we are estimating. Whether those assumptions are reasonable is a difficult question, one that requires knowledge about the world as it was and the world as it now is. *Math won't save us.*
-
-The issue is always: Do the data we have and the data we want to have come from the same population? If there is no connection between the two, progress is impossible. But, in this case, if we are willing to consider the population to be US residents over the last decade (including today), and if we are willing to assume that our data set of 115 individuals is representative of that population, then we can use our data to create a model to answer our question.
-
-Ethical issues are tricky, or at least trickier than they were in the context of models in which the dependent variable was height or age. (And the ethical issues in conducting the experiment in the first place are non-trivial.) Assume we make a good model. What is to prevent someone from using that information to, say, influence voting and donations? Imagine a Republican Senate candidate who hires Spanish-speakers to ride commuter trains in order to shift voters' attitudes toward immigration in a conservative direction. She believes (correctly?) that doing so will increase her odds of winning the election. Is that the sort of knowledge we seek to create? We can make such models. Indeed, the purpose of this chapter is to show you how to do so! But should you make those models?
 
 ### Justice
 
@@ -736,7 +655,7 @@ A Preceptor Table for this model would look very similar to the one in the first
 
 <!-- DK: We need to add Preceptor Tables here and elsewhere. The below one is wrong because it does not show two potential outcomes.  Should use proper potential outcome notation, as introduced in chapter 4. -->
 
-<!-- MM: Agree: Preceptor tables need to be added here as well as in wisdom -->
+<!-- MM: Agree: Preceptor Tables need to be added here as well as in wisdom -->
 
 
 The math for this model is exactly the same as the math for the predictive model in the first part of this chapter, although we change the notation a bit for clarity.
@@ -967,32 +886,6 @@ So far, we have only created models in which the predictor variable is discrete,
 
 * *What would you expect the income to be for a 40-year old?*
 
-### Wisdom
-
-```{r echo = FALSE, fig.cap = "Wisdom"}
-knitr::include_graphics("other/images/Wisdom.jpg")
-```
-
-Before making a model which seeks to explain `income`, we should plot it and the variable we think is connected to it.
-
-<!-- MM: Relate to ideal Preceptor tables -->
-
-```{r}
-ch8 %>%
-  ggplot(aes(x = age, y = income)) + 
-  geom_point() + 
-  labs(title = "Income and Age",
-       subtitle = "Older people make more money. Maybe?",
-       x = "Age",
-       y = "Income") +
-  scale_y_continuous(labels = scales::dollar_format(accuracy = 1))
-```
-
-Is that data believable? Maybe? One could imagine that income was not recorded exactly and that, therefore, it is not surprising that many people had exactly the same income. Rounding makes different numbers the same, after all. But what about the (almost) complete lack of people reporting income between \$150,000 and \$250,000? In a real data science project, this puzzle would require further investigation. For now, we ignore the issue and blithely press on.
-
-<!-- MM: population? -->
-
-
 ### Justice
 
 <!-- MM: Add representativeness and validity -->
@@ -1145,34 +1038,6 @@ So far in this chapter, we have only considered *continuous* outcome variables. 
 *Among all people who have an income $100,000, what proportion are liberal?*
 
 *Assume we have a group of eight people, two of whom make $100,000, two $200,000, two $300,000 and two $400,000. How many will be liberal?*
-
-### Wisdom
-
-<!-- MM: Ideal preceptor table -->
-
-Look at our data.
-
-
-```{r}
-ch8 %>%
-  ggplot(aes(x = income, y = liberal)) + 
-  geom_jitter(width = 0, height = 0.1) + 
-  labs(title = "Liberal Status by Income in Trains Dataset",
-       subtitle = "Where the gap in the income distribution?",
-       x = "Income",
-       y = "Liberal") +
-  scale_x_continuous(labels = scales::dollar_format())
-```
-
-Why is there only one observation with an income between $135,000 and $250,000? We don't know. The important thing is to notice it, to explore the variables you are using in the model.
-
-<!-- MM: Is the data of the same population or close enough? Ch.5 states representativeness is in Justice -->
-
-The second part of Wisdom is examining whether the data we have is representative of the overall population about which we seek to draw inferences. Our data is from 2012 and includes only Boston-area commuters. Our questions are, apparently, about today. Are they for the world, the US, the Boston-area, or just commuters at these select train stations? We don't know! The questions are not very precise. 
-
-One of the key jobs of a data scientist is to guide people --- our colleagues, bosses and clients --- toward asking precise questions. We must help them to translate English into inference. That translation requires precision. In this case, let's assume that the questions reference Boston-area commuters in 2021.
-
-So, is the data we have from 2012 representative of the data from 2021 about which we seek to draw inferences? Maybe? There is rarely a correct answer to this question. Some things have changed in Boston and some things have not. Our job is to think about these changes and adjust our confidence in our final answers accordingly. Or, in the worst case scenario, if there is no way to understand our actual data and our desired data as coming from the same population, we must stop the project right there.
 
 
 ### Justice
