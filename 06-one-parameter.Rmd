@@ -1008,39 +1008,10 @@ The total number of red beads selected in a sample of 50 beads, $T_i$, is equal 
 knitr::include_graphics("other/images/Courage.jpg")
 ```
 
-We've evaluated our data and questions and chosen a mathematical formula. Now it's time to work on our code to create a model that can simulate the real world. 
+Given a data set to use and a mathematical formula to work with, the next step is to write some code. We will use the **rstanarm** package, which provides a user friendly interface to work with the statistical language Stan. 
 
+**rstanarm** and Stan are appealing because they are powerful. Functions such as `stan_glm()` can do everything we did by hand in Chapter 5 in a few lines of code. Because we will use a professional statistical library, the objects we make will become more complex. In this Chapter, we provide the steps for answering our questions. Chapter \@ref(two-parameters) will provide a more detailed explanation of the objects we will make. *To be clear, you do not need to fully understand this section or how this code works. This is an introduction, not a formal lesson.*
 
-
-We are Bayesian data scientists that make Bayesian models. This means that we make specific assumptions and consider different things to be either fixed or variable compared to other data science frameworks. One of the most important distinctions is that in Bayesian data science, **we don't know the values of our parameters**. Consider the DGM created in Justice: 
-
-$$ T_i  \sim B(\rho, n = 50) $$
-
-Some non-Bayesian frameworks are concerned with the probability distribution of our observed data, but do not care much about the probability distribution for $\rho$ and assume it to be fixed. If $\rho$ is fixed, the equation above becomes one simple binomial distribution. Think of this as a standard 2 dimensional plot. 
-
-Us Bayesians consider our observed data to be fixed. We don't consider alternate realities where our observed data is different due to sampling variation. Instead, we are concerned with the probability distribution of our parameter. In our urn scenario, $\rho$ is variable, so we have to create a separate binomial distribution for each possible value of $\rho$. Think of this as a 3 dimensional joint distribution like what we created in Section \@ref(n-models).
-
-It is essential to understand the joint distribution and the posterior, two concepts Bayesians use to solve problems. We will provide quick definitions of them both here, including statistical notation which may be helpful to some. 
-
-**The joint distribution**, $p(y|\theta)$, models the outcome $y$ given one or more unknown parameter(s), $\theta$. The equation illustrates exact same concept we addressed while discussing the distinctions of Bayesian science: because our parameters are variable, we have to create separate distributions for each potential value. Combining all these distributions together creates a joint distribution that is 3 dimensional when plotted. 
-
-Careful readers may note that the equation for the joint distribution, $p(y|\theta)$, appears to be very similar to the equation for the DGM, $p(y_i|\theta)$. They are indeed similar, but know that the joint distribution models all outcomes, while the DGM models selecting one individual outcome, $y_i$. Also know that many data scientists refer to the joint distribution as "the likelihood".  
-
-**The posterior**, $p(\theta|y)$, describes the relative plausibility of all parameter values, $\theta$, given some data $y$.  As soon as we incorporate data into our model, we in effect update our beliefs and create the posterior which models our uncertainty regarding a parameter. The posterior is our coveted end goal, which we can use to answer our questions. We have referenced the posterior many times before, and this definition does not change its meaning. 
-
-In our urn scenario, obtaining the posterior involves first creating many binomial distributions for each possible population proportion. This is the joint distribution, and it is a 3 dimensional model. We then select the distribution that corresponds with our data: 17 red beads are sampled. We can represent the posterior with the following:
-
-$$\text{Prob}(\text{models} | \text{data} = 17)$$
-
-This is equivalent to taking a 2 dimensional slice of the 3 dimensional model. We are left with a probability distribution for our parameter, $\rho$. 
-
-In Chapter \@ref(probability), we first started our tibble with a range of possible values for our parameter $\rho$. We then took samples using each possible value to create the 3 dimensional joint distribution. Finally, we took a slice of the joint distribution based on the data we collected, to create the posterior distribution. This is not how professionals work. Many data scientists use the **rstanarm** package, which provides a user friendly interface to work with the statistical language Stan. 
-
-**rstanarm** and Stan are appealing because they are powerful. Functions such as `stan_glm()` can do everything we did by hand in Chapter 5 in a few lines of code. Because we will use a professional statistical library, the objects we make will become more complex. In this chapter we will explain our models in terms of high level Bayesian concepts, and Chapter \@ref(two-parameters) will provide a more detailed explanation of the objects we will make. **To be clear, you do not need to fully understand this section or how this code works. This is an introduction, not a formal lesson.**
-
-Again, we are attempting to answer this question: *If we get 17 red beads in a random sample of size 50 taken from a mixed urn, what proportion $\rho$ of the beads in the urn are red?*
-
-We want to estimate the value of $\rho$, but because us Bayesians consider $\rho$ to be variable, we need to create a posterior distribution that addresses our uncertainty regarding its true value. We can easily create the posterior by using `stan_glm()`. Let's go ahead and create our model, and then view the results in a tibble. 
 
 ```{r, message = FALSE}
 library(rstanarm)
@@ -1051,49 +1022,23 @@ fit_1 <- stan_glm(formula = red ~ 1,
                   family = binomial,
                   refresh = 0,
                   seed = 10) 
-
-fit_1 %>%
-  as_tibble()
 ```
 
-This tibble shows us 4,000 draws from the posterior distribution.`stan_glm()` simplifies all the work which we did by hand previously into one single function. We can also visualize our 4,000 draws from the posterior in a histogram:
+
+Recall that we assumed a binomial model for the data generating mechanism.  In `stan_glm()` we denote this with `family = binomial`. In addition to the type of the distribution, we also need to analyze the outcome and predictor variables involved. The outcome is the quantity we are measuring, in this case the total number of red beads in our sample, $T_i$.  Because we have no predictors, we use the argument `formula = red ~ 1`, which means that we only model the outcome based on the unknown proportion of red beads in the urn, $\rho$. 
+
+We pass in data in a binomial format: the 1's represent the number of successes (red beads drawn), and the 0's represent the number of failures (white beads drawn). As such, we pass a tibble with 17 red beads and 33 white beads into `data`. 
+
+We use `refresh = 0` to suppress the behavior of printing to the console, and `seed = 10` so that we get the same output every time we run the code. The resulting model is:
 
 ```{r}
-fit_1 %>%
-  as_tibble() %>%
-   ggplot(aes(x = `(Intercept)`)) +
-    geom_histogram(aes(y = after_stat(count/sum(count))),
-                   bins = 50) +
-    labs(title = "4,000 draws from the Posterior Distribution",
-         subtitle = "Why is the x axis negative? We will address this soon.",
-         x = expression(rho),
-         y = "Probability") + 
-    scale_x_continuous(labels = scales::number_format()) +
-    scale_y_continuous(labels = scales::percent_format()) +
-    theme_classic()
+fit_1
 ```
 
-Let's examine the purpose of the arguments used within `stan_glm()` in terms of high level Bayesian concepts. 
-
-- **The joint distribution**: The `family` and `formula` arguments relate to the joint distribution, also known as the likelihood by some. In Justice, we created the following model for our sampling mechanism:
-
-$$ T_i  \sim B(\rho, n = 50) $$
-
-This is a binomial distribution. In `stan_glm()` we denote this with `family = binomial`. In addition to the type of the distribution, we also need to analyze the outcome and predictor variables involved. The outcome is the quantity we are measuring, in this case the total number of red beads in our sample, $T_i$.  Covariates are continuous predictor variables that help forecast our outcome. For example, age is a covariate that effects the outcome of someone's blood pressure. Because we only measure how many red beads are in the sample (the outcome), we have no covariates which we can use to make our model more accurate. Because we have no predictors, we use the argument `formula = red ~ 1`, which means that we only model the outcome without the consideration of any covariates. 
-
-- **The data**: We are required to pass data into the `data` argument in order for `stan_glm()` to "take a slice" of the joint distribution and estimate the posterior. Because we are measuring the total number of red beads in a sample, $T_i$, we pass in data in a binomial format: the 1's represent the number of successes (red beads drawn), and the 0's represent the number of failures (white beads drawn). As such, we pass a tibble with 17 red beads and 33 white beads into `data`. 
-
-- Other arguments: we use `refresh = 0` to suppress the behavior of printing to the console, and `seed = 10` to make produce the same output every time we run the code. 
-
- Once we have the `fit_1` object, it is easy to answer two sorts of questions: the posterior probability distribution for $\rho$ and predictions for new draws from the urn. The key new functions are `posterior_epred()` for the former and `posterior_predict()` for the latter.
+We will learn the meaning of this output in Chapter \@ref(two-parameters). Once we have the `fit_1` object, it is easy to answer two sorts of questions: the posterior probability distribution for $\rho$ and predictions for new draws from the urn. The key new functions are `posterior_epred()` for the former and `posterior_predict()` for the latter.
  
-#### Answering the questions
  
-There are some questions left to be answered. Let's attempt to answer them here. 
-
-> Why is the x axis of the posterior distribution negative? Shouldn't all values be between 0 and 1?
-
-The x axis of our posterior is negative because for binomial models, `stan_glm()` chooses to use the "logit" function to convert our probabilities. We can use `posterior_epred()` to find the **e**xpected **pred**iction of our posterior without the logit function. Know that we do not just use `posterior_epred()` to undo transformations. We will use it many more times throughout this *Primer* to create the expected distribution based off some covariate.  Let's recreate our posterior using `posterior_epred()`:
+ Let's recreate our posterior using `posterior_epred()`:
 
 ```{r}
 ppd_for_p <- posterior_epred(fit_1, 
@@ -1174,11 +1119,20 @@ knitr::include_app("https://www.youtube.com/embed/sVxUUotm1P4")
 knitr::include_graphics("other/images/Temperance.jpg")
 ```
 
-Now that we have our posterior distribution for the proportion $\rho$ of red beads in the urn, we can use that object to forecast other outcomes, outcomes which we have not yet observed. We can now answer the question from the start of the Chapter: 
+With the fitted model object `fit_1`, we can now answer the questions with which we began the project.
+
+Recall the first question:
+
+*If we get 17 red beads in a random sample of size 50 taken from a mixed urn, what proportion $\rho$ of the beads in the urn are red?*
+
+
+
+
+
+Recall the second question:
 
 *What is the probability, using the same urn, that we will draw more than 8 red beads if we use a shovel of size 20?*
 
-#### Using the posterior
 
 Whenever someone asks you a question, you need to decide what posterior probability distribution would make it easy for you to answer that question. In this case, if we know the posterior probability distribution for the number of red beads in a shovel of size 20, then a question about the likelihood of drawing more than 8 (or any other value) is easy to answer.
 
@@ -1331,86 +1285,6 @@ ppd_reds_in_20   %>%
 
 The red bars illustrate the area under a specific section of the curve, as compared to the *entire* area under the curve. *Each question requires looking at a new area under the curve.* When someones asks you a question, they are doing two things. First, they are providing instructions as to the posterior your should create. Here, the results with a shovel of 20 slots. Second, they are asking a question about the area under the curve in a specific region. Here, the region where the number of red beads is greater than 8 is highlighted in red. Therefore, the area below the curve that **is red** is how we get our estimate. 
 
-
-<!-- RS: Can we ask a question like: If we draw 22 red beads out of 50 from a new urn, how certain are we that the two urns have the same proportion red? 
-
-I would create 2 posteriors and calculate the overlapping area, and then finally do (1 - overlapping area) to calculate the percent certainty that the two urns have a different proportion red (we cannot answer whether or not they have the same). I am not sure a.) if that is an answerable question b.) if the way I explained above is the correct way to answer the question and c.) even if we can answer the question, should we even answer it? Does knowing the percent even help us?  I saw earlier comment that "we can never have enough finding the area under the curve stuff", so just want to give more practice. Code below illustrates what I'm thinking.  -->
-
-<!-- ```{r} -->
-<!-- fit_3 <- stan_glm(formula = red ~ 1, -->
-<!--                   data = tibble(red = c(rep(1, 22), -->
-<!--                                         rep(0, 28))), -->
-<!--                   family = binomial, -->
-<!--                   refresh = 0, -->
-<!--                   seed = 10) -->
-
-<!-- ppd3<- posterior_epred(fit_3, -->
-<!--                 newdata = tibble(constant = 1)) %>% -->
-<!--   as.vector() -->
-
-
-<!-- ppd1 <- posterior_epred(fit_1, -->
-<!--                 newdata = tibble(constant = 1)) %>% -->
-<!--   as.vector() -->
-
-<!-- #Next 2 lines produce the same result, because the number of overlapping data points are the same for both vectors, and there are 4,000 rows in each vector. -->
-
-<!-- 1 - ((length(ppd3[ppd3 < ppd1]) + length(ppd1[ppd3 < ppd1]))/length(ppd3)) -->
-<!-- 1 - (2*length(ppd1[ppd3 < ppd1])/4000) -->
-
-
-<!-- # We are 71.7% sure that the two urns do not have the same proportion red? -->
-
-<!-- ppd_for_p %>% -->
-<!--   ggplot(aes(x = p)) + -->
-<!--   geom_histogram(data = ppd3 %>% as_tibble() %>% rename(p = value), -->
-<!--                  aes(y = after_stat(count/sum(count))), bins = 50, fill = "blue", alpha = .5) + -->
-<!--     geom_histogram(aes(y = after_stat(count/sum(count)), fill = "blue", alpha = .5), -->
-<!--                    bins = 50) + -->
-<!--     labs(title = "Posterior Probability Distribution", -->
-<!--          subtitle = "Distribution shape is the same as earlier, but the proportion red is centered at .34", -->
-<!--          x = "Proportion p of Red Beads in Urn", -->
-<!--          y = "Probability") + -->
-
-<!--     scale_x_continuous(labels = scales::number_format()) + -->
-<!--     scale_y_continuous(labels = scales::percent_format()) + -->
-<!--     theme_classic() -->
-<!-- ``` -->
-
-<!-- RS: This code below serves to illustrate that the more data we have, the more refined our posterior becomes. Use data from real sampling activity (33 trials). Again, not sure if there is any value to this.  -->
-
-<!-- ```{r} -->
-<!-- newdata <- tactile_sample_urn %>% -->
-<!--   select(red_beads) %>% -->
-<!--   mutate(red = map(red_beads, ~ c(rep(1, .), rep(0, 50-.)))) %>% -->
-<!--   select(red) %>% -->
-<!--   unnest(red) -->
-
-
-<!-- fit_4 <- stan_glm(family = binomial, -->
-<!--                   seed = 10, -->
-<!--                   refresh = 0, -->
-<!--                   formula = red ~ 1, -->
-<!--                   data = newdata) -->
-
-<!-- ppd4 <- posterior_epred(fit_4, newdata = tibble(constant = 1)) %>% -->
-<!--   as_tibble() %>% -->
-<!--   rename(p = `1`) -->
-
-<!-- ppd4 %>% -->
-<!--   ggplot(aes(x = p)) + -->
-<!--     geom_histogram(aes(y = after_stat(count/sum(count))), -->
-<!--                    bins = 50) + -->
-<!--     labs(title = "Posterior Probability Distribution", -->
-<!--          subtitle = "Much smaller range of values on the x axis than before", -->
-<!--          x = "Proportion p of Red Beads in Urn", -->
-<!--          y = "Probability") + -->
-
-<!--     scale_x_continuous(labels = scales::number_format()) + -->
-<!--     scale_y_continuous(labels = scales::percent_format()) + -->
-<!--     theme_classic() -->
-
-<!-- ``` -->
 
 See Chapter \@ref(two-parameters) for a thorough discussion of the use of **rstanarm**. This package will be our main tool for the rest of the *Primer*.
 
