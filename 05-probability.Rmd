@@ -1536,7 +1536,7 @@ sims <- 10000000
 
 odds <- tibble(sim_ID = 1:sims) %>%
   mutate(heads = map_int(sim_ID, ~ rbinom(n = 1, size = 20, p = .4))) %>% 
-  mutate(above_ten = ifelse(heads >= 10, TRUE, FALSE))
+  mutate(above_ten = if_else(heads >= 10, TRUE, FALSE))
 
 odds
 
@@ -1576,7 +1576,7 @@ p_draws <- tibble(p = rep(seq(0, 1, 0.1), 1000)) %>%
   
 odds_2nd <- tibble(p = sample(p_draws$p, size = sims, replace = TRUE)) %>%
   mutate(heads = map_int(p, ~ rbinom(n = 1, size = 20, p = .))) %>% 
-  mutate(above_ten = ifelse(heads >= 10, TRUE, FALSE)) 
+  mutate(above_ten = if_else(heads >= 10, TRUE, FALSE)) 
 
 odds_2nd
 
@@ -1621,7 +1621,7 @@ odds_3rd <- tibble(p = sample(p_posterior$p,
   mutate(heads = map_int(p, ~ rbinom(n = 1, 
                                      size = 20, 
                                      p = .))) %>% 
-  mutate(above_ten = ifelse(heads >= 10, 
+  mutate(above_ten = if_else(heads >= 10, 
                          TRUE, 
                          FALSE)) 
 
