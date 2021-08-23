@@ -4,15 +4,16 @@ Everyone loves visualizations.
 
 <!-- Heather owns this Chapter! Change anything an everything! Change anything you like in Getting Started. -->
 
-<!-- Discuss `group` aesthetic, especially for line plots. Don't use the unemployment data anymore. Use two or three of the temperature series from primer.data::temperature. -->
+<!-- Cut out all R and R Studio section. Place cool/useful parts of it in Getting Started. -->
+
+<!-- Talk more about aesthetics (i.e., aes()) in Basic plots. Make more use of color and fill. Explain how you can use either constants (like "steelblue") or variables (like party) when using these aesthetics. -->
 
 <!-- Add the formula for median, like this one: https://math.stackexchange.com/questions/1097546/what-is-the-general-formula-for-calculating-the-median -->
 
 <!-- Better explain Tidyverse. -->
 
-<!-- Fix opening graph so that it looks nicer? Used to use economist_theme(), which was slick but the subtitle overlapping with the title wasn't great aesthetically and also probably wasn't the best "hey look pretty graphs" appeal. Even with the new clean_theme(), the last 50,000 axis label is cropped. Or maybe change the graph completely? -->
+<!-- Don't do this yet. Same with the `group` aesthetic, especially for line plots. Don't use the unemployment data anymore. Use two or three of the temperature series from primer.data::temperature. -->
 
-<!-- Make graphs at end also use clean_theme(). -->
 
 ```{r, message = FALSE, echo = FALSE}
 library(tidyverse)
@@ -20,7 +21,8 @@ library(ggthemes)
 library(scales)
 library(gapminder)
 
-# first plot, I'm keeping the old plot in here because it takes too long to load the trump plot in plotly
+# first plot, I'm keeping the old plot in here because it takes too long to load
+# the trump plot in plotly
 
 gap_p <- gapminder %>%
   filter(continent != "Oceania") %>%
@@ -39,6 +41,11 @@ gap_p <- gapminder %>%
                   labels = scales::dollar_format(accuracy = 1)) + 
     theme_clean() + 
     theme(legend.position = "none")
+
+
+
+# download.file(url = "",
+#              destfile = "01-visualization/data/visualization_trump_data.csv")
 
 trump_data <- read_csv("01-visualization/data/visualization_trump_data.csv",
                        show_col_types = FALSE)
@@ -63,18 +70,9 @@ trump_p
 
 Once you have read this chapter, and completed the associated tutorials, you will be able to create graphics like this one with your data. Join us on the journey.
 
-## R and RStudio
+## Basic R commands
 
-We use the terms "coding" and "programming" interchangeably.
-
-If you want a slower introduction than we are providing here, check out the short book, [*Getting Used to R, RStudio, and R Markdown*](https://rbasics.netlify.com/). @usedtor2016 include screencast recordings that you can follow along and pause as you learn. They include an introduction to R Markdown, a tool used for reproducible research in R.
-
-With the rest of this primer, we will use a different font to distinguish regular text from `computer_code`.
-
-
-<!-- KX: can we copy the order from https://www.tutorialspoint.com/r/r_data_types.htm? -->
-
-If you'd like to follow along with this section, you can open open the *Console pane* in RStudio.
+We use the terms "coding" and "programming" interchangeably. With the rest of this *Primer*, we will use a different font to distinguish regular text from `computer_code`. If you'd like to follow along with this section, you can open open the *Console pane* in RStudio.
 
 * *Running code*: the act of telling R to put our code into action. 
 
@@ -227,7 +225,6 @@ We see the first few values for each variable in a row after the variable name. 
 
 `dbl` refers to "double", which is computer terminology for quantitative/numerical variables. `int` is for  "integer." `fct` is refers to a "factor," a variable that is "nominal," meaning a member of a smallish number of categories. `chr` is for character data.
 
-<!-- HL: the definitions for these terms feel sort of all over the place, maybe the terms + the abbreviations R uses should just all be in the glossary so people have one place to reference when they're confused -->
 
 #### `summary()`
 
@@ -576,7 +573,7 @@ Note the message. R is telling us that we need to specify the `method` and `form
 
 Let's add the argument `method = "lm"`, where "lm" stands for **l**inear **m**odel. This causes the fitted line to be straight rather than curved. Let's also add the argument `formula = y ~ x`. This makes both messages go away. Again, R was not giving us an error before. It was simply telling us what options it was using since we did not specify the options ourselves.
 
-<!-- HL: should we explain why we make the argument formula = y~x? -->
+<!-- HL: should we explain why we make the argument formula = y~x? The reason is that R is concerned that we don't know exactly what model it is estimating. So, it is warning us that y is function of x. We make the warning go away by specifying that relationship in the argument. -->
 
 *Always include enough detail in your code to make those messages disappear.*
 
@@ -628,7 +625,7 @@ The values on the y-axis are scaled so that the total area under the curve equal
 
 <!-- DK: Other stuff to finish this section with? -->
 
-<!-- HL: could we just list other uncommonly used geom functions that people have the option of using if they want to and point them to another resource that they can learn from if they want? -->
+<!-- HL: could we just list other uncommonly used geom functions that people have the option of using if they want to and point them to another resource that they can learn from if they want? Yes!  -->
 
 
 ## Tidyverse
@@ -921,7 +918,7 @@ The *quantile* of a distribution is the value of that distribution which occupie
 
 The 5th percentile distribution is the point below which 5% of the data falls. The 95th percentile is, similarly, the point below which 95% of the data falls. The 50th percentile, the median, splits the data into two separate, and equal, parts. The minimum is at the 0th percentile. The maximum is at the 100th percentile.
 
-<!-- HL: it's kinda unclear what the relationship between this paragraph and quantiles is? Also I sort of think the definition of quantile is rather wordy and not super clear -->
+<!-- HL: it's kinda unclear what the relationship between this paragraph and quantiles is? Also I sort of think the definition of quantile is rather wordy and not super clear. So fix it! -->
 
 Let's take a look at the `poverty` variable in the `kenya` tibble from the **primer.data** package. `poverty` is the percentage of residents in each community with incomes below the poverty line. Let's first confirm that  `quantile()` works by comparing its output with that from simpler functions.
 
@@ -1100,7 +1097,7 @@ ggplot(data = gapminder,
 
 Recall that the y-aesthetic of a histogram --- the count of the observations in each bin --- gets computed automatically. We can use the  `after_stat()` argument within `geom_histogram()` to generate percent values as our y-aesthetic. 
 
-<!-- HL: should probably explain what after_stat does -->
+<!-- HL: should probably explain what after_stat does. So do so! -->
 
 
 ```{r}
@@ -1370,13 +1367,6 @@ gap_anim <- gapminder %>%
 gap_anim
 ```
 
-The **plotly** package makes our plot interactive. Click on it and explore!
 
-
-```{r, cache = TRUE, message = FALSE, warning = FALSE}
-library(plotly)
-
-ggplotly(gap_p)
-```
 
 A beautiful plot is just a collection of steps, each simple enough on its own. We have taught you (some of) these steps. Time to start walking on your own.
