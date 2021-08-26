@@ -4,16 +4,15 @@ Everyone loves visualizations.
 
 <!-- Heather owns this Chapter! Change anything an everything! Change anything you like in Getting Started. -->
 
-<!-- Cut out all R and R Studio section. Place cool/useful parts of it in Getting Started. -->
+<!-- Cut out all R and R Studio section. Place cool/useful parts of it in Getting Started. DONE -->
 
 <!-- Talk more about aesthetics (i.e., aes()) in Basic plots. Make more use of color and fill. Explain how you can use either constants (like "steelblue") or variables (like party) when using these aesthetics. -->
 
-<!-- Add the formula for median, like this one: https://math.stackexchange.com/questions/1097546/what-is-the-general-formula-for-calculating-the-median -->
+<!-- Add the formula for median, like this one: https://math.stackexchange.com/questions/1097546/what-is-the-general-formula-for-calculating-the-median. DONE -->
 
 <!-- Better explain Tidyverse. -->
 
 <!-- Don't do this yet. Same with the `group` aesthetic, especially for line plots. Don't use the unemployment data anymore. Use two or three of the temperature series from primer.data::temperature. -->
-
 
 ```{r, message = FALSE, echo = FALSE}
 library(tidyverse)
@@ -21,130 +20,37 @@ library(ggthemes)
 library(scales)
 library(gapminder)
 
-# first plot, I'm keeping the old plot in here because it takes too long to load
-# the trump plot in plotly
+president_data <- read_csv("01-visualization/data/president_approval.csv",
+                           show_col_types = FALSE) %>% 
+  pivot_longer(names_to = "approval_type",
+               values_to = "rate",
+               cols = c(-president, -enddate)) %>% 
+  mutate(enddate = lubridate::mdy(enddate),
+         enddate = lubridate::yday(enddate),
+         enddate = as.integer(enddate - 20))
 
-gap_p <- gapminder %>%
-  filter(continent != "Oceania") %>%
-  filter(year == max(year)) %>% 
-  ggplot(aes(gdpPercap, lifeExp, color = continent)) +
-    geom_point(alpha = 0.7) +
-    geom_smooth(method = "lm", 
-                formula = y ~ x,
-                se = FALSE) + 
-    facet_wrap(~continent, nrow = 2) +
-    labs(title = "Life Expectancy and GDP per Capita",
-         subtitle = "Connection between GDP and life expectancy is weakest in Africa",
-         x = "GDP per Capita",
-         y = "Life Expectancy") +
-    scale_x_log10(breaks = c(500, 5000, 50000),
-                  labels = scales::dollar_format(accuracy = 1)) + 
-    theme_clean() + 
-    theme(legend.position = "none")
-
-
-
-# download.file(url = "",
-#              destfile = "01-visualization/data/visualization_trump_data.csv")
-
-trump_data <- read_csv("01-visualization/data/visualization_trump_data.csv",
-                       show_col_types = FALSE)
-
-trump_p <- trump_data %>% 
+hundred_days_p <- president_data %>%
   ggplot(mapping = aes(x = enddate,
                        y = rate,
                        color = approval_type)) +
-   geom_point(alpha = 0.05,
+   facet_wrap(~president) +
+   geom_point(alpha = 0.1,
               size = 0.5) +
    geom_smooth(method = "gam",
                formula = y ~ s(x, bs = "cs")) +
-   coord_cartesian(ylim = c(30, 65)) +
+   coord_cartesian(ylim = c(30,60)) +
    theme_fivethirtyeight() +
-   labs(title = "Trump's Approval and Disapproval Ratings From \n2017-2021",
-        subtitle = "His approval peaked in late 2017 but has since stayed consistent throughout.",
+   labs(title = "Approval Ratings During the First Hundred Days",
+        subtitle = "Both recent presidents have climbing disapproval ratings during their first hundred days.",
         x = NULL,
         y = NULL,
-        color = "Approval or Disapproval")
-trump_p
+        color = NULL,
+        caption = "Source: FiveThirtyEight Data")
+
+hundred_days_p
 ```
 
 Once you have read this chapter, and completed the associated tutorials, you will be able to create graphics like this one with your data. Join us on the journey.
-
-## Basic R commands
-
-We use the terms "coding" and "programming" interchangeably. With the rest of this *Primer*, we will use a different font to distinguish regular text from `computer_code`. If you'd like to follow along with this section, you can open open the *Console pane* in RStudio.
-
-* *Running code*: the act of telling R to put our code into action. 
-
-* *Objects*: where values are stored in R. You can *assign* values to objects and display the contents of objects. Use the assignment operator `<-` to do so.  You can choose almost any name you like for an object, as long as the name does not begin with a number or a special character like `+`, `*`, `-`, `/`, `^`, etc.
-
-For example we can save the result of `4 + 3` to an object named `x`. 
-
-```{r}
-x <- 4 + 3
-```
-
-Now, whenever we type `x`, the value of 4 + 3 will appear:
-
-```{r}
-x
-```
-
-
-* *Data types*: integers, doubles/numerics, logicals, and characters. 
-  + Integers are values like -1, 0, 2, 4092. 
-  + Doubles or numerics are a larger set of values containing both the integers but also fractions and decimal values like -24.932 and 0.8.
-  + Logicals are either `TRUE` or `FALSE`. Characters are text like "cabbage", "Hamilton", or "The Wire is the greatest TV show ever."
-  + Characters are often denoted with the quotation marks around them.
-
-* *Vectors*: a collection of values. These are created using the `c()` function, where the `c` stands for **c**ombine. 
-
-For example, `c(2, 4, 6, 8)` creates a four element vector of numeric values.
-
-```{r}
-c(1, 2, 3, 4)
-```
-
-
-* *Factors*: used to represent "categorical data." We will go into detail about these and other variable types in Chapter \@ref(wrangling).
-
-<!-- Explain factors and categorical data more, even after reading wrangling I'm still somewhat unsure what it means and it might be good to have a more in-depth explanation here for those of us who aren't super familiar with data terms. Maybe just a paragraph.  -->
-
-* *Data frames*: rectangular arrangements of data. Think of a [spreadsheet](https://en.wikipedia.org/wiki/Spreadsheet). Rows correspond to *units*. Columns correspond to *variables*. Modern data frames are called *tibbles*. 
-
-<!-- It's somewhat unclear what "modern data frame" means, maybe elaborate. -->
-
-* *Boolean algebra*: `TRUE/FALSE` statements and mathematical operators such as `<` (less than), `<=` (less than or equal to), and `!=` (not equal to). For example, `4 + 2 >= 3` will return `TRUE`, but `3 + 5 <= 1` will return `FALSE`. 
-
-* *Inclusion*: Tested for with the `%in%` operator. For example, `"B" %in% c("A", "B")` returns `TRUE` while `"C" %in% c("A", "B")` returns `FALSE`. 
-
-* *Equality*: Tested for using `==`. For example, `2 + 1 == 3` compares `2 + 1` to `3` and is legal R code, returning `TRUE`. On the other hand, `2 + 1 = 3` will return an error because we can not assign one number to another. 
-
-* *Logical operators*: `&` representing "and" as well as `|` representing "or." For example, `(2 + 1 == 3) & (2 + 1 == 4)` returns `FALSE` since at least one of the two parts is not `TRUE`. On the other hand, `(2 + 1 == 3) | (2 + 1 == 4)` returns `TRUE` since at least one of the two parts is `TRUE`. 
-
-* *Functions*: perform tasks, and are also called *commands*. They take in inputs called *arguments* and return outputs. You can either manually specify a function's arguments or use the function's *default values*. 
-
-For example, `sqrt(64)` is the function `sqrt()` with 64 as its argument. 
-
-```{r}
-sqrt(64)
-```
-
-* *Help files*: provide documentation for functions and datasets. You can bring up help files by adding a `?` before the name of the object then run this in the console.
-
-* *Code comments*: are text placed after a `#` symbol. Nothing will be run after a `#` symbol, which is useful when you include comments in your code, as you always should.
-
-* *Errors, warnings, and messages*: generally reported in a red font. When there is an error, the code will not run. Read (and/or google) the message and try fix it. Warnings don't prevent code from completing. For example, if you create a scatterplot based on data with two missing values, you will see this warning: 
-
-````
-Warning message:
-Removed 2 rows containing missing values (geom_point).  
-````
-
-<!-- DK: Indent this so that it is connected to the bullet point above. -->
-
-Messages are similar. In both cases, you should fix the underlying issue until the warning/message goes away.    
-
 
 ## Looking at data
 
@@ -891,8 +797,12 @@ $$\bar{x} = \frac{x_1 + x_2 + \cdots + x_N}{N}$$
 
 **`median()`**
 
-The median is another commonly reported measure of the center of a distribution, calculated by first sorting the vector of values from smallest to largest. The middle element in the sorted list is the *median*.  If the middle falls between two values, then the median is the mean of those two middle values. The median and the mean are the two most common measures of the *center* of a distribution. The median is more stable, less affected by outliers. There is no widely accepted symbol for the median, although $\tilde{x}$ is not uncommon.
+The median is another commonly reported measure of the center of a distribution, calculated by first sorting the vector of values from smallest to largest. The middle element in the sorted list is the *median*.  If the middle falls between two values, then the median is the mean of those two middle values. The median and the mean are the two most common measures of the *center* of a distribution. The median is more stable, less affected by outliers. There is no widely accepted symbol for the median, although $\tilde{x}$ is not uncommon. If we have $n$ data points, and $n$ is even, the median is given by:
 
+$$m(x) = {\frac{1}{2}}{(x_{\frac{n}{2}} + x_{\frac{n}{2} + 1})}$$
+If $n$ is odd, then the median is given by:
+
+$$m(x) = x_{\frac{n+1}{2}}$$
 **`sd()`**
 
 The standard deviation (*sd*) of a distribution is a measure of its variation around the mean.  
@@ -1339,7 +1249,7 @@ Recall the plot we began the chapter with:
 
 
 ```{r, echo = FALSE}
-trump_p
+hundred_days_p
 ```
 
 You now know enough to make plots like this by yourself.
@@ -1349,7 +1259,18 @@ It is important to know that we have only seen a small part of what R offers. Fo
 ```{r, cache = TRUE}
 library(gganimate)
 
-gap_anim <- gapminder %>%
+# president_anim <- president_data %>% 
+#   ggplot(mapping = aes(x = enddate,
+#                        y = rate,
+#                        color = approval_type)) +
+#     facet_wrap(~president,
+#                nrow = 1) +
+#     geom_smooth(method = "gam",
+#                 formula = y ~s(x, bs = "cs")) +
+#     theme_fivethirtyeight() +
+#     transition_reveal(day)
+
+president_anim <- gapminder %>%
   filter(continent != "Oceania") %>%
   ggplot(aes(gdpPercap, lifeExp, color = continent)) +
     geom_point(show.legend = FALSE, alpha = 0.7) +
@@ -1364,7 +1285,7 @@ gap_anim <- gapminder %>%
     labs(title = "Year: {frame_time}") +
     shadow_wake(wake_length = 0.1, alpha = FALSE)
 
-gap_anim
+president_anim
 ```
 
 
