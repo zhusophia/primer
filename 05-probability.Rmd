@@ -26,7 +26,7 @@
 <!-- Rethinking Chapter 2. Garden of forking data is just excellent stuff. -->
 <!-- Bayesian Workshop -->
 
-*This chapter is being edited.*
+*This chapter is a draft. There are errors.*
 
 > The usual touchstone of whether what someone asserts is mere persuasion or at least a subjective conviction, i.e., firm belief, is betting. Often someone pronounces his propositions with such confident and inflexible defiance that he seems to have entirely laid aside all concern for error. A bet disconcerts him. Sometimes he reveals that he is persuaded enough for one ducat but not for ten. For he would happily bet one, but at ten he suddenly becomes aware of what he had not previously noticed, namely that it is quite possible that he has erred. -— Immanuel Kant, *Critique of Pure Reason*
 
@@ -34,42 +34,30 @@ The central tension, and opportunity, in data science is the interplay between t
 
 What does it mean that Trump had a *30% chance* of winning re-election in the fall of 2016? That there is a *90% probability* of rain today? That the dice at the casino are *fair*? 
 
-Probability is about quantifying uncertainty. We can think of probability as a proportion. The probability of an event occurring is a number from 0 to 1, where 0 means that the event is impossible and 1 means that the event is 100% certain.
+Probability is about quantifying uncertainty. Think of *probability* as a proportion. The probability of an event occurring is a number from 0 to 1, where 0 means that the event is impossible and 1 means that the event is 100% certain.
 
-Let's begin with the simplest events: coin flips and dice rolls. If the dice and the coins are fair, we can operate under the assumption that all outcomes are equally likely. 
-
-This allows us to make the following statements:
+Begin with the simplest events: coin flips and dice rolls. The set of all outcomes is the *sample space*. With fair coins and dice, we know that:
 
 * The probability of rolling a 1 or a 2 is 2/6, or 1/3.
 * The probability of rolling a 1, 2, 3, 4, 5, or 6 is 1.  
 * The probability of flipping a coin and getting tails is 1/2.
 
-We use the symbol $\text{Prob()}$ to refer to the probability of a specific outcome. For example:
+If the probability of an outcome is unknown, we will often refer to it as an unknown *parameter*, something which we might use data to *estimate*. We usually use Greek letters to refer to parameters. Whenever we are talking about a specific probability (represented by a single value), we will use $\rho$ (the Greek letter "rho" but spoken aloud as "p" by us) with a *subscript* which specifies the exact outcome of which it is the probability. For instance, $\rho_h = 0.5$ denotes the probability of getting heads on a coin toss when the coin is fair. $\rho_t$ --- spoken as "PT" or "P sub T" or "P tails" --- denotes the probability of getting tails on a coin toss. This notation can become annoying if the outcome whose probability we seek is not so easy to define. For example, we might write the probability of rolling a 1, 2 or 3 using a fair die as:
 
 $$
-\text{Prob(rolled die equal 1 or 2 or 3)} = 0.5
+\rho_{die\ roll\ is\ 1,\ 2\ or\ 3} = 0.5
 $$
 
-We will rarely write out the full definition of the event with the $\text{Prob()}$ symbol.  Instead, we will define an event A as when a rolled die equals 1, 2 or 3. Then, we write 
+We will rarely write out the full definition of the event with the $\rho$ symbol.  Instead, we will define an event A as when a rolled die equals 1, 2 or 3 and, then, write 
 
-$$
-\text{Prob(A)} = 0.5
-$$
+$$\rho_A = 0.5$$. 
 
-A random variable is a function which produces a value from a sample set. A random variable can be either discrete --- where the sample set has a limited number of members, like H or T for the result of a coin flip, or 2, 3, ..., 12 for the sum of two die --- or continuous (any value in a continuous range). Probability is a claim about the value of a random variable, i.e., that you have a 50% probability of getting a 1, 2 or 3 when you roll a fair die. 
+
+A *random variable* is a function which produces a value from a sample set. A random variable can be either discrete --- where the sample set has a limited number of members, like H or T for the result of a coin flip, or 2, 3, ..., 12 for the sum of two die --- or continuous (any value in a continuous range). Probability is a claim about the value of a random variable, i.e., that you have a 50% probability of getting a 1, 2 or 3 when you roll a fair die. 
 
 We usually use capital letters for random variables. So, $C$ might be our symbol for the random variable which is a coin toss and $D$ might be our symbol for the random variable which is the sum of two dice. When discussing random variables in general, or when we grow tired of coming up with new symbols, we will use $Y$. 
 
 Small letters refer to a single outcome or result from a random variable. $c$ is the outcome from one coin toss. $d$ is the result from one throw of the dice. The value of the outcome must come from the sample space. So, $c$ can only take on two possible values: heads or tails. When discussing random variables in general, we use $y$ to refer to one outcome of the random variable $y$. If there are multiple outcomes --- if we have, for example, flipped the coin multiple times --- then we use subscripts to indicate the separate outcomes: $y_1$, $y_2$, and so on. The symbol for an arbitrary outcome is $y_i$.  
-
-As explained in Section \@ref(random-variables), R provides many functions for *simulating* random variables. We general refer to a (simulated) value of a random variable as a "draw." To create three "draws" from a random distribution, we use:
-
-```{r}
-rnorm(3)
-```
-
-
-<!-- DK: -->
 
 The only package we need in this chapter is **tidyverse**.
 
@@ -95,7 +83,7 @@ library(primer.data)
 ```
 
 
-## Distributions {distributions}
+## Distributions {#distributions}
 
 A variable in a tibble is a column, a vector of values. We sometimes refer to this vector as a "distribution." This is somewhat sloppy in that a distribution can be many things, most commonly a mathematical formula. But, strictly speaking, a "frequency distribution" or an "empirical distribution" is a list of values, so this usage is not unreasonable.
 
@@ -110,24 +98,47 @@ ten_rolls <- c(5, 5, 1, 5, 4, 2, 6, 2, 1, 5)
 
 There are other ways of storing the data in this vector. Instead of reporting every observation, we could just record the number of times each value appears.
 
-```{r}
-table(ten_rolls)
+```{r, echo = FALSE}
+tibble(outcome = ten_rolls) %>% 
+  group_by(outcome) %>% 
+  count() %>% 
+  ungroup() %>% 
+  mutate(portion = n / sum(n)) %>% 
+  gt() %>% 
+    tab_header(title = "Distribution of Ten Rolls of a Fair Die",
+               subtitle = "Counts and percentages reflect the same information") %>% 
+    cols_label(outcome = "Outcome",
+               n = "Count",
+               portion = "Percentage") %>% 
+    fmt_percent(portion, decimals = 0)
 ```
 
 
 In this case, with only 10 values, it is actually less efficient to store the data like this. But what happens when we have 10,000 rolls?
 
-```{r}
-ten_thousand_rolls <- sample(1:6, size = 10000, replace = TRUE)
-table(ten_thousand_rolls)
+```{r, echo = FALSE}
+set.seed(89)
+
+tibble(outcome = sample(1:6, size = 1000, replace = TRUE)) %>% 
+  group_by(outcome) %>% 
+  count() %>% 
+  ungroup() %>% 
+  mutate(portion = n / sum(n)) %>% 
+  gt() %>% 
+    tab_header(title = "Distribution of One Thousand Rolls of a Fair Die",
+               subtitle = "Counts and percentages reflect the same information") %>% 
+    cols_label(outcome = "Outcome",
+               n = "Count",
+               portion = "Percentage") %>% 
+    fmt_percent(portion, decimals = 0)
 ```
 
-Instead of keeping around a vector of length 10,000, we can just keep 10 values, without losing any information.
+Instead of keeping around a vector of length 1,000, we can just keep 12 values --- the 6 possible outcomes and their frequency --- without losing any information.
 
-Two distributions can be identical even if they are of very different lengths. Let's compare our original distribution of 10 rolls of the die with another distribution which just features 1,000 copies of those 10 rolls.
+Two distributions can be identical even if they are of very different lengths. Let's compare our original distribution of 10 rolls of the die with another distribution which just features 100 copies of those 10 rolls.
 
 ```{r}
-more_rolls <- rep(ten_rolls, 1000)
+more_rolls <- rep(ten_rolls, 100)
 ```
 
 
@@ -142,18 +153,18 @@ rolls_p <- tibble(value = ten_rolls) %>%
 more_rolls_p <- tibble(value = more_rolls) %>% 
   ggplot(aes(value)) +
     geom_bar(aes(y = after_stat(count))) +
-    labs(title = "Distribution of 10,000 Rolls",
+    labs(title = "Distribution of 1,000 Rolls",
          y = NULL)
 
 
 rolls_p + more_rolls_p
 ```
 
-The two vectors have the exact same shape because even though of different lengths, these values were drawn from the same distribution. *The total count for each value does not matter. What matters is the relative proportions.*
+The two graphs have the exact same shape because, even though the vectors are of different lengths, the relative proportions of the outcomes are identical. In some sense, both vectors are from the same distribution. *The total count for each value does not matter. What matters is the relative proportions.*
 
 ### Normalizing distributions
 
-If two distributions have the same shape, then they only differ by the labels on the y-axis. There are various ways of "normalizing" distributions to make them all the same scale. The most common scale is one which the area under the distribution adds to 1, e.g.,  100%. For example, we can transform either of the rolls plots above to look like:
+If two distributions have the same shape, then they only differ by the labels on the y-axis. There are various ways of "normalizing" distributions to make them all the same scale. The most common scale is one in which the area under the distribution adds to 1, e.g.,  100%. For example, we can transform the plots above to look like:
 
 ```{r, echo = FALSE}
 rolls_p <- tibble(value = ten_rolls) %>% 
@@ -166,7 +177,7 @@ rolls_p <- tibble(value = ten_rolls) %>%
 more_rolls_p <- tibble(value = more_rolls) %>% 
   ggplot(aes(value)) +
     geom_bar(aes(y = after_stat(count/sum(count)))) +
-    labs(title = "Distribution of 10,000 Rolls",
+    labs(title = "Distribution of 1,000 Rolls",
          y = NULL) +
     scale_y_continuous(labels = scales::percent_format(accuracy = 1))
 
@@ -181,17 +192,23 @@ We sometimes refer to a distribution as "unnormalized" if the area under the cur
 
 We use `summarize()` to calculate statistics for a variable, a column, a vector of values or a distribution. Note the language sloppiness. For the purposes of this book, "variable," "column," "vector," and "distribution" all mean the same thing. Popular statistical functions include: `mean()`, `median()`, `min()`, `max()`, `n()` and `sum()`. Functions which may be new to you include three measures of the "spread" of a distribution: `sd()` (the standard deviation), `mad()` (the scaled median absolute deviation) and `quantile()`, which is used to calculate an *interval* which includes a specified proportion of the values. 
 
-*A distribution is a function that shows the possible values of a variable and how often they occur.*
+<!-- *A distribution is a function that shows the possible values of a variable and how often they occur.* DK: I like this! But where to include it? -->
 
-Think of the distribution of a variable as an urn from which we can pull out, at random, values for that variable. Drawing a thousand or so values from that urn, and then looking at a histogram, can show where the values are centered and how they vary. Because people are sloppy, they will use the word distribution to refer to both the (imaginary!) urn from which we are drawing values and to the list of values we have drawn. It is better, however, to keep three distinct ideas separate:
+Think of the distribution of a variable as an urn from which we can pull out, at random, values for that variable. Drawing a thousand or so values from that urn, and then looking at a histogram, can show where the values are centered and how they vary. Because people are sloppy, they will use the word distribution to refer to at least three related entities: 
+
+1. the (imaginary!) urn from which we are drawing values.
+2. all the values in the urn
+3. all the values which we have drawn from the urn, whether that be 10 or 10,000
+
+Sloppiness is the usage if the word distribution is universal. However, you must keep three distinct ideas separate:
 
 * The *unknown true distribution* which, in reality, generates the data which we see. Outside of stylized examples in which we *assume* that a distribution follows a simple mathematical formula, we will never have access to the unknown true distribution. We can only estimate it. This unknown true distribution is often referred to as the *data generating mechanism*, or DGM. It is a function or black box or urn which produces data. We can see the data. We can't see the urn. 
 
-* The *estimated distribution* which, we think, generates the data which we see. Again, we can never know the unknown true distribution. But, by making some assumptions and using the data we have, we can *estimate* a distribution. Our estimate may be very close to the true distribution. Or it may be far away. The main task of data science to to create and use these estimated distributions. Almost always, these distributions are instantiated in computer code.
+* The *estimated distribution* which, we think, generates the data which we see. Again, we can never know the unknown true distribution. But, by making some assumptions and using the data we have, we can *estimate* a distribution. Our estimate may be very close to the true distribution. Or it may be far away. The main task of data science to to create and use these estimated distributions. Almost always, these distributions are instantiated in computer code. Just as there is a *true* data generating mechanism associated with the (unknown) *true* distribution, there is an *estimated* data generating mechanism associated with the *estimated* ditribution.
 
 * A *vector of numbers drawn* from the estimated distribution. Both true and estimated distributions can be complex animals, difficult to describe accurately and in detail. But a vector of numbers drawn from a distribution is easy to understand and use. So, in general, we work with vectors of numbers. When someone --- either a colleague or a piece of R code --- creates a distribution which we want to use to answer a question, we don't really want the distribution itself. Rather, we want a vectors of "draws" from that distribution. Vectors are easy to work with! Complex computer code is not.
 
-Again, people (including us!) will often be sloppy and use the same word, "distribution," without making it clear whether they are talking about the *true distribution*, the *estimated distribution*, or a vector of *draws* from the estimated distribution. Try not to be sloppy.
+Again, people (including us!) will often be sloppy and use the same word, "distribution," without making it clear whether they are talking about the *true distribution*, the *estimated distribution*, or a vector of *draws* from the estimated distribution. The same sloppiness applues to the use of the term *data generating mechanism*. Try not to be sloppy.
 
 Much of the rest of the *Primer* involves learning how to work with distributions, which generally means working with the draws from those distributions. Fortunately, the usual rules of arithmetic apply. You can add/subtract/multiply/divide distributions by working with draws from those distributions, just as you can add/subtract/multiply/divide regular numbers.
 
@@ -203,20 +220,20 @@ Much of the rest of the *Primer* involves learning how to work with distribution
 
 ## Probability distributions
 
-```{r, echo = FALSE, out.width="60%", fig.align='center', fig.cap = 'Bruno de Finetti, an Italian statistician who wrote a famous treatise on the theory of probability that began with the statement "PROBABILITY DOES NOT EXIST." This is because probability only exists subjectively in our minds.'}
+```{r, echo = FALSE, out.width="60%", fig.align='center', fig.cap = 'Bruno de Finetti, an Italian statistician who wrote a famous treatise on the theory of probability that began with the statement "PROBABILITY DOES NOT EXIST."'}
 knitr::include_graphics("05-probability/images/de_finetti.jpg")
 ```
 
 
-For the purposes of this *Primer*, a *probability distribution* is a mathematical object that covers a set of outcomes, where each distinct outcome has a chance of occurring between 0 and 1 inclusive. The chances must sum to 1. The set of possible outcomes --- heads or tails for the coin, 1 through 6 for a single die, 2 through 12 for a pair of dice --- can be either discrete or continuous. Remember, discrete data can only take on certain values. On the other hand, continuous data is data, like height and weight, which can take any values. This set of outcomes is the *domain* of the probability distribution. 
+For the purposes of this *Primer*, a *probability distribution* is a mathematical object which maps a set of outcomes to probabilities, where each distinct outcome has a chance of occurring between 0 and 1 inclusive. The probabilities must sum to 1. The set of possible outcomes, i.e., the sample space --- heads or tails for the coin, 1 through 6 for a single die, 2 through 12 for the sum of a pair of dice --- can be either discrete or continuous. Remember, discrete data can only take on certain values. Continuous data, like height and weight, which can take any values within a range. The set of outcomes is the *domain* of the probability distribution. The *range* is the associated probabilities. 
 
-Assume that a probability distribution is a create by a *probability function*, a set function which maps outcomes to probabilities. The concept of a "probability function" is often split into two categories: probability *mass* functions (for discrete random variables) and probability *density* functions (for continuous random variables). As usual, we will be a bit sloppy, using the term probability distribution for both the mapping itself and for the function which creates the mapping.
+Assume that a probability distribution is created by a *probability function*, a set function which maps outcomes to probabilities. The concept of a "probability function" is often split into two categories: probability *mass* functions (for discrete random variables) and probability *density* functions (for continuous random variables). As usual, we will be a bit sloppy, using the term probability distribution for both the mapping itself and for the function which creates the mapping.
 
-There are three types of probability distributions: *mathematical*, *empirical*, and *posterior*. 
+We discuss three types of probability distributions: *empirical*, *mathematical*, and *posterior*. 
 
-The key difference between a distribution, as we have explored them in Section \@ref(distributions), and a *probability* distribution is the requirement that the sum of the probabilities of the individual outcomes must be exactly 1. There is no such requirement for a distribution. But any distribution can be turned into a probability distribution by "normalizing" it.  In this context, we will often refer to a distribution which is not (yet) a probability distribution as an "unnormalized" distribution.  
+The key difference between a *distribution*, as we have explored them in Section \@ref(distributions), and a *probability* distribution is the requirement that the sum of the probabilities of the individual outcomes must be exactly 1. There is no such requirement for a distribution in general. But any distribution can be turned into a probability distribution by "normalizing" it.  In this context, we will often refer to a distribution which is not (yet) a probability distribution as an "unnormalized" distribution.  
 
-Pay attention to notation. Whenever we are talking about a specific probability (represented by a single value), we will use $\rho$ (the Greek letter "rho" but spoken aloud as "p" by us) with a *subscript* which specifies the exact outcome of which it is the probability. For instance, $\rho_h = 0.5$ denotes the probability of getting heads on a coin toss when the coin is fair. $\rho_t$ --- spoken as "PT" or "P sub T" or "P tails" --- denotes the probability of getting tails on a coin toss. However, when we are referring to the entire probability distribution over a set of outcomes, we will use $\text{Prob}()$. For example, the probability distribution of a coin toss is $\text{Prob}(\text{coin})$. That is, $\text{Prob}(\text{coin})$ is composed of the two specific probabilities (50% and 50%) mapped from the two values in the domain (Heads and Tails). Similarly, $\text{Prob}(\text{sum of two dice})$ is the probability distribution over the set of 11 outcomes (2 through 12) which are possible when you take the sum of two dice. $\text{Prob}(\text{sum of two dice})$ is made up of 11 numbers --- $\rho_2$,  $\rho_3$, ..., $\rho_{12}$ --- each representing the unknown probability that the sum will equal their value. That is, $\rho_2$ is the probability of rolling a 2.
+Pay attention to notation. Whenever we are talking about a specific probability (represented by a single value), we will use $\rho$ (the Greek letter "rho" but spoken aloud as "p" by us) with a *subscript* which specifies the exact outcome of which it is the probability. For instance, $\rho_h = 0.5$ denotes the probability of getting heads on a coin toss when the coin is fair. $\rho_t$ --- spoken as "PT" or "P sub T" or "P tails" --- denotes the probability of getting tails on a coin toss. However, when we are referring to the entire probability distribution over a set of outcomes, we will use $P()$. For example, the probability distribution of a coin toss is $P(\text{coin})$. That is, $P(\text{coin})$ is composed of the two specific probabilities (50% and 50%) mapped from the two values in the domain (Heads and Tails). Similarly, $P(\text{sum of two dice})$ is the probability distribution over the set of 11 outcomes (2 through 12) which are possible when you take the sum of two dice. $P(\text{sum of two dice})$ is made up of 11 numbers --- $\rho_2$,  $\rho_3$, ..., $\rho_{12}$ --- each representing the unknown probability that the sum will equal their value. That is, $\rho_2$ is the probability of rolling a 2.
 
 
 
@@ -681,11 +698,11 @@ Don't worry about the distinctions between discrete and continuous outcomes, or 
 
 <!-- DK: Should be p(A). Discuss p(A, B). Find a better example.  -->
 
-Recall that $\text{Prob}(\text{coin})$ is the probability distribution for the result of a coin toss. It includes two parts, the probability of heads ($\rho_h$) and the probability of tails ($\rho_t$). This is a *univariate* distribution because there is only one outcome, which can be heads or tails. If there is more than one outcome, then we have a *joint* distribution.
+Recall that $P(\text{coin})$ is the probability distribution for the result of a coin toss. It includes two parts, the probability of heads ($\rho_h$) and the probability of tails ($\rho_t$). This is a *univariate* distribution because there is only one outcome, which can be heads or tails. If there is more than one outcome, then we have a *joint* distribution.
 
 <!-- DK: Use of "outcome" is sloppy. Does a single die roll have one outcome or 6? -->
 
-Joint distributions are also mathematical objects that cover a set of outcomes, where each distinct outcome has a chance of occurring between 0 and 1 and the sum of all chances must equal 1. The key to a joint distribution is it measures the chance that both events A and B will occur. The notation is $\text{Prob}(A, B)$.
+Joint distributions are also mathematical objects that cover a set of outcomes, where each distinct outcome has a chance of occurring between 0 and 1 and the sum of all chances must equal 1. The key to a joint distribution is it measures the chance that both events A and B will occur. The notation is $P(A, B)$.
 
 Let's say that you are rolling two six-sided dice simultaneously. Die 1 is weighted so that there is a 50% chance of rolling a 6 and a 10% chance of each of the other values. Die 2 is weighted so there is a 50% chance of rolling a 5 and a 10% chance of rolling each of the other values. Let's roll both dice 1,000 times. In previous examples involving two dice, we cared about the sum of results and not the outcomes of the first versus the second die of each simulation. With a joint distributions, the order matters; so instead of 11 possible outcomes on the x-axis of our distribution plot (ranging from 2 to 12), we have 36. Furthermore, a 2D probability distribution is not sufficient to represent all of the variables involved, so the joint distribution for this example is displayed using a 3D plot.
 
@@ -756,7 +773,7 @@ knitr::include_graphics("05-probability/images/tree-2.png")
 
 We decide to go down the top branch *if* our random person has the disease. We go down the bottom branch *if* they do not. This is called **conditional probability**. The probability of testing positive is **dependent** on whether the person has the disease.
 
-How would you express this in statistical notation? $\text{Prob}(A|B)$ is the same thing as the probability of A *given* B. $\text{Prob}(A|B)$ essentially means the probability of A *if* we know for sure the value of B. Note that $\text{Prob}(A|B)$ is not the same thing as $\text{Prob}(B|A)$.
+How would you express this in statistical notation? $P(A|B)$ is the same thing as the probability of A *given* B. $P(A|B)$ essentially means the probability of A *if* we know for sure the value of B. Note that $P(A|B)$ is not the same thing as $P(B|A)$.
 
 In summary, we work with three main categories of probability distributions. First, p(A) is the probability distribution for event A. This is sometimes refered to as a *univariate* probability distribution because there is only one random variable. Second, p(A, B) is the joint probability distribution of A and B. Third, p(A | B) is the conditional probability distribution of A given that B has taken on a specific value. This is often written as p(A | B = b).
 
@@ -882,7 +899,7 @@ Question: *If you test positive, what is the probability that you have Probophob
 
 More generally, we are estimating a *conditional probability*. Conditional on the outcome of a postive test, what is the probability that you have Probophobia? Mathematically, we want:
 
-$$ \text{Prob}(\text{Probophobia | Test = Postive} ) $$
+$$ P(\text{Probophobia | Test = Postive} ) $$
 
 
 To answer this question, we need to use the tools of joint and conditional probability from earlier in the Chapter. We begin by building, by hand, the joint distribution of the possible models (you have the Probophobia or you do not) and of the possible outcomes (you test positive or negative). Building the joint distribution involves *assuming* that each model is true and then creating the distribution of outcomes which might occur if that assumption is true. 
@@ -1123,7 +1140,7 @@ Imagine that your friend gives you a bag with two marbles. There could either be
 
 Question: *What is the chance of the bag contains exactly two white marbles, given that when we selected the marbles three times, everytime we select a white marble?*
 
-$$ \text{Prob}(\text{2 White Marbles in bag | White Marbles Sampled = 3} ) $$
+$$ P(\text{2 White Marbles in bag | White Marbles Sampled = 3} ) $$
 Just as during the *Probophobia* models, in order to answer this question, we need to start up with the simulated data and then graphing out the joint distribution of this sinerio because we need to considered all possible outcomes of this model, and then based on the joint distribution we can slice out the the part we want (Conditional distribution) in the end making an posterior graph as well as normalizing it to see the probability.
 
 Step 1: Simulate the data into an tibble
