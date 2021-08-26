@@ -296,7 +296,7 @@ ggplot(aes(x = results)) +
 
 The distribution of a single observation is described by this formula.  
 
-$$ P(Y = y) = \begin{cases} 1/2 &\text{for }x= \text{Heads}\\ 1/2 &\text{for }x= \text{Tails} \end{cases}$$
+$$ P(Y = y) = \begin{cases} 1/2 &\text{for }y= \text{Heads}\\ 1/2 &\text{for }y= \text{Tails} \end{cases}$$
 
 We could also use this formula: $y_i \sim Bernoulli(p)$. Expected value of $y_i$ is this mathematical probability distribution. If the mathematical assumptions are correct, then as your sample size increases, the empirical probability distribution will look more and more like the mathematical distribution.
 
@@ -659,10 +659,11 @@ tibble(height = c(rep(170, 2), rep(173, 3), rep(175, 8),
 
 In general when we think about the difference between these three distributions, we can think about the mathematical as completely theoretical, imagine we only have an paper and a pencil, and we were ask to create a model to represent our population,and that model is the *mathematical distributions*. *Empirical distribution* on the other hand is different, empirical distribution is completely based on data, there is no such thing as writing down formula or equation and coming up with a distribution based on that, we come up with *empirical distribution* by analyzing data, you can think of empirical distribution as someone flip a coin 1000 times, and we record the data and creating a graph based on that, and believe that the data we pulled up is representative for the entire population. Last but not least, *Posterior distribution* this graph represents one's belief about certain situation, for example when we think about flipping a coin, our mathematical and empirical results would likely look similar, and if there is no other assumption our posterior should also looks similar, but if were in a casino, and someone tells you that they want to bet 100 bucks on head and you bet 100 bucks on tail, who wins we get's all the money. Now you maybe suspicious, you won't likely to trust this person who is convincing you to bet, now the *posterior distribution* could help you to visualize and quantified your beliefs which is extremely helpful when making decision. 
 
-In short:
-* Mathematical distribution is based on mathematical formula and some basic assumptions
-* Empirical distribution is based on data, the data could either done by yourself or somebody else.
-* Posterior distribution is based on belief, the belief is usually shaped by added information about the scenario. 
+In short:  
+
+* Mathematical distribution is based on mathematical formula and some basic assumptions  
+* Empirical distribution is based on data, the data could either done by yourself or somebody else.  
+* Posterior distribution is based on belief, the belief is usually shaped by added information about the scenario.   
 
 There is a direct connection between the concept of the population and the concept of a probability distribution. But they are not the same thing! The connection is that the probability distribution --- whether it is empirical, mathematical, or posterior --- is a *description* of the contents of the urn, which is the population.
 
@@ -1079,28 +1080,17 @@ Question : *10 people walks up to testing center, 5 of them tested negative, 5 o
 
 ```{r}
 tibble(test = 1:100000) %>%
-mutate(person1 =   map_int(test, ~ rbinom(n = 1, size = 1, p = 0.3))) %>%
-  
-mutate(person2 = map_int(test, ~ rbinom(n = 1, size = 1, p = 0.3))) %>%
-  
-mutate(person3 = map_int(test, ~ rbinom(n = 1, size = 1, p = 0.3))) %>%
-  
-mutate(person4 =  map_int(test, ~ rbinom(n = 1, size = 1, p = 0.3))) %>%
-  
-mutate(person5 = map_int(test, ~ rbinom(n = 1, size = 1, p = 0.3))) %>%
-  
-  
-mutate(person6 = map_int(test, ~ rbinom(n = 1, size = 1, p = 0.7))) %>%
-  
-mutate(person7 = map_int(test, ~ rbinom(n = 1, size = 1, p = 0.7))) %>%
-  
-mutate(person8 = map_int(test, ~ rbinom(n = 1, size = 1, p = 0.7))) %>%
-  
-mutate(person9 = map_int(test, ~ rbinom(n = 1, size = 1, p = 0.7))) %>%
-  
-mutate(person10 =  map_int(test, ~ rbinom(n = 1, size = 1, p = 0.7))) %>%
-  
-select(!test) %>%
+  mutate(person1 =  map_int(test, ~ rbinom(n = 1, size = 1, p = 0.3))) %>%
+  mutate(person2 =  map_int(test, ~ rbinom(n = 1, size = 1, p = 0.3))) %>%
+  mutate(person3 =  map_int(test, ~ rbinom(n = 1, size = 1, p = 0.3))) %>%
+  mutate(person4 =  map_int(test, ~ rbinom(n = 1, size = 1, p = 0.3))) %>%
+  mutate(person5 =  map_int(test, ~ rbinom(n = 1, size = 1, p = 0.3))) %>%
+  mutate(person6 =  map_int(test, ~ rbinom(n = 1, size = 1, p = 0.7))) %>%
+  mutate(person7 =  map_int(test, ~ rbinom(n = 1, size = 1, p = 0.7))) %>%
+  mutate(person8 =  map_int(test, ~ rbinom(n = 1, size = 1, p = 0.7))) %>%
+  mutate(person9 =  map_int(test, ~ rbinom(n = 1, size = 1, p = 0.7))) %>%
+  mutate(person10 = map_int(test, ~ rbinom(n = 1, size = 1, p = 0.7))) %>%
+  select(!test) %>%
   
 mutate(sum = rowSums(.))%>%
   
@@ -1112,7 +1102,6 @@ ggplot(aes(sum)) +
     scale_y_continuous(labels = 
                          scales::percent_format(accuracy = 1)) +
     theme_classic()  
-
 
 ```
 

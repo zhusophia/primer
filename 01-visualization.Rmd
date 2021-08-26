@@ -2,17 +2,23 @@
 
 Everyone loves visualizations.
 
+<!-- Solve all problems, except geom_line and the group aesthetic. -->
+
 <!-- Heather owns this Chapter! Change anything an everything! Change anything you like in Getting Started. -->
 
-<!-- Cut out all R and R Studio section. Place cool/useful parts of it in Getting Started. DONE -->
+<!-- Go through all comments. Keep the ones you agree with. Delete the ones you do not. Once you fix whatever a comment complains about, delete the comment. -->
 
-<!-- Talk more about aesthetics (i.e., aes()) in Basic plots. Make more use of color and fill. Explain how you can use either constants (like "steelblue") or variables (like party) when using these aesthetics. -->
+<!-- Make presidential approval animated. -->
 
-<!-- Add the formula for median, like this one: https://math.stackexchange.com/questions/1097546/what-is-the-general-formula-for-calculating-the-median. DONE -->
+<!-- Delete any graphics, like select, which are not useful! Don't forget to delete the png files from  01-visualization/images. -->
 
-<!-- Better explain Tidyverse. -->
+<!-- Delete any image which we are not using. You only need to check this Rmd. -->
 
-<!-- Don't do this yet. Same with the `group` aesthetic, especially for line plots. Don't use the unemployment data anymore. Use two or three of the temperature series from primer.data::temperature. -->
+<!-- Talk more about aesthetics (i.e., aes()) in Basic plots. Make more use of color and fill. Explain how you can use either constants (like "steelblue") or variables (like party) when using these aesthetics. Make them as comfortable with color and fill as they are with data and mapping.  -->
+
+
+<!-- Hold off on this for now. Don't use the unemployment data anymore. Use two or three of the temperature series from primer.data::temperature.  I have similar concerns about the `group` aesthetic, especially for line plots. But maybe group is too difficult? But can you possibly do geom_line without showing groups? -->
+
 
 ```{r, message = FALSE, echo = FALSE}
 library(tidyverse)
@@ -41,7 +47,7 @@ hundred_days_p <- president_data %>%
    coord_cartesian(ylim = c(30,60)) +
    theme_fivethirtyeight() +
    labs(title = "Approval Ratings During the First Hundred Days",
-        subtitle = "Both recent presidents have climbing disapproval ratings during their first hundred days.",
+        subtitle = "Both recent presidents had climbing disapproval ratings.",
         x = NULL,
         y = NULL,
         color = NULL,
@@ -321,7 +327,7 @@ Almost every aspect of the code used to create this plot is identical to our sca
 
 ### `geom_histogram()`
 
-<!-- DK: All awk. Rewrite. Passing by position is important! -->
+<!-- All awk. Rewrite. Passing by position is important! -->
 
 A histogram is a plot that visualizes the *distribution* of a numerical value.
 
@@ -444,8 +450,6 @@ One of the most common plots used to visualize the distribution of categorical d
 
 We can add trend lines to the plots we create using the `geom_smooth()` function. 
 
-<!-- DK: Will handle geom_smooth().explain method, se, and formula -->
-
 Recall the following scatterplot from our previous work. 
 
 ```{r}
@@ -479,7 +483,7 @@ Note the message. R is telling us that we need to specify the `method` and `form
 
 Let's add the argument `method = "lm"`, where "lm" stands for **l**inear **m**odel. This causes the fitted line to be straight rather than curved. Let's also add the argument `formula = y ~ x`. This makes both messages go away. Again, R was not giving us an error before. It was simply telling us what options it was using since we did not specify the options ourselves.
 
-<!-- HL: should we explain why we make the argument formula = y~x? The reason is that R is concerned that we don't know exactly what model it is estimating. So, it is warning us that y is function of x. We make the warning go away by specifying that relationship in the argument. -->
+<!--UP TO YOU!  HL: should we explain why we make the argument formula = y~x? The reason is that R is concerned that we don't know exactly what model it is estimating. So, it is warning us that y is function of x. We make the warning go away by specifying that relationship in the argument. -->
 
 *Always include enough detail in your code to make those messages disappear.*
 
@@ -497,7 +501,7 @@ ggplot(trains,
               formula = y ~ x)
 ```
 
-Notice the gray section surrounding the line we plotted. This area is called the confidence interval, which is set to 95% by default. We will learn about confidence intervals in Chapter \@ref(probability). You can make the shaded are disappear by adding `se = FALSE` as another argument to `geom_smooth()`.
+Notice the gray section surrounding the line we plotted. This area is called the confidence interval, which is set to 95% by default. We will learn about confidence intervals in Chapter \@ref(probability). You can make the shaded area disappear by adding `se = FALSE` as another argument to `geom_smooth()`.
 
 ### `geom_density()`
 
@@ -529,9 +533,8 @@ ggplot(trains,
 
 The values on the y-axis are scaled so that the total area under the curve equals one. 
 
-<!-- DK: Other stuff to finish this section with? -->
 
-<!-- HL: could we just list other uncommonly used geom functions that people have the option of using if they want to and point them to another resource that they can learn from if they want? Yes!  -->
+<!-- Could we just list other uncommonly used geom functions that people have the option of using if they want to and point them to another resource that they can learn from if they want? Yes!  -->
 
 
 ## Tidyverse
@@ -615,7 +618,6 @@ trains %>%
          age < 40)
 ```
 
-<!-- DK: More examples? -->
 
 ### `select` variables
 
@@ -691,8 +693,6 @@ trains %>%
 
 ### `arrange()`
 
-<!-- DK: Where is the graphic? -->
-
 `arrange()` allows us to sort/reorder a tibble's rows according to the values of a specific variable. Unlike `filter()` or `select()`, `arrange()` does not remove any rows or columns from the tibble. Example:
 
 ```{r}
@@ -709,9 +709,7 @@ trains %>%
   arrange(desc(age))
 ```
 
-This is the first of many "pipes" which we will create in *The Primer*. First, we have the `trains` tibble. Second, we pipe that to the `select()` function. Third, we pipe the results of `select()` to the `arrange()` function. *Each step in the pipe starts with a tibble and then, once it is done, produces a tibble. It is tibbles all the way down!*
-
-<!-- DK: Need a graphic of turtle tibbles stacked on each other. -->
+This is the first of many "pipes" which we will create in *The Primer*. First, we have the `trains` tibble. Second, we pipe that to the `select()` function. Third, we pipe the results of `select()` to the `arrange()` function. *Each step in the pipe starts with a tibble and then, once it is done, produces a tibble. It is [tibbles all the way down](https://en.wikipedia.org/wiki/Turtles_all_the_way_down)!*
 
 
 ### `mutate()` 
@@ -738,7 +736,7 @@ trains <- trains %>%
   mutate(income_in_thousands = (income) / 1000)
 ```
 
-<!-- DK: Awk -->
+<!-- Awkward -->
 
 Whenever we create a new tibble, or a new variable within a tibble, we face a dilemma: Should we overwrite the existing tibble/variable or create a new one? There is no right answer. 
 
@@ -747,8 +745,6 @@ For example, instead of overwriting `trains` in the code above, we could have cr
 
 #### `if_else()`
 
-
-<!-- DK: Edit these lines from R4DS. Are there other functions which we should mention here? Do something sensible with group_by. To get `_` to work in caption title. Found at https://github.com/rstudio/bookdown/issues/209  -->
 
 `if_else()` is often used within calls to `mutate()`. It has three arguments. The first argument `test` should be a logical vector. The result will contain the value of the second argument, `yes`, when test is TRUE, and the value of the third argument, `no`, when it is FALSE. 
 
@@ -761,9 +757,6 @@ trains %>%
 ```
 
 Another function similar to `if_else()`, is `dplyr::case_when()`. `case_when()` is particularly useful inside mutate when you want to create a new variable that relies on a complex combination of existing variables. Note that there is a different version of `ifelse()` in **dplyr**: `if_else()`. This works exactly the same as the standard version but is somewhat more robust. 
-
-
-<!-- DK: More details? -->
 
 
 ### `summarize()`
@@ -808,8 +801,6 @@ $$m(x) = x_{\frac{n+1}{2}}$$
 The standard deviation (*sd*) of a distribution is a measure of its variation around the mean.  
 
 $$\text{sd} = \sqrt{\frac{(x_1 - \bar{x})^2 + (x_2 - \bar{x})^2 + \cdots + (x_n - \bar{x})^2}{n - 1}}$$
-
-<!-- DK: More detail. How much does it cover? Plot a not-too-weirdish distribution and show two sd's on it. -->
 
 
 **`mad()`**
@@ -896,11 +887,10 @@ If you have a tibble which has been grouped, you can remove the grouping variabl
 
 ## Advanced Plots
 
-<!-- DK: Other stuff needed here? after_stat; plotting two geoms at once; scale_x for changing labels; scales:: for axis formatting. coord_cartesian() and xlim/ylim, which allows for zooming/rescaling graphs. Other? -->
+<!-- Other stuff needed here? after_stat; plotting two geoms at once; scale_x for changing labels; scales:: for axis formatting. coord_cartesian() and xlim/ylim, which allows for zooming/rescaling graphs. Other? -->
 
 <!-- - using scales to change the name and labels of a legend. -->
 
-<!-- - facet_grid() to facet by more than 1 variable. -->
 
 <!-- 1) Plots are ordered alphabetically if it is a character and by levels if it is a factor. Dates appear differently in plots. reorder() is useful. Cover this at start of advanced plotting. -->
 
