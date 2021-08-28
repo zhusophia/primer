@@ -1,8 +1,15 @@
 # Probability {#probability}
 
-<!-- FIX THE NOTATION! The probability distribution for random variable A is P(A), not Prob(A) or p(A) or pd(A) or pdf(A). P is the *probability function* which is a probability mass function in the case of continuous variables and a probability distribution function in the case of discrete variables. The probability of event "a", which is a specific value of A, is P(A = a), which we will often simplify as Prob(a). -->
+<!-- We use "spoken aloud" paragraph about \rho twice. That should be fixed. -->
 
-<!-- If A and B are independent, you can make a draw from the joint distribution of A and B --- p(A, B) --- by first taking a draw from A and combining it with a draw from B. -->
+<!-- Should we bring on the topic of population in this chapter. If so, how? -->
+
+<!-- Should we use Preceptor Tables, one for flipping coints, rolling dice and so on. Probably not. Too much! -->
+
+<!-- Related is the question of Preceptor Tables is how to introduce the Question. We certainly need a question each time because, once we have the model, we have to show readers how to "work with" the distribution, and that requires a question to answer. Revisit this sentence: "All data science problems". -->
+
+
+<!-- If A and B are independent, you can make a draw from the joint distribution of A and B --- p(A, B) --- by first taking a draw from A and combining it with a draw from B. Maybe this means discussing independence in the section of joint distributions? -->
 
 <!-- The way that one does does so, is one draws 4,000 values from them, does some manipulation *row-by_row*, and then, hooray, you have you answer.  -->
 
@@ -32,7 +39,7 @@
 
 The central tension, and opportunity, in data science is the interplay between the *data* and the *science*, between our empirical observations and the models which we use to understand them. Probability is the language we use to explore that interplay; it connects models to data, and data to models.
 
-What does it mean that Trump had a *30% chance* of winning re-election in the fall of 2016? That there is a *90% probability* of rain today? That the dice at the casino are *fair*? 
+What does it mean that Trump had a *30% chance* of winning election in the fall of 2016? That there is a *90% probability* of rain today? That the dice at the casino are *fair*? 
 
 Probability is about quantifying uncertainty. Think of *probability* as a proportion. The probability of an event occurring is a number from 0 to 1, where 0 means that the event is impossible and 1 means that the event is 100% certain.
 
@@ -42,22 +49,22 @@ Begin with the simplest events: coin flips and dice rolls. The set of all outcom
 * The probability of rolling a 1, 2, 3, 4, 5, or 6 is 1.  
 * The probability of flipping a coin and getting tails is 1/2.
 
-If the probability of an outcome is unknown, we will often refer to it as an unknown *parameter*, something which we might use data to *estimate*. We usually use Greek letters to refer to parameters. Whenever we are talking about a specific probability (represented by a single value), we will use $\rho$ (the Greek letter "rho" but spoken aloud as "p" by us) with a *subscript* which specifies the exact outcome of which it is the probability. For instance, $\rho_h = 0.5$ denotes the probability of getting heads on a coin toss when the coin is fair. $\rho_t$ --- spoken as "PT" or "P sub T" or "P tails" --- denotes the probability of getting tails on a coin toss. This notation can become annoying if the outcome whose probability we seek is not so easy to define. For example, we might write the probability of rolling a 1, 2 or 3 using a fair die as:
+If the probability of an outcome is unknown, we will often refer to it as an unknown *parameter*, something which we might use data to *estimate*. We usually use Greek letters to refer to parameters. Whenever we are talking about a specific probability (represented by a single value), we will use $\rho$ (the Greek letter "rho" but spoken aloud as "p" by us) with a *subscript* which specifies the exact outcome of which it is the probability. For instance, $\rho_h = 0.5$ denotes the probability of getting heads on a coin toss when the coin is fair. $\rho_t$ --- spoken as "PT" or "P sub T" or "P tails" --- denotes the probability of getting tails on a coin toss. This notation can become annoying if the outcome whose probability we seek is less concise. For example, we might write the probability of rolling a 1, 2 or 3 using a fair die as:
 
 $$
 \rho_{die\ roll\ is\ 1,\ 2\ or\ 3} = 0.5
 $$
 
-We will rarely write out the full definition of the event with the $\rho$ symbol.  Instead, we will define an event A as when a rolled die equals 1, 2 or 3 and, then, write 
+We will rarely write out the full definition of the event with the $\rho$ symbol.  Instead, we will define an event "a" as when a rolled die equals 1, 2 or 3 and, then, write 
 
-$$\rho_A = 0.5$$. 
+$$\rho_a = 0.5$$
 
 
 A *random variable* is a function which produces a value from a sample set. A random variable can be either discrete --- where the sample set has a limited number of members, like H or T for the result of a coin flip, or 2, 3, ..., 12 for the sum of two die --- or continuous (any value in a continuous range). Probability is a claim about the value of a random variable, i.e., that you have a 50% probability of getting a 1, 2 or 3 when you roll a fair die. 
 
 We usually use capital letters for random variables. So, $C$ might be our symbol for the random variable which is a coin toss and $D$ might be our symbol for the random variable which is the sum of two dice. When discussing random variables in general, or when we grow tired of coming up with new symbols, we will use $Y$. 
 
-Small letters refer to a single outcome or result from a random variable. $c$ is the outcome from one coin toss. $d$ is the result from one throw of the dice. The value of the outcome must come from the sample space. So, $c$ can only take on two possible values: heads or tails. When discussing random variables in general, we use $y$ to refer to one outcome of the random variable $y$. If there are multiple outcomes --- if we have, for example, flipped the coin multiple times --- then we use subscripts to indicate the separate outcomes: $y_1$, $y_2$, and so on. The symbol for an arbitrary outcome is $y_i$.  
+Small letters refer to a single outcome or result from a random variable. $c$ is the outcome from one coin toss. $d$ is the result from one throw of the dice. The value of the outcome must come from the sample space. So, $c$ can only take on two possible values: heads or tails. When discussing random variables in general, we use $y$ to refer to one outcome of the random variable $Y$. If there are multiple outcomes --- if we have, for example, flipped the coin multiple times --- then we use subscripts to indicate the separate outcomes: $y_1$, $y_2$, and so on. The symbol for an arbitrary outcome is $y_i$, where $i$ ranges from 1 through $N$, the total number of events or experiments for which an outcome $y$ was produced.  
 
 The only package we need in this chapter is **tidyverse**.
 
@@ -96,9 +103,17 @@ Consider the vector which is the result of rolling one die 10 times.
 ten_rolls <- c(5, 5, 1, 5, 4, 2, 6, 2, 1, 5)
 ```
 
-There are other ways of storing the data in this vector. Instead of reporting every observation, we could just record the number of times each value appears.
+There are other ways of storing the data in this vector. Instead of reporting every observation, we could record the number of times each value appears and the percentage of the total which this number accounts for.
 
 ```{r, echo = FALSE}
+# When I try to use `fmt_percent(portion, decimals = 0)`, it works
+# interactively. But, when knitting the whole chapter, you get 19prcnt and
+# similar nonsense. This link may be relevant:
+
+# https://stackoverflow.com/questions/67952525/escaping-symbol-in-gt-package-function-fmt-percent
+
+# Really ought to submit a reprex to R Studio Community.
+
 tibble(outcome = ten_rolls) %>% 
   group_by(outcome) %>% 
   count() %>% 
@@ -109,12 +124,11 @@ tibble(outcome = ten_rolls) %>%
                subtitle = "Counts and percentages reflect the same information") %>% 
     cols_label(outcome = "Outcome",
                n = "Count",
-               portion = "Percentage") %>% 
-    fmt_percent(portion, decimals = 0)
+               portion = "Percentage") 
 ```
 
 
-In this case, with only 10 values, it is actually less efficient to store the data like this. But what happens when we have 10,000 rolls?
+In this case, with only 10 values, it is actually less efficient to store the data like this. But what happens when we have 1,000 rolls?
 
 ```{r, echo = FALSE}
 set.seed(89)
@@ -129,8 +143,7 @@ tibble(outcome = sample(1:6, size = 1000, replace = TRUE)) %>%
                subtitle = "Counts and percentages reflect the same information") %>% 
     cols_label(outcome = "Outcome",
                n = "Count",
-               portion = "Percentage") %>% 
-    fmt_percent(portion, decimals = 0)
+               portion = "Percentage") 
 ```
 
 Instead of keeping around a vector of length 1,000, we can just keep 12 values --- the 6 possible outcomes and their frequency --- without losing any information.
@@ -160,7 +173,7 @@ more_rolls_p <- tibble(value = more_rolls) %>%
 rolls_p + more_rolls_p
 ```
 
-The two graphs have the exact same shape because, even though the vectors are of different lengths, the relative proportions of the outcomes are identical. In some sense, both vectors are from the same distribution. *The total count for each value does not matter. What matters is the relative proportions.*
+The two graphs have the exact same shape because, even though the vectors are of different lengths, the relative proportions of the outcomes are identical. In some sense, both vectors are from the same distribution. *Relative proportions, not the total counts, are what matter.*
 
 ### Normalizing distributions
 
@@ -198,9 +211,9 @@ Think of the distribution of a variable as an urn from which we can pull out, at
 
 1. the (imaginary!) urn from which we are drawing values.
 2. all the values in the urn
-3. all the values which we have drawn from the urn, whether that be 10 or 10,000
+3. all the values which we have drawn from the urn, whether that be 10 or 1,000
 
-Sloppiness is the usage if the word distribution is universal. However, you must keep three distinct ideas separate:
+Sloppiness in the usage of the word distribution is universal. However, keep three distinct ideas separate:
 
 * The *unknown true distribution* which, in reality, generates the data which we see. Outside of stylized examples in which we *assume* that a distribution follows a simple mathematical formula, we will never have access to the unknown true distribution. We can only estimate it. This unknown true distribution is often referred to as the *data generating mechanism*, or DGM. It is a function or black box or urn which produces data. We can see the data. We can't see the urn. 
 
@@ -208,7 +221,7 @@ Sloppiness is the usage if the word distribution is universal. However, you must
 
 * A *vector of numbers drawn* from the estimated distribution. Both true and estimated distributions can be complex animals, difficult to describe accurately and in detail. But a vector of numbers drawn from a distribution is easy to understand and use. So, in general, we work with vectors of numbers. When someone --- either a colleague or a piece of R code --- creates a distribution which we want to use to answer a question, we don't really want the distribution itself. Rather, we want a vectors of "draws" from that distribution. Vectors are easy to work with! Complex computer code is not.
 
-Again, people (including us!) will often be sloppy and use the same word, "distribution," without making it clear whether they are talking about the *true distribution*, the *estimated distribution*, or a vector of *draws* from the estimated distribution. The same sloppiness applues to the use of the term *data generating mechanism*. Try not to be sloppy.
+Again, people (including us!) will often be sloppy and use the same word, "distribution," without making it clear whether they are talking about the *true distribution*, the *estimated distribution*, or a vector of *draws* from the estimated distribution. The same sloppiness applies to the use of the term *data generating mechanism*. Try not to be sloppy.
 
 Much of the rest of the *Primer* involves learning how to work with distributions, which generally means working with the draws from those distributions. Fortunately, the usual rules of arithmetic apply. You can add/subtract/multiply/divide distributions by working with draws from those distributions, just as you can add/subtract/multiply/divide regular numbers.
 
@@ -225,7 +238,9 @@ knitr::include_graphics("05-probability/images/de_finetti.jpg")
 ```
 
 
-For the purposes of this *Primer*, a *probability distribution* is a mathematical object which maps a set of outcomes to probabilities, where each distinct outcome has a chance of occurring between 0 and 1 inclusive. The probabilities must sum to 1. The set of possible outcomes, i.e., the sample space --- heads or tails for the coin, 1 through 6 for a single die, 2 through 12 for the sum of a pair of dice --- can be either discrete or continuous. Remember, discrete data can only take on certain values. Continuous data, like height and weight, which can take any values within a range. The set of outcomes is the *domain* of the probability distribution. The *range* is the associated probabilities. 
+For the purposes of this *Primer*, a *probability distribution* is a mathematical object which maps a set of outcomes to probabilities, where each distinct outcome has a chance of occurring between 0 and 1 inclusive. The probabilities must sum to 1. The set of possible outcomes, i.e., the sample space --- heads or tails for the coin, 1 through 6 for a single die, 2 through 12 for the sum of a pair of dice --- can be either discrete or continuous. Remember, discrete data can only take on certain values. Continuous data, like height and weight, can take any value within a range. The set of outcomes is the *domain* of the probability distribution. The *range* is the associated probabilities. 
+
+<!-- DK: Make this connection clearer with a graphic or a table? Might not be worth the trouble since we don't use the terms domain and range again. -->
 
 Assume that a probability distribution is created by a *probability function*, a set function which maps outcomes to probabilities. The concept of a "probability function" is often split into two categories: probability *mass* functions (for discrete random variables) and probability *density* functions (for continuous random variables). As usual, we will be a bit sloppy, using the term probability distribution for both the mapping itself and for the function which creates the mapping.
 
@@ -233,13 +248,13 @@ We discuss three types of probability distributions: *empirical*, *mathematical*
 
 The key difference between a *distribution*, as we have explored them in Section \@ref(distributions), and a *probability* distribution is the requirement that the sum of the probabilities of the individual outcomes must be exactly 1. There is no such requirement for a distribution in general. But any distribution can be turned into a probability distribution by "normalizing" it.  In this context, we will often refer to a distribution which is not (yet) a probability distribution as an "unnormalized" distribution.  
 
-Pay attention to notation. Whenever we are talking about a specific probability (represented by a single value), we will use $\rho$ (the Greek letter "rho" but spoken aloud as "p" by us) with a *subscript* which specifies the exact outcome of which it is the probability. For instance, $\rho_h = 0.5$ denotes the probability of getting heads on a coin toss when the coin is fair. $\rho_t$ --- spoken as "PT" or "P sub T" or "P tails" --- denotes the probability of getting tails on a coin toss. However, when we are referring to the entire probability distribution over a set of outcomes, we will use $P()$. For example, the probability distribution of a coin toss is $P(\text{coin})$. That is, $P(\text{coin})$ is composed of the two specific probabilities (50% and 50%) mapped from the two values in the domain (Heads and Tails). Similarly, $P(\text{sum of two dice})$ is the probability distribution over the set of 11 outcomes (2 through 12) which are possible when you take the sum of two dice. $P(\text{sum of two dice})$ is made up of 11 numbers --- $\rho_2$,  $\rho_3$, ..., $\rho_{12}$ --- each representing the unknown probability that the sum will equal their value. That is, $\rho_2$ is the probability of rolling a 2.
+Pay attention to notation. Recall that when we are talking about a specific probability (represented by a single value), we will use $\rho$ (the Greek letter "rho" but spoken aloud as "p" by us) with a *subscript* which specifies the exact outcome of which it is the probability. For instance, $\rho_h = 0.5$ denotes the probability of getting heads on a coin toss when the coin is fair. $\rho_t$ --- spoken as "PT" or "P sub T" or "P tails" --- denotes the probability of getting tails on a coin toss. However, when we are referring to the entire probability distribution over a set of outcomes, we will use $P()$. For example, the probability distribution of a coin toss is $P(\text{coin})$. That is, $P(\text{coin})$ is composed of the two specific probabilities (50% and 50%) mapped from the two values in the domain (Heads and Tails). Similarly, $P(\text{sum of two dice})$ is the probability distribution over the set of 11 outcomes (2 through 12) which are possible when you take the sum of two dice. $P(\text{sum of two dice})$ is made up of 11 numbers --- $\rho_2$,  $\rho_3$, ..., $\rho_{12}$ --- each representing the unknown probability that the sum will equal their value. That is, $\rho_2$ is the probability of rolling a 2.
 
 
 
 ### Flipping a coin
 
-All data science problems start with a question. Example: *What will be the result of the next flip of a coin?* All questions are answered with the help of probability distributions.
+All data science problems start with a question. Example: *What are the chances of getting three heads in a row when flipping a fair coin?* All questions are answered with the help of probability distributions.
 
 
 An *empirical distribution* is based on data. You can think of this as the probability distribution created by running a simulation. In theory, if we increase the number of coins we flip in our simulation, the empirical distribution will look more and more similar to the mathematical distribution. The mathematical distribution is the Platonic form. The empirical distribution will often look like the mathematical probability distribution, but it will rarely be exactly the same.
@@ -297,14 +312,30 @@ ggplot(aes(x = results)) +
 The distribution of a single observation is described by this formula.  
 
 $$ P(Y = y) = \begin{cases} 1/2 &\text{for }y= \text{Heads}\\ 1/2 &\text{for }y= \text{Tails} \end{cases}$$
+We sometimes do not know that the probability of heads and the probability of tails both equal 50%. In that case, we might write:
 
-We could also use this formula: $y_i \sim Bernoulli(p)$. Expected value of $y_i$ is this mathematical probability distribution. If the mathematical assumptions are correct, then as your sample size increases, the empirical probability distribution will look more and more like the mathematical distribution.
+$$ P(Y = y) = \begin{cases} \rho_H &\text{for }y= \text{Heads}\\ \rho_T &\text{for }y= \text{Tails} \end{cases}$$
+
+Yet, we know that, by definition, $\rho_H + \rho_T = 1$, so we can rewrite the above asL
+
+$$ P(Y = y) = \begin{cases} \rho_H &\text{for }y= \text{Heads}\\ 1- \rho_H &\text{for }y= \text{Tails} \end{cases}$$
+
+Coin flipping (and related scenarios with only two possible outcomes) are such common problems, that the notation is often simplified further, with $\rho$ understood, by convention, to be the probability of heads. In that case, we can write the mathematical distribution is two canonical forms:
+
+$$P(Y) = Bernoulli(\rho)$$
+and
+
+$$y_i \sim Bernoulli(\rho)$$
+All five of these versions mean the same thing! The first four describe the mathematical probability distribution for a fair coin. The capital $Y$ within the $P()$ indicates a random variable. The fifth highlights one "draw" from that random variable, hence the lower case $y$ and the subscript $i$.
+
+Most probability distributions do not have special names, which is why we will use the generic symbol $P$ to define them. But some common probability distributions do have names, like "Bernoulli" in this case.
+
+
+If the mathematical assumptions are correct, then as your sample size increases, the empirical probability distribution will look more and more like the mathematical distribution.
 
 A *posterior distribution* is based on beliefs and expectations. It displays your belief about things you can't see right now. You may have posterior distributions for outcomes in the past, present, or future.
 
-In the case of the coin toss, the posterior distribution changes depending on your beliefs. For instance, let's say your friend brought a coin to school and asked to bet you. If the result is heads, you have to pay them $5. 
-
-This makes you suspicious, or in other world you no longer trust the "population" that was made in the previous two examples, that is all the results and probability was based on flipping a fair coin, and that's why the only way left (if you don't jsut simply walk away) is your posterior distribution. Your posterior distribution reflects or beliefs based on the assumption, this time the population is no longer the fair dice where we define $\rho_h$=0.5, is the population of "crooked" dice where you might believe that $\rho_h$ is 0.95 and $\rho_t$ is 0.05.
+In the case of the coin toss, the posterior distribution changes depending on your beliefs. For instance, let's say your friend brought a coin to school and asked to bet you. If the result is heads, you have to pay them $5. In that case, your posterior probability distribution might look like this:
 
 
 ```{r, echo = FALSE}
@@ -329,18 +360,37 @@ ggplot(aes(x = results)) +
 
 The full terminology is mathematical (or empirical or posterior) *probability* distribution. But we will often shorten this to just mathematical (or empirical or posterior) distribution. The word "probability" is understood, even if it is not present.
 
-*Population* is an very key concepts in data analysis, and will use throughout later chapters. The definition for Population is essentially the imaginary urn from which our data has been, or will be, drawn. 
+<!-- DK: Not sure I like this. Maybe use `rbinom(n = 10, size = 13, prob = 0.5)` instead? Maybe show both? -->
 
+Recall the question with which we started this section: *What are the chances of getting three heads in a row when flipping a fair coin?* To answer this question, we need to use a probability distribution as our *data generating mechanism*. Fortunately, the `rbinom()` function allows us to generate the results for coin flips. For example:
 
-<!-- DK: Add a paragraph discussing the concept of a population. And why or why not we could use our empirical data. Thinking about the population helps you decide whether (or not) to make use of the mathematical and empirical distributions when you are creating your posterior. -->
+```{r}
+rbinom(n = 10, size = 1, prob = 0.5)
+```
+generates the results of 10 coin flips, where a result of heads is presented as `1` and tails as `0`. With this tool, we can generate 1,000 draws from our experiment:
 
-<!-- Determine a good definition of population. The population is the set of all units from which the data you have, and the data you want to have, has been, or will be, drawn. -->
+```{r}
+tibble(toss_1 = rbinom(n = 1000, size = 1, prob = 0.5),
+       toss_2 = rbinom(n = 1000, size = 1, prob = 0.5),
+       toss_3 = rbinom(n = 1000, size = 1, prob = 0.5))
+```
 
-<!-- DK: Tie this more closely to the notion of distribution in chapter 2. In particular, recall the distinction between a distribution and draws from a distribution. -->
+Because the flips are independent, we can consider each row to be a draw from the experiment. Then, we simply count up the proportion of experiments in which resulted in three heads.
+
+```{r}
+tibble(toss_1 = rbinom(n = 1000, size = 1, prob = 0.5),
+       toss_2 = rbinom(n = 1000, size = 1, prob = 0.5),
+       toss_3 = rbinom(n = 1000, size = 1, prob = 0.5)) %>% 
+  mutate(three_heads = toss_1 + toss_2 + toss_3 == 3) %>% 
+  summarize(chance = mean(three_heads))
+```
+
+This is close enough to the correct answer of $1/8$th. If we increase the sample size, we will get closer to the truth. 
+
+This is our first example of using a data generating mechanism --- meaning `rbinom()` --- to answer a question. We will see many more in the chapters to come.
 
 
 ### Rolling two dice
-
 
 We get an *empirical distribution* by rolling two dice a hundred times, either by hand or with a computer simulation. The result is not identical to the mathematical distribution because of the inherent randomness of the real world and/or of simulation. 
 
@@ -401,6 +451,7 @@ tibble(sum = c(rep(c(2, 12), 1),
 ```
 
 $$ P(Y = y) = \begin{cases} \dfrac{y-1}{36} &\text{for }y=1,2,3,4,5,6 \\ \dfrac{13-y}{36} &\text{for }y=7,8,9,10,11,12 \\ 0 &\text{otherwise} \end{cases} $$
+
 
 
 The *posterior distribution* for rolling two dice a hundred times depends on your beliefs. If you take the dice from your Monopoly set, you have reason to believe that the assumptions underlying the mathematical distribution are true. However, if you walk into a crooked casino and a host asks you to play craps, you might be suspicious, just as in the "flipping a coin example" the word "suspicious" means you no longer trust the "population" where the mathematical and empircal distribution drawn their data from. For example, in craps, a come-out roll of 7 and 11 is a "natural," resulting in a win for the "shooter" and a loss for the casino. You might expect those numbers to occur less often than they would with fair dice. Meanwhile, a come-out roll of 2, 3 or 12 is a loss for the shooter. You might also expect values like 2, 3 and 12 to occur more frequently. Your posterior distribution might look like this:
@@ -937,7 +988,7 @@ jd_disease <- tibble(ID = 1:sims, have_disease = rep(c(TRUE, FALSE), 5000)) %>%
 jd_disease
 ```
 
-The first step is to simply create an tibble that consists of the simulated data we need to plot our distribution. Keep in mind that in the setting we have two different probabilities and they are completely separate from each other and we want to keep the two probabilities and the disease results in two and only two columns so that we can graph using the `ggplot()` function. And that's why we used the `rep` and `seq` functions when creating the table, we used the `seq` function to set the sequence we wants, in this case is only two numbers, 0.01 (99% accuracy for testing negative if no disease, therefore 1% for testing positive if no disease) and 0.5 (50% accuracy for testing positive/negative if have disease), then we used the `rep` functions to repeat the process 10,000 times for each probability, in total 20,000 times. Note that this number "20,000" also represent the population in our simulated data, we simulated 20,000 results from testing, where 10,000 results from the have-disease group and 10,000 for the no-disease group, we often use the capital N to represent the population, in this simulated data N=20,000.
+The first step is to simply create an tibble that consists of the simulated data we need to plot our distribution. Keep in mind that in the setting we have two different probabilities and they are completely separate from each other and we want to keep the two probabilities and the disease results in two and only two columns so that we can graph using the `ggplot()` function. And that's why we used the `rep` and `seq` functions when creating the table, we used the `seq` function to set the sequence we wants, in this case is only two numbers, 0.01 (99% accuracy for testing negative if no disease, therefore 1% for testing positive if no disease) and 0.5 (50% accuracy for testing positive/negative if have disease), then we used the `rep` functions to repeat the process 10,000 times for each probability, in total 20,000 times. Note that this number "20,000" also represent the number of observations in our simulated data, we simulated 20,000 results from testing, where 10,000 results from the have-disease group and 10,000 for the no-disease group, we often use the capital N to represent the population, in this simulated data $N=20,000$.
 
 Plot the joint distribution:
 
@@ -1742,9 +1793,8 @@ In this case, using the mean and standard deviation produces a 95%  interval whi
 
 ## Cardinal Virtues
 
-<!-- Wisdom: Begin with the ideal Preceptor Table. Depends on the question. Might be all voters in Massachusetts. Might be just the Republican voters. This determines if we are causal or predictive.  Key is that sometimes you want to know multiple potential outcomes for person X. If so, you are doing a causal model. If, however, you only need to know one outcome --- often because just one outcome is conceivable --- then it is predictive. The ideal Preceptor table will generally not have any rows for data we actually have. We never really care about the causal effect in election X specifically. We want to make claims about elections in general. -->
+<!-- Wisdom: The ideal Preceptor table will generally not have any rows for data we actually have. We never really care about the causal effect in election X specifically. We want to make claims about elections in general. -->
 
-<!-- Then look for data and explore that data. What must I assume about the population, to allow me to go forward? If the data is not "close enough" to my ideal Preceptor Table, I give up. Wisdom is about knowing when to quit. Going forward means assuming that the actual data and the data from the ideal Preceptor Table come from the same population. -->
 
 
 <!-- With population, we make a distinction between Wisdom --- Are the rows from the same population? --- and Justice --- Are the rows we have data for *representative* of that population? That works nicely! Can we do the same thing wit columns? In our ideal Preceptor Table, we have a column called "treatment" which specifies the postcards we might send. With Wisdom, we need to decide if that treatment is drawn from the same population (?) of conceivable treatments as the "treatment" which was used in our data. Are the different things labelled "treatment" close enough that we can stack them in the same tibble? If no, then we give up. We can't go further. -->
@@ -1769,9 +1819,9 @@ In this case, using the mean and standard deviation produces a 95%  interval whi
 
 The four [Cardinal Virtues](https://en.wikipedia.org/wiki/Cardinal_virtues) are Wisdom, Justice, Courage, and Temperance. Because data science is, ultimately, a moral act, we use these virtues to guide our work. Every data science project begins with a question.
 
-* *Wisdom* starts by creating the Preceptor Table. What data, if we had it, would allow us to answer our question easily? If the Preceptor Table has one outcome, then the model is *predictive*. If it has more than one (potential) outcome, then the model is *causal*. We then explore the data we have. You can never look too closely at your data. Key question: Are the data we have close enough to the data we want (i.e., the Preceptor Table) that we can consider both as coming from the same *population*? If not, we can't proceed further. 
+* *Wisdom* starts by creating the Preceptor Table. What data, if we had it, would allow us to answer our question easily? If the Preceptor Table has one outcome, then the model is *predictive*. If it has more than one (potential) outcome, then the model is *causal*. We then explore the data we have. You can never look too closely at your data. Key question: Are the data we have close enough to the data we want (i.e., the Preceptor Table) that we can consider both as coming from the same *population*? If not, we can't proceed further. Key in making that decision is the assumption of *validity*. Do the columns in the Preceptor Table match the columns in the data?
 
-* *Justice* starts with the Population Table -- the data we want to have, the data which we actually have and all the other data from that same *population*. Each row of the Population Table is defined by a unique Unit/Time combination. We explore three key issues about the Population Table. First, do the columns demonstrate *validity*, i.e., is the meaning consistent across the rows? Second, does the relationship among the variables demonstrate *stability*, meaning is the model stable across different time periods? Third, are the rows associated with the data *representative* of all the units which we might have had data for? Justice concludes by making an assumption about the *data generating mechanism*. What general mathematical formula connects the outcome variable we are interested in with the other data that we have?
+* *Justice* starts with the Population Table -- the data we want to have, the data which we actually have and all the other data from that same *population*. Each row of the Population Table is defined by a unique Unit/Time combination. We explore two key issues about the Population Table. First, does the relationship among the variables demonstrate *stability*, meaning is the model stable across different time periods? Third, are the rows associated with the data *representative* of all the units which we might have had data for from that time period? Justice concludes by making an assumption about the *data generating mechanism*. What general mathematical formula connects the outcome variable we are interested in with the other data that we have?
 
 * *Courage* allows us to explore different models. Even though Justice has provided the basic mathematical structure of the model, we still need to decide which variables to include and to estimate the values of unknown parameters. We avoid hypothesis tests. We check our models for consistency with the data we have. We select one model. 
 
@@ -1787,7 +1837,7 @@ knitr::include_graphics("other/images/Wisdom.jpg")
 
 Wisdom helps us decide if we can even hope to answer our question with the data we have.
 
-First, start with the Preceptor Table. What rows and columns of data do you need such that, if you had them all, the calculation of the quantity of interest would be trivial? If you want to know the average height of an adult in India, then the Preceptor Table would include a row for each adult and a column for their height. With no missing data, the average is easy to determine, as are a wide variety of other *estimands*, other unknown numbers. 
+First, start with the Preceptor Table. What rows and columns of data do you need such that, if you had them all, the calculation of the quantity of interest would be trivial? If you want to know the average height of an adult in India, then the Preceptor Table would include a row for each adult and a column for their height. With no missing data, the average is easy to determine, as are a wide variety of other *estimands*, other unknown values. 
 
 One key aspect of this Preceptor Table is whether or not we need more than one potential outcome in order to calculate our estimand. For example, if we want to know the causal effect of exposure to Spanish-speakers on attitude toward immigration then we need a causal model, one which estimates that attitude for each person under both treatment and control. The Preceptor Table would require two columns for the outcome. If, on the other hand, we only want to predict someone's attitude, or compare one person's attitude to another's, then we would only need a Preceptor Table with one column for the outcome. 
 
@@ -1811,9 +1861,12 @@ Second, we look at the data we have and perform an exploratory data analysis, an
 
 We care about other variables as well, especially those that are most correlated/connected with the outcome variable. The more time that we spend looking at these variables, the more likely we are to create a useful model.
 
-Third, a key concept is the "population." We need the data we want --- the Preceptor Table --- and the data we have to be similar enough that we can consider them as all having come from the same statistical population. From [Wikipedia](https://en.wikipedia.org/wiki/Statistical_population):
+Third, a key concept is the *population*. We need the data we want --- the Preceptor Table --- and the data we have to be similar enough that we can consider them as all having come from the same statistical population. From [Wikipedia](https://en.wikipedia.org/wiki/Statistical_population):
 
 > In statistics, a population is a set of similar items or events which is of interest for some question or experiment. A statistical population can be a group of existing objects (e.g. the set of all stars within the Milky Way galaxy) or a hypothetical and potentially infinite group of objects conceived as a generalization from experience (e.g. the set of all opening hands in all the poker games in Las Vegas tomorrow).
+
+Mechanically, assuming that the Precetor Table and the data are drawn from the same population is the same thing as "stacking" the two on top of each other. For that to make sense, the variables must mean the same thing --- at least mostly --- in both sources. This is the assumption of *validity*. For example, if the Preceptor Table concerns who people will vote for in the election next week and the data is from a survey taken last week, it is not obvious that we can consider the data as coming from the same population. After all, voting and survey responses are not exactly the same thing. We can only assume that they are --- which is precisely what everyone who forecasts elections does --- if we assume that both are "valid" measures of the same underlying construct.
+
 
 If we assume that the data we have is drawn from the same population as the data in the Preceptor Table, then we can use information about the former to make inferences about the latter. We can combine the Preceptor Table and the data into a single *Population Table*. If we can't do that, if we can't assume that the two sources come from the same population, then we can't use our data to answer our questions. We have no choice but to walk away. The heart of Wisdom is knowing when to walk away. As John Tukey noted: 
 
@@ -1827,11 +1880,8 @@ knitr::include_graphics("other/images/Justice.jpg")
 
 After Wisdom, we have an *Population Table.* It includes rows for the data we have and the data we want to have. It has missing values, most importantly for potential outcomes which were not observed. The central problem in inference is to fill in the question marks in the Population Table.
 
-There are three key issues to explore in any Population Table: validity, stability and representativeness.
+There are two key issues to explore in any Population Table: stability and representativeness.
 
-* *Validity* focuses on the columns of the Population Table. We should confirm that the data we have accurately captures the concepts we care about. Is the data *valid*, given the problem we are trying to solve? 
-
-<!-- DK: Add more! Columns from different sources really mean the same thing. Infinite preceptor table. Et cetera.-->
 
 * *Stability* assumes that the relationship between the outcome variable and the covariates is consistent over time. Never forget that *temporal* nature of almost all real data science problems. Our Preceptor Table will focus on rows for today or for the near future. The data we have will always be from before today. We must almost always assume that the future will be like the past in order to use data from the past to make predictions about the future.
 
@@ -1849,7 +1899,7 @@ The total number $H$ of Heads in experiment $i$ with 20 flips of a single coin, 
  
 Note:
 
-* This is a cheat and a simplification! We are Bayesians but we have not specified the full Bayesian machinery. We really need priors on the unknown parameter $\rho_h$ as well. But that is too complex for an introductory class, so we wave our hands, accept the default sensible parameters built into the R packages we use and point readers to more advanced books, like @roas. 
+* This is a cheat and a simplification! We are Bayesians but we have not specified the full Bayesian machinery. We really need priors on the unknown parameter $\rho_h$ as well. But that is too complex for an introductory textbook, so we wave our hands, accept the default sensible parameters built into the R packages we use, and point readers to more advanced books, like @roas. 
 
 * Defining $\rho_h$ as the "the probability that the coin comes up Heads" is a bit of a fudge. If you calculate that by hand and then compare it to what our tools produce, they won't be the same. Instead, the calculated value will be closer to zero. Why? $\rho_h$ is really the "long-run percentage of the time the coin comes up Heads." It is not just the percentage from this experiment. 
 
