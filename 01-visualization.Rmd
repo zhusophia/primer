@@ -2,12 +2,27 @@
 
 Everyone loves visualizations.
 
-<!-- Solve all problems, except geom_line and the group aesthetic. -->
-
 <!-- Heather owns this Chapter! Change anything an everything! Change anything you like in Getting Started. -->
 
+<!-- Add comments to the code chunks, even if students won't see the comments. For example, initial plot should have a whole bunch of comments about where you got this data and how we can update it in the future.  -->
 
-<!-- Delete any image which we are not using. You only need to check this Rmd. DONE-->
+<!-- Finish up opening plot.  -->
+
+<!-- Create "Going further" section. It includes some cool plots, without the code for making them (I think) and with a brief (short paragraph) description of the package which is used to make them and references for learning more. One animation. One map. One interactive.  -->
+
+<!-- https://github.com/PPBDS/primer/blob/d11aae84a8562caedc94615b8de28f3620af8bf7/01-visualization.Rmd -->
+
+<!-- Do the census and maps tutorials from chapter 3. -->
+
+<!-- Take ownership of the Advanced Plotting section. Add the tips and tricks in the comments. -->
+
+
+<!-- Ignore below for now. -->
+
+<!-- Use this for maps https://walker-data.com/census-r/ -->
+
+<!-- Solve all problems, except geom_line and the group aesthetic. -->
+
 
 <!-- Talk more about aesthetics (i.e., aes()) in Basic plots. Make more use of color and fill. Explain how you can use either constants (like "steelblue") or variables (like party) when using these aesthetics. Make them as comfortable with color and fill as they are with data and mapping.  -->
 
@@ -32,14 +47,13 @@ hundred_days_p <- president_data %>%
   ggplot(mapping = aes(x = enddate,
                        y = rate,
                        color = approval_type)) +
-   facet_wrap(~president) +
+   facet_wrap(~ president) +
    geom_point(alpha = 0.1,
               size = 0.5) +
    geom_smooth(method = "gam",
                formula = y ~ s(x, bs = "cs")) +
-   coord_cartesian(ylim = c(30,60)) +
+   coord_cartesian(ylim = c(30, 60)) +
    theme_fivethirtyeight() +
-   scale_y_continuous(scales::percent_format(accuracy = 1)) +
    labs(title = "Approval Ratings During the First Hundred Days",
         subtitle = "Both recent presidents had climbing disapproval ratings.",
         x = NULL,
@@ -50,30 +64,6 @@ hundred_days_p <- president_data %>%
 hundred_days_p
 ```
 
-<!-- HL: Am I doing the percents right here? Why aren't they working -->
-
-```{r, echo = FALSE}
-# president_data %>%
-#   ggplot(mapping = aes(x = enddate,
-#                        y = rate,
-#                        color = approval_type)) +
-#    facet_wrap(~ president) +
-#    geom_point(size = 0.5,
-#               alpha = 0.5) +
-#    coord_cartesian(ylim = c(30, 60)) +
-#    theme_fivethirtyeight() +
-#    labs(title = "Approval Ratings During the First Hundred Days",
-#         subtitle = "Both recent presidents had climbing disapproval ratings.",
-#         x = NULL,
-#         y = NULL,
-#         color = NULL,
-#         caption = "Source: FiveThirtyEight Data") +
-#    transition_time(enddate) +
-#    shadow_mark() 
-  
-
-
-```
 
 
 Once you have read this chapter, and completed the associated tutorials, you will be able to create graphics like this one with your data. Join us on the journey.
@@ -503,8 +493,6 @@ Note the message. R is telling us that we need to specify the `method` and `form
 
 Let's add the argument `method = "lm"`, where "lm" stands for **l**inear **m**odel. This causes the fitted line to be straight rather than curved. Let's also add the argument `formula = y ~ x`. We make the argument `y ~ x` since R doesn't know what model it is estimating, and gives us a warning that y is a function of x. By specifying this relationship, the warning disappears as R is sure of the model it is estimating. Again, R was not giving us an error before. It was simply telling us what options it was using since we did not specify the options ourselves.
 
-<!--UP TO YOU!  HL: should we explain why we make the argument formula = y~x? The reason is that R is concerned that we don't know exactly what model it is estimating. So, it is warning us that y is function of x. We make the warning go away by specifying that relationship in the argument. DONE -->
-
 *Always include enough detail in your code to make those messages disappear.*
 
 ```{r}
@@ -848,8 +836,6 @@ I.e., the 5th percentile distribution is the point below which 5% of the data fa
 
 Therefore, the value of the 5th percentile would be the quantile of the 5th percentile. Say the dataset consisted of numbers from 0-100. Therefore, the 5th percentile would at 5, so 5 would be the quantile.
 
-<!-- HL: it's kinda unclear what the relationship between this paragraph and quantiles is? Also I sort of think the definition of quantile is rather wordy and not super clear. So fix it! Is this right? I'm not 100 sure. -->
-
 Let's take a look at the `poverty` variable in the `kenya` tibble from the **primer.data** package. `poverty` is the percentage of residents in each community with incomes below the poverty line. Let's first confirm that  `quantile()` works by comparing its output with that from simpler functions.
 
 ```{r}
@@ -1024,8 +1010,6 @@ ggplot(data = gapminder,
 
 Recall that the y-aesthetic of a histogram --- the count of the observations in each bin --- gets computed automatically. We can use the  `after_stat()` argument within `geom_histogram()` to generate percent values as our y-aesthetic. `after_stat()` allows us to control the values of the variables calculated specifically for this specific aesthetic layer. 
 
-<!-- HL: should probably explain what after_stat does. So do so! This is a bad explanation but Done ish?-->
-
 
 ```{r}
 ggplot(data = gapminder, 
@@ -1098,8 +1082,7 @@ There is another function called `scale_x_discrete/scale_y_discrete`. This funct
 ### Text
 
 
-Recall we use `labs()` to add labels and titles to our plots. 
-We can also change labels inside the plots using `geom_text()`.
+Recall we use `labs()` to add labels and titles to our plots. We can also change labels inside the plots using `geom_text()`.
 
 ```{r}
 ggplot(gapminder_filt, 
@@ -1241,6 +1224,21 @@ ggplot(data = economics,
 
 There! Within the `theme()` function, we can change the plot title to bold, the background to blue, and get rid of the "minor" grid lines. `theme()` is a very versatile function. See the full list of elements [here](https://ggplot2-book.org/polishing.html#polishing).
 
+<!-- https://dsy5.github.io/World-Happiness-Data-Analysis-and-Visualizations/ -->
+<!-- y = NULL to get rid of axis labels all together. -->
+<!-- coord_flip() to flip axes, useful in  bar charts with long variable values. -->
+
+<!-- https://abhay1105.github.io/The-Evolution-of-Basketball/ -->
+<!-- How to change legend title? -->
+<!-- How to change order of items in legend (good to use to match how they are ordered in the plot) -->
+
+<!-- Potentially order the tips and tricks relevant to visualizations: -->
+<!-- https://moderndive.com/C-appendixC.html -->
+
+## Going further
+
+
+
 ## Summary
 
 *Tibbles are rectangular stores of data. They are a specific type of data frame, so we will use both terms interchangeably.*
@@ -1259,9 +1257,6 @@ There! Within the `theme()` function, we can change the plot title to bold, the 
 
 In this chapter, we first looked at basic coding terminology and concepts that we deal with when programming with R. We then learned about the three basic components that make up each plot: data, mapping, and one or more geoms. The **ggplot2** package offers a wide range of geoms that we can use to create different types of plots. Next, we examined the "super package" **tidyverse**, which includes helpful tools for visualization. It also offers features for importing and manipulating data, which is the main topic of Chapter @\ref(wrangling). Lastly, we explored advanced plotting features such as axis scaling, faceting, and themes. 
 
-The main *statistical* concept we discussed was that of a "distribution," a collection of related numbers. In R, these numbers are usually stored as a variable inside of a tibble. "Frequency distribution" and "empirical distribution" are common phrases to describe such objects. We learned how to calculate statistics --- often referred to as "summary statistics" --- about these distributions. The most important involve two concepts: the center of the distribution and the variability of the distribution. The center is most often summarized with the *mean* (`mean()`) or the *median* (`median()`). Variability is measured with the standard deviation (`sd()`) or the scaled median absolute deviation (`mad()`) or the 95% confidence interval (`quantile(probs = c(0.025, 0.975))`).   
-
-
 Recall the plot we began the chapter with:
 
 
@@ -1270,30 +1265,5 @@ hundred_days_p
 ```
 
 You now know enough to make plots like this by yourself.
-
-It is important to know that we have only seen a small part of what R offers. For example, we can use the **gganimate** package to bring plots to life:
-
-```{r, cache = TRUE}
-library(gganimate)
-
-president_anim <- gapminder %>%
-  filter(continent != "Oceania") %>%
-  ggplot(aes(gdpPercap, lifeExp, color = continent)) +
-    geom_point(show.legend = FALSE, alpha = 0.7) +
-    facet_wrap(~continent, nrow = 1) +
-    scale_size(range = c(2, 12)) +
-    scale_x_log10() +
-    labs(subtitle = "Life Expectancy and GDP per Capita (1952-2007)",
-         x = "GDP per Capita, USD",
-         y = "Life Expectancy, Years") +
-    theme_linedraw() +
-    transition_time(year) +
-    labs(title = "Year: {frame_time}") +
-    shadow_wake(wake_length = 0.1, alpha = FALSE)
-
-president_anim
-```
-
-
 
 A beautiful plot is just a collection of steps, each simple enough on its own. We have taught you (some of) these steps. Time to start walking on your own.
