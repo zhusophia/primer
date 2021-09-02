@@ -6,19 +6,12 @@ Everyone loves visualizations.
 
 <!-- Heather owns this Chapter! Change anything an everything! Change anything you like in Getting Started. -->
 
-<!-- Go through all comments. Keep the ones you agree with. Delete the ones you do not. Once you fix whatever a comment complains about, delete the comment. -->
 
-<!-- Make presidential approval animated. -->
-
-<!-- Delete any graphics, like select, which are not useful! Don't forget to delete the png files from  01-visualization/images. -->
-
-<!-- Delete any image which we are not using. You only need to check this Rmd. -->
+<!-- Delete any image which we are not using. You only need to check this Rmd. DONE-->
 
 <!-- Talk more about aesthetics (i.e., aes()) in Basic plots. Make more use of color and fill. Explain how you can use either constants (like "steelblue") or variables (like party) when using these aesthetics. Make them as comfortable with color and fill as they are with data and mapping.  -->
 
-
 <!-- Hold off on this for now. Don't use the unemployment data anymore. Use two or three of the temperature series from primer.data::temperature.  I have similar concerns about the `group` aesthetic, especially for line plots. But maybe group is too difficult? But can you possibly do geom_line without showing groups? -->
-
 
 ```{r, message = FALSE, echo = FALSE}
 library(tidyverse)
@@ -46,6 +39,7 @@ hundred_days_p <- president_data %>%
                formula = y ~ s(x, bs = "cs")) +
    coord_cartesian(ylim = c(30,60)) +
    theme_fivethirtyeight() +
+   scale_y_continuous(scales::percent_format(accuracy = 1)) +
    labs(title = "Approval Ratings During the First Hundred Days",
         subtitle = "Both recent presidents had climbing disapproval ratings.",
         x = NULL,
@@ -56,6 +50,7 @@ hundred_days_p <- president_data %>%
 hundred_days_p
 ```
 
+<!-- HL: Am I doing the percents right here? Why aren't they working -->
 
 ```{r, echo = FALSE}
 # president_data %>%
@@ -506,9 +501,9 @@ ggplot(trains,
 
 Note the message. R is telling us that we need to specify the `method` and `formula` argument, just the way it told us to provide the `bins` argument when we used `geom_histogram()` before.
 
-Let's add the argument `method = "lm"`, where "lm" stands for **l**inear **m**odel. This causes the fitted line to be straight rather than curved. Let's also add the argument `formula = y ~ x`. This makes both messages go away. Again, R was not giving us an error before. It was simply telling us what options it was using since we did not specify the options ourselves.
+Let's add the argument `method = "lm"`, where "lm" stands for **l**inear **m**odel. This causes the fitted line to be straight rather than curved. Let's also add the argument `formula = y ~ x`. We make the argument `y ~ x` since R doesn't know what model it is estimating, and gives us a warning that y is a function of x. By specifying this relationship, the warning disappears as R is sure of the model it is estimating. Again, R was not giving us an error before. It was simply telling us what options it was using since we did not specify the options ourselves.
 
-<!--UP TO YOU!  HL: should we explain why we make the argument formula = y~x? The reason is that R is concerned that we don't know exactly what model it is estimating. So, it is warning us that y is function of x. We make the warning go away by specifying that relationship in the argument. -->
+<!--UP TO YOU!  HL: should we explain why we make the argument formula = y~x? The reason is that R is concerned that we don't know exactly what model it is estimating. So, it is warning us that y is function of x. We make the warning go away by specifying that relationship in the argument. DONE -->
 
 *Always include enough detail in your code to make those messages disappear.*
 
@@ -558,8 +553,16 @@ ggplot(trains,
 
 The values on the y-axis are scaled so that the total area under the curve equals one. 
 
+### Conclusion
 
-<!-- Could we just list other uncommonly used geom functions that people have the option of using if they want to and point them to another resource that they can learn from if they want? Yes!  -->
+The `geoms` we talked about are some of the most commonly used ones while using R. However, there are an endless list of options for you to pick from. We've listed a couple more here, however, feel free to check out [this documentation here](https://ggplot2.tidyverse.org/reference/) if you want to learn more!
+
+* `geom_boxplot()`: this creates a box and whiskers plot, which visualizes 5 summary statistics.
+* `geom_dotplot()`: this is similar to a bar graph, except with stacked dots on top of each other rather than bars.
+* `geom_map()`: this is a geom option you have to turn polygons to an actual map. However, there is another method that we will teach you in [Maps](https://ppbds.github.io/primer/maps.html) that also allows you to create maps.
+* `geom_text()`: this geom allows you to add text onto your plots. We will use an example of this in the Visualization Case Studies tutorial!
+
+<!-- Could we just list other uncommonly used geom functions that people have the option of using if they want to and point them to another resource that they can learn from if they want? Yes! DONE -->
 
 
 ## Tidyverse
@@ -820,7 +823,6 @@ The median is another commonly reported measure of the center of a distribution,
 $$m(x) = {\frac{1}{2}}{(x_{\frac{n}{2}} + x_{\frac{n}{2} + 1})}$$
 If $n$ is odd, then the median is given by:
 
-$$m(x) = x_{\frac{n+1}{2}}$$
 **`sd()`**
 
 The standard deviation (*sd*) of a distribution is a measure of its variation around the mean.  
@@ -842,9 +844,11 @@ The basic idea for both *sd* and *mad* is that we need a measure of variation ar
 
 The *quantile* of a distribution is the value of that distribution which occupies a specific percentile location in the sorted list of values. 
 
-The 5th percentile distribution is the point below which 5% of the data falls. The 95th percentile is, similarly, the point below which 95% of the data falls. The 50th percentile, the median, splits the data into two separate, and equal, parts. The minimum is at the 0th percentile. The maximum is at the 100th percentile.
+I.e., the 5th percentile distribution is the point below which 5% of the data falls. The 95th percentile is, similarly, the point below which 95% of the data falls. The 50th percentile, the median, splits the data into two separate, and equal, parts. The minimum is at the 0th percentile. The maximum is at the 100th percentile.
 
-<!-- HL: it's kinda unclear what the relationship between this paragraph and quantiles is? Also I sort of think the definition of quantile is rather wordy and not super clear. So fix it! -->
+Therefore, the value of the 5th percentile would be the quantile of the 5th percentile. Say the dataset consisted of numbers from 0-100. Therefore, the 5th percentile would at 5, so 5 would be the quantile.
+
+<!-- HL: it's kinda unclear what the relationship between this paragraph and quantiles is? Also I sort of think the definition of quantile is rather wordy and not super clear. So fix it! Is this right? I'm not 100 sure. -->
 
 Let's take a look at the `poverty` variable in the `kenya` tibble from the **primer.data** package. `poverty` is the percentage of residents in each community with incomes below the poverty line. Let's first confirm that  `quantile()` works by comparing its output with that from simpler functions.
 
@@ -920,8 +924,6 @@ If you have a tibble which has been grouped, you can remove the grouping variabl
 <!-- 1) Plots are ordered alphabetically if it is a character and by levels if it is a factor. Dates appear differently in plots. reorder() is useful. Cover this at start of advanced plotting. -->
 
 <!-- 2) Purpose of Advanced plotting is to show the tools for making the plots that appear in socviz.co, chapters 3 and 4.  -->
-
-<!-- BG: teach scalexcont, scaleycont, afterstat, late tricks in the book, do not worry about building gapminder -->
 
 Good visualizations teach. When you construct a plot, decide what message you want to convey. Here are some functions which may be helpful. 
 
@@ -1020,9 +1022,9 @@ ggplot(data = gapminder,
                  color = "white")
 ```
 
-Recall that the y-aesthetic of a histogram --- the count of the observations in each bin --- gets computed automatically. We can use the  `after_stat()` argument within `geom_histogram()` to generate percent values as our y-aesthetic. 
+Recall that the y-aesthetic of a histogram --- the count of the observations in each bin --- gets computed automatically. We can use the  `after_stat()` argument within `geom_histogram()` to generate percent values as our y-aesthetic. `after_stat()` allows us to control the values of the variables calculated specifically for this specific aesthetic layer. 
 
-<!-- HL: should probably explain what after_stat does. So do so! -->
+<!-- HL: should probably explain what after_stat does. So do so! This is a bad explanation but Done ish?-->
 
 
 ```{r}
@@ -1273,17 +1275,6 @@ It is important to know that we have only seen a small part of what R offers. Fo
 
 ```{r, cache = TRUE}
 library(gganimate)
-
-# president_anim <- president_data %>% 
-#   ggplot(mapping = aes(x = enddate,
-#                        y = rate,
-#                        color = approval_type)) +
-#     facet_wrap(~president,
-#                nrow = 1) +
-#     geom_smooth(method = "gam",
-#                 formula = y ~s(x, bs = "cs")) +
-#     theme_fivethirtyeight() +
-#     transition_reveal(day)
 
 president_anim <- gapminder %>%
   filter(continent != "Oceania") %>%
