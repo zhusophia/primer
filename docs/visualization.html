@@ -44,16 +44,16 @@
 <p>Everyone loves visualizations.</p>
 <!-- Heather owns this Chapter! Change anything an everything! Change anything you like in Getting Started. -->
 <!-- Add comments to the code chunks, even if students won't see the comments. For example, initial plot should have a whole bunch of comments about where you got this data and how we can update it in the future.  -->
-<!-- Finish up opening plot.  -->
+<!-- Finish up opening plot. DONE -->
 <!-- Create "Going further" section. It includes some cool plots, without the code for making them (I think) and with a brief (short paragraph) description of the package which is used to make them and references for learning more. One animation. One map. One interactive.  -->
 <!-- https://github.com/PPBDS/primer/blob/d11aae84a8562caedc94615b8de28f3620af8bf7/01-visualization.Rmd -->
 <!-- Do the census and maps tutorials from chapter 3. -->
+<!-- Hold off on this for now. Don't use the unemployment data anymore. Use two or three of the temperature series from primer.data::temperature.  I have similar concerns about the `group` aesthetic, especially for line plots. But maybe group is too difficult? But can you possibly do geom_line without showing groups? -->
 <!-- Take ownership of the Advanced Plotting section. Add the tips and tricks in the comments. -->
 <!-- Ignore below for now. -->
 <!-- Use this for maps https://walker-data.com/census-r/ -->
 <!-- Solve all problems, except geom_line and the group aesthetic. -->
-<!-- Talk more about aesthetics (i.e., aes()) in Basic plots. Make more use of color and fill. Explain how you can use either constants (like "steelblue") or variables (like party) when using these aesthetics. Make them as comfortable with color and fill as they are with data and mapping.  -->
-<!-- Hold off on this for now. Don't use the unemployment data anymore. Use two or three of the temperature series from primer.data::temperature.  I have similar concerns about the `group` aesthetic, especially for line plots. But maybe group is too difficult? But can you possibly do geom_line without showing groups? -->
+<!-- Talk more about aesthetics (i.e., aes()) in Basic plots. Make more use of color and fill. Explain how you can use either constants (like "steelblue") or variables (like party) when using these aesthetics. Make them as comfortable with color and fill as they are with data and mapping. DONE  -->
 <div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-2-1.png" width="100%"></div>
 <p>Once you have read this chapter, and completed the associated tutorials, you will be able to create graphics like this one with your data. Join us on the journey.</p>
 <div id="looking-at-data" class="section level2" number="2.1">
@@ -306,12 +306,65 @@
 <p>Note that like with <code>geom</code>s, we add a layer using <code><a href="https://rdrr.io/r/base/Arithmetic.html">+</a></code> when creating <code>labs()</code>for our plot. In general, every plot should give a title and axes labels. You should also add a <code>subtitle</code>, the purpose of which is to give a short “main point” of the graphic. What do you want the viewer to notice? You should also provide the source for the data, usually via the <code>caption</code> argument.</p>
 <p>Let’s now take a tour of some of the more useful geoms.</p>
 </div>
-<div id="geom_jitter" class="section level3" number="2.2.2">
+<div id="colour-and-fill" class="section level3" number="2.2.2">
 <h3>
-<span class="header-section-number">2.2.2</span> <code>geom_jitter()</code><a class="anchor" aria-label="anchor" href="#geom_jitter"><i class="fas fa-link"></i></a>
+<span class="header-section-number">2.2.2</span> Colour and Fill<a class="anchor" aria-label="anchor" href="#colour-and-fill"><i class="fas fa-link"></i></a>
+</h3>
+<p>Before we take a look at the other useful geoms, let’s first talk about colour and fill. These are two arguments we can use to change the colour of geoms we have.</p>
+<p>Let’s take a look at this plot below.</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">trains</span>, 
+       mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">age</span>, 
+                     y <span class="op">=</span> <span class="va">income</span>,
+                     color <span class="op">=</span> <span class="va">party</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Age and Income Among Boston Commuters"</span>,
+       subtitle <span class="op">=</span> <span class="st">"Older commuters don't seem to make more money"</span>,
+       x <span class="op">=</span> <span class="st">"Age"</span>,
+       y <span class="op">=</span> <span class="st">"Income"</span>,
+       caption <span class="op">=</span> <span class="st">"Data source: Enos (2014)"</span><span class="op">)</span></code></pre></div>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-16-1.png" width="100%">
+You’ll notice that the plot is the exact same as the plot in the previous section, with one key exception: we’ve added colours that separate the commuters by party. How did we do this? You’ll notice in the <code>mapping = aes()</code> function, we’ve added another argument. This argument, <code>color =</code>, can change the colour of the dots by a certain value. In this case, we changed the colour by party.</p>
+<p>You can also change the dots to another colour. For instance, take this plot below:</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">trains</span>, 
+       mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">age</span>, 
+                     y <span class="op">=</span> <span class="va">income</span>,
+                     color <span class="op">=</span> <span class="st">"steel blue"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="co"># for some reason this is always this colour regardless of what i change it to, like steel blue isn't blue?</span>
+  <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Age and Income Among Boston Commuters"</span>,
+       subtitle <span class="op">=</span> <span class="st">"Older commuters don't seem to make more money"</span>,
+       x <span class="op">=</span> <span class="st">"Age"</span>,
+       y <span class="op">=</span> <span class="st">"Income"</span>,
+       caption <span class="op">=</span> <span class="st">"Data source: Enos (2014)"</span><span class="op">)</span></code></pre></div>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-17-1.png" width="100%">
+By setting the color argument equal to <code>steelblue</code>, we could change the dots to blue. R has 657 built-in color names, which you can view if you run the command <code><a href="https://rdrr.io/r/grDevices/colors.html">grDevices::colors()</a></code>. Give it a try in your console! If a colour you want isn’t in the 657 inbuilt ones, you can also change the colour with a HEX colour code.</p>
+<div id="difference-between-fill-and-colour" class="section level4" number="2.2.2.1">
+<h4>
+<span class="header-section-number">2.2.2.1</span> Difference Between Fill and Colour<a class="anchor" aria-label="anchor" href="#difference-between-fill-and-colour"><i class="fas fa-link"></i></a>
+</h4>
+<p>There is another argument you can use, called <code>fill</code>. The key difference between fill and colour is that fill defines the colour with which a geom is filled, whereas colour moreso defines the outline of a particular geom. For example:</p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">trains</span>,
+       mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">race</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu">geom_bar</span><span class="op">(</span>color <span class="op">=</span> <span class="st">"pink"</span><span class="op">)</span></code></pre></div>
+<p><img src="book_temp_files/figure-html/unnamed-chunk-18-1.png" width="100%">
+You can see here that <code>color</code> has only changed the very outline of the bars. Comparatively, if we used <code>fill</code>:</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">trains</span>,
+       mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">race</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu">geom_bar</span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"pink"</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-19-1.png" width="100%"></div>
+<p>You get pink bars instead. You can change the fill and color of all the geoms we show you below, so happy colouring!</p>
+</div>
+</div>
+<div id="geom_jitter" class="section level3" number="2.2.3">
+<h3>
+<span class="header-section-number">2.2.3</span> <code>geom_jitter()</code><a class="anchor" aria-label="anchor" href="#geom_jitter"><i class="fas fa-link"></i></a>
 </h3>
 <p>Consider a different scatter plot using the <code>trains</code> data.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">trains</span>, 
        mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">att_start</span>, 
                      y <span class="op">=</span> <span class="va">att_end</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
@@ -321,12 +374,12 @@
        x <span class="op">=</span> <span class="st">"Attitude Before Experiment"</span>,
        y <span class="op">=</span> <span class="st">"Attitude After Experiment"</span>,
        caption <span class="op">=</span> <span class="st">"Data source: Enos (2014)"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-16-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-20-1.png" width="100%"></div>
 <p>The problem with this display is “overplotting.” Because attitudes are measured as integers, we do not know if a given point represents just one person or a dozen. There are two methods we can use to address overplotting: transparency and jitter.</p>
 <p><strong>Method 1: Changing the transparency</strong></p>
 <p>We can change the transparency/opacity of the points by using the <code>alpha</code> argument within <code>geom_point()</code>. The <code>alpha</code> argument can be set to any value between <code>0</code> and <code>1</code>, where <code>0</code> sets the points to be 100% transparent and <code>1</code> sets the points to be 100% opaque. By default, <code>alpha</code> is set to <code>1</code>.</p>
 <p>Use a new <code>alpha</code> value to the scatterplot.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">trains</span>, 
        mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">att_start</span>, 
                      y <span class="op">=</span> <span class="va">att_end</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
@@ -336,12 +389,12 @@
        x <span class="op">=</span> <span class="st">"Attitude Before Experiment"</span>,
        y <span class="op">=</span> <span class="st">"Attitude After Experiment"</span>,
        caption <span class="op">=</span> <span class="st">"Data source: Enos (2014)"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-17-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-21-1.png" width="100%"></div>
 <p>Note that there is no <code>aes()</code> surrounding <code>alpha = 0.2</code>. This is because we are not mapping a variable to an aesthetic attribute, but only changing the default setting of <code>alpha</code>.</p>
 <p><strong>Method 2: Jittering the points</strong></p>
 <p>We can also decide to jitter the points on the plot. We do this by replacing <code>geom_point()</code> with <code>geom_jitter()</code>. Keep in mind that jittering is strictly a visualization tool; even after creating a jittered scatterplot, the original values saved in the data frame remain unchanged.</p>
 <p>In order to specify how much jitter to add, we use the <code>width</code> and <code>height</code> arguments to <code>geom_jitter()</code>. This corresponds to how hard you’d like to shake the plot in horizontal x-axis units and vertical y-axis units, respectively. It is important to add just enough jitter to break any overlap in points, but not to the extent where you alter the original pattern in points.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">trains</span>, 
        mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">att_start</span>, 
                      y <span class="op">=</span> <span class="va">att_end</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
@@ -351,18 +404,18 @@
        x <span class="op">=</span> <span class="st">"Attitude Before Experiment"</span>,
        y <span class="op">=</span> <span class="st">"Attitude After Experiment"</span>,
        caption <span class="op">=</span> <span class="st">"Data source: Enos (2014)"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-18-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-22-1.png" width="100%"></div>
 <p>When deciding whether to jitter a scatterplot or use the <code>alpha</code> argument to <code>geom_point()</code>, know that there is no single right answer. We suggest you play around with both methods to see which one better emphasizes the point you are trying to make.</p>
 </div>
-<div id="geom_line" class="section level3" number="2.2.3">
+<div id="geom_line" class="section level3" number="2.2.4">
 <h3>
-<span class="header-section-number">2.2.3</span> <code>geom_line()</code><a class="anchor" aria-label="anchor" href="#geom_line"><i class="fas fa-link"></i></a>
+<span class="header-section-number">2.2.4</span> <code>geom_line()</code><a class="anchor" aria-label="anchor" href="#geom_line"><i class="fas fa-link"></i></a>
 </h3>
 <p>Linegraphs show the relationship between two numerical variables when the variable on the x-axis, also called the <em>explanatory</em>, <em>predictive</em>, or <em>independent</em> variable, is of a sequential nature. In other words, there is an inherent ordering to the variable.</p>
 <div class="inline-figure"><img src="https://imgs.xkcd.com/comics/decline.png" width="100%"></div>
 <p>The most common examples of linegraphs have some notion of time on the x-axis: hours, days, weeks, years, etc. Since time is sequential, we connect consecutive observations of the variable on the y-axis with a line. Linegraphs that have some notion of time on the x-axis are also called <em>time series</em> plots.</p>
 <p>Let’s plot the median duration of unemployment in the United States over the last 50 years.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">economics</span>,
        mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">date</span>, y <span class="op">=</span> <span class="va">uempmed</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_line</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
@@ -371,12 +424,12 @@
        x <span class="op">=</span> <span class="st">"Date"</span>,
        y <span class="op">=</span> <span class="st">"Median Duration in Weeks"</span>,
        caption <span class="op">=</span> <span class="st">"Source: FRED Economic Data"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-20-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-24-1.png" width="100%"></div>
 <p>Almost every aspect of the code used to create this plot is identical to our scatter plots, except for the geom we used.</p>
 </div>
-<div id="geom_histogram" class="section level3" number="2.2.4">
+<div id="geom_histogram" class="section level3" number="2.2.5">
 <h3>
-<span class="header-section-number">2.2.4</span> <code>geom_histogram()</code><a class="anchor" aria-label="anchor" href="#geom_histogram"><i class="fas fa-link"></i></a>
+<span class="header-section-number">2.2.5</span> <code>geom_histogram()</code><a class="anchor" aria-label="anchor" href="#geom_histogram"><i class="fas fa-link"></i></a>
 </h3>
 <!-- All awk. Rewrite. Passing by position is important! -->
 <p>A histogram is a plot that visualizes the <em>distribution</em> of a numerical value.</p>
@@ -386,12 +439,12 @@
 <li>We draw a bar whose height indicates the corresponding count.</li>
 </ol>
 <p>Let’s consider the <code>income</code> variable from the the <code>trains</code> tibble. Pay attention to how we have changed the two arguments to <code>ggplot()</code>. We have removed <code>data =</code> and <code>mapping =</code>. The code still works because R functions allow for passing in arguments by <em>position</em>. The first argument to <code>ggplot()</code> is the <code>data</code>. We don’t need to tell R that <code>trains</code> is the value for <code>data</code>. R assumes that it is because we passed it in as the first argument. Similarly, the second argument to <code>ggplot()</code> is <code>mapping</code>, so R assumes that <code>aes(x = income)</code> is the value we want for <code>mapping</code> because it is the second item passed in.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span><span class="va">trains</span>, 
        <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">income</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_histogram</span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-21-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-25-1.png" width="100%"></div>
 <p>Note the message printed above:</p>
 <blockquote>
 <p><code>stat_bin()</code> using <code>bins = 30</code>. Pick better value with <code>binwidth</code>.</p>
@@ -399,7 +452,7 @@
 <p>You would get the same message if you ran this code yourself. Try it!</p>
 <p>The message is telling us that the histogram was constructed using <code>bins = 30</code> for 30 equally spaced bins. This is the default value. Unless you override this default number of bins with a number you specify, R will choose 30 by default. Because this is an important aspect of making a histogram, R insists on informing you with this message. You make this message go away by specifying the <code>bin</code> number yourself, as you should always do.</p>
 <p>Let’s specify <code>bins</code> and also add some labels.</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span><span class="va">trains</span>, 
        <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">income</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_histogram</span><span class="op">(</span>bins <span class="op">=</span> <span class="fl">50</span><span class="op">)</span> <span class="op">+</span>
@@ -408,10 +461,10 @@
        x <span class="op">=</span> <span class="st">"Income"</span>,
        y <span class="op">=</span> <span class="st">"Count"</span>,
        caption <span class="op">=</span> <span class="st">"Data source: Enos (2014)"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-22-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-26-1.png" width="100%"></div>
 <p>Unlike scatterplots and linegraphs, there is now only one variable being mapped in <code>aes()</code>. Here, that variable is <code>income</code>. The y-aesthetic of a histogram, the count of the observations in each bin, gets computed for you automatically. Furthermore, the geometric object layer is now a <code>geom_histogram()</code>.</p>
 <p>We can use the <code>fill</code> argument to change the color of the actual bins. Let’s set <code>fill</code> to “steelblue.”</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span><span class="va">trains</span>, 
        <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">income</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_histogram</span><span class="op">(</span>bins <span class="op">=</span> <span class="fl">50</span>,
@@ -421,7 +474,7 @@
        x <span class="op">=</span> <span class="st">"Income"</span>,
        y <span class="op">=</span> <span class="st">"Count"</span>,
        caption <span class="op">=</span> <span class="st">"Data source: Enos (2014)"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-23-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-27-1.png" width="100%"></div>
 <p>We can also adjust the number of bins in our histogram in one of two ways:</p>
 <ol style="list-style-type: decimal">
 <li><p>By adjusting the number of bins via the <code>bins</code> argument to <code>geom_histogram()</code>.</p></li>
@@ -429,42 +482,42 @@
 </ol>
 <p>In this data, however, there are not many unique values for <code>income</code>, so neither approach will have much effect. Replace <code>income</code> with <code>age</code> if you want to experiment with these options.</p>
 </div>
-<div id="geom_bar" class="section level3" number="2.2.5">
+<div id="geom_bar" class="section level3" number="2.2.6">
 <h3>
-<span class="header-section-number">2.2.5</span> <code>geom_bar()</code><a class="anchor" aria-label="anchor" href="#geom_bar"><i class="fas fa-link"></i></a>
+<span class="header-section-number">2.2.6</span> <code>geom_bar()</code><a class="anchor" aria-label="anchor" href="#geom_bar"><i class="fas fa-link"></i></a>
 </h3>
 <p><code>geom_bar()</code> visualizes the distribution of a categorical variable. This is a simpler task than creating a histogram, as we are simply counting different categories within a categorical variable, also known as the <em>levels</em> of the categorical variable. Often the best way to visualize these different counts, also known as <em>frequencies</em>, is with a barplot.</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">trains</span>, 
        mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">race</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_bar</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-24-1.png" width="100%"></div>
-<div id="two-categorical-variables" class="section level4" number="2.2.5.1">
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-28-1.png" width="100%"></div>
+<div id="two-categorical-variables" class="section level4" number="2.2.6.1">
 <h4>
-<span class="header-section-number">2.2.5.1</span> Two categorical variables<a class="anchor" aria-label="anchor" href="#two-categorical-variables"><i class="fas fa-link"></i></a>
+<span class="header-section-number">2.2.6.1</span> Two categorical variables<a class="anchor" aria-label="anchor" href="#two-categorical-variables"><i class="fas fa-link"></i></a>
 </h4>
 <p>Another use of barplots is to visualize the <em>joint</em> distribution of two categorical variables. (See Chapter <a href="probability.html#probability">6</a> for the definition of a joint distribution.) Let’s look at <code>race</code>, as well as <code>treatment</code>, in the <code>trains</code> data by using the <code>fill</code> argument inside the <code>aes()</code> aesthetic mapping. Recall the <code>fill</code> aesthetic corresponds to the color used to fill the bars.</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span><span class="va">trains</span>, 
        <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">race</span>, fill <span class="op">=</span> <span class="va">treatment</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_bar</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-25-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-29-1.png" width="100%"></div>
 <p>This is an example of a <em>stacked barplot</em>. While simple to make, in certain aspects it is not ideal. For example, it is difficult to compare the heights of the different colors between the bars, corresponding to comparing the number of people of different races within each region.</p>
 <p>An alternative to stacked barplots are <em>side-by-side barplots</em>, also known as <em>dodged barplots</em>. The code to create a side-by-side barplot includes a <code>position = "dodge"</code> argument added inside <code>geom_bar()</code>. In other words, we are overriding the default barplot type, which is a <em>stacked</em> barplot, and specifying it to be a side-by-side barplot instead.</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span><span class="va">trains</span>, 
        <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">race</span>, fill <span class="op">=</span> <span class="va">treatment</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_bar</span><span class="op">(</span>position <span class="op">=</span> <span class="st">"dodge"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-26-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-30-1.png" width="100%"></div>
 <p>Whites are over-represented in the Control group even though the <code>treatment</code> was assigned at random.</p>
 </div>
 </div>
-<div id="geom_col" class="section level3" number="2.2.6">
+<div id="geom_col" class="section level3" number="2.2.7">
 <h3>
-<span class="header-section-number">2.2.6</span> <code>geom_col()</code><a class="anchor" aria-label="anchor" href="#geom_col"><i class="fas fa-link"></i></a>
+<span class="header-section-number">2.2.7</span> <code>geom_col()</code><a class="anchor" aria-label="anchor" href="#geom_col"><i class="fas fa-link"></i></a>
 </h3>
 <p><code>geom_col()</code> is similar to <code>geom_bar()</code>, except that <code>geom_col()</code> requires you to calculate the number of observations in each category ahead of time. <code>geom_bar()</code> does the calculation for you. See an example below.</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu">group_by</span><span class="op">(</span><span class="va">race</span>,<span class="va">treatment</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">summarize</span><span class="op">(</span>count <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="fu">n</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -473,22 +526,22 @@
                        fill <span class="op">=</span> <span class="va">treatment</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
    <span class="fu">geom_col</span><span class="op">(</span>position <span class="op">=</span> <span class="st">"dodge"</span><span class="op">)</span></code></pre></div>
 <pre><code>## `summarise()` has grouped output by 'race'. You can override using the `.groups` argument.</code></pre>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-27-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-31-1.png" width="100%"></div>
 <p>You will learn to filter the data later in this chapter. However, what is key here is there was a y-variable supplied in <code>geom_col()</code> but there was not in <code>geom_bar()</code>. <code>geom_col()</code> gives you more control over the data that is being presented compared to <code>geom_bar()</code>, which may come in useful in some circumstances.</p>
-<div id="no-pie-charts" class="section level4" number="2.2.6.1">
+<div id="no-pie-charts" class="section level4" number="2.2.7.1">
 <h4>
-<span class="header-section-number">2.2.6.1</span> No pie charts!<a class="anchor" aria-label="anchor" href="#no-pie-charts"><i class="fas fa-link"></i></a>
+<span class="header-section-number">2.2.7.1</span> No pie charts!<a class="anchor" aria-label="anchor" href="#no-pie-charts"><i class="fas fa-link"></i></a>
 </h4>
 <p>One of the most common plots used to visualize the distribution of categorical data is the pie chart. While they may seem harmless enough, pie charts actually present a problem in that humans are unable to judge angles well. <span class="citation"><a href="references.html#ref-robbins2013" role="doc-biblioref">Robbins</a> (<a href="references.html#ref-robbins2013" role="doc-biblioref">2013</a>)</span> argues that we overestimate angles greater than 90 degrees and we underestimate angles less than 90 degrees. In other words, it is difficult for us to determine the relative size of one piece of the pie compared to another. <em>Do not use pie charts.</em></p>
 </div>
 </div>
-<div id="geom_smooth" class="section level3" number="2.2.7">
+<div id="geom_smooth" class="section level3" number="2.2.8">
 <h3>
-<span class="header-section-number">2.2.7</span> <code>geom_smooth()</code><a class="anchor" aria-label="anchor" href="#geom_smooth"><i class="fas fa-link"></i></a>
+<span class="header-section-number">2.2.8</span> <code>geom_smooth()</code><a class="anchor" aria-label="anchor" href="#geom_smooth"><i class="fas fa-link"></i></a>
 </h3>
 <p>We can add trend lines to the plots we create using the <code>geom_smooth()</code> function.</p>
 <p>Recall the following scatterplot from our previous work.</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span><span class="va">trains</span>, 
        <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">att_start</span>, 
            y <span class="op">=</span> <span class="va">att_end</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
@@ -498,9 +551,9 @@
        x <span class="op">=</span> <span class="st">"Attitude Before Experiment"</span>,
        y <span class="op">=</span> <span class="st">"Attitude After Experiment"</span>,
        caption <span class="op">=</span> <span class="st">"Data source: Enos (2014)"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-28-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-32-1.png" width="100%"></div>
 <p>We can add a trend line to our graph by adding the layer <code>geom_smooth()</code>. Including trend lines allow us to visualize the relationship between <code>att_start</code> and <code>att_end</code>.</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span><span class="va">trains</span>, 
        <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">att_start</span>, 
            y <span class="op">=</span> <span class="va">att_end</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
@@ -512,11 +565,11 @@
        caption <span class="op">=</span> <span class="st">"Data source: Enos (2014)"</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_smooth</span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## `geom_smooth()` using method = 'loess' and formula 'y ~ x'</code></pre>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-29-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-33-1.png" width="100%"></div>
 <p>Note the message. R is telling us that we need to specify the <code>method</code> and <code>formula</code> argument, just the way it told us to provide the <code>bins</code> argument when we used <code>geom_histogram()</code> before.</p>
 <p>Let’s add the argument <code>method = "lm"</code>, where “lm” stands for <strong>l</strong>inear <strong>m</strong>odel. This causes the fitted line to be straight rather than curved. Let’s also add the argument <code>formula = y ~ x</code>. We make the argument <code>y ~ x</code> since R doesn’t know what model it is estimating, and gives us a warning that y is a function of x. By specifying this relationship, the warning disappears as R is sure of the model it is estimating. Again, R was not giving us an error before. It was simply telling us what options it was using since we did not specify the options ourselves.</p>
 <p><em>Always include enough detail in your code to make those messages disappear.</em></p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span><span class="va">trains</span>, 
        <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">att_start</span>, 
            y <span class="op">=</span> <span class="va">att_end</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
@@ -528,15 +581,15 @@
        caption <span class="op">=</span> <span class="st">"Data source: Enos (2014)"</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_smooth</span><span class="op">(</span>method <span class="op">=</span> <span class="st">"lm"</span>, 
               formula <span class="op">=</span> <span class="va">y</span> <span class="op">~</span> <span class="va">x</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-30-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-34-1.png" width="100%"></div>
 <p>Notice the gray section surrounding the line we plotted. This area is called the confidence interval, which is set to 95% by default. We will learn about confidence intervals in Chapter <a href="probability.html#probability">6</a>. You can make the shaded area disappear by adding <code>se = FALSE</code> as another argument to <code>geom_smooth()</code>.</p>
 </div>
-<div id="geom_density" class="section level3" number="2.2.8">
+<div id="geom_density" class="section level3" number="2.2.9">
 <h3>
-<span class="header-section-number">2.2.8</span> <code>geom_density()</code><a class="anchor" aria-label="anchor" href="#geom_density"><i class="fas fa-link"></i></a>
+<span class="header-section-number">2.2.9</span> <code>geom_density()</code><a class="anchor" aria-label="anchor" href="#geom_density"><i class="fas fa-link"></i></a>
 </h3>
 <p>Recall our plot from the <code>geom_histogram()</code> section.</p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span><span class="va">trains</span>, 
        <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">income</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_histogram</span><span class="op">(</span>bins <span class="op">=</span> <span class="fl">50</span><span class="op">)</span> <span class="op">+</span>
@@ -545,9 +598,9 @@
        x <span class="op">=</span> <span class="st">"Income"</span>,
        y <span class="op">=</span> <span class="st">"Count"</span>,
        caption <span class="op">=</span> <span class="st">"Data source: Enos (2014)"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-31-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-35-1.png" width="100%"></div>
 <p>Change <code>geom_histogram()</code> to <code>geom_density()</code> to make a density plot, which is a smoothed version of the histogram.</p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span><span class="va">trains</span>, 
        <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">income</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_density</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
@@ -556,12 +609,12 @@
        x <span class="op">=</span> <span class="st">"Income"</span>,
        y <span class="op">=</span> <span class="cn">NULL</span>,
        caption <span class="op">=</span> <span class="st">"Data source: Enos (2014)"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-32-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-36-1.png" width="100%"></div>
 <p>The values on the y-axis are scaled so that the total area under the curve equals one.</p>
 </div>
-<div id="conclusion" class="section level3" number="2.2.9">
+<div id="conclusion" class="section level3" number="2.2.10">
 <h3>
-<span class="header-section-number">2.2.9</span> Conclusion<a class="anchor" aria-label="anchor" href="#conclusion"><i class="fas fa-link"></i></a>
+<span class="header-section-number">2.2.10</span> Conclusion<a class="anchor" aria-label="anchor" href="#conclusion"><i class="fas fa-link"></i></a>
 </h3>
 <p>The <code>geoms</code> we talked about are some of the most commonly used ones while using R. However, there are an endless list of options for you to pick from. We’ve listed a couple more here, however, feel free to check out <a href="https://ggplot2.tidyverse.org/reference/">this documentation here</a> if you want to learn more!</p>
 <ul>
@@ -607,13 +660,13 @@
 <span class="header-section-number">2.3.3</span> <code>filter()</code> rows<a class="anchor" aria-label="anchor" href="#filter-rows"><i class="fas fa-link"></i></a>
 </h3>
 <div class="figure">
-<span id="fig:unnamed-chunk-33"></span>
+<span id="fig:unnamed-chunk-37"></span>
 <img src="01-visualization/images/filter.png" alt="filter() reduces the rows in a tibble." width="100%"><p class="caption">
 FIGURE 2.1: filter() reduces the rows in a tibble.
 </p>
 </div>
 <p>The <code><a href="https://rdrr.io/r/stats/filter.html">filter()</a></code> function works much like the “Filter” option in Microsoft Excel. It allows you to specify criteria about the values of a variable in your dataset and then selects only the rows that match that criteria.</p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">gender</span> <span class="op">==</span> <span class="st">"Male"</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 64 x 14
@@ -632,7 +685,7 @@ FIGURE 2.1: filter() reduces the rows in a tibble.
 ## # … with 54 more rows, and 4 more variables: station &lt;chr&gt;, hisp_perc &lt;dbl&gt;,
 ## #   ideology_start &lt;int&gt;, ideology_end &lt;int&gt;</code></pre>
 <p>The result of using <code><a href="https://rdrr.io/r/stats/filter.html">filter()</a></code> will be a tibble with just the rows that you want. When we alter our data, it can be a good idea to save the result in a new data frame by using the <code><a href="https://rdrr.io/r/base/assignOps.html">&lt;-</a></code> assignment operator.</p>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains_men</span> <span class="op">&lt;-</span> <span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">gender</span> <span class="op">==</span> <span class="st">"Male"</span><span class="op">)</span></code></pre></div>
 <p>Let’s break down the code. We assigned our new data to an object named <code>trains_men</code> via <code>trains_men &lt;-</code>. Because we assigned this modified data frame to <code>trains_men</code>, it is a separate entity from the initial <code>trains</code> data frame. If, however, we had written the code as <code>trains &lt;- trains</code> we would have overwritten the already-existing tibble.</p>
@@ -658,7 +711,7 @@ FIGURE 2.1: filter() reduces the rows in a tibble.
 <code><a href="https://rdrr.io/r/base/Logic.html">&amp;</a></code> for “and”</li>
 </ul>
 <p>For example, let’s <code><a href="https://rdrr.io/r/stats/filter.html">filter()</a></code> the <code>trains</code> tibble to include only women who are Republicans and younger than 40.</p>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">gender</span> <span class="op">==</span> <span class="st">"Female"</span> <span class="op">&amp;</span> 
            <span class="va">party</span> <span class="op">==</span> <span class="st">"Republican"</span> <span class="op">&amp;</span>
@@ -672,7 +725,7 @@ FIGURE 2.1: filter() reduces the rows in a tibble.
 ## # … with 4 more variables: station &lt;chr&gt;, hisp_perc &lt;dbl&gt;,
 ## #   ideology_start &lt;int&gt;, ideology_end &lt;int&gt;</code></pre>
 <p>Instead of creating a single criterion with many parts, like with an <code><a href="https://rdrr.io/r/base/Logic.html">&amp;</a></code>, you can just separate the parts with a comma. The resulting tibble is the same.</p>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">gender</span> <span class="op">==</span> <span class="st">"Female"</span>,
          <span class="va">party</span> <span class="op">==</span> <span class="st">"Republican"</span>,
@@ -691,14 +744,14 @@ FIGURE 2.1: filter() reduces the rows in a tibble.
 <span class="header-section-number">2.3.4</span> <code>select</code> variables<a class="anchor" aria-label="anchor" href="#select-variables"><i class="fas fa-link"></i></a>
 </h3>
 <div class="figure">
-<span id="fig:unnamed-chunk-38"></span>
+<span id="fig:unnamed-chunk-42"></span>
 <img src="01-visualization/images/select.png" alt="select() reduces the number of columns in a tibble." width="100%"><p class="caption">
 FIGURE 2.2: select() reduces the number of columns in a tibble.
 </p>
 </div>
 <p>Using the <code><a href="https://rdrr.io/r/stats/filter.html">filter()</a></code> function we were able to pick out specific <em>rows</em> (observations) from the tibble. The <code>select()</code> function allows us to pick specific <em>columns</em> (variables) instead.</p>
 <p>Use <code>glimpse()</code> to see the names of the variables in <code>trains</code>:</p>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">glimpse</span><span class="op">(</span><span class="va">trains</span><span class="op">)</span></code></pre></div>
 <pre><code>## Rows: 115
 ## Columns: 14
@@ -717,7 +770,7 @@ FIGURE 2.2: select() reduces the number of columns in a tibble.
 ## $ ideology_start &lt;int&gt; 3, 4, 1, 4, 2, 5, 5, 4, 4, 4, 3, 5, 4, 1, 2, 2, 3, 4, 2…
 ## $ ideology_end   &lt;int&gt; 3, 4, 2, 4, 2, 5, 5, 4, 3, 4, 3, 4, 4, 1, 2, 3, 3, 1, 2…</code></pre>
 <p>However, if you only need two of these variables, say <code>gender</code> and <code>treatment</code>. You can <code>select()</code> just these two:</p>
-<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu">select</span><span class="op">(</span><span class="va">gender</span>, <span class="va">treatment</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 115 x 2
@@ -735,7 +788,7 @@ FIGURE 2.2: select() reduces the number of columns in a tibble.
 ## 10 Male   Treated  
 ## # … with 105 more rows</code></pre>
 <p>You can drop, or “de-select,” certain variables by using the minus (<code><a href="https://rdrr.io/r/base/Arithmetic.html">-</a></code>) sign:</p>
-<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="va">gender</span>, <span class="op">-</span><span class="va">liberal</span>, <span class="op">-</span><span class="va">party</span>, <span class="op">-</span><span class="va">age</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 115 x 10
@@ -754,7 +807,7 @@ FIGURE 2.2: select() reduces the number of columns in a tibble.
 ## # … with 105 more rows, and 2 more variables: ideology_start &lt;int&gt;,
 ## #   ideology_end &lt;int&gt;</code></pre>
 <p>You can specify a range of columns by using the <code><a href="https://rdrr.io/r/base/Colon.html">:</a></code> operator.</p>
-<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu">select</span><span class="op">(</span><span class="va">gender</span><span class="op">:</span><span class="va">age</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 115 x 5
@@ -773,7 +826,7 @@ FIGURE 2.2: select() reduces the number of columns in a tibble.
 ## # … with 105 more rows</code></pre>
 <p>This will <code>select()</code> all columns between the two specified variables.
 The <code>select()</code> function can also be used to rearrange columns when used with the <code>everything()</code> helper function. We can put the <code>treatment</code> and <code>gender</code> variables first with:</p>
-<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu">select</span><span class="op">(</span><span class="va">treatment</span>, <span class="va">gender</span>, <span class="fu">everything</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 115 x 14
@@ -792,7 +845,7 @@ The <code>select()</code> function can also be used to rearrange columns when us
 ## # … with 105 more rows, and 4 more variables: station &lt;chr&gt;, hisp_perc &lt;dbl&gt;,
 ## #   ideology_start &lt;int&gt;, ideology_end &lt;int&gt;</code></pre>
 <p>The helper functions <code>starts_with()</code>, <code>ends_with()</code>, and <code>contains()</code> can be used to select variables/columns that match those conditions. Examples:</p>
-<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu">select</span><span class="op">(</span><span class="fu">starts_with</span><span class="op">(</span><span class="st">"a"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 115 x 3
@@ -816,7 +869,7 @@ The <code>select()</code> function can also be used to rearrange columns when us
 </h3>
 <p><code>slice()</code> and <code>pull()</code> are additional functions that you can use to pick out specific rows or columns within a data frame.</p>
 <p>Using <code>slice()</code> gives us specific rows from the <code>trains</code> tibble:</p>
-<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu">slice</span><span class="op">(</span><span class="fl">2</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 4 x 14
@@ -830,7 +883,7 @@ The <code>select()</code> function can also be used to rearrange columns when us
 ## #   ideology_start &lt;int&gt;, ideology_end &lt;int&gt;</code></pre>
 <p>Unlike <code><a href="https://rdrr.io/r/stats/filter.html">filter()</a></code>, <code>slice()</code> relies on numeric order of the data.</p>
 <p><code>pull()</code> grabs out a variable as a vector, rather than leaving it within a tibble, as <code>select()</code> does:</p>
-<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu">slice</span><span class="op">(</span><span class="fl">2</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">pull</span><span class="op">(</span><span class="va">age</span><span class="op">)</span></code></pre></div>
@@ -841,7 +894,7 @@ The <code>select()</code> function can also be used to rearrange columns when us
 <span class="header-section-number">2.3.6</span> <code>arrange()</code><a class="anchor" aria-label="anchor" href="#arrange"><i class="fas fa-link"></i></a>
 </h3>
 <p><code>arrange()</code> allows us to sort/reorder a tibble’s rows according to the values of a specific variable. Unlike <code><a href="https://rdrr.io/r/stats/filter.html">filter()</a></code> or <code>select()</code>, <code>arrange()</code> does not remove any rows or columns from the tibble. Example:</p>
-<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu">select</span><span class="op">(</span><span class="va">treatment</span>, <span class="va">gender</span>, <span class="va">age</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">arrange</span><span class="op">(</span><span class="va">age</span><span class="op">)</span></code></pre></div>
@@ -860,7 +913,7 @@ The <code>select()</code> function can also be used to rearrange columns when us
 ## 10 Control   Male      23
 ## # … with 105 more rows</code></pre>
 <p><code>arrange()</code> always returns rows sorted in ascending order by default. To switch the ordering to descending order instead, use the <code>desc()</code> function:</p>
-<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu">select</span><span class="op">(</span><span class="va">treatment</span>, <span class="va">gender</span>, <span class="va">age</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">arrange</span><span class="op">(</span><span class="fu">desc</span><span class="op">(</span><span class="va">age</span><span class="op">)</span><span class="op">)</span></code></pre></div>
@@ -885,13 +938,13 @@ The <code>select()</code> function can also be used to rearrange columns when us
 <span class="header-section-number">2.3.7</span> <code>mutate()</code><a class="anchor" aria-label="anchor" href="#mutate"><i class="fas fa-link"></i></a>
 </h3>
 <div class="figure">
-<span id="fig:unnamed-chunk-49"></span>
+<span id="fig:unnamed-chunk-53"></span>
 <img src="01-visualization/images/mutate.png" alt="`mutate() adds a column to a tibble." width="100%"><p class="caption">
 FIGURE 2.3: `mutate() adds a column to a tibble.
 </p>
 </div>
 <p><code>mutate()</code> takes existing columns and creates a new column. Recall that the <code>income</code> variable in the <code>trains</code> tibble is in dollars. Let’s use <code>mutate()</code> to create a new variable which is income in thousands of dollars. (We use <code>select()</code> at the start of the pipe so that it is easier to see the new and old variables at the same time.)</p>
-<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu">select</span><span class="op">(</span><span class="va">gender</span>, <span class="va">income</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate</span><span class="op">(</span>income_in_thousands <span class="op">=</span> <span class="va">income</span> <span class="op">/</span> <span class="fl">1000</span><span class="op">)</span></code></pre></div>
@@ -911,7 +964,7 @@ FIGURE 2.3: `mutate() adds a column to a tibble.
 ## # … with 105 more rows</code></pre>
 <p>Notice that we have a newly created column at the right-hand side of our tibble named <code>income_in_thousands</code>.</p>
 <p>When creating new variables we can also <em>overwrite</em> the original tibble:</p>
-<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains</span> <span class="op">&lt;-</span> <span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate</span><span class="op">(</span>income_in_thousands <span class="op">=</span> <span class="op">(</span><span class="va">income</span><span class="op">)</span> <span class="op">/</span> <span class="fl">1000</span><span class="op">)</span></code></pre></div>
 <!-- Awkward -->
@@ -923,7 +976,7 @@ FIGURE 2.3: `mutate() adds a column to a tibble.
 </h4>
 <p><code>if_else()</code> is often used within calls to <code>mutate()</code>. It has three arguments. The first argument <code>test</code> should be a logical vector. The result will contain the value of the second argument, <code>yes</code>, when test is TRUE, and the value of the third argument, <code>no</code>, when it is FALSE.</p>
 <p>Imagine that we want to create a new variable <code>old</code>, which is TRUE when <code>age &gt; 50</code> and FALSE otherwise.</p>
-<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu">select</span><span class="op">(</span><span class="va">age</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate</span><span class="op">(</span>old <span class="op">=</span> <span class="fu">if_else</span><span class="op">(</span><span class="va">age</span> <span class="op">&gt;</span> <span class="fl">50</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></code></pre></div>
@@ -953,7 +1006,7 @@ FIGURE 2.3: `mutate() adds a column to a tibble.
 </iframe>
 <p>We often need to calculate <em>summary statistics</em>, things like the <em>mean</em> (also called the average) and the <em>median</em> (the middle value). Other examples of summary statistics include the <em>sum</em>, the <em>minimum</em>, the <em>maximum</em>, and the <em>standard deviation</em>.</p>
 <p>The function <code>summarize()</code> allows us to calculate these statistics on individual columns from a tibble. Example:</p>
-<div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu">summarize</span><span class="op">(</span>mn_age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span>, 
             sd_age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html">sd</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span><span class="op">)</span></code></pre></div>
@@ -981,15 +1034,15 @@ If <span class="math inline">\(n\)</span> is odd, then the median is given by:</
 <p>I.e., the 5th percentile distribution is the point below which 5% of the data falls. The 95th percentile is, similarly, the point below which 95% of the data falls. The 50th percentile, the median, splits the data into two separate, and equal, parts. The minimum is at the 0th percentile. The maximum is at the 100th percentile.</p>
 <p>Therefore, the value of the 5th percentile would be the quantile of the 5th percentile. Say the dataset consisted of numbers from 0-100. Therefore, the 5th percentile would at 5, so 5 would be the quantile.</p>
 <p>Let’s take a look at the <code>poverty</code> variable in the <code>kenya</code> tibble from the <strong>primer.data</strong> package. <code>poverty</code> is the percentage of residents in each community with incomes below the poverty line. Let’s first confirm that <code><a href="https://rdrr.io/r/stats/quantile.html">quantile()</a></code> works by comparing its output with that from simpler functions.</p>
-<div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">min</a></span><span class="op">(</span><span class="va">kenya</span><span class="op">$</span><span class="va">poverty</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/median.html">median</a></span><span class="op">(</span><span class="va">kenya</span><span class="op">$</span><span class="va">poverty</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">kenya</span><span class="op">$</span><span class="va">poverty</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 0.18 0.43 0.90</code></pre>
-<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb79"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/quantile.html">quantile</a></span><span class="op">(</span><span class="va">kenya</span><span class="op">$</span><span class="va">poverty</span>, probs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.5</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>##   0%  50% 100% 
 ## 0.18 0.43 0.90</code></pre>
 <p>The <code>probs</code> argument allows us to specify the percentile(s) we want. Two of the most important percentiles are the 2.5th and 97.5th because they define the <em>95% interval</em>, a central range which includes 95% of the values.</p>
-<div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb81"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/quantile.html">quantile</a></span><span class="op">(</span><span class="va">kenya</span><span class="op">$</span><span class="va">poverty</span>, probs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.975</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>##  2.5% 97.5% 
 ##  0.22  0.66</code></pre>
@@ -1001,7 +1054,7 @@ If <span class="math inline">\(n\)</span> is odd, then the median is given by:</
 <span class="header-section-number">2.3.9</span> <code>group_by()</code><a class="anchor" aria-label="anchor" href="#group_by"><i class="fas fa-link"></i></a>
 </h3>
 <p>We can the use <code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code> with <code>summarize()</code> to calculate the average age for all the people in <code>trains</code>, as we did above.</p>
-<div class="sourceCode" id="cb79"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb83"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu">summarize</span><span class="op">(</span>avg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 1 x 1
@@ -1009,7 +1062,7 @@ If <span class="math inline">\(n\)</span> is odd, then the median is given by:</
 ##   &lt;dbl&gt;
 ## 1  42.4</code></pre>
 <p>What if we want the mean <code>age</code> for each <code>gender</code>? Consider:</p>
-<div class="sourceCode" id="cb81"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb85"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu">group_by</span><span class="op">(</span><span class="va">gender</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 115 x 15
@@ -1029,7 +1082,7 @@ If <span class="math inline">\(n\)</span> is odd, then the median is given by:</
 ## # … with 105 more rows, and 5 more variables: station &lt;chr&gt;, hisp_perc &lt;dbl&gt;,
 ## #   ideology_start &lt;int&gt;, ideology_end &lt;int&gt;, income_in_thousands &lt;dbl&gt;</code></pre>
 <p>The data is the same as before, but note the “Groups” message at the top. R is informing you that this tibble has been grouped so that any operation you perform now will be done for each <code>gender</code>.</p>
-<div class="sourceCode" id="cb83"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb87"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu">group_by</span><span class="op">(</span><span class="va">gender</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">summarize</span><span class="op">(</span>avg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span><span class="op">)</span></code></pre></div>
@@ -1040,7 +1093,7 @@ If <span class="math inline">\(n\)</span> is odd, then the median is given by:</
 ## 2 Male    43.5</code></pre>
 <p>Notice the message R sends us. The warning means that the tibble which issues forth from the end of the pipe has been “ungrouped.” This means the group attribute we applied with <code>group_by()</code> has been removed. This behavior is the (sensible) default.</p>
 <p>The proper way to handle the situation, here and everywhere else that we use <code>group_by()</code> and <code>summarize()</code>, is to specify the <code>.groups</code> argument.</p>
-<div class="sourceCode" id="cb85"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb89"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trains</span> <span class="op">%&gt;%</span> 
   <span class="fu">group_by</span><span class="op">(</span><span class="va">gender</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">summarize</span><span class="op">(</span>mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span>,
@@ -1070,22 +1123,22 @@ If <span class="math inline">\(n\)</span> is odd, then the median is given by:</
 <span class="header-section-number">2.4.1</span> Plot objects<a class="anchor" aria-label="anchor" href="#plot-objects"><i class="fas fa-link"></i></a>
 </h3>
 <p>Plots are R objects, just like tibbles. We can create them, print them and save them. Up until now, we have just “spat” them out in an R code chunk. Nothing wrong with that! Indeed, this is the most common approach to plotting in R. Sometimes, however, it is handy to work with a plot object. Consider:</p>
-<div class="sourceCode" id="cb87"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb91"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">train_plot</span> <span class="op">&lt;-</span> <span class="fu">ggplot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">trains</span>, 
        mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">age</span>, 
                      y <span class="op">=</span> <span class="va">income</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p>This is the same code as our first example with <code>geom_point()</code>. <code>train_plot</code> is an R object. This code does not print anything out. In order to make this plot appear, we need to print it out explicitly:</p>
-<div class="sourceCode" id="cb88"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb92"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">train_plot</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-62-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-66-1.png" width="100%"></div>
 <p>Recall that typing the name of an object is the same thing as using <code><a href="https://rdrr.io/r/base/print.html">print()</a></code>. Now that we have this object, we can display it whenever we want.</p>
 <p>But, sometimes, we want a permanent copy of the plot, saved to our computer. That is the purpose of <code>ggsave()</code>:</p>
-<div class="sourceCode" id="cb89"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb93"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggsave</span><span class="op">(</span>filename <span class="op">=</span> <span class="st">"enos_trains.jpg"</span>, 
        plot <span class="op">=</span> <span class="va">train_plot</span><span class="op">)</span></code></pre></div>
 <p><code>ggsave()</code> uses the suffix of the provided <code>filename</code> to determine the type of image to save. Because we use “enos_trains.jpg,” the file is saved in JPEG format. If we had used “enos_trains.png,” the file would have been saved as a PNG. We can display a saved file by using <code><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html">knitr::include_graphics()</a></code>. For example:</p>
-<div class="sourceCode" id="cb90"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb94"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html">include_graphics</a></span><span class="op">(</span><span class="st">"enos_trains.jpg"</span><span class="op">)</span></code></pre></div>
 <p>This code displays the image in an Rmd, assuming that the file “enos_trains.jpg” is located in the current working directory. A common scenario is that we create an image and store it in a directory named <code>figures/</code> and then use that figure in more than one Rmd.</p>
 </div>
@@ -1095,29 +1148,29 @@ If <span class="math inline">\(n\)</span> is odd, then the median is given by:</
 </h3>
 <p>Faceting splits a visualization into parts, one for each value of another variable.. This will create multiple copies of the same type of plot with matching x and y axes, but whose contents will differ.</p>
 <p>Before we proceed, let’s create a subset of the tibble <code>gapminder</code>, from the <strong>gapminder</strong>, package to use. (You may need to install the <strong>gapminder</strong> package for this code to work. Refer back to the introduction if you need a refresher on how to do so.)</p>
-<div class="sourceCode" id="cb91"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb95"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jennybc/gapminder">gapminder</a></span><span class="op">)</span>
 <span class="va">gapminder_filt</span> <span class="op">&lt;-</span> <span class="va">gapminder</span> <span class="op">%&gt;%</span> 
       <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">year</span> <span class="op">==</span> <span class="fl">2007</span>, <span class="va">continent</span> <span class="op">!=</span> <span class="st">"Oceania"</span><span class="op">)</span></code></pre></div>
 <p>Let’s plot our filtered data using <code>geom_point()</code></p>
-<div class="sourceCode" id="cb92"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb96"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">gapminder_filt</span>, 
        mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">gdpPercap</span>, 
                      y <span class="op">=</span> <span class="va">lifeExp</span>, 
                      color <span class="op">=</span> <span class="va">continent</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-66-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-70-1.png" width="100%"></div>
 <p>It is difficult to compare the continents despite the colors. It would be much easier if we could “split” this scatterplot by the 4 continents. In other words, we would create plots of <code>gdpPercap</code> and <code>lifeExp</code> for each <code>continent</code> separately. We do this by using the function <code>facet_wrap()</code> with the argument <code>~ continent</code>. In <code>facet_wrap</code>, you must always put the tilde (~) in front of the variable you wish to wrap it by.</p>
-<div class="sourceCode" id="cb93"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb97"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">gapminder_filt</span>, 
        mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">gdpPercap</span>, 
                      y <span class="op">=</span> <span class="va">lifeExp</span>, 
                      color <span class="op">=</span> <span class="va">continent</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">facet_wrap</span><span class="op">(</span><span class="op">~</span> <span class="va">continent</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-67-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-71-1.png" width="100%"></div>
 <p>This is much better! We can specify the number of rows and columns in the grid by using the <code>nrow</code> argument inside of <code>facet_wrap()</code>. Let’s get all continents in a row by setting <code>nrow</code> to 1. Let’s also add a trend line <code>geom_smooth()</code> to our faceted plot.</p>
-<div class="sourceCode" id="cb94"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb98"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">gapminder_filt</span>, 
        mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">gdpPercap</span>, 
                      y <span class="op">=</span> <span class="va">lifeExp</span>, 
@@ -1127,7 +1180,7 @@ If <span class="math inline">\(n\)</span> is odd, then the median is given by:</
   <span class="fu">geom_smooth</span><span class="op">(</span>method <span class="op">=</span> <span class="st">"lm"</span>, 
               formula <span class="op">=</span> <span class="va">y</span> <span class="op">~</span> <span class="va">x</span>, 
               se <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-68-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-72-1.png" width="100%"></div>
 <p>As expected, we can see a positive correlation between economic development and life expectancy on all continents.</p>
 </div>
 <div id="stats" class="section level3" number="2.4.3">
@@ -1135,20 +1188,20 @@ If <span class="math inline">\(n\)</span> is odd, then the median is given by:</
 <span class="header-section-number">2.4.3</span> Stats<a class="anchor" aria-label="anchor" href="#stats"><i class="fas fa-link"></i></a>
 </h3>
 <p>Consider the following histogram.</p>
-<div class="sourceCode" id="cb95"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb99"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">gapminder</span>, 
        mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">lifeExp</span><span class="op">)</span><span class="op">)</span><span class="op">+</span> 
   <span class="fu">geom_histogram</span><span class="op">(</span>bins <span class="op">=</span> <span class="fl">20</span>, 
                  color <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-69-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-73-1.png" width="100%"></div>
 <p>Recall that the y-aesthetic of a histogram — the count of the observations in each bin — gets computed automatically. We can use the <code>after_stat()</code> argument within <code>geom_histogram()</code> to generate percent values as our y-aesthetic. <code>after_stat()</code> allows us to control the values of the variables calculated specifically for this specific aesthetic layer.</p>
-<div class="sourceCode" id="cb96"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb100"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">gapminder</span>, 
        mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">lifeExp</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">geom_histogram</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y <span class="op">=</span> <span class="fu">after_stat</span><span class="op">(</span><span class="va">count</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">count</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, 
                    bins <span class="op">=</span> <span class="fl">20</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">labs</span><span class="op">(</span>y <span class="op">=</span> <span class="st">"Percentage"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-70-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-74-1.png" width="100%"></div>
 </div>
 <div id="axis-limits-and-scales" class="section level3" number="2.4.4">
 <h3>
@@ -1159,13 +1212,13 @@ If <span class="math inline">\(n\)</span> is odd, then the median is given by:</
 <span class="header-section-number">2.4.4.1</span> <code>coord_cartesian()</code><a class="anchor" aria-label="anchor" href="#coord_cartesian"><i class="fas fa-link"></i></a>
 </h4>
 <p>We can also manipulate the limits of the axes by using <code><a href="https://rdrr.io/r/graphics/plot.window.html">xlim()</a></code> and <code><a href="https://rdrr.io/r/graphics/plot.window.html">ylim()</a></code> within a call to <code>coord_cartesian()</code>. For example, assume that we are only interested in countries with a GDP per capita from 0 to 30,000. Recall that, because <code>data</code> is the first argument and <code>mapping</code> is the second to <code>ggplot()</code>, we don’t actually have to name the arguments. We can just provide them, as long as they are in the correct order.</p>
-<div class="sourceCode" id="cb97"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb101"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span><span class="va">gapminder_filt</span>, 
        <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">gdpPercap</span>, y <span class="op">=</span> <span class="va">lifeExp</span>, color <span class="op">=</span> <span class="va">continent</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">facet_wrap</span><span class="op">(</span><span class="op">~</span> <span class="va">continent</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">coord_cartesian</span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">30000</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-71-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-75-1.png" width="100%"></div>
 <p>We can see that the GDP per capita on the x-axis is now only shown from 0 to 30,000.</p>
 </div>
 <div id="scale_x-and-scale_y" class="section level4" number="2.4.4.2">
@@ -1173,26 +1226,26 @@ If <span class="math inline">\(n\)</span> is odd, then the median is given by:</
 <span class="header-section-number">2.4.4.2</span> <code>scale_x</code> and <code>scale_y</code><a class="anchor" aria-label="anchor" href="#scale_x-and-scale_y"><i class="fas fa-link"></i></a>
 </h4>
 <p>We can also change the scaling of the axes. For example, it might be useful to display the axes on a logarithmic scale by using <code>scale_x_log10()</code> or <code>scale_y_log10()</code>. Also, note that we can (lazily!) not provide the explicit <code>x</code> and <code>y</code> argument names to <code>aes()</code> as long as we provide the values in the right order: <code>x</code> comes before <code>y</code>.</p>
-<div class="sourceCode" id="cb98"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb102"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span><span class="va">gapminder_filt</span>, 
        <span class="fu">aes</span><span class="op">(</span><span class="va">gdpPercap</span>, <span class="va">lifeExp</span>, color <span class="op">=</span> <span class="va">continent</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">facet_wrap</span><span class="op">(</span><span class="op">~</span> <span class="va">continent</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_smooth</span><span class="op">(</span>formula <span class="op">=</span> <span class="va">y</span> <span class="op">~</span> <span class="va">x</span>, method <span class="op">=</span> <span class="st">"lm"</span>, se <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">scale_x_log10</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-72-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-76-1.png" width="100%"></div>
 <!-- BG: Need scale_x_cont and scale_y_cont here -->
 <p>Beyond <code>scale_x_log10()</code>, there are other ways to change the scales. We will cover <code>scale_y_continuous</code> and <code>scale_x_continuous</code> in this section.</p>
 <p>There are two major uses for <code>scale_x_continuous</code>, and that is to change the breaks and the labels. Take the graph below.</p>
-<div class="sourceCode" id="cb99"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb103"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span><span class="va">gapminder_filt</span>, 
        <span class="fu">aes</span><span class="op">(</span><span class="va">gdpPercap</span>, <span class="va">lifeExp</span>, color <span class="op">=</span> <span class="va">continent</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">facet_wrap</span><span class="op">(</span><span class="op">~</span><span class="va">continent</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_smooth</span><span class="op">(</span>formula <span class="op">=</span> <span class="va">y</span> <span class="op">~</span> <span class="va">x</span>, method <span class="op">=</span> <span class="st">"lm"</span>, se <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-73-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-77-1.png" width="100%"></div>
 <p>We only want there to be breaks on the y-axis every 20 years instead of every 10. We also want to add dollar signs to the x-axis, and to have breaks every 20,000 dollars. Let’s fix the graph!</p>
-<div class="sourceCode" id="cb100"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb104"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span><span class="va">gapminder_filt</span>, 
        <span class="fu">aes</span><span class="op">(</span><span class="va">gdpPercap</span>, <span class="va">lifeExp</span>, color <span class="op">=</span> <span class="va">continent</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
@@ -1201,7 +1254,7 @@ If <span class="math inline">\(n\)</span> is odd, then the median is given by:</
   <span class="fu">scale_y_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">40</span>, <span class="fl">60</span>, <span class="fl">80</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">scale_x_continuous</span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/label_dollar.html">dollar_format</a></span><span class="op">(</span><span class="op">)</span>,
                      breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">20000</span>, <span class="fl">40000</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><img src="book_temp_files/figure-html/unnamed-chunk-74-1.png" width="100%">
+<p><img src="book_temp_files/figure-html/unnamed-chunk-78-1.png" width="100%">
 Let’s break this down. We used the <code>breaks</code> argument to create the breaks on the scale. We used the <code><a href="https://rdrr.io/r/base/c.html">c()</a></code> function to specify what breaks we wanted. Then, we used <code>labels</code> to modify the labels on the x-axis. The <code><a href="https://rdrr.io/r/base/ns-dblcolon.html">::</a></code> allows us to extract a function from a specific package, if the function exists in multiple packages. So, we specifically extract the <code>dollar_format</code> function from the <code>scales</code> package to change the labels of the x-axis.</p>
 <p>There is another function called <code>scale_x_discrete/scale_y_discrete</code>. This function is similar enough to <code>scale_y/x_continuous</code> that we will not give it its own section. The only difference in the usage of the discrete vs. continuous function is that the discrete function is applied to <strong>discrete variables</strong>. Discrete variables are those that are countable (i.e. the number of tables in a room) with nothing in between, whereas continuous variables have infinite possibilities (i.e. height has infinite possibilities).</p>
 </div>
@@ -1211,7 +1264,7 @@ Let’s break this down. We used the <code>breaks</code> argument to create the 
 <span class="header-section-number">2.4.5</span> Text<a class="anchor" aria-label="anchor" href="#text"><i class="fas fa-link"></i></a>
 </h3>
 <p>Recall we use <code>labs()</code> to add labels and titles to our plots. We can also change labels inside the plots using <code>geom_text()</code>.</p>
-<div class="sourceCode" id="cb101"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb105"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span><span class="va">gapminder_filt</span>, 
        <span class="fu">aes</span><span class="op">(</span><span class="va">gdpPercap</span>, <span class="va">lifeExp</span>, color <span class="op">=</span> <span class="va">continent</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
@@ -1227,7 +1280,7 @@ Let’s break this down. We used the <code>breaks</code> argument to create the 
             size <span class="op">=</span> <span class="fl">2</span>, 
             color <span class="op">=</span> <span class="st">"black"</span>, 
             check_overlap <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-75-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-79-1.png" width="100%"></div>
 <p>Let’s breakdown the code within <code>geom_text()</code>. We included a new aesthetic called <em>label</em>. This defines the character variable which will be used as the basis for the labels. We set <code>label</code> to country so each point corresponds to the country it represents. We set the text font by setting <code>size</code> to 2, and we set the text color by using <code>color</code>. Finally, we included the argument <code>check_overlap = TRUE</code> to make sure the names of the countries were legible.</p>
 </div>
 <div id="themes" class="section level3" number="2.4.6">
@@ -1236,7 +1289,7 @@ Let’s break this down. We used the <code>breaks</code> argument to create the 
 </h3>
 <p><strong>Themes</strong> can be used to change the overall appearance of a plot without much effort. We add themes as layers to our plots. You can find an overview of the different themes in <strong>ggplot</strong> <a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">here</a>.</p>
 <p>Consider the following faceted scatterplot.</p>
-<div class="sourceCode" id="cb102"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb106"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">gapminder</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">continent</span> <span class="op">!=</span> <span class="st">"Oceania"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">year</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">year</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -1251,10 +1304,10 @@ Let’s break this down. We used the <code>breaks</code> argument to create the 
          x <span class="op">=</span> <span class="st">"GDP per Capita in USD"</span>,
          y <span class="op">=</span> <span class="st">"Life Expectancy"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_x_log10</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">500</span>, <span class="fl">5000</span>, <span class="fl">50000</span><span class="op">)</span><span class="op">)</span> </code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-76-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-80-1.png" width="100%"></div>
 <p>Note the use of the <code>breaks</code> argument to <code>scale_x_log10()</code>. This specifies the location of labels on the x-axis. We can also use the <code>labels</code> argument if we want to change their appearence. These tricks work in the entire family of <code>scale_*</code> functions.</p>
 <p>Let’s now add a theme to our faceted scatterplot. We will use the theme <code><a href="https://rdrr.io/pkg/ggthemes/man/theme_economist.html">theme_economist()</a></code>, from the <strong>ggthemes</strong> package, to make our plot look like the plots in the <em>The Economist</em>.</p>
-<div class="sourceCode" id="cb103"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb107"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jrnold/ggthemes">ggthemes</a></span><span class="op">)</span>
 
 <span class="va">gapminder</span> <span class="op">%&gt;%</span>
@@ -1272,9 +1325,9 @@ Let’s break this down. We used the <code>breaks</code> argument to create the 
          y <span class="op">=</span> <span class="st">"Life Expectancy"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">scale_x_log10</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">500</span>, <span class="fl">5000</span>, <span class="fl">50000</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://rdrr.io/pkg/ggthemes/man/theme_economist.html">theme_economist</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-77-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-81-1.png" width="100%"></div>
 <p>This looks pretty good. However, notice the legend the top of our graph. It crowds our graph and takes away from the most important part: the data. We can use <code>theme()</code> to customize the non-data parts of our plots such as background, gridlines, and legends. Let’s de-clutter the graph by removing our legend. We can do this by using the <code>legend.position</code> argument and setting it to “none.”</p>
-<div class="sourceCode" id="cb104"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb108"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">gapminder</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">continent</span> <span class="op">!=</span> <span class="st">"Oceania"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">year</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">year</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -1292,7 +1345,7 @@ Let’s break this down. We used the <code>breaks</code> argument to create the 
                   labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/label_dollar.html">dollar_format</a></span><span class="op">(</span>accuracy <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
     <span class="fu"><a href="https://rdrr.io/pkg/ggthemes/man/theme_economist.html">theme_economist</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu">theme</span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-78-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-82-1.png" width="100%"></div>
 <p>Great. Now our graph is easier to visualize.</p>
 <div id="theme" class="section level4" number="2.4.6.1">
 <h4>
@@ -1318,7 +1371,7 @@ Let’s break this down. We used the <code>breaks</code> argument to create the 
 </li>
 </ul>
 <p>Let’s look at an example of how we might want to modify a graph. Take this graph below.</p>
-<div class="sourceCode" id="cb105"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb109"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">economics</span>,
        mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">date</span>,
                      y <span class="op">=</span> <span class="va">unemploy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
@@ -1328,9 +1381,9 @@ Let’s break this down. We used the <code>breaks</code> argument to create the 
        x <span class="op">=</span> <span class="st">"Year"</span>,
        y <span class="op">=</span> <span class="st">"Number of Unemployed (in thousands)"</span>,
        caption <span class="op">=</span> <span class="st">"Source: FRED Economic Data"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-79-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-83-1.png" width="100%"></div>
 <p>You have a couple of problems with this graph. Firstly, you want the title to be bold. You want there to be a light blue background. You also don’t particularly care for there to be so many grid lines from the x-axis. Let’s change this!</p>
-<div class="sourceCode" id="cb106"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb110"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">economics</span>,
        mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">date</span>,
                      y <span class="op">=</span> <span class="va">unemploy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
@@ -1343,7 +1396,7 @@ Let’s break this down. We used the <code>breaks</code> argument to create the 
   <span class="fu">theme</span><span class="op">(</span>plot.title <span class="op">=</span> <span class="fu">element_text</span><span class="op">(</span>face <span class="op">=</span> <span class="st">"bold"</span><span class="op">)</span>,
         panel.background <span class="op">=</span> <span class="fu">element_rect</span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"lightblue"</span><span class="op">)</span>,
         panel.grid.minor.x <span class="op">=</span> <span class="fu">element_blank</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-80-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-84-1.png" width="100%"></div>
 <p>There! Within the <code>theme()</code> function, we can change the plot title to bold, the background to blue, and get rid of the “minor” grid lines. <code>theme()</code> is a very versatile function. See the full list of elements <a href="https://ggplot2-book.org/polishing.html#polishing">here</a>.</p>
 <!-- https://dsy5.github.io/World-Happiness-Data-Analysis-and-Visualizations/ -->
 <!-- y = NULL to get rid of axis labels all together. -->
@@ -1360,6 +1413,8 @@ Let’s break this down. We used the <code>breaks</code> argument to create the 
 <h2>
 <span class="header-section-number">2.5</span> Going further<a class="anchor" aria-label="anchor" href="#going-further"><i class="fas fa-link"></i></a>
 </h2>
+<p>There are so many more plots you can make with R that we have not shown you yet. For example, you can create cool animations with the <em>gganimate</em> package, like this plot below.</p>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-85-1.gif" width="100%"></div>
 </div>
 <div id="summary-2" class="section level2" number="2.6">
 <h2>
@@ -1374,7 +1429,7 @@ Let’s break this down. We used the <code>breaks</code> argument to create the 
 <p><em>The two most important attributes of a distribution are its center and its variation around that center.</em></p>
 <p>In this chapter, we first looked at basic coding terminology and concepts that we deal with when programming with R. We then learned about the three basic components that make up each plot: data, mapping, and one or more geoms. The <strong>ggplot2</strong> package offers a wide range of geoms that we can use to create different types of plots. Next, we examined the “super package” <strong>tidyverse</strong>, which includes helpful tools for visualization. It also offers features for importing and manipulating data, which is the main topic of Chapter @(wrangling). Lastly, we explored advanced plotting features such as axis scaling, faceting, and themes.</p>
 <p>Recall the plot we began the chapter with:</p>
-<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-81-1.png" width="100%"></div>
+<div class="inline-figure"><img src="book_temp_files/figure-html/unnamed-chunk-86-1.png" width="100%"></div>
 <p>You now know enough to make plots like this by yourself.</p>
 <p>A beautiful plot is just a collection of steps, each simple enough on its own. We have taught you (some of) these steps. Time to start walking on your own.</p>
 
