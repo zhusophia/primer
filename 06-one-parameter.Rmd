@@ -2,54 +2,13 @@
 
 <!-- RS: There was a random paragraph about the Central Limit therom in the polling section. I moved it to "changing shovel sizes". Guessing Preceptor will delete, but I didn't write it so no harm to me.  -->
 
-<!-- RS: Only 2 glaring errors left in this chapter:  -->
+<!-- RS: Technically, standard error should not use sigma in it's formula, as it specifically refers to a point statistic and not a population. Someone may want to change all the sigmas to s.  -->
 
-<!-- a.) the way it handles SE. Some definitions are incorrect, and vocab/prose is clunky.  -->
-
-<!-- b.) Summary section needs to be cleaned up, but that is no big deal. -->
-
-<!-- RS: I also fixed the Pop Table -->
+<!-- RS: There needs to be more explanation about confidence intervals!  -->
 
 <!-- In some paragraphs we say that it is impossible to conduct a census because we don't have access to the urn, in others like this we do have access and can complete the census. Which is it? You pick. -->
 
 <!-- Older comments: -->
-
-<!-- 6.3 Sample size (What happens when we change sample size?) -->
-
-<!-- Questions: I feel like we need more explanation about confidence intervals. Also do we want to differentiate between calculating an unknown population proportion and an unknown mu? Nonetheless I feel like understanding that if we take a simple random sample, how to construct a 95% confidence interval using $\bar{x}$ +/- 2(SD), because I feel like it is not emphasized how cool it is how our samples will be normally distributed no matter if if our population is normally distributed, but this could be too much statistics. 
-
-<!-- 1. Comparing sampling distributions:  -->
-
-<!--  - a. What is a sampling distribution? Introduce some vocab, but cut out unessential stuff (vocab is boring). Emphasize that this is a model, and we will never have the sampling distribution in real life. Also create vocab distinctions. Although the actual sampling distribution consists of many more trials, 1,000 is large enough for our purposes, and as such we will refer to distributions with many trials as sampling distributions.  -->
-
-<!--  - b. Re-factoring our code: Start with a question: How do the sampling distributions of shovel sizes 25, 50, and 100 compare. Then make 3 separate variables. Yuck! Re-factor our code to make one tibble, using both mapping and expand_grid().  -->
-
-<!--  - c. Variance: Make 3 graphs to explain variance.  -->
-
-<!--  - End section with finding standard deviation of each sampling distribution. Foreshadow that this is related to the Standard Error.   -->
-
-<!--  - In this section readers will make the facet wrapped graph, the colored graph of 1,000 p values for each shovel size, and the line graph that plots standard deviation against shovel size.  -->
-
-<!-- 2. Standard deviation and standard error:  -->
-
-<!--  - a. Standard Deviation: We just took the standard deviation of sampling distributions for different shovel sizes. What are the implications? Use graphs of the 3 different sampling distributions but add sd and mean lines. Explain that the mean is the same as the population proportion. When we have a larger sample size, our samples are more likely to be close to the real population proportion.  -->
-
-<!--  - b. Standard Error: Standard deviation of a point statistic. Before we were looking at our entire population. Now we look at a single sample, and ask ourselves how close/how far is this from the real population parameter. This is standard error, and it is related to standard deviation: When the standard deviation of our sampling distribution is low, each sample more likely to be closer to the real pop parameter, and as such each individual sample is more likely to have a smaller standard error.  -->
-
-<!-- 3. SE and SD equations:  -->
-
-<!--   - a. Vocab: Reuse stuff from current section, maybe cut back a little.  -->
-
-<!--   - b. Standard deviation for a population proportion: Show the equation (sqrt(p(1-p)/n)) for calculating standard deviation. Overlay sd equation on the graph of 100 sample sizes as well as the facet wrapped graph to show that they produce the same result.  Make sure to use mean of sampling distribution for our estimate of p.-->
-
-<!--   - c. Standard error for a population proportion: Replace p with p hat. We are now working with one sample.  -->
-
-<!--   - d. difference between mean and p using vocab.  -->
-
-<!--   - e. Equations for sd and se for a population mean. Include an image or two for understanding, but do not go into too much depth (that is for the next section) -->
-
-<!-- - f. calculating confidence intervals -->
-
 
 <!-- Old stuff: -->
 
@@ -602,7 +561,7 @@ As the sample size increases, the sample to sample variation decreases, and our 
 knitr::include_graphics("06-one-parameter/images/variance_everywhere_meme.jpeg")
 ```
 
-Let's take a step back from all the variance. The reality is that our code needs to be *re-factored*, as it is bad practice to make a separate tibble for each sample size. To make comparisons easier, let's attempt to put all 3 shovel sizes in the same tibble using mapping. 
+Let's take a step back from all the variance. The reality is that our code needs to be better optimized, as it is bad practice to make a separate tibble for each sample size. To make comparisons easier, let's attempt to put all 3 shovel sizes in the same tibble using mapping. 
 
 ```{r}
 tibble(trial_ID = 1:1000) %>%
@@ -645,11 +604,16 @@ This is, approximately, the same result as we saw above, but with 1 re-factored 
 
 Now that we have this framework, there's no need to limit ourselves to the sizes 25, 50, and 100.  Why not try all integers from 1 to 100? We can use the same code, except we'll now set `shovel_size = 1:100`.
 
+<!-- RS: For me, the tutorial doesn't knit unless this is included. For whoever is reading this, if the tutorial knits for you, then please delete the code chunk below! -->
+
+<!-- RS: If it's still a problem, it has something to do with the code chunk cache = TRUE option being confused with the raysharer/rgl cache = TRUE.  -->
+
 ```{r, echo = FALSE}
 options(rgl.useNULL = TRUE)
 library(rgl)
 library(rayshader)
 ```
+
 
 ```{r, cache = TRUE}
 shovels_100 <- expand_grid(trial_ID = c(1:1000), shovel_size = c(1:100)) %>% 
@@ -896,8 +860,6 @@ If we know the color of every bead, then calculating the proportion of beads whi
 
 <!-- DK: That is fairly quick. Answering our second question, even with perfect knowledge of rho is non-trivial. Ignore that complexity for now. -->
 
-<!-- RS: Added back elipses at bottom, because I am trying to make it uniform across the chapter that there is alot we don't know about the urn because we can never access it physically.  -->
-
 The data we have, unfortunately, only provides the color for 50 beads. 
 
 ```{r, echo = FALSE}
@@ -927,8 +889,6 @@ The last step of Wisdom is to consider whether or not we can consider the units 
 We also consider why some beads do get sampled, while others do not. This is a consequence of the *sampling mechanism*. We hope that our sampling mechanism has near equal access to all members of the population, or else our samples would be biased. Almost all samples have some bias, but we must make a judgement call to see if the data we have is close enough to the data we want (i.e., the Preceptor Table) that we can consider both as coming from the same population. Our sample of 50 beads is taken from a *mixed* urn, so hopefully there is a near equal chance of selecting each bead, and our samples are representative of the population. 
 
 <!-- Could get into more details here, e.g., Sometimes, the Preceptor Table and the Population Table have the same number of rows. This happens when all the data arfe rows from the Preceptor Table. Example would be the simple case of an urn, the beads in which you know do not change color, and from which you have drawn a sample. But, what if beads can change color? Then the data from the sample 10 minutes ago has a less than certain relationship with the Preceptor Table. The same includes the color for bead 96 ten minites ago. The Preceptor Table has one row for bead 96 now, at this moment. So, in this case, the Population Table has a row for every bead at each moment in time that we care about. At the very least, it as 1,000 rows for 10 minutes ago (when we took the sample) and 1,000 rows for now. -->
-
-<!-- RS: Expanded on above comment alot in Pop. Table section (definetly too much detail), would appreciate suggestions on how to reformat to be concise. I pride my explanation for being best in the primer, so I feel like we need to keep a detailed explanation either here or move to Ch. 4 or 5.   -->
 
 ### Justice
 
@@ -1326,8 +1286,6 @@ See Chapter \@ref(two-parameters) for a thorough discussion of the use of **rsta
 
 #### Assesing uncertainty
 
-<!-- RS: This kind of acts as a short summary + going over limitations of Temperance.  -->
-
 The process Cardinal Virtues process may seem tedious, but we use them for good reason. In Wisdom we determined what data we need to answer our question, and in Justice we analyzed whether or not the data we have can answer our question. If we had skipped these steps, we would be at risk of creating models with "bad data" in Courage and Temperance, and draw misleading conclusions. 
 
 We have successfully answered our questions using the Cardinal Virtues, but we must also realize that there are limitations to our models. Earlier we claimed there is a `r round(100 *sum(ppd_reds_in_20$total > 8)/length(ppd_reds_in_20$total))`% chance that we will draw more than 8 red beads out of a sample size of 20. However, we must be modest about our claims. Is this question about *this* particular urn, or all urns? Clearly, as our predictions are based upon the posterior from our specific urn, our conclusions can only be applied to *this particular urn*; our conclusions are not generalizable to all urns.
@@ -1356,27 +1314,27 @@ pbinom(q = 8, size = 20, prob = .4, lower.tail = FALSE)
 
 Sadly, the answer to our question could be `r round(pbinom(q = 8, size = 20, prob = .3, lower.tail = FALSE)*100)`%, `r round(pbinom(q = 8, size = 20, prob = .4, lower.tail = FALSE)*100)`%, a value in between, or even a more extreme value. We will never know the correct answer, and must settle with our best estimate of `r round(100 *sum(ppd_reds_in_20$total > 8)/length(ppd_reds_in_20$total))`% that factors in our uncertainty regarding the true value of $\rho$. Long story short, our models are never the truth. 
 
-<!-- RS: Nicely worded but I'm not sure if it fits in. Maybe a future author will find use for it.  -->
-
-<!-- Asserting a posterior distribution is, conceptually, the same as opening a casino and allowing people to place wagers on outcomes, with the odds consistent with your posterior. If your posterior is wrong, they will take all your money. That would be bad! So, what do we do? Rule of thumb: the future is always more variable than our models would suggest. The entire point of the virtue of Temperance to be aware of that fact and take account of it. Courage --- that bold bastard --- comes along and says, "Here is the model! Let's calculate the posterior and open the casino!" Temperance says, "Hold on! Yes, I can calculate the posterior, but we need to be cautious." Temperance is concerned with the tails of our predictions, not the center. What is the best strategy for opening our casino, then? Limit the bets on the first few nights to make sure our posterior is OK. *Temperance is concerned with the sensible management of the casino.* -->
-
 ### Bad practices
 
 Although the process was long, we have successfully gone through the cardinal virtues and answered our questions like real data scientists. In this section we will address some pitfalls to avoid. 
 
 #### Confidence intervals
 
-<!-- RS: If we end up not discussing the √p(1-p)/n equation, then this section will have to be deleted or reworked.  -->
-
 Let's go back to our first question:
 
 >If we get 17 red beads in a random sample of size 50 taken from a mixed urn, what proportion $\rho$ of the beads in the urn are red?
 
-If we had decided to, we could have answered this question using confidence intervals and statistics. First calculate the standard error given 34% of the beads in the sample are red out of a sample size of 50:
+If we had decided to, we could have answered this question using confidence intervals and statistics. First calculate the standard error:
 
-$$  SE = \sqrt\frac{.34(1-.34)}{50} \approx .067$$
+$$  SE = \frac{\sigma\text{ of data}}{\sqrt{\text{sample size}}} = \frac{.4785}{\sqrt{50}} \approx .067$$
 
-We can then create a 95% confidence interval:
+We calculate the numerator by taking the standard deviation of a dataset with 50 observation, where 1's represent red beads and 0's represent white beads: 
+
+```{r}
+sd(c(rep(1, 17), rep(0, 33)))
+```
+
+You can then use the standard error to create a 95% confidence interval:
 
 $$  CI = \bar{x} \hspace{.1cm} \pm 2SE = .34 \hspace{.1cm} \pm .134$$
 
@@ -1514,7 +1472,7 @@ Other highlights:
 - By creating a virtual analog of our urn and our shovel, we were able to look at *even more* samples and observe the effects of sampling size on our results. 
 - More samples yield more even distributions which should resemble a bell. 
 - Larger sample sizes decrease standard deviation, meaning that the resulting proportions red are closer to one another than when the sample sizes are smaller. This means that larger samples = lower SD = more precise guesses. 
-- When we are writing a lot of code for something we want to perform frequently, write a function instead! This saves time and functions can be called within `map()` for more ease when plotting results.
+- If we want to repeat the same task multiple times, like comparing the distributions of 3 sample sizes, use mapping and functions like `expand_grid()` to cut down on repetative code. 
 
 ### Standard error
 
@@ -1524,14 +1482,14 @@ Other highlights:
 - If we could only know two pieces of information from our data, we would need a measure of the **center** of the distribution (like mean or median) and a measure of the **variability** of the distribution (like sd or MAD). 
 - SE refers to the standard deviation of a sample statistic (aka point estimate), such as the mean or median. Therefore, the "standard error of the mean" refers to the standard deviation of the distribution of sample means taken from a population. 
 
-### Answering the questions
+### Cardinal Virtues
 
 - `stan_glm()` can create a joint distribution and then estimate the posterior probability distribution, conditional on the data which was passed in to the data argument. This is a much easier way to create the posterior distribution, and will be explored in more detail in Chapter \@ref(two-parameters). 
+- We use the posterior distribution to answer our questions. 
 
-### Discussion
+### Case study: Polls
 
-- The sampling mechanism is responsible for which items/beads/people/etc are selected to be sampled. In the urn example, the *sampling mechanism* is the shovel. 
-- Random sampling ensures that our point estimates are **accurate**, while having a large sample size ensures that our estimates are **precise**. The difference between precision and accuracy is important if we are to make informed estimates. 
+- Polling is a more complex real life application of the binomial distribution.
 - Real life sampling is *extremely* prone to error. This cannot be emphasized enough. We are often forced to choose between precision and accuracy during real-life sampling. 
 
 In this chapter, we performed both tactile and virtual sampling exercises to infer about an unknown parameter We also presented a case study of sampling in real life with polls. In each case, we used the sample proportion $\hat{\rho}$ to estimate the population proportion $\rho$. However, we are not just limited to scenarios related to proportions. In other words, we can use sampling to estimate other population parameters using other point estimates as well.
