@@ -6,7 +6,7 @@ Everyone loves visualizations.
 
 <!-- Add comments to the code chunks, even if students won't see the comments. For example, initial plot should have a whole bunch of comments about where you got this data and how we can update it in the future.  -->
 
-<!-- Finish up opening plot.  -->
+<!-- Finish up opening plot. DONE -->
 
 <!-- Create "Going further" section. It includes some cool plots, without the code for making them (I think) and with a brief (short paragraph) description of the package which is used to make them and references for learning more. One animation. One map. One interactive.  -->
 
@@ -14,8 +14,9 @@ Everyone loves visualizations.
 
 <!-- Do the census and maps tutorials from chapter 3. -->
 
-<!-- Take ownership of the Advanced Plotting section. Add the tips and tricks in the comments. -->
+<!-- Hold off on this for now. Don't use the unemployment data anymore. Use two or three of the temperature series from primer.data::temperature.  I have similar concerns about the `group` aesthetic, especially for line plots. But maybe group is too difficult? But can you possibly do geom_line without showing groups? -->
 
+<!-- Take ownership of the Advanced Plotting section. Add the tips and tricks in the comments. -->
 
 <!-- Ignore below for now. -->
 
@@ -24,9 +25,8 @@ Everyone loves visualizations.
 <!-- Solve all problems, except geom_line and the group aesthetic. -->
 
 
-<!-- Talk more about aesthetics (i.e., aes()) in Basic plots. Make more use of color and fill. Explain how you can use either constants (like "steelblue") or variables (like party) when using these aesthetics. Make them as comfortable with color and fill as they are with data and mapping.  -->
+<!-- Talk more about aesthetics (i.e., aes()) in Basic plots. Make more use of color and fill. Explain how you can use either constants (like "steelblue") or variables (like party) when using these aesthetics. Make them as comfortable with color and fill as they are with data and mapping. DONE  -->
 
-<!-- Hold off on this for now. Don't use the unemployment data anymore. Use two or three of the temperature series from primer.data::temperature.  I have similar concerns about the `group` aesthetic, especially for line plots. But maybe group is too difficult? But can you possibly do geom_line without showing groups? -->
 
 ```{r, message = FALSE, echo = FALSE}
 library(tidyverse)
@@ -54,6 +54,7 @@ hundred_days_p <- president_data %>%
                formula = y ~ s(x, bs = "cs")) +
    coord_cartesian(ylim = c(30, 60)) +
    theme_fivethirtyeight() +
+   scale_y_continuous(scales::percent_format(accuracy = 1)) +
    labs(title = "Approval Ratings During the First Hundred Days",
         subtitle = "Both recent presidents had climbing disapproval ratings.",
         x = NULL,
@@ -63,7 +64,6 @@ hundred_days_p <- president_data %>%
 
 hundred_days_p
 ```
-
 
 
 Once you have read this chapter, and completed the associated tutorials, you will be able to create graphics like this one with your data. Join us on the journey.
@@ -247,6 +247,62 @@ ggplot(data = trains,
 Note that like with `geom`s, we add a layer using `+` when creating `labs()`for our plot. In general, every plot should give a title and axes labels. You should also add a `subtitle`, the purpose of which is to give a short "main point" of the graphic. What do you want the viewer to notice? You should also provide the source for the data, usually via the `caption` argument.
 
 Let's now take a tour of some of the more useful geoms.
+
+### Colour and Fill
+
+Before we take a look at the other useful geoms, let's first talk about colour and fill. These are two arguments we can use to change the colour of geoms we have. 
+
+Let's take a look at this plot below.
+
+```{r}
+ggplot(data = trains, 
+       mapping = aes(x = age, 
+                     y = income,
+                     color = party)) + 
+  geom_point() +
+  labs(title = "Age and Income Among Boston Commuters",
+       subtitle = "Older commuters don't seem to make more money",
+       x = "Age",
+       y = "Income",
+       caption = "Data source: Enos (2014)")
+```
+You'll notice that the plot is the exact same as the plot in the previous section, with one key exception: we've added colours that separate the commuters by party. How did we do this? You'll notice in the `mapping = aes()` function, we've added another argument. This argument, `color = `, can change the colour of the dots by a certain value. In this case, we changed the colour by party.
+
+You can also change the dots to another colour. For instance, take this plot below:
+
+```{r}
+ggplot(data = trains, 
+       mapping = aes(x = age, 
+                     y = income,
+                     color = "steel blue")) + 
+  # for some reason this is always this colour regardless of what i change it to, like steel blue isn't blue?
+  geom_point() +
+  labs(title = "Age and Income Among Boston Commuters",
+       subtitle = "Older commuters don't seem to make more money",
+       x = "Age",
+       y = "Income",
+       caption = "Data source: Enos (2014)")
+```
+By setting the color argument equal to `steelblue`, we could change the dots to blue. R has 657 built-in color names, which you can view if you run the command `grDevices::colors()`. Give it a try in your console! If a colour you want isn't in the 657 inbuilt ones, you can also change the colour with a HEX colour code.
+
+#### Difference Between Fill and Colour
+
+There is another argument you can use, called `fill`. The key difference between fill and colour is that fill defines the colour with which a geom is filled, whereas colour moreso defines the outline of a particular geom. For example:
+
+```{r}
+ggplot(data = trains,
+       mapping = aes(x = race)) +
+  geom_bar(color = "pink")
+```
+You can see here that `color` has only changed the very outline of the bars. Comparatively, if we used `fill`:
+
+```{r}
+ggplot(data = trains,
+       mapping = aes(x = race)) +
+  geom_bar(fill = "pink")
+```
+
+You get pink bars instead. You can change the fill and color of all the geoms we show you below, so happy colouring!
 
 ### `geom_jitter()`
 
@@ -1237,6 +1293,28 @@ There! Within the `theme()` function, we can change the plot title to bold, the 
 
 ## Going further
 
+There are so many more plots you can make with R that we have not shown you yet. For example, you can create cool animations with the *gganimate* package, like this plot below.
+
+```{r, echo = FALSE, cache = TRUE}
+library(gganimate)
+
+gapminder_p <- gapminder %>%
+  filter(continent != "Oceania") %>%
+  ggplot(aes(gdpPercap, lifeExp, color = continent)) +
+    geom_point(show.legend = FALSE, alpha = 0.7) +
+    facet_wrap(~continent, nrow = 1) +
+    scale_size(range = c(2, 12)) +
+    scale_x_log10() +
+    labs(subtitle = "Life Expectancy and GDP per Capita (1952-2007)",
+         x = "GDP per Capita, USD",
+         y = "Life Expectancy, Years") +
+    theme_linedraw() +
+    transition_time(year) +
+    labs(title = "Year: {frame_time}") +
+    shadow_wake(wake_length = 0.1, alpha = FALSE)
+
+gapminder_p
+```
 
 
 ## Summary
