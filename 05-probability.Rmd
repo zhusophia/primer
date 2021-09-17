@@ -1,19 +1,15 @@
 # Probability {#probability}
 
-<!-- We use "spoken aloud" paragraph about \rho twice. That should be fixed. -->
-
 <!-- Should we bring on the topic of population in this chapter. If so, how? -->
 
-<!-- Should we use Preceptor Tables, one for flipping coins, rolling dice and so on. Probably not. Too much! -->
+<!-- Topics we don't currently address in the chapter but which we might add: population, Preceptor Table, Population Table. -->
 
-<!-- Related is the question of Preceptor Tables is how to introduce the Question. We certainly need a question each time because, once we have the model, we have to show readers how to "work with" the distribution, and that requires a question to answer. Revisit this sentence: "All data science problems". -->
+<!-- How do we introduce the Question? We certainly need a question each time because, once we have the model, we have to show readers how to "work with" the distribution, and that requires a question to answer. Revisit this sentence: "All data science problems". -->
 
 
 <!-- If A and B are independent, you can make a draw from the joint distribution of A and B --- p(A, B) --- by first taking a draw from A and combining it with a draw from B. Maybe this means discussing independence in the section of joint distributions? -->
 
 <!-- The way that one does does so, is one draws 4,000 values from them, does some manipulation *row-by_row*, and then, hooray, you have you answer.  -->
-
-<!-- Often, one needs to go backwards. Start with question. How many random variables do you need to know the values of to answer the question? If someone asks you about the tallest of 5 men, then, (obviously?), you need to know the height of the five men. (Would it be useful to connect this to the Preceptor Table?) So, you need to work with 5 random variables and we do that by working with the probability distributions. -- Added>
 
 <!-- You can consider these pdfs to be independent, so you can draw them independently and then --- this is the magic! --- you can treat a row as a draw from their joint distribution. -->
 
@@ -248,7 +244,7 @@ We discuss three types of probability distributions: *empirical*, *mathematical*
 
 The key difference between a *distribution*, as we have explored them in Section \@ref(distributions), and a *probability* distribution is the requirement that the sum of the probabilities of the individual outcomes must be exactly 1. There is no such requirement for a distribution in general. But any distribution can be turned into a probability distribution by "normalizing" it.  In this context, we will often refer to a distribution which is not (yet) a probability distribution as an "unnormalized" distribution.  
 
-Pay attention to notation. Recall that when we are talking about a specific probability (represented by a single value), we will use $\rho$ (the Greek letter "rho" but spoken aloud as "p" by us) with a *subscript* which specifies the exact outcome of which it is the probability. For instance, $\rho_h = 0.5$ denotes the probability of getting heads on a coin toss when the coin is fair. $\rho_t$ --- spoken as "PT" or "P sub T" or "P tails" --- denotes the probability of getting tails on a coin toss. However, when we are referring to the entire probability distribution over a set of outcomes, we will use $P()$. For example, the probability distribution of a coin toss is $P(\text{coin})$. That is, $P(\text{coin})$ is composed of the two specific probabilities (50% and 50%) mapped from the two values in the domain (Heads and Tails). Similarly, $P(\text{sum of two dice})$ is the probability distribution over the set of 11 outcomes (2 through 12) which are possible when you take the sum of two dice. $P(\text{sum of two dice})$ is made up of 11 numbers --- $\rho_2$,  $\rho_3$, ..., $\rho_{12}$ --- each representing the unknown probability that the sum will equal their value. That is, $\rho_2$ is the probability of rolling a 2.
+Pay attention to notation. Recall that when we are talking about a specific probability (represented by a single value), we will use $\rho$ (the Greek letter "rho") with a *subscript* which specifies the exact outcome of which it is the probability. For instance, $\rho_h = 0.5$ denotes the probability of getting heads on a coin toss when the coin is fair. $\rho_t$ --- spoken as "PT" or "P sub T" or "P tails" --- denotes the probability of getting tails on a coin toss. However, when we are referring to the entire probability distribution over a set of outcomes, we will use $P()$. For example, the probability distribution of a coin toss is $P(\text{coin})$. That is, $P(\text{coin})$ is composed of the two specific probabilities (50% and 50%) mapped from the two values in the domain (Heads and Tails). Similarly, $P(\text{sum of two dice})$ is the probability distribution over the set of 11 outcomes (2 through 12) which are possible when you take the sum of two dice. $P(\text{sum of two dice})$ is made up of 11 numbers --- $\rho_2$,  $\rho_3$, ..., $\rho_{12}$ --- each representing the unknown probability that the sum will equal their value. That is, $\rho_2$ is the probability of rolling a 2.
 
 
 
@@ -480,15 +476,12 @@ tibble(results = c(rep(2, 15), rep(3, 15), rep(4, 7),
 
 Someone less suspicious of the casino would have a posterior distribution which looks more like the mathematical distribution.
 
-Recall *Population*, Population is the imaginary urn from which our data has been, or will be, drawn. A perfect probability distribution is simply pour all the data in the population (urn), and count them, however this is impossible because there are infinite or very large number of data out there. For rolling two dice for example, our population is rolling two dice infinite times and calculate the sum for each time. Because it's never possible to get access to all the data, that's why we need the *Mathematical* and the *Empirical* distribution. Yet, the *Posterior * distribution is different because we essenciaially switching to another population(urn) for the data we believe.
-
 ### Presidential elections
 
 Now let's say we are building probability distributions for political events, like a presidential election. We want to know the probability that Democratic candidate wins X electoral votes, where X comes from the range of possible outcomes: 0 to 538. (The total number of electoral votes in US elections since 1964 is 538.)
 
 The *empirical distribution* in this case could involve looking into past elections in the United States and counting the number of electoral votes that the Democrats won in each. For the empirical distribution, we create a tibble with electoral vote results from past elections. Looking at elections since 1964, we can observe that the number of electoral votes that the Democrats received in each one is different. Given that we only have 15 entries, it is difficult to draw conclusions or make predictions based off of this empirical distribution.
 
-However, this model is enough to suggest that the assumptions of the mathematical probability distribution above do not work for electoral votes. The model assumes that the Democrats have a 50% chance of receiving each of the 538 votes. Just looking at the mathematical probability distribution, we can observe that receiving 13 or 17 or 486 votes out of 538 would be extreme and almost impossible under this mathematical model. However, our empirical distribution tells us that those were real election results.
 
 ```{r, echo = FALSE}
 # Votes are since 1964, for Democratic candidate
@@ -543,8 +536,7 @@ ggplot(data = result, aes(total)) +
 
 If our assumptions about this mathematical distribution are correct (they are not), then as the sample size increase, the empirical distribution should look more and more similar to the our mathematical distribution. 
 
-
-We know that campaign platforms, donations, charisma, and many other factors will contribute to a candidate's success. Elections are more complicated than coin tosses. We also know that many presidential elections in history have resulted in much bigger victories or defeats than this distribution seems to allow for.
+However, the data from past elections is more than enough to demonstrate that the assumptions of the mathematical probability distribution above do not work for electoral votes. The model assumes that the Democrats have a 50% chance of receiving each of the 538 votes. Just looking at the mathematical probability distribution, we can observe that receiving 13 or 17 or 486 votes out of 538 would be extreme and almost impossible if the mathematical model were accurate. However, our empirical distribution shows that such extreme outcomes are quite common. Presidential elections have resulted in much bigger victories or defeats than this distribution seems to allow for.
 
 
 The *posterior distribution* of electoral votes is a popular topic, and an area of strong disagreement, among data scientists. Consider this posterior from *FiveThirtyEight*.
@@ -701,31 +693,10 @@ tibble(height = c(rep(170, 2), rep(173, 3), rep(175, 8),
   
 ```
 
-In general when we think about the difference between these three distributions, we can think about the mathematical as completely theoretical, imagine we only have an paper and a pencil, and we were ask to create a model to represent our population,and that model is the *mathematical distributions*. *Empirical distribution* on the other hand is different, empirical distribution is completely based on data, there is no such thing as writing down formula or equation and coming up with a distribution based on that, we come up with *empirical distribution* by analyzing data, you can think of empirical distribution as someone flip a coin 1000 times, and we record the data and creating a graph based on that, and believe that the data we pulled up is representative for the entire population. Last but not least, *Posterior distribution* this graph represents one's belief about certain situation, for example when we think about flipping a coin, our mathematical and empirical results would likely look similar, and if there is no other assumption our posterior should also looks similar, but if were in a casino, and someone tells you that they want to bet 100 bucks on head and you bet 100 bucks on tail, who wins we get's all the money. Now you maybe suspicious, you won't likely to trust this person who is convincing you to bet, now the *posterior distribution* could help you to visualize and quantified your beliefs which is extremely helpful when making decision. 
-
-In short:  
-
-* Mathematical distribution is based on mathematical formula and some basic assumptions  
-* Empirical distribution is based on data, the data could either done by yourself or somebody else.  
-* Posterior distribution is based on belief, the belief is usually shaped by added information about the scenario.   
-
-There is a direct connection between the concept of the population and the concept of a probability distribution. But they are not the same thing! The connection is that the probability distribution --- whether it is empirical, mathematical, or posterior --- is a *description* of the contents of the urn, which is the population.
-
-And Again:
-*Population* is the imaginary urn from which our data has been, or will be, drawn.
-
 
 Comments:
 
-
-```{r, echo = FALSE, fig.cap = "The truth is out there"}
-knitr::include_graphics("05-probability/images/truth_out_there.jpg")
-```
- 
-
-* *The truth is out there.* If we asked all 300+ million Americans whether or not they approve of President Biden, we could know $p$ exactly. Alas, we can't do that. We use a posterior probability distribution to summarize are beliefs about the true value of $p$, a truth we can never confirm.
-
-* *Continuous variables are a myth.* Nothing that can be represented on a computer is [truly continuous](https://cs.stackexchange.com/questions/71648/why-is-data-in-computer-science-considered-to-be-discrete). Even something which appears continuous, like $p$, actually can only take on a (very large) set of discrete variables. In this case, there are approximately 300 million possible true values of $p$, one for each total number of people who approve of President Biden.
+* *Continuous variables are a myth.* Nothing that can be represented on a computer is [truly continuous](https://cs.stackexchange.com/questions/71648/why-is-data-in-computer-science-considered-to-be-discrete). Even something which appears continuous, like height, actually can only take on a (very large) set of discrete variables. 
 
 * The math of continuous probability distributions can be tricky. Read [a book](https://drive.google.com/file/d/1VmkAAGOYCTORq1wxSQqy255qLJjTNvBI/view) on  mathematical probability for all the messy details. Little of that matters in applied work.
 
@@ -735,7 +706,7 @@ knitr::include_graphics("05-probability/images/truth_out_there.jpg")
 
 Don't worry about the distinctions between discrete and continuous outcomes, or between the discrete and continuous probability distributions which we will use to summarize our beliefs about those outcomes. The basic intuition is the same in both cases.
 
-<!-- DK: This section is no longer necessary because we introduce these concepts above. So, move the important stuff up and then delete this. -->
+
 
 
 
@@ -1985,3 +1956,47 @@ If you are keen to learn more about probability, here is a video featuring Profe
 ```{r, echo = FALSE}
 knitr::include_app("https://www.youtube.com/embed/6C7yRBfh2ok")
 ```
+
+
+
+<!-- ```{r, echo = FALSE, fig.cap = "The truth is out there"} -->
+<!-- knitr::include_graphics("05-probability/images/truth_out_there.jpg") -->
+<!-- ``` -->
+
+
+<!-- * *The truth is out there.* The next adult American male we meet will have a height. Right now, we don't know what it is.  -->
+
+
+<!-- Notes from DeGroot Probability and Statistics and from Freund Mathemathical Statistics.  -->
+
+<!-- Not sure how useful these are or how to incorporate them, but wanted to keep them around. -->
+
+<!-- A random variable is a function which generates the value of an unknown variable. -->
+
+<!-- A probability function is a set function which maps outcomes to probabilities. -->
+
+<!-- The value of a random variable is a function of a chance experiment. -->
+
+<!-- Probabilities are values of a set function. -->
+
+<!-- Random variables are capital letters, like X, while real values are small letters, like x. -->
+
+<!-- X = x is the set of elements in the sample space for which the random variable X takes on the vaklue x. -->
+
+<!-- Freund (p. 86): Give a table and then give a formula which creates the table. That formula is the probability distribution of X. Example: -->
+
+<!-- x     P(X = x) -->
+<!-- 2       1/36 -->
+<!-- 3       2/36 -->
+<!-- ...     ... -->
+<!-- 7       6/36 -->
+<!-- ...     ... -->
+<!-- 12      1/36 -->
+
+<!-- An event or experiment os any process wh0se outcome is not known with certainty. -->
+
+<!-- The sample space is all possible outcomes of the event. -->
+
+<!-- DeGroot (p. 97): "Consider an experiment for which the sample space us denoted by S. A real-valued function that is defined on the space S is called a random variable. In other words, in a particular experiment a random variable X would be some function that assigns a real number X(s) to each possible outcome s \subset S. -->
+
+
