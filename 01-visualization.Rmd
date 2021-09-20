@@ -8,11 +8,11 @@ Everyone loves visualizations.
 
 <!-- Take ownership of the Advanced Plots section. Add the tips and tricks in the comments. -->
 
-<!-- Create "Going further" section. It includes some cool plots, without the code for making them (I think) and with a brief (short paragraph) description of the package which is used to make them and references for learning more. One animation. One map. One interactive.  -->
+<!-- Create "Going further" section. It includes some cool plots, without the code for making them (I think) and with a brief (short paragraph) description of the package which is used to make them and references for learning more. One animation. One map. One interactive. DONE -->
 
 <!-- https://github.com/PPBDS/primer/blob/d11aae84a8562caedc94615b8de28f3620af8bf7/01-visualization.Rmd -->
 
-<!-- Do the census and maps tutorials from chapter 3. Consider https://walker-data.com/census-r/ -->
+<!-- Do the census and maps tutorials from chapter 3. Consider https://walker-data.com/census-r/ DONE-->
 
 <!-- Add comments to the code chunks, even if students won't see the comments. For example, initial plot should have a whole bunch of comments about where you got this data and how we can update it in the future.  -->
 
@@ -1334,6 +1334,36 @@ gapminder_plotly <- ggplotly(gapminder_plot)
 
 gapminder_plotly
 ```
+
+You can also create maps from census data, like this plot below.
+
+```{r, echo = FALSE}
+library(tidycensus)
+library(tigris)
+options(tigris_use_cache = TRUE)
+
+# source of map: https://walker-data.com/census-r/mapping-census-data-with-r.html#using-geometry-in-tidycensus
+
+dc_income <- get_acs(
+  geography = "tract", 
+  variables = "B19013_001",
+  state = "DC", 
+  geometry = TRUE)
+
+dc_income_map_p <- ggplot(data = dc_income,
+       mapping = aes(fill = estimate)) +
+  geom_sf() +
+  scale_fill_distiller(palette = "RdPu", 
+                       direction = 1) +
+  theme_void() +
+  labs(title = "Median Household Income by Tract in Washington, DC",
+       fill = "USD ($)",
+       caption = "Data: US Census Data")
+
+dc_income_map_p
+
+```
+
 
 ## Summary
 
