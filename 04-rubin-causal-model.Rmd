@@ -56,8 +56,6 @@ for discussion. I think that something like c("$$13 - \\tau_M$$") could become c
 
 <!-- Rubin (2011, page 288), Discussion of “Towards more accessible conceptions of statistical inferences” by C. J. Wild, M. Pfannkuch, M. Regan and N. J. Horton, Journal of the Royal Statistical Society. Series A (Statistics in Society), Vol. 174, No. 2 (APRIL 2011), pp. 247-295. -->
 
-<!-- SZ: Going back to previous meeting, I still don't really understand the importance of this: Maybe we can mention it in the chapter as well? -->
-
 Have you ever wondered what the world would be like without you?
 
 ```{r, echo = FALSE}
@@ -103,7 +101,6 @@ To estimate average height, we need to estimate Andy's height -- our missing dat
 
 Keep in mind that there is a *truth* out there, a state of the world independent of our knowledge of it. Andy is a specific height. If we had a complete Preceptor Table, with no missing values, we could calculate the average height of the brothers exactly. No fancy statistics would be needed. Just arithmetic.
 
-<!-- SZ: If we wanted to shorten down the amount of text, we can just use one example: either harvard height or brothers, and apply it to the population table as well -->
 
 ### Harvard Height
 
@@ -300,7 +297,7 @@ Causal inference is often compared with prediction.  In prediction, we want to k
 
 These are both missing data problems. Prediction involves estimating an outcome variable that we don't have, and thus is missing, whether because it is in the future or because it is from data that we are unable to collect. Thus, prediction is the term for using statistical inference to fill in missing data for *individual* outcomes. Causal inference, however, is the term for filling in missing data for *numerous* potential outcomes. This is unlike prediction, where only one potential outcome can *ever* be observed, even in principle.  
 
-<!-- SZ: Sounds a lot more confusing than it really is, maybe adding two tables side-by-side to compare would help?  -->
+<!-- SZ: Sounds a lot more confusing than it really is, maybe adding two tables side-by-side to compare would help?  Agreed. Please do this! Very simple case. Table only has one row. Still use Yao example. -->
 
 Key point: In a predictive model, there is only one $Y(u)$ value for each unit. This is very different to the RCM where there are (at least) two potential outcomes (treatment and control). There is only one outcome column in a predictive model, whereas there are two or more in a causal model.
 
@@ -333,6 +330,8 @@ In other words, there needs to be a distinction between $Y_t$ for Yao, and $Y_t$
 Instead of $Y_t$, we will use $Y_t(u)$ to represent "Attitude if Treated." If you want to talk about only Emma, you could say "Emma's Attitude if Treated" or "$Y_t(u = Emma)$" or "the $Y_t(u)$ for Emma", but not just $Y_t$. That notation is too ambiguous when there is more than one subject.
 
 Let's look at a Preceptor Table with more subjects using our new notation: 
+
+<!-- DK: Do you two table trick. A descriptive table only has one outcome table, labeled Y. -->
 
 ```{r, echo = FALSE}
 # First, we create a tibble with the values we want for the table
@@ -379,7 +378,7 @@ From this Preceptor Table, there are many possible estimands we might be interes
 
 Similar concepts can also be applied to the Population Table, where similar to Preceptor Tables, can contain more than one potential outcome. 
 
-<!-- SZ: Not sure how to expand on this - you can't really calculate the estimand of a population table, can you? -->
+<!-- SZ: Not sure how to expand on this - you can't really calculate the estimand of a population table, can you? Revisit this after reading 6, 7 and 8. -->
 
 <!-- DK: Feel free to add a paragraph about Population Tables. Like: "Population Tables, like Preceptor Tables, can include more than one potential outcome. Otherwise, the structure of such Population Tables is the same as we saw earlier: ... " -->
 
@@ -745,13 +744,12 @@ As we noted before, this is a popular estimand. Why?
 
 Just because the ATE is often a useful estimand doesn't mean that it *always* is. 
 
-<!-- DK: Would be nice if the numbers here were calculated from the actual data, and not hard coded. -->
-<!-- SZ: I mean, we can add back in the spanish trains problem -->
+<!-- The below numbers are now wrong. Replace them with the calculated numbers (+8 and -4) which are derived in the Two values for tau section.  -->
 
 Consider point #3. For example, let's say the treatment effect does vary dependent on sex. For males there is a strong negative effect (-3.5), but for females there is a smaller positive effect (+1). However, the average treatment effect for the whole sample, even if you estimate it correctly, will be a single negative number (-1) -- since the negative effect for males is larger than the positive effect for females.  
 
 
-<!-- DK: Stick in the formula for estimating ATE. -->
+<!-- DK: Stick in the formula for estimating ATE with the assumption of a single tau. Average y for treated - average y for control. Right it however you like.  -->
 
 Estimating the average treatment effect, by calculating $\widehat{ATE}$, is easy.  But is our $\widehat{ATE}$ a good estimate of the actual ATE?  After all, if we knew all the missing values in the Preceptor Table, we could calculate the ATE perfectly.  But those missing values may be wildly different from the observed values.  Consider this Preceptor Table:
 
@@ -784,6 +782,8 @@ tibble(subject = c("Yao", "Emma", "Cassidy", "Tahmid", "Diego"),
 ```
 
 &nbsp;
+
+DK: Are these numbers still right? Not sure!
 
 In this example, there is indeed a constant treatment effect for everyone: $+3$. Note that the *observed* values are all the same, but the unobserved values were such that our estimated ATE, $-1$, is pretty far from the actual ATE, $+3$. If we think we have a reasonable estimate of ATE, using that value as a constant for $\tau$ might be our *best guess*. For more discussion, see more from Matt Blackwell:
 
