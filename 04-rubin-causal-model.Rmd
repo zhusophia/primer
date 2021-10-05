@@ -4,10 +4,11 @@
 library(tidyverse)
 library(gt)
 library(gtsummary)
+library(knitr)
+library(xtable)
+library(kableExtra)
 ```
 
-
-<!-- DK: Read the chapter. Fix all the ugliness and typos and stupidity. Leave lots of comments/questions. Go through all my comments. -->
 
 <!-- Read chapters 6, 7 and 8. Submit PRs to fix any typos or stupidity. Leave comments if you like. -->
 
@@ -35,8 +36,6 @@ https://mpopov.com/blog/2020/05/22/strings-in-r-4.x/
 for discussion. I think that something like c("$$13 - \\tau_M$$") could become c(r"$13 - \tau_M$")
 ->
 
-
-<!-- Stick in the formula for estimating ATE. See DK comment in text. -->
 
 <!-- Replace Sliding Doors in Summary with something from Wonderful Life that references "An angel gets his wings."  Every time a predictive model is interpreted causally, a devil gets his pitchfork. -->
 
@@ -66,6 +65,9 @@ George Bailey, a character from the movie "It's a Wonderful Life," believes that
 
 By showing what the world would have been like without George, we get an idea of the *causal effect* of his life on his town and the people who live there. This chapter explains causation using the framework of *potential outcomes* and the *Rubin Causal Model* (RCM). 
 
+Before we start, it should be mentioned that there are several concepts, such as the Preceptor Table, that you will never see in other textbooks is NOT  - it's an ~exclusive~ concept which will only be touched upon in the Primer. However, this whole chapter ultimately seeks to help you visualize all your data and allow you to figure out whether a question is truly worth pursuing or not.
+
+<!-- Rough - will edit  -->
 
 ## Preceptor Table
 
@@ -333,6 +335,7 @@ Let's look at a Preceptor Table with more subjects using our new notation:
 
 <!-- DK: Do you two table trick. A descriptive table only has one outcome table, labeled Y. -->
 
+
 ```{r, echo = FALSE}
 # First, we create a tibble with the values we want for the table
 
@@ -358,7 +361,7 @@ tibble(subject = c("Yao", "Emma", "Cassidy", "Tahmid", "Diego"),
     cols_align(align = "left", columns = c(subject)) %>%
     fmt_markdown(columns = everything()) %>%
     tab_spanner(label = "Outcomes", c(ytreat, ycontrol))  %>%
-    tab_spanner(label = "Causal Effect", c(ydiff))
+    tab_spanner(label = "Causal Effect", c(ydiff)) 
 ```
 
 &nbsp;
@@ -376,23 +379,51 @@ From this Preceptor Table, there are many possible estimands we might be interes
 
 :::
 
-Similar concepts can also be applied to the Population Table, where similar to Preceptor Tables, can contain more than one potential outcome. 
+Similar concepts can also be applied to the Population Table, where similar to Preceptor Tables, which can also answer several questions that one may be interested in knowing. 
 
-<!-- SZ: Not sure how to expand on this - you can't really calculate the estimand of a population table, can you? Revisit this after reading 6, 7 and 8. -->
+``` {r, echo = FALSE}
+tibble(source = c("Population", "...",  "Data", "Data", 
+                  "...", "Population", "...", 
+                  "Preceptor Table", "...", "Population"),
+       year = c("2010", "...", "2015", "2015", 
+                "...","2018", "...", "2021", "...", "2025"),
+       ID = c("?", "...", "Tao", "Cassidy","...", "?","...","Tao", "...","?"),
+       ytreated = c("?", "...", "5", "-1", "...", "?", "...","13", "...", "?"),
+       ycontroled = c("?", "...", "3", "2", "...", "?", "...","9", "...", "?"),
+       causaleffect = c("?", "...", "+2", "-3", "...", "?", "...","+4", "...", "?")) %>% 
+  
+  gt() %>%
+  tab_header(title = "Population Table") %>% 
+  cols_label(source = md("Source"),
+             year = md("Year"),
+             ID = md("ID"),
+             ytreated = md("$$Y_t(u)$$"), 
+             ycontroled = md("$$Y_c(u)$$"),
+             causaleffect = md("$$Y_t(u) - Y_c(u)$$")) %>%
+  tab_style(cell_borders(sides = "right"),
+            location = cells_body(columns = c(source))) %>%
+  tab_style(style = cell_text(align = "left", v_align = "middle", size = "large"), 
+            locations = cells_column_labels(columns = c(source))) %>%
+  cols_align(align = "center", columns = everything()) %>%
+  cols_align(align = "left", columns = c(source)) %>%
+  fmt_markdown(columns = everything()) %>% 
+  tab_spanner(label = "Outcomes", c(ytreated, ycontroled))  %>%
+  tab_spanner(label = "Causal Effect", c(causaleffect))
+```
 
-<!-- DK: Feel free to add a paragraph about Population Tables. Like: "Population Tables, like Preceptor Tables, can include more than one potential outcome. Otherwise, the structure of such Population Tables is the same as we saw earlier: ... " -->
+For example, we get a much better picture of all our data, as it all combines into one nice looking Population table. We can take a look a past data about Yao, or Cassidy, and their previous outcomes and causal effects. We can also see the rest of the units which fall under our desired population, but we don't have any data about, hence the question makes.
 
+Consider these examples: 
 
-And so on. There are a lot of things one might care about!
+- Difference in potential outcome for one person, eg., the difference between Yao's $Y_t(u)$ values: $-8$
+- Difference in causal effect for on person, for Yao it would be $-2$: $+2- +4$
 
-All of the variables calculated above are examples of estimands we might be interested in. One estimand is important enough that it has its own name: the **average treatment effect**, often abbreviated as **ATE**. The average treatment effect is the mean of all the individual causal effects. Here, the mean is $+1.6$.
+All of the variables calculated in the Preceptor and Population table are examples of estimands we might be interested in. One estimand is important enough that it has its own name: the **average treatment effect**, often abbreviated as **ATE**. The average treatment effect is the mean of all the individual causal effects. Here, the mean is $+1.6$.
 
 What does our real-world Preceptor Table look like?
 
 ```{r, echo = FALSE}
-# First, we create a tibble with the values we want for the table
-
-tibble(subject = c("Yao", "Emma", "Cassidy", "Tahmid", "Diego"),
+causal_table <- tibble(subject = c("Yao", "Emma", "Cassidy", "Tahmid", "Diego"),
        ytreat = c("13", "14", "?", "?", "3"),
        ycontrol = c("?", "?", "6", "12", "?"),
        ydiff = c("?", "?", "?", "?", "?")) %>%
@@ -400,7 +431,48 @@ tibble(subject = c("Yao", "Emma", "Cassidy", "Tahmid", "Diego"),
   # Then, we use the gt function to make it pretty
   
   gt() %>%
-    tab_header(title = "Preceptor Table") %>% 
+    tab_header(title = "Causal Preceptor Table") %>% 
+    cols_move(columns = c(ytreat, ycontrol), after = c(subject)) %>%
+    tab_style(cell_borders(sides = "right"),
+              location = cells_body(columns = c(subject))) %>%
+    tab_style(style = cell_text(align = "left", v_align = "middle", size = "large"), 
+              locations = cells_column_labels(columns = c(subject))) %>%
+    cols_align(align = "center", columns = everything()) %>%
+    cols_align(align = "left", columns = c(subject)) %>%
+    fmt_markdown(columns = everything())  %>%
+    tab_spanner(label = "Outcomes", c(ytreat, ycontrol))  %>%
+    tab_spanner(label = "Causal Effect", c(ydiff))
+
+predictive_table <- tibble(subject = c("Yao", "Emma", "Cassidy", "Tahmid", "Diego"),
+       yall = c("13", "14", "6", "12", "3")) %>% 
+gt() %>%
+    tab_header(title = "Predictive Preceptor Table") %>% 
+    cols_move(columns = c(yall), after = c(subject)) %>%
+    tab_style(cell_borders(sides = "right"),
+              location = cells_body(columns = c(subject))) %>%
+    tab_style(style = cell_text(align = "left", v_align = "middle", size = "large"), 
+              locations = cells_column_labels(columns = c(subject))) %>%
+    cols_align(align = "center", columns = everything()) %>%
+    cols_align(align = "left", columns = c(subject)) %>%
+    fmt_markdown(columns = everything())
+
+```
+
+<!-- SZ: Can't seem to make GT tables appear side by side, can only find working versions for Kable tables. Thoughts?  
+See: https://stackoverflow.com/questions/65835639/arrange-gt-tables-side-by-side-or-in-a-grid-or-table-of-tables -->
+
+```{r, echo = FALSE}
+# First, we create a tibble with the values we want for the table
+
+causal_table <- tibble(subject = c("Yao", "Emma", "Cassidy", "Tahmid", "Diego"),
+       ytreat = c("13", "14", "?", "?", "3"),
+       ycontrol = c("?", "?", "6", "12", "?"),
+       ydiff = c("?", "?", "?", "?", "?")) %>%
+  
+  # Then, we use the gt function to make it pretty
+  
+  gt() %>%
+    tab_header(title = "Causal Preceptor Table") %>% 
     cols_label(subject = md("ID"),
                   ytreat = md("$$Y_t(u)$$"),
                   ycontrol = md("$$Y_c(u)$$"),
@@ -415,6 +487,25 @@ tibble(subject = c("Yao", "Emma", "Cassidy", "Tahmid", "Diego"),
     fmt_markdown(columns = everything())  %>%
     tab_spanner(label = "Outcomes", c(ytreat, ycontrol))  %>%
     tab_spanner(label = "Causal Effect", c(ydiff))
+
+predictive_table <- tibble(subject = c("Yao", "Emma", "Cassidy", "Tahmid", "Diego"),
+       yall = c("13", "14", "6", "12", "3")) %>% 
+gt() %>%
+    tab_header(title = "Predictive Preceptor Table") %>% 
+    cols_label(subject = md("ID"),
+                  yall = md("$$Y_(u)$$")) %>%
+    cols_move(columns = c(yall), after = c(subject)) %>%
+    tab_style(cell_borders(sides = "right"),
+              location = cells_body(columns = c(subject))) %>%
+    tab_style(style = cell_text(align = "left", v_align = "middle", size = "large"), 
+              locations = cells_column_labels(columns = c(subject))) %>%
+    cols_align(align = "center", columns = everything()) %>%
+    cols_align(align = "left", columns = c(subject)) %>%
+    fmt_markdown(columns = everything())
+
+causal_table
+predictive_table
+  
 ```
 
 &nbsp;
@@ -504,7 +595,13 @@ tibble(subject = c("Yao", "Emma", "Cassidy", "Tahmid", "Diego"),
 
 Now we need to find an estimate for $\tau$ in order to fill in the missing values. One approach is to subtract the average of the observed control values from the average of the observed treated values. $$((13 + 14 + 3) / 3) - ((6 + 12) /  2)$$ $$10 - 9 = +1$$
 
-This gives us an estimate of $+1$ for $\tau$. Let's fill in our missing values by adding $\tau$ to the observed values under control and by subtracting $\tau$ from the observed value under treatment like so:
+Or, in other words, we use this formula:
+
+$$$\frac{\Sigma Y_t(u)}{n_t} + \frac{\Sigma Y_c(u)}{n_c} = \widehat{ATE}$$
+
+$\Sigma$ represents the sum of the treated/control values, and n represents the amount of values within the control and treated group.This formula is for something called $\widehat{ATE}$, which we will discuss in more depth in a later section. 
+
+Continuing with the example, calculating the ATE or the causal effect, gives us an estimate of $+1$ for $\tau$. Let's fill in our missing values by adding $\tau$ to the observed values under control and by subtracting $\tau$ from the observed value under treatment like so:
 
 ```{r, echo = FALSE}
 # First, we create a tibble with the values we want for the table
@@ -726,9 +823,9 @@ Can we solve for $\tau_{yao}$? No! That is the *Fundamental Problem of Causal In
 
 ### Average treatment effect
 
-The average treatment effect is the **average** difference in *potential* outcomes between the treated group and the control groups. Because averaging is a linear operator, the average difference is the same as the difference between the averages. The distinction between this estimand and estimands like $\tau$, $\tau_M$ and $\tau_F$, is that, in this case, we do not care about using the average treatment effect to fill in missing values in each row. The average treatment effect is useful because we don't have to assume anything about each individuals' $\tau$, like $\tau_{yao}$, but can still understand something about the average causal effect across the whole population. 
+The average treatment effect (ATE) is the **average** difference in *potential* outcomes between the treated group and the control groups. Because averaging is a linear operator, the average difference is the same as the difference between the averages. The distinction between this estimand and estimands like $\tau$, $\tau_M$ and $\tau_F$, is that, in this case, we do not care about using the average treatment effect to fill in missing values in each row. The average treatment effect is useful because we don't have to assume anything about each individuals' $\tau$, like $\tau_{yao}$, but can still understand something about the average causal effect across the whole population. 
 
-As we did before, the simplest way to estimate the ATE is to take the mean of the treated group ($10$) and the mean of the control group ($9$) and then take the difference in those means ($1$). We'll call this estimate of the average treatment effect, $\widehat{ATE}$, pronounced "ATE-hat."
+As we did before, the simplest way to estimate the ATE is to take the mean of the treated group ($10$) and the mean of the control group ($9$) and then take the difference in those means ($1$). If we use this method to an estimate of the ATE, we'll call it $\widehat{ATE}$, pronounced "ATE-hat."
 
 If we already did this exact same calculation above, why are we talking about it again? Remember that we are unwilling to assume treatment effect is constant in our study population, and we cannot solve for $\tau$ if $\tau$ is different for different individuals. This is where $\widehat{ATE}$ is helpful. 
 
@@ -744,12 +841,8 @@ As we noted before, this is a popular estimand. Why?
 
 Just because the ATE is often a useful estimand doesn't mean that it *always* is. 
 
-<!-- The below numbers are now wrong. Replace them with the calculated numbers (+8 and -4) which are derived in the Two values for tau section.  -->
+Consider point #3. For example, let's say the treatment effect does vary dependent on sex. For males there is a small negative effect (-4), but for females there is a larger positive effect (+8). However, the average treatment effect for the whole sample, even if you estimate it correctly, will be a single negative number (+1) -- since the positive effect for females is larger than the negative effect for males.   
 
-Consider point #3. For example, let's say the treatment effect does vary dependent on sex. For males there is a strong negative effect (-3.5), but for females there is a smaller positive effect (+1). However, the average treatment effect for the whole sample, even if you estimate it correctly, will be a single negative number (-1) -- since the negative effect for males is larger than the positive effect for females.  
-
-
-<!-- DK: Stick in the formula for estimating ATE with the assumption of a single tau. Average y for treated - average y for control. Right it however you like.  -->
 
 Estimating the average treatment effect, by calculating $\widehat{ATE}$, is easy.  But is our $\widehat{ATE}$ a good estimate of the actual ATE?  After all, if we knew all the missing values in the Preceptor Table, we could calculate the ATE perfectly.  But those missing values may be wildly different from the observed values.  Consider this Preceptor Table:
 
@@ -783,9 +876,7 @@ tibble(subject = c("Yao", "Emma", "Cassidy", "Tahmid", "Diego"),
 
 &nbsp;
 
-DK: Are these numbers still right? Not sure!
-
-In this example, there is indeed a constant treatment effect for everyone: $+3$. Note that the *observed* values are all the same, but the unobserved values were such that our estimated ATE, $-1$, is pretty far from the actual ATE, $+3$. If we think we have a reasonable estimate of ATE, using that value as a constant for $\tau$ might be our *best guess*. For more discussion, see more from Matt Blackwell:
+In this example, there is indeed a constant treatment effect for everyone: $+3$. Note that the *observed* values are all the same, but the unobserved values were such that our estimated ATE, $+1$, is pretty far from the actual ATE, $+3$. If we think we have a reasonable estimate of ATE, using that value as a constant for $\tau$ might be our *best guess*. For more discussion, see more from Matt Blackwell:
 
 ```{r echo = FALSE}
 knitr::include_app("https://www.youtube.com/embed/cBYUuD2aVkA")
