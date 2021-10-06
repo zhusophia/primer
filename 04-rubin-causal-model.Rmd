@@ -6,28 +6,22 @@ library(gt)
 library(gtsummary)
 library(knitr)
 library(xtable)
-library(kableExtra)
 ```
 
 
-<!-- Read chapters 6, 7 and 8. Submit PRs to fix any typos or stupidity. Leave comments if you like. -->
+<!-- https://stats.stackexchange.com/questions/3520/can-someone-explain-the-concept-of-exchangeability. Mention this under stability? -->
 
-<!-- https://stats.stackexchange.com/questions/3520/can-someone-explain-the-concept-of-exchangeability -->
-
-<!-- Key changes to come: -->
 
 <!-- Need to emphasize units, variables and (if causal) treatments/outcomes throughout. Every time you mention creating the Preceptor Table, we should mention these three.  When predictive, an outcome like immigration attitude has a single column, where it is the name of the column. When causal, the column names are the name of the treatment, and the value in the column is the outcome variable. An outcome variable in a causal model does not have one column, it has two or more. -->
 
 
 <!-- Rough idea: Organize the set of problems which can plague us into broad categories, united in a similar structure. I *think* that the way to do this is to discuss the missing data mechanisms which can cause trouble.  -->
 
-<!-- You can use information from your data to fill in the missing rows of the Preceptor Table, or at least to make inferences about summary statistics from the Preceptor Table. You don't really need to know everyone's causal effect, if all you care about is the average causal effect. -->
-
 <!-- Complications discuss: What are the broad categories of what can go wrong? Phrase this in terms of correlations between X and missingness. First, if missingness is correlated with the values of unobserved potential outcomes, you are hosed! Second, missingness might be correlated with values of observed outcomes. Third, missingness might be correlated with the values of righthand side variables. Fourth, missingness might be correlated with the values of other variables.   -->
 
+<!-- You can use information from your data to fill in the missing rows of the Preceptor Table, or at least to make inferences about summary statistics from the Preceptor Table. You don't really need to know everyone's causal effect, if all you care about is the average causal effect. -->
+
 <!-- Put the Glossary at the start the summary. -->
-
-
 
 <!-- Clean up the weird text in some of the tables. See this
 
@@ -65,7 +59,7 @@ George Bailey, a character from the movie "It's a Wonderful Life," believes that
 
 By showing what the world would have been like without George, we get an idea of the *causal effect* of his life on his town and the people who live there. This chapter explains causation using the framework of *potential outcomes* and the *Rubin Causal Model* (RCM). 
 
-Before we start, it should be mentioned that there are several concepts, such as the Preceptor Table, that you will never see in other textbooks is NOT  - it's an ~exclusive~ concept which will only be touched upon in the Primer. However, this whole chapter ultimately seeks to help you visualize all your data and allow you to figure out whether a question is truly worth pursuing or not.
+Before we start, it should be mentioned that there are several concepts, such as the Preceptor Table, that you will never see in other textbooks  -- it's an *exclusive* concept which will only be used in the *Primer*. However, this whole chapter ultimately seeks to help you visualize all your data and allow you to figure out whether a question is truly worth pursuing or not.
 
 <!-- Rough - will edit  -->
 
@@ -409,14 +403,14 @@ tibble(source = c("Population", "...",  "Data", "Data",
   tab_spanner(label = "Causal Effect", c(causaleffect))
 ```
 
-For example, we get a much better picture of all our data, as it all combines into one nice looking Population table. We can take a look a past data about Yao, or Cassidy, and their previous outcomes and causal effects. We can also see the rest of the units which fall under our desired population, but we don't have any data about, hence the question makes.
+For example, we get a much better picture of all our data, as it all combines into one nice looking Population Table. We can take a look a past data about Yao, or Cassidy, and their previous outcomes and causal effects. We can also see the rest of the units which fall under our desired population, but we don't have any data about, hence the question makes.
 
 Consider these examples: 
 
 - Difference in potential outcome for one person, eg., the difference between Yao's $Y_t(u)$ values: $-8$
 - Difference in causal effect for on person, for Yao it would be $-2$: $+2- +4$
 
-All of the variables calculated in the Preceptor and Population table are examples of estimands we might be interested in. One estimand is important enough that it has its own name: the **average treatment effect**, often abbreviated as **ATE**. The average treatment effect is the mean of all the individual causal effects. Here, the mean is $+1.6$.
+All of the variables calculated in the Preceptor and Population Tables are examples of estimands we might be interested in. One estimand is important enough that it has its own name: the **average treatment effect**, often abbreviated as **ATE**. The average treatment effect is the mean of all the individual causal effects. Here, the mean is $+1.6$.
 
 What does our real-world Preceptor Table look like?
 
@@ -994,7 +988,7 @@ Indeed, there are an infinite number of possible treatments. This is why it is c
 
 ### Stability
 
-Stability means that the relationship between the columns is the same for three categories of rows: the data, the Preceptor table, and the larger population from which both are drawn. 
+Stability means that the relationship between the columns is the same for three categories of rows: the data, the Preceptor Table, and the larger population from which both are drawn. 
 
 In our height example, it is much easier to assume stability over a greater period of time. Changes in global height occur extremely slowly, so height being stable across a span of 20 years is reasonable to assume. Can we say the same for this example, where we are looking at attitudes on immigration? 
 
@@ -1021,9 +1015,24 @@ Does the train experiment allow us to calculate a causal effect for people who c
 
 Generally: *if there was no chance that a certain type of person would have been in this experiment, we cannot make an assumption for that person*. 
 
-## Assignment mechanism
+### Unconfoundedness
 
-The "assignment mechanism" is the process by which some units received the treatment while the other units got the control. 
+A third assumption we use when working with causal models --- but not with predictive models --- is "unconfoundedness." Whether a unit received treatment or control should be independent of all covariates and all potential outcomes. Such a condition is most easily satisfied via random assignment to treatment or control.  
+
+<!-- Add a paragraph or two about this topic. Maybe the perfect doctor? See https://en.wikipedia.org/wiki/Rubin_causal_model -->
+
+
+<!-- DK: Delete this next section. But mention these topics in the above two sections, including the general idea of "Missing data mechanisms". -->
+
+## Missing data mechanisms
+
+*This section is a draft.*
+
+If we have a Preceptor Table with no missing values, we have it easy. We just calculate the answer. Sadly, Preceptor Tables are (almost) always missing values, they have "missing data." The process by which some data is missing is known as the "missing data mechanism." The are two main missing data mechanisms which are of interest: the *assignment mechanism* and the *sampling mechanism*. The assignment mechanism is the process by which some units receive (or are "assigned") the treatment and some units receive the control. The sampling mechanism is the process by which some units appear in our data and some do not. 
+
+<!-- DK: This section sucks! Delete it all!  -->
+
+
 
 Consider *sampling*. If we are trying to estimate the average attitude towards immigrants in the US, we usually do so by taking a sample. The process by which people enter our sample is called the *sampling mechanism*. If the process by which people enter our sample is related to their attitude, even indirectly, then estimates from our sample will not be good estimates for the population.
 
