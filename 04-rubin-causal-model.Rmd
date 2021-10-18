@@ -1019,7 +1019,68 @@ Generally: *if there was no chance that a certain type of person would have been
 
 A third assumption we use when working with causal models --- but not with predictive models --- is "unconfoundedness." Whether a unit received treatment or control should be independent of all covariates and all potential outcomes. Such a condition is most easily satisfied via random assignment to treatment or control.  
 
-<!-- Add a paragraph or two about this topic. Maybe the perfect doctor? See https://en.wikipedia.org/wiki/Rubin_causal_model -->
+The idea of unconfoundedness can be seen through ‘The Perfect Doctor Experiment.’ Imagine we have this godly doctor who knows how any patient will respond to a certain drug. Using this information, they always assign each patient the best drug to cure their disease. Today, the doctor has just received a new drug ($Y_t(u)$) which should lower someone's blood pressure, and she is responsible for determining whether the drug actually works using an experiment. The information that the Perfect Doctor knows is displayed below. 
+
+```{r, echo = FALSE}
+tibble(subject = c("Yao", "Emma", "Cassidy", "Tahmid", "Diego", "MEAN"),
+       ytreat = c("130", "120", "100", "115", "135", "120"),
+       ycontrol = c("105", "140", "170", "125", "100", "128"),
+       ydiff = c("+25", "-20", "-70", "-10", "35", "-8")) %>%
+  
+  gt() %>%
+    tab_header(title = "Holy Grail of Information") %>% 
+    cols_label(subject = md("ID"),
+                  ytreat = md("$$Y_t(u)$$"),
+                  ycontrol = md("$$Y_c(u)$$"),
+                  ydiff = md("$$Y_t(u) - Y_c(u)$$")) %>%
+    cols_move(columns = c(ytreat, ycontrol), after = c(subject)) %>%
+    tab_style(cell_borders(sides = "right"),
+              location = cells_body(columns = c(subject))) %>%
+    tab_style(style = cell_text(align = "left", v_align = "middle", size = "large"), 
+              locations = cells_column_labels(columns = c(subject))) %>%
+    cols_align(align = "center", columns = everything()) %>%
+    cols_align(align = "left", columns = c(subject)) %>%
+    tab_spanner(label = "Blood Pressure Outcomes", c(ytreat, ycontrol)) %>%
+    tab_spanner(label = "Causal Effect", c(ydiff)) %>%
+    fmt_markdown(columns = everything())
+```
+
+&nbsp;
+
+Let’s say she was bribed to get results that showed that this new drug sucks, so she makes the following treatment assignments. 
+
+&nbsp;
+
+```{r, echo = FALSE}
+tibble(subject = c("Yao", "Emma", "Cassidy", "Tahmid", "Diego", "MEAN"),
+       ytreat = c("?", "120", "100", "115", "?", "111.66"),
+       ycontrol = c("105", "?", "?", "?", "100", "102.5"),
+       ydiff = c("?", "?", "?", "?", "?", "9.16")) %>%
+  
+  # Then, we use the gt function to make it pretty
+  
+  gt() %>%
+    tab_header(title = "Skewed Holy Grail of Information") %>% 
+    cols_label(subject = md("ID"),
+                  ytreat = md("$$Y_t(u)$$"),
+                  ycontrol = md("$$Y_c(u)$$"),
+                  ydiff = md("$$Y_t(u) - Y_c(u)$$")) %>%
+    cols_move(columns = c(ytreat, ycontrol), after = c(subject)) %>%
+    tab_style(cell_borders(sides = "right"),
+              location = cells_body(columns = c(subject))) %>%
+    tab_style(style = cell_text(align = "left", v_align = "middle", size = "large"), 
+              locations = cells_column_labels(columns = c(subject))) %>%
+    cols_align(align = "center", columns = everything()) %>%
+    cols_align(align = "left", columns = c(subject)) %>%
+    tab_spanner(label = "Blood Pressure Outcomes", c(ytreat, ycontrol)) %>%
+    tab_spanner(label = "Causal Effect", c(ydiff)) %>%
+    fmt_markdown(columns = everything())
+```
+
+&nbsp;
+
+The Perfect Doctor ends up producing skewed data, as she filters out all the bad reactions to the drug. Notice how the average causal effect (the difference between means) is significantly distorted. In the biased table, it shows that the control drug produces a better response, but when we look at the table with all the information, it shows that the new drug does better. We can also see how it impacts an individual unit, such as Yao, where The Doctor hides the negative effects of him taking the drug by assigning Yao be a part of the control group. 
+
 
 
 <!-- DK: Delete this next section. But mention these topics in the above two sections, including the general idea of "Missing data mechanisms". -->
