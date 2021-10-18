@@ -1015,7 +1015,7 @@ Does the train experiment allow us to calculate a causal effect for people who c
 
 Generally: *if there was no chance that a certain type of person would have been in this experiment, we cannot make an assumption for that person*.
 
-Additionally, representativeness can also consider whether or not the sample is biased or not. Let's look at it from the lenses of two types of missing data mechanisms: The assignment and sampling mechanism. The sampling mechanism will be talked about in this section, whereas the assignment mechanism will be discussed in the next section. 
+Additionally, representativeness can also consider whether or not the sample is biased or not. Let's look at it from the lenses of missing data mechanisms. If we have a Preceptor Table with no missing values, we have it easy. We just calculate the answer. Sadly, Preceptor Tables are (almost) always missing values, resulting in "missing data." The process by which some data is missing is known as the "missing data mechanism." The are two main missing data mechanisms which are of interest: the *assignment mechanism* and the *sampling mechanism*. The assignment mechanism is the process by which some units receive (or are "assigned") the treatment and some units receive the control. The sampling mechanism is the process by which some units appear in our data and some do not. The sampling mechanism will be talked about in this section, whereas the assignment mechanism will be discussed in the next section. 
 
 You can not just select healthy people for a drug trial, as that might lead to an incorrect conclusion on whether or not the drug is valuable. For example, the study might conclude that they got healthier because the drug was valuable. In reality, maybe they only got better because they were already healthy to begin with. Or, perhaps the drug actually is valuable, but the study might be considered null since they only used healthy people. I suppose we can conclude there isn't a right or wrong in representativeness, we just need to discuss and consider all sides when conducting our experiment. 
 
@@ -1096,98 +1096,9 @@ Unconfoundedness can also be seen if:
 
 Now that we’ve established that unconfoundedness sucks, let’s discuss how we can prevent it. All we have to do is ensure that covariants and potential outcomes don’t affect the assignment mechanism. Sounds easy! 
 
-The only way we actually care about is randomization, where you randomly assign control and treatment groups. Flip a coin, draw sticks, whatever. As long as you use randomization as your assignment mechanism, you’re good. There is the possibility that you can’t use pure randomization due to ethical or practical reasons, so we are forced to use non-random assignment mechanisms. This does result in skewed results, but it is encouraged that you use as much randomization as possible. 
+The only way we actually care about is randomization, where you randomly assign control and treatment groups. Flip a coin, draw sticks, whatever. As long as you use randomization as your assignment mechanism, you’re good. There is the possibility that you can’t use pure randomization due to ethical or practical reasons, so we are forced to use non-random assignment mechanisms. Many statistical methods have been developed for causal inference when there is a non-random assignment mechanism. Those methods, however, are beyond the scope of this book. So, we can pretend they don't exist, and just say "try your best to randomize everything!"
 
-<!-- DK: Delete this next section. But mention these topics in the above two sections, including the general idea of "Missing data mechanisms". -->
-
-## Missing data mechanisms
-
-*This section is a draft.*
-
-If we have a Preceptor Table with no missing values, we have it easy. We just calculate the answer. Sadly, Preceptor Tables are (almost) always missing values, they have "missing data." The process by which some data is missing is known as the "missing data mechanism." The are two main missing data mechanisms which are of interest: the *assignment mechanism* and the *sampling mechanism*. The assignment mechanism is the process by which some units receive (or are "assigned") the treatment and some units receive the control. The sampling mechanism is the process by which some units appear in our data and some do not. 
-
-<!-- DK: This section sucks! Delete it all!  -->
-
-Consider *sampling*. If we are trying to estimate the average attitude towards immigrants in the US, we usually do so by taking a sample. The process by which people enter our sample is called the *sampling mechanism*. If the process by which people enter our sample is related to their attitude, even indirectly, then estimates from our sample will not be good estimates for the population.
-
-Whenever the assignment mechanism is correlated with the potential outcomes, we say that there is **confounding**. Confounding is a problem, since it means that our simple estimate of the $ATE$ is, potentially, biased.
-
-Assignment mechanisms can also intentionally be biased in order to manufacture desired outcomes. Let's consider a scenario where once again an entire platform is either treated or a control. In this case the assignment mechanism is the choice of the Spanish-speakers; they are allowed to choose which platform they want to stand on. Let's also say that they can *perfectly* predict the attitude of people on each platform. The Spanish-speakers know that a platform with more liberal attitudes towards immigrants will be more friendly, and therefore always choose to stand on those platforms. In this case, the assignment mechanism of platforms is not random. The Spanish-speakers know these values for the platforms in the experiment: 
-
-```{r, echo = FALSE}
-# First, we create a tibble with the values we want for the table
-
-tibble(subject = c("Platform 1", "Platform 2", "Platform 3", "Platform 4", "Platform 5", "Platform 6"),
-       ytreat = c("14", "7", "5", "13", "4", "13"),
-       ycontrol = c("10", "6", "8", "12", "6", "11"),
-       ydiff = c("+4", "+1", "-3", "+1", "-2", "+2")) %>%
-  
-  # Then, we use the gt function to make it pretty
-  
-  gt() %>%
-    tab_header(title = "Preceptor Table") %>% 
-    cols_label(subject = md("ID"),
-                  ytreat = md("$$Y_t(u)$$"),
-                  ycontrol = md("$$Y_c(u)$$"),
-                  ydiff = md("$$Y_t(u) - Y_c(u)$$")) %>%
-    cols_move(columns = c(ytreat, ycontrol), after = c(subject)) %>%
-    tab_style(cell_borders(sides = "right"),
-              location = cells_body(columns = c(subject))) %>%
-    tab_style(style = cell_text(align = "left", v_align = "middle", size = "large"), 
-              locations = cells_column_labels(columns = c(subject))) %>%
-    cols_align(align = "center", columns = everything()) %>%
-    cols_align(align = "left", columns = c(subject)) %>%
-    tab_spanner(label = "Outcomes", c(ytreat, ycontrol)) %>%
-    tab_spanner(label = "Causal Effect", c(ydiff))
-```
-
-&nbsp;
-
-Based on this knowledge the Spanish-speakers in the experiment would choose the following treatment assignments: 
-
-```{r, echo = FALSE}
-# First, we create a tibble with the values we want for the table
-
-tibble(subject = c("Platform 1", "Platform 2", "Platform 3", "Platform 4", "Platform 5", "Platform 6"),
-       ytreat = c("?", "7", "5", "?", "4", "?"),
-       ycontrol = c("10", "?", "?", "12", "?", "11"),
-       ydiff = c("?", "?", "?", "?", "?", "?")) %>%
-  
-  # Then, we use the gt function to make it pretty
-  
-  gt() %>%
-    tab_header(title = "Preceptor Table") %>% 
-    cols_label(subject = md("ID"),
-                  ytreat = md("$$Y_t(u)$$"),
-                  ycontrol = md("$$Y_c(u)$$"),
-                  ydiff = md("$$Y_t(u) - Y_c(u)$$")) %>%
-    cols_move(columns = c(ytreat, ycontrol), after = c(subject)) %>%
-    tab_style(cell_borders(sides = "right"),
-              location = cells_body(columns = c(subject))) %>%
-    tab_style(style = cell_text(align = "left", v_align = "middle", size = "large"), 
-              locations = cells_column_labels(columns = c(subject))) %>%
-    cols_align(align = "center", columns = everything()) %>%
-    cols_align(align = "left", columns = c(subject)) %>%
-    tab_spanner(label = "Outcomes", c(ytreat, ycontrol)) %>%
-    tab_spanner(label = "Causal Effect", c(ydiff)) 
-```
-
-&nbsp;
-
-The assignment mechanism used distorts the averages of both $Y_t(u)$ and $Y_c(u)$, which in turn distorts the difference in means. The average of the treated group is shifted lower (more liberal), while the average of the control group is shifted higher (more conservative). 
-
-This is an extreme example of a problem called **selection bias**. Selection bias is when the person who is assigning treatment chooses on the basis of potential outcomes. The Spanish-speakers are not choosing platforms to stand on randomly. Rather, they are making treatment decisions based directly on the potential outcomes of each platform. Remember, whenever the assignment mechanism is correlated with the potential outcomes there is confounding, which is a problem because it means that our estimate is biased. Not all examples of confounding are caused by selection bias, but when there is selection bias there is *always* confounding.
-
-Much like how the best way to avoid making poor inferences from a sample to a population is to take a random sample of the population, the best assignment mechanism for avoiding confounding is **randomization**. For each platform we could flip a coin to determine if it is in the treatment or control group.
-
-Random assignment guarantees that, on average, there is no correlation between treatment assignment and anything else, neither covariates nor potential outcomes. 
-
-In many circumstances, however, randomized trials are not possible due to ethical or practical concerns. In such scenarios there is by necessity a non-random assignment mechanism.
-
-For example, let's say some of the train platforms in the experiment are so loud the Spanish-speakers might not be heard by anyone nearby. Therefore by necessity, only quieter platforms can be assigned to the treatment group. This non-random assignment may introduce confounding. Say there is some systematic difference between the people on quieter platforms compared with the people on the louder platforms. In that case, the assignment mechanism is correlated with potential outcomes, so there is confounding. 
-
-Many statistical methods have been developed for causal inference when there is a non-random assignment mechanism. Those methods, however, are beyond the scope of this book.
-
+<!-- DK: Delete this next section. But mention these topics in the above two sections, including the general idea of "Missing data mechanisms". sz: yup -->
 
 ## Summary
 
